@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true
+    },
+    "files": [
+        "typings/index.d.ts",
+        "server.ts",
+        "types.ts",
+        "routes/index.ts"
+    ]
+} 
