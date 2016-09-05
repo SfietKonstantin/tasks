@@ -9,6 +9,9 @@
         "typings/index.d.ts",
         "server.ts",
         "types.ts",
-        "routes/index.ts"
+        "idataprovider.ts",
+        "data.ts",
+        "routes/index.ts",
+        "routes/api.ts"
     ]
 } 

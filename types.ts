@@ -17,10 +17,13 @@ export class Impact {
   task_id: number
   name: string
   description: string
+  duration: number
 }
 
 export class TaskNode {
   parent: TaskNode
   children: Array<TaskNode>
+  start_date: Date
+  duration: number
   task: Task
 }

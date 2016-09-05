@@ -4,6 +4,8 @@ import * as path from "path"
 import * as logger from "morgan"
 import * as http from "http"
 import * as routes from "./routes/index"
+import { Api } from "./routes/api"
+import { BasicDataProvider } from "./data"
 
 class HttpError extends Error {
   constructor(status: number, message: string) {
@@ -16,10 +18,13 @@ class HttpError extends Error {
 export class Server {
   private app: express.Application
   private server: http.Server
+  private api: Api
 
   public constructor() {
+    this.api = new Api(new BasicDataProvider())
     this.app = express()
-    this.app.set('views', path.join(__dirname, 'views'))
+    this.app.set('view engine', 'ejs');
+    // this.app.set('views', path.join(__dirname, 'views'))
 
     // uncomment after placing your favicon in /public
     //this.app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
@@ -29,6 +34,10 @@ export class Server {
     this.app.use(express.static(path.join(__dirname, 'public')))
 
     this.app.get('/', routes.index)
+    this.app.get('/api/project/list', this.api.getProjectList.bind(this.api))
+    this.app.get('/api/project/:id', this.api.getProject.bind(this.api))
+    this.app.get('/api/project/:id/task/list', this.api.getProjectTaskList.bind(this.api))
+    this.app.get('/api/task/:id', this.api.getTask.bind(this.api))
 
     this.app.use(this.errorHandler)
     this.registerErrorHandlers()
