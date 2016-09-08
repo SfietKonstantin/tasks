@@ -1,0 +1,100 @@
+<%- include('header') -%>
+
+<div class="page-header navbar-default">
+    <div class="container-fluid">
+        <ol class="breadcrumb">
+            <li><a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
+            <li><a href="/project/<%= project.id %>"><%= project.name %></a></li>
+            <li class="active">Task #<%= task.id %></li>
+        </ol>
+        <h1><%= task.name %></h1>
+    </div>
+</div>
+<div id="content" class="container-fluid"></div>
+    <div id="main" class="col-sm-9 col-md-10 main">
+        <h2>Overview</h2>
+    </div>
+
+    <div id="sidebar" class="col-sm-3 col-md-2 sidebar">
+        <h2>Tags</h2>
+    </div>
+
+
+<!--
+    <script type="text/babel">
+        var CommentBox = React.createClass({
+            getInitialState: function() {
+                return {data: []};
+            },
+                componentDidMount: function() {
+                $.ajax({
+                    url: this.props.url,
+                    dataType: 'json',
+                    cache: false,
+                    success: function(data) {
+                        this.setState({data: data.tasks});
+                    }.bind(this),
+                    error: function(xhr, status, err) {
+                        console.error(this.props.url, status, err.toString());
+                    }.bind(this)
+                });
+            },
+            render: function() {
+                return (
+                    <div className="commentBox">
+                        <h1>Comments</h1>
+                        <CommentList data={this.state.data} />
+                        <CommentForm />
+                    </div>
+                );
+            }
+        });
+
+        var CommentList = React.createClass({
+            render: function() {
+                var commentNodes = this.props.data.map(function(project) {
+                    return (
+                        <Comment author={project.name} key={project.id}>
+                            {project.description}
+                        </Comment>
+                    );
+                });
+                return (
+                    <div className="commentList">
+                        {commentNodes}
+                    </div>
+                );
+            }
+        });
+
+        var CommentForm = React.createClass({
+            render: function() {
+                return (
+                    <div className="commentForm">
+                        Hello, world! I am a CommentForm.
+                    </div>
+                );
+            }
+        });
+
+        var Comment = React.createClass({
+            render: function() {
+                return (
+                    <div className="comment">
+                        <h2 className="commentAuthor">
+                            {this.props.author}
+                        </h2>
+                        {this.props.children}
+                    </div>
+                );
+            }
+        });
+
+        ReactDOM.render(
+        <CommentBox url="/api/project/1/task/list" />,
+            document.getElementById('content')
+        );
+    </script>
+-->
+
+<%- include('footer') -%>

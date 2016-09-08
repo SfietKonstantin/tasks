@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "target": "es6",
         "module": "commonjs",
         "noImplicitAny": true,
         "removeComments": true,
@@ -11,7 +12,8 @@
         "types.ts",
         "idataprovider.ts",
         "data.ts",
-        "routes/index.ts",
-        "routes/api.ts"
+        "graph.ts",
+        "routes/api.ts",
+        "test/tst_graph.ts"
     ]
 } 

@@ -9,6 +9,7 @@ class RequestError {
 }
 
 export class Api {
+    private dataProvider : IDataProvider
     constructor(dataProvider: IDataProvider)
     {
         this.dataProvider = dataProvider
@@ -18,7 +19,7 @@ export class Api {
         res.json({projects: projects})
     }
     getProject(req: express.Request, res: express.Response) {
-        let id: number = req.params.id
+        let id: number = Number(req.params.id)
         let project = this.dataProvider.getProject(id)
         if (project == null) {
             let error = new RequestError("This project do not exists")
@@ -28,7 +29,7 @@ export class Api {
         }
     }
     getProjectTaskList(req: express.Request, res: express.Response) {
-        let id: number = req.params.id
+        let id: number = Number(req.params.id)
         let project = this.dataProvider.getProject(id)
         if (project == null) {
             let error = new RequestError("This project do not exists")
@@ -39,20 +40,19 @@ export class Api {
         }
     }
     getTask(req: express.Request, res: express.Response) {
-        let id: number = req.params.id
-        let task = this.dataProvider.getTask(id)
-        if (task == null) {
+        let id: number = Number(req.params.id)
+        let node = this.dataProvider.getNode(id)
+        if (node == null) {
             let error = new RequestError("This task do not exists")
             res.status(404).json(error)
         } else {
-            let project = this.dataProvider.getProject(task.project_id)
+            let project = this.dataProvider.getProject(node.task.projectId)
             if (project == null) {
                 let error = new RequestError("This task is not attached to an existing project")
                 res.status(500).json(error)
             } else {
-                res.json({project: project, task: task})
+                res.json({project: project, task: node})
             }
         }
     }
-    private dataProvider : IDataProvider
 }
