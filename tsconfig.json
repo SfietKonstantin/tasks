@@ -9,11 +9,13 @@
     "files": [
         "typings/index.d.ts",
         "server.ts",
-        "types.ts",
-        "idataprovider.ts",
-        "data.ts",
-        "graph.ts",
+        "core/types.ts",
+        "core/testdata.ts",
+        "core/data/idataprovider.ts",
+        "core/data/redisdataprovider.ts",
+        "core/graph/graph.ts",
         "routes/api.ts",
-        "test/tst_graph.ts"
+        "test/tst_graph.ts",
+        "test/tst_redis.ts"
     ]
 } 

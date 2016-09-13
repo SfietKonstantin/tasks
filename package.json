@@ -7,10 +7,13 @@
     "test": "mocha --reporter spec"
   },
   "dependencies": {
+    "async": "^2.0.1",
+    "bluebird": "^3.4.6",
     "body-parser": "~1.15.1",
-    "express": "~4.13.4",
     "ejs": "~2.5.0",
+    "express": "~4.13.4",
     "morgan": "~1.7.0",
+    "redis": "^2.6.2",
     "serve-favicon": "~2.3.0"
   },
   "devDependencies": {

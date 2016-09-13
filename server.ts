@@ -5,8 +5,9 @@ import * as logger from "morgan"
 import * as http from "http"
 import { Api } from "./routes/api"
 import { Routes } from "./routes/routes"
-import { IDataProvider } from "./idataprovider"
-import { BasicDataProvider } from "./data"
+import { IDataProvider } from "./core/data/idataprovider"
+import { RedisDataProvider } from "./core/data/redisdataprovider"
+import * as testdata from "./core/testdata"
 
 class HttpError extends Error {
     constructor(status: number, message: string) {
@@ -24,7 +25,9 @@ export class Server {
     private routes: Routes
 
     public constructor() {
-        this.dataProvider = new BasicDataProvider() 
+        this.dataProvider = new RedisDataProvider(RedisDataProvider.getDefaultClient())
+        testdata.fillTestData(this.dataProvider)
+
         this.api = new Api(this.dataProvider)
         this.routes = new Routes(this.dataProvider)
         this.app = express()
@@ -40,9 +43,9 @@ export class Server {
 
         this.app.get('/', this.routes.index.bind(this.routes))
         this.app.get('/task/:id', this.routes.getTask.bind(this.routes))
-        this.app.get('/api/project/list', this.api.getProjectList.bind(this.api))
+        this.app.get('/api/project/list', this.api.getProjects.bind(this.api))
         this.app.get('/api/project/:id', this.api.getProject.bind(this.api))
-        this.app.get('/api/project/:id/task/list', this.api.getProjectTaskList.bind(this.api))
+        this.app.get('/api/project/:id/task/list', this.api.getProjectTasks.bind(this.api))
         this.app.get('/api/task/:id', this.api.getTask.bind(this.api))
 
         this.app.use(this.errorHandler)

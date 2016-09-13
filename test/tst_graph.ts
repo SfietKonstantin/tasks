@@ -1,6 +1,6 @@
 import * as chai from "chai"
-import { Task } from "../types"
-import { TaskNode } from "../graph"
+import { Task } from "../core/types"
+import { TaskNode } from "../core/graph/graph"
 
 describe("Graph", () => {
     describe("Simple compute test", () => {

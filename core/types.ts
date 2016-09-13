@@ -23,16 +23,19 @@ export class Task {
     }
 }
 
-export class Impact {
-    id: number
-    taskId: number
-    name: string
-    description: string
+export class TaskComputedData {
+    task: Task
     startDate: Date
     duration: number
+}
 
-    constructor(id: number, taskId: number) {
+export class Impact {
+    id: number
+    name: string
+    description: string
+    duration: number
+
+    constructor(id: number) {
         this.id = id
-        this.taskId = taskId
     }
 }
