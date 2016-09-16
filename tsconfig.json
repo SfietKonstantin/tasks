@@ -16,6 +16,6 @@
         "core/graph/graph.ts",
         "routes/api.ts",
         "test/tst_graph.ts",
-        "test/tst_redis.ts"
+        "test/tst_redis_project.ts"
     ]
 } 

@@ -1,4 +1,4 @@
-import { IDataProvider, FieldNotFoundError } from "./idataprovider"
+import { IDataProvider, ProjectNotFoundError, TaskNotFoundError, ImpactNotFoundError } from "./idataprovider"
 import { Project, Task, Impact } from "../types"
 import * as redis from "redis"
 import * as async from "async"
@@ -14,18 +14,12 @@ declare module 'redis' {
         incrAsync(...args: any[]): Promise<any>;
         saddAsync(...args: any[]): Promise<any>;
         smembersAsync(...args: any[]): Promise<any>;
+        hmsetAsync(...args: any[]): Promise<any>;
         hgetallAsync(...args: any[]): Promise<any>;
         existsAsync(...args: any[]): Promise<number>;
     }
     export interface Multi {
         execAsync(): Promise<any>;
-    }
-}
-
-class DataBaseError {
-    message: string
-    constructor(message: string) {
-        this.message = message
     }
 }
 
@@ -45,10 +39,10 @@ class RedisTask {
         let redisTask = new RedisTask(task)
         let id = task.id
         return client.multi().hmset("task:" + id, redisTask)
-                            .mset("task:" + id + ":estimatedStartDate", task.estimatedStartDate.getTime(),
-                                "task:" + id + ":estimatedDuration", task.estimatedDuration)
-                            .sadd("project:" + task.projectId + ":tasks", id)
-                            .execAsync().then((result: any) => {})
+                             .mset("task:" + id + ":estimatedStartDate", task.estimatedStartDate.getTime(),
+                                   "task:" + id + ":estimatedDuration", task.estimatedDuration)
+                             .sadd("project:" + task.projectId + ":tasks", id)
+                             .execAsync().then((result: any) => {})
         
     }
     static load(id: number, client: redis.RedisClient) : Promise<Task> {
@@ -108,19 +102,20 @@ export class RedisDataProvider implements IDataProvider {
     }
     getAllProjects() : Promise<Array<Project>> {
         return this.client.smembersAsync("project:ids").then((ids: Array<String>) => {
-            return this.getProjects(ids.map(RedisDataProvider.indexFromString)
-                                       .sort(RedisDataProvider.compareNumbers))
-        })
-    }
-    getProjects(ids: Array<number>) : Promise<Array<Project>> {
-        return new Promise<Array<Project>>((resolve, reject) => {
-            async.map(ids, this.getMappedProject.bind(this), (error: Error, result: Array<Project>) => {
-                if (error) {
-                    reject(error)
-                } else {
-                    resolve(result)
-                }
+            let sortedIds = ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
+            return new Promise<Array<Project>>((resolve, reject) => {
+                async.map(ids, this.getMappedProject.bind(this), (error: Error, result: Array<Project>) => {
+                    if (error) {
+                        reject(error)
+                    } else {
+                        resolve(result)
+                    }
+                })
+            }).then((projects: Array<Project>) => {
+                return projects.filter((project: Project) => { return !!project })
             })
+        }).catch((error: Error) => {
+            return []
         })
     }
     getProject(id: number) : Promise<Project> {
@@ -136,8 +131,7 @@ export class RedisDataProvider implements IDataProvider {
     addProject(project: Project) : Promise<number> {
         return this.getNextId("project").then((id: number) => {
             project.id = id
-            return this.client.multi().hmset("project:" + id, project)
-                                      .execAsync().then((result: any) => { return id })
+            return this.client.hmsetAsync("project:" + id, project).then((result: any) => { return id })
         })
     }
     setProjectRootTask(projectId: number, taskId: number) : Promise<void> {
@@ -266,11 +260,7 @@ export class RedisDataProvider implements IDataProvider {
         this.getProject(id).then((project: Project) => {
             callback(null, project)
         }).catch((error: Error) => {
-            if (error instanceof FieldNotFoundError) {
-                callback(null, null)
-            } else {
-                callback(error, null)
-            }
+            callback(null, null)
         })
     }
     private getNextId(type: string) : Promise<number> {
@@ -280,21 +270,26 @@ export class RedisDataProvider implements IDataProvider {
             })
         })
     }
-    private exists(type: string, id: number) : Promise<void> {
-        return this.client.existsAsync(type + ":" + id).then((result: number) => {
+    private projectExists(id: number) : Promise<void> {
+        return this.client.existsAsync("project:" + id).then((result: number) => {
             if (result != 1) {
-                throw new FieldNotFoundError(type + " " + id + " not found")
+                throw new ProjectNotFoundError("Project " + id + " not found")
             }
         })
     }
-    private projectExists(id: number) : Promise<void> {
-        return this.exists("project", id)
-    }
     private taskExists(id: number) : Promise<void> {
-        return this.exists("task", id)
+        return this.client.existsAsync("task:" + id).then((result: number) => {
+            if (result != 1) {
+                throw new TaskNotFoundError("Task " + id + " not found")
+            }
+        })
     }
     private impactExists(id: number) : Promise<void> {
-        return this.exists("impact", id)
+        return this.client.existsAsync("impact:" + id).then((result: number) => {
+            if (result != 1) {
+                throw new ImpactNotFoundError("Impact " + id + " not found")
+            }
+        })
     }
     private getMappedTask(id: number, callback: (error: Error, task: Task) => void) {
         this.getTask(id).then((task: Task) => {

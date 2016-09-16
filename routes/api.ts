@@ -1,26 +1,12 @@
 import * as express from "express"
 import { Task, Project } from "../core/types"
-import { IDataProvider, FieldNotFoundError } from "../core/data/idataprovider"
+import { IDataProvider, NotFoundError } from "../core/data/idataprovider"
 import { TaskNode } from "../core/graph/graph"
 
 class RequestError {
     message: string
     constructor(message: string) {
         this.message = message
-    }
-}
-
-class ApiTask extends Task {
-    start_date: Date
-    duration: number
-    constructor(node: TaskNode) {
-        super(node.task.id, node.task.projectId)
-        this.name = node.task.name
-        this.description = node.task.description
-        this.estimatedStartDate = node.task.estimatedStartDate
-        this.estimatedDuration = node.task.estimatedDuration
-        this.start_date = node.start_date
-        this.duration = node.duration
     }
 }
 
@@ -42,7 +28,7 @@ export class Api {
         this.dataProvider.getProject(id).then((project: Project) => {
             res.json({projects: project})
         }).catch((error) => {
-            if (error instanceof FieldNotFoundError) {
+            if (error instanceof NotFoundError) {
                 res.status(404).json(error)
             } else {
                 res.status(500).json(error)
@@ -57,7 +43,7 @@ export class Api {
                 res.json({project: project, tasks: tasks})
             })
         }).catch((error: Error) => {
-            if (error instanceof FieldNotFoundError) {
+            if (error instanceof NotFoundError) {
                 res.status(404).json(error)
             } else {
                 res.status(500).json(error)
@@ -71,7 +57,7 @@ export class Api {
                 res.json({project: project, task: task})
             })
         }).catch((error: Error) => {
-            if (error instanceof FieldNotFoundError) {
+            if (error instanceof NotFoundError) {
                 res.status(404).json(error)
             } else {
                 res.status(500).json(error)

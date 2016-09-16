@@ -57,11 +57,23 @@ function fillTasksData(dataProvider: IDataProvider, projectId: number) : Promise
     })
 }
 
+function fillTaskRelations(dataProvider: IDataProvider) : Promise<void> {
+    return dataProvider.setTaskRelation(1, 2).then(() => {
+        return dataProvider.setTaskRelation(1, 3).then(() => {
+            return dataProvider.setTaskRelation(2, 4).then(() => {
+                return dataProvider.setTaskRelation(3, 4)
+            })
+        })
+    })
+}
+
 export function fillTestData(dataProvider: IDataProvider) {
     dataProvider.getAllProjects().then((projects: Array<Project>) => {
         if (projects.length == 0) {
             return fillProjectsData(dataProvider).then((id: number) => {
-                return fillTasksData(dataProvider, id)
+                return fillTasksData(dataProvider, id).then(() => {
+                    return fillTaskRelations(dataProvider)
+                })
             })
         }
     })

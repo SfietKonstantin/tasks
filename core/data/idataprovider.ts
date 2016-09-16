@@ -1,22 +1,43 @@
 import { Project, Task, Impact } from "../types"
+import { TaskNode } from "../graph/graph"
 
-export class FieldNotFoundError {
-    message: string
-    constructor(message: string) {
-        this.message = message
+export class NotFoundError extends Error implements Error {
+    name: string
+    constructor(name: string, message: string) {
+        super(message)
+        this.name = name
     }
 }
 
-export class TransactionError {
+export class ProjectNotFoundError extends NotFoundError {
+    constructor(message: string) {
+        super("ProjectNotFoundError", message)
+    }
+}
+
+export class TaskNotFoundError extends NotFoundError {
+    constructor(message: string) {
+        super("TaskNotFoundError", message)
+    }
+}
+
+export class ImpactNotFoundError extends NotFoundError {
+    constructor(message: string) {
+        super("ImpactNotFoundError", message)
+    }
+}
+
+export class TransactionError implements Error {
+    name: string
     message: string
     constructor(message: string) {
+        this.name = "TransactionError"
         this.message = message
     }
 }
 
 export interface IDataProvider {
     getAllProjects() : Promise<Array<Project>>
-    getProjects(ids: Array<number>) : Promise<Array<Project>>
     getProject(id: number) : Promise<Project>
     addProject(project: Project) : Promise<number>
     setProjectRootTask(projectId: number, taskId: number) : Promise<void>
@@ -36,4 +57,6 @@ export interface IDataProvider {
     getImpactedTaskIds(id: number) : Promise<Array<number>>
     addImpact(impact: Impact) : Promise<number>
     setImpactForTask(id: number, taskId: number) : Promise<void>
+
+    // getTree(id: number) : Promise<TaskNode>
 } 
