@@ -1,7 +1,7 @@
 import * as express from "express"
 import { Task, Project } from "../core/types"
 import { IDataProvider, NotFoundError } from "../core/data/idataprovider"
-import { TaskNode } from "../core/graph/graph"
+import { TaskNode } from "../core/graph/types"
 
 class RequestError {
     message: string

@@ -1,8 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
-import * as async from "async"
 import * as bluebird from "bluebird"
-import { Project, Task, Impact } from "../core/types"
+import { Project, Task } from "../core/types"
 import { ProjectNotFoundError, TaskNotFoundError } from "../core/data/idataprovider"
 import { RedisDataProvider } from "../core/data/redisdataprovider"
 
@@ -14,7 +13,6 @@ declare module 'redis' {
         delAsync(...args: any[]): Promise<any>;
         hmsetAsync(...args: any[]): Promise<any>;
         hdelAsync(...args: any[]): Promise<any>;
-        flushdbAsync(...args: any[]): Promise<number>;
     }
 }
 
@@ -45,16 +43,16 @@ describe("Redis", () => {
             project2.name = "Project 2"
             project2.description = "Description 2"
 
-            async.mapSeries([project1, project2], (project: Project, callback: (error: Error, id: number) => void) => {
-                db.addProject(project).then((id: number) => {
-                    callback(null, id)
-                }).catch((error: Error) => {
-                    callback(error, null)
-                })
-            }, (error: Error, result: Array<number>) => {
-                chai.expect(result).to.length(2)
-                chai.expect(result[0]).to.equals(1)
-                chai.expect(result[1]).to.equals(2)
+            db.addProject(project1).then((result: number) => {
+                chai.expect(project1.id).to.equals(1)
+                chai.expect(result).to.equals(1)
+            }).then(() => {
+                return db.addProject(project2)
+            }).then((result: number) => {
+                chai.expect(project2.id).to.equals(2)
+                chai.expect(result).to.equals(2)
+                done()
+            }).catch((error: Error) => {
                 done(error)
             })
         })
@@ -108,9 +106,9 @@ describe("Redis", () => {
         })
         it("Should corrupt project id properties", (done) => {
             client.delAsync("project:ids").then((result) => {
-                return client.setAsync("project:ids", "test").then((result) => {
-                    done()
-                })
+                client.setAsync("project:ids", "test")
+            }).then((result) => {
+                done()
             }).catch((error) => {
                 done(error)
             })
@@ -129,7 +127,7 @@ describe("Redis", () => {
     })
     describe("getProject", () => {
         it("Should add some testing data", (done) => {
-            let project1 = new Project(null)
+let project1 = new Project(null)
             project1.name = "Project 1"
             project1.description = "Description 1"
 
@@ -137,18 +135,21 @@ describe("Redis", () => {
             project2.name = "Project 2"
             project2.description = "Description 2"
 
-            async.mapSeries([project1, project2], (project: Project, callback: (error: Error, id: number) => void) => {
-                db.addProject(project).then((id: number) => {
-                    callback(null, id)
-                }).catch((error: Error) => {
-                    callback(error, null)
-                })
-            }, (error: Error, result: Array<number>) => {
+            db.addProject(project1).then((result: number) => {
+                chai.expect(project1.id).to.equals(1)
+                chai.expect(result).to.equals(1)
+            }).then(() => {
+                return db.addProject(project2)
+            }).then((result: number) => {
+                chai.expect(project2.id).to.equals(2)
+                chai.expect(result).to.equals(2)
+                done()
+            }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get project", (done) => {
-            db.getProject(1).then((project:Project) => {
+            db.getProject(1).then((project: Project) => {
                 chai.expect(project.id).to.equals(1)
                 chai.expect(project.name).to.equals("Project 1")
                 chai.expect(project.description).to.equals("Description 1")
@@ -173,7 +174,7 @@ describe("Redis", () => {
             })
         })
         it("Should get project", (done) => {
-            db.getProject(1).then((project:Project) => {
+            db.getProject(1).then((project: Project) => {
                 chai.expect(project.id).to.equals(1)
                 chai.expect(project.name).to.null
                 chai.expect(project.description).to.equals("Description 1")
@@ -209,6 +210,7 @@ describe("Redis", () => {
 
             db.addProject(project).then((id: number) => {
                 chai.expect(id).to.equals(1)
+                chai.expect(project.id).to.equal(1)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -240,6 +242,7 @@ describe("Redis", () => {
 
             db.addProject(project).then((id: number) => {
                 chai.expect(id).to.equals(3)
+                chai.expect(project.id).to.equal(3)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -247,9 +250,9 @@ describe("Redis", () => {
         })
         it("Should corrupt project id properties", (done) => {
             client.delAsync("project:ids").then((result) => {
-                return client.setAsync("project:ids", "test").then((result) => {
-                    done()
-                })
+                client.setAsync("project:ids", "test")
+            }).then((result) => {
+                done()
             }).catch((error) => {
                 done(error)
             })
@@ -276,14 +279,17 @@ describe("Redis", () => {
             project.name = "Project"
             project.description = "Description"
 
-            db.addProject(project).then((id: number) => {
-                let task = new Task(null, id)
+            db.addProject(project).then((projectId: number) => {
+                chai.expect(projectId).to.equals(1)
+
+                let task = new Task(null, projectId)
                 task.name = "Task"
                 task.description = "Description"
                 task.estimatedStartDate = new Date(2016, 9, 1)
                 task.estimatedDuration = 30
                 
-                return db.addTask(id, task).then((id: number) => {
+                return db.addTask(projectId, task).then((id: number) => {
+                    chai.expect(id).to.equal(1)
                     done()
                 })
             }).catch((error: Error) => {
@@ -315,9 +321,9 @@ describe("Redis", () => {
         })
         it("Should corrupt project properties", (done) => {
             client.delAsync("project:1:root").then((result) => {
-                return client.hmsetAsync("project:1:root", {"test": "test"}).then((result) => {
-                    done()
-                })
+                return client.hmsetAsync("project:1:root", {"test": "test"})
+            }).then((result) => {
+                done()
             }).catch((error) => {
                 done(error)
             })
@@ -340,6 +346,8 @@ describe("Redis", () => {
             project.description = "Description"
 
             db.addProject(project).then((projectId: number) => {
+                chai.expect(projectId).to.equals(1)
+
                 let task1 = new Task(null, projectId)
                 task1.name = "Task 1"
                 task1.description = "Description"
@@ -351,28 +359,17 @@ describe("Redis", () => {
                 task2.description = "Description"
                 task2.estimatedStartDate = new Date(2016, 9, 15)
                 task2.estimatedDuration = 15
-                
-                return new Promise<void>((resolve, reject) => {
-                    async.mapSeries([task1, task2], (task: Task, callback: (error: Error, id: number) => void) => {
-                        db.addTask(projectId, task).then((id: number) => {
-                            callback(null, id)
-                        }).catch((error: Error) => {
-                            callback(error, null)
-                        })
-                    }, (error: Error, result: Array<number>) => {
-                        chai.expect(result).to.length(2)
-                        chai.expect(result[0]).to.equals(1)
-                        chai.expect(result[1]).to.equals(2)
-                        if (error) {
-                            reject(error)
-                        } else {
-                            resolve()
-                        }
-                    })
+
+                return db.addTask(projectId, task1).then((result: number) => {
+                    chai.expect(result).to.equals(1)
                 }).then(() => {
-                    return db.setProjectRootTask(projectId, 2).then(() => {
-                        done()
-                    })
+                    return db.addTask(projectId, task2)
+                }).then((result: number) => {
+                    chai.expect(result).to.equals(2)
+                }).then(() => {
+                    return db.setProjectRootTask(projectId, 2)
+                }).then(() => {
+                    done()
                 })
             }).catch((error: Error) => {
                 done(error)
@@ -396,9 +393,9 @@ describe("Redis", () => {
         })
         it("Should corrupt project properties", (done) => {
             client.delAsync("project:1:root").then((result) => {
-                return client.hmsetAsync("project:1:root", {"test": "test"}).then((result) => {
-                    done()
-                })
+                return client.hmsetAsync("project:1:root", {"test": "test"})
+            }).then((result) => {
+                done()
             }).catch((error) => {
                 done(error)
             })

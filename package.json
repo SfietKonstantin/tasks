@@ -3,20 +3,26 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build:webpack": "webpack",
+    "build:ts:server": "tsc -p .",
+    "build": "npm run build:ts:server && npm run build:webpack",
     "start": "node ./bin/www",
     "test": "mocha --reporter spec"
   },
   "dependencies": {
-    "async": "^2.0.1",
     "bluebird": "^3.4.6",
     "body-parser": "~1.15.1",
     "ejs": "~2.5.0",
     "express": "~4.13.4",
     "morgan": "~1.7.0",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
     "redis": "^2.6.2",
     "serve-favicon": "~2.3.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0"
+    "chai": "^3.5.0",
+    "ts-loader": "^0.8.2",
+    "typescript": "^2.0.3"
   }
 }

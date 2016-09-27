@@ -1,38 +1,39 @@
-import { Project, Task, Impact } from "../types"
-import { TaskNode } from "../graph/graph"
+import { Project, Task, TaskResults, Impact } from "../types"
 
 export class NotFoundError extends Error implements Error {
     name: string
-    constructor(name: string, message: string) {
+    constructor(message: string) {
         super(message)
-        this.name = name
     }
 }
 
 export class ProjectNotFoundError extends NotFoundError {
     constructor(message: string) {
-        super("ProjectNotFoundError", message)
+        super(message)
     }
 }
 
 export class TaskNotFoundError extends NotFoundError {
     constructor(message: string) {
-        super("TaskNotFoundError", message)
+        super(message)
     }
 }
 
 export class ImpactNotFoundError extends NotFoundError {
     constructor(message: string) {
-        super("ImpactNotFoundError", message)
+        super(message)
     }
 }
 
-export class TransactionError implements Error {
-    name: string
-    message: string
+export class InvalidInputError extends Error implements Error {
     constructor(message: string) {
-        this.name = "TransactionError"
-        this.message = message
+        super(message)
+    }
+}
+
+export class TransactionError extends Error implements Error {
+    constructor(message: string) {
+        super(message)
     }
 }
 
@@ -51,12 +52,14 @@ export interface IDataProvider {
     getParentTaskIds(id: number) : Promise<Array<number>>
     getChildrenTaskIds(id: number) : Promise<Array<number>>
 
+    getTaskResults(id: number) : Promise<TaskResults>
+    setTasksResults(results: Array<TaskResults>) : Promise<void>
+
     getImpacts(ids: Array<number>) : Promise<Array<Impact>>
     getImpact(id: number): Promise<Impact>
     getTaskImpactIds(id: number) : Promise<Array<number>>
     getImpactedTaskIds(id: number) : Promise<Array<number>>
     addImpact(impact: Impact) : Promise<number>
     setImpactForTask(id: number, taskId: number) : Promise<void>
-
-    // getTree(id: number) : Promise<TaskNode>
+    getImpactsValues(ids: Array<number>) : Promise<Array<number>>
 } 

@@ -1,6 +1,5 @@
 import { IDataProvider } from "./data/idataprovider"
 import { Project, Task } from "./types"
-import * as async from "async"
 
 function fillProjectsData(dataProvider: IDataProvider) : Promise<number> {
     let project = new Project(1)
@@ -40,30 +39,17 @@ function fillTasksData(dataProvider: IDataProvider, projectId: number) : Promise
     task4.estimatedDuration = 30
     tasks.push(task4)
 
-    return new Promise<void>((resolve, reject) => {
-        async.map(tasks, (task: Task, callback: (error: Error, id: number) => void) => {
-            dataProvider.addTask(projectId, task).then((id: number) => {
-                callback(null, id)
-            }).catch((error: Error) => {
-                callback(error, null)
-            })
-        }, (error: Error, result: Array<number>) => {
-            if (error) {
-                reject(error)
-            } else {
-                resolve()
-            }
-        })
-    })
+    let mappedTasks = tasks.map((task: Task) => { return dataProvider.addTask(projectId, task) })
+    return Promise.all(mappedTasks).then((ids) => {})
 }
 
 function fillTaskRelations(dataProvider: IDataProvider) : Promise<void> {
     return dataProvider.setTaskRelation(1, 2).then(() => {
-        return dataProvider.setTaskRelation(1, 3).then(() => {
-            return dataProvider.setTaskRelation(2, 4).then(() => {
-                return dataProvider.setTaskRelation(3, 4)
-            })
-        })
+        return dataProvider.setTaskRelation(1, 3)
+    }).then(() => {
+        return dataProvider.setTaskRelation(2, 4)
+    }).then(() => {
+        return dataProvider.setTaskRelation(3, 4)
     })
 }
 
@@ -71,9 +57,9 @@ export function fillTestData(dataProvider: IDataProvider) {
     dataProvider.getAllProjects().then((projects: Array<Project>) => {
         if (projects.length == 0) {
             return fillProjectsData(dataProvider).then((id: number) => {
-                return fillTasksData(dataProvider, id).then(() => {
-                    return fillTaskRelations(dataProvider)
-                })
+                return fillTasksData(dataProvider, id)
+            }).then(() => {
+                return fillTaskRelations(dataProvider)
             })
         }
     })

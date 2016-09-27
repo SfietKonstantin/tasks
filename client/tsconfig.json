@@ -1,0 +1,16 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "outDir": "../public/",
+        "target": "es5",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "jsx": "react"
+    },
+    "files": [
+        "../typings/index.d.ts",
+        "./Hello.tsx",
+        "./index.tsx"
+    ]
+}
+ 

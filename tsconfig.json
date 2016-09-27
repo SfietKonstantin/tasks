@@ -12,10 +12,17 @@
         "core/types.ts",
         "core/testdata.ts",
         "core/data/idataprovider.ts",
+        "core/data/iredisdataprovider.ts",
         "core/data/redisdataprovider.ts",
+        "core/graph/types.ts",
+        "core/graph/igraph.ts",
         "core/graph/graph.ts",
         "routes/api.ts",
         "test/tst_graph.ts",
-        "test/tst_redis_project.ts"
+        "test/tst_redis_project.ts",
+        "test/tst_redis_task.ts",
+        "test/tst_redis_taskresults.ts",
+        "test/tst_redis_impact.ts",
+        "test/tst_graph_persistence.ts"
     ]
 } 

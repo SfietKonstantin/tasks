@@ -23,10 +23,15 @@ export class Task {
     }
 }
 
-export class TaskComputedData {
-    task: Task
+export class TaskResults {
+    taskId: number
     startDate: Date
     duration: number
+    constructor(taskId: number, startDate: Date, duration: number) {
+        this.taskId = taskId
+        this.startDate = startDate
+        this.duration = duration
+    }
 }
 
 export class Impact {
