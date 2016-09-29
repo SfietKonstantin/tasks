@@ -1,7 +1,11 @@
 module.exports = {
-    entry: './client/index.tsx',
+    entry: {
+        client: './client/index.tsx',
+        task: './client/task.tsx'
+    },
     output: {
-        filename: 'public/bundle.js'
+        library: "[name]",
+        filename: 'public/[name].bundle.js'
     },
     resolve: {
         extensions: ['', '.webpack.js', '.web.js', '.tsx', '.js']
@@ -10,5 +14,10 @@ module.exports = {
         loaders: [
             { test: /\.tsx$/, loader: 'ts-loader' }
         ]
+    },
+    externals: {
+        "react": "React",
+        "react-dom": "ReactDOM",
+        "jquery": "jQuery"
     }
 }

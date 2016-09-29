@@ -13,7 +13,9 @@ declare module 'redis' {
         mgetAsync(...args: any[]): Promise<any>;
         msetAsync(...args: any[]): Promise<any>;
         incrAsync(...args: any[]): Promise<any>;
+        sismemberAsync(...args: any[]): Promise<any>;
         saddAsync(...args: any[]): Promise<any>;
+        sremAsync(...args: any[]): Promise<any>;
         smembersAsync(...args: any[]): Promise<any>;
         hmsetAsync(...args: any[]): Promise<any>;
         hgetallAsync(...args: any[]): Promise<any>;
@@ -189,6 +191,22 @@ export class RedisDataProvider implements IRedisDataProvider {
             return this.client.smembersAsync("task:" + id + ":children")
         }).then((ids: Array<string>) => {
             return ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
+        })
+    }
+    isTaskImportant(id: number) : Promise<boolean> {
+        return this.taskExists(id).then(() => {
+            return this.client.sismemberAsync("task:important", id)
+        }).then((result: number) => {
+            return (result != 0)
+        })
+    }
+    setTaskImportant(id: number, important: boolean) : Promise<void> {
+        return this.taskExists(id).then(() => {
+            if (important) {
+                return this.client.saddAsync("task:important", id)
+            } else {
+                return this.client.sremAsync("task:important", id)
+            }
         })
     }
     getTaskResults(id: number) : Promise<TaskResults> {

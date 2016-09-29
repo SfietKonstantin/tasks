@@ -7,7 +7,7 @@ import { Hello } from "./Hello";
 var ajaxSettings = {}
 jQuery.ajax(ajaxSettings)
 
-ReactDOM.render(
-    <Hello compiler="TypeScript" framework="React" />,
-    document.getElementById("example")
-);
+// ReactDOM.render(
+    // <Hello compiler="TypeScript" framework="React" />,
+    // document.getElementById("example")
+// );

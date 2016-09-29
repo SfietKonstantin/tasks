@@ -10,7 +10,8 @@
     "files": [
         "../typings/index.d.ts",
         "./Hello.tsx",
-        "./index.tsx"
+        "./index.tsx",
+        "./task.tsx"
     ]
 }
  

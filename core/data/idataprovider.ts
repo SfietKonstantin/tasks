@@ -51,6 +51,8 @@ export interface IDataProvider {
     setTaskRelation(parentTaskId: number, childTaskId: number) : Promise<void>
     getParentTaskIds(id: number) : Promise<Array<number>>
     getChildrenTaskIds(id: number) : Promise<Array<number>>
+    isTaskImportant(id: number) : Promise<boolean>
+    setTaskImportant(id: number, important: boolean) : Promise<void>
 
     getTaskResults(id: number) : Promise<TaskResults>
     setTasksResults(results: Array<TaskResults>) : Promise<void>

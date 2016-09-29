@@ -64,4 +64,34 @@ export class Api {
             }
         })
     }
+    isTaskImportant(req: express.Request, res: express.Response) {
+        let id: number = Number(req.params.id)
+        let important = this.dataProvider.isTaskImportant(id).then((result: boolean) => {
+            res.json({important: result})
+        }).catch((error: Error) => {
+            if (error instanceof NotFoundError) {
+                res.status(404).json(error)
+            } else {
+                res.status(500).json(error)
+            }
+        })
+    }
+    putTaskImportant(req: express.Request, res: express.Response) {
+       this.setTaskImportant(req, res, true) 
+    }
+    deleteTaskImportant(req: express.Request, res: express.Response) {
+       this.setTaskImportant(req, res, false) 
+    }
+    private setTaskImportant(req: express.Request, res: express.Response, important: boolean) {
+        let id: number = Number(req.params.id)
+        this.dataProvider.setTaskImportant(id, important).then(() => {
+            res.json({important: important})
+        }).catch((error: Error) => {
+            if (error instanceof NotFoundError) {
+                res.status(404).json(error)
+            } else {
+                res.status(500).json(error)
+            }
+        })
+    }
 }
