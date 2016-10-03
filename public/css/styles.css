@@ -1,9 +1,7 @@
-body {
-    padding-top: 30px;
-}
-
 .navbar {
     min-height: 30px;
+    border-radius: 0px;
+    margin-bottom: 0px;
 }
 
 .navbar-brand {
@@ -42,13 +40,55 @@ h2 {
     border-left: 1px solid #eee
 }*/
 
+/* Page header */
 .page-header {
-    padding-bottom: 10px;
+    padding-bottom: 0px;
     margin-top: 0px;
     margin-bottom: 0px;
 }
 
-/* Task header */
-.task-header-tools {
-    float: right
+.page-header-container {
+    padding-top: 20px;
 }
+
+.page-header-nav {
+    margin-top: 10px;
+    border-bottom-width: 0px;
+}
+
+/* Task */
+.task-header-tools {
+    float: right;
+}
+
+.task-overview {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.task-overview-state {
+    font-size: 35px;
+}
+
+.task-overview-progress {
+    margin-top: 20px;
+}
+
+.task-overview-start {
+    text-align: left;
+}
+
+.task-overview-end {
+    text-align: right;
+}
+
+.task-overview-label {
+    font-size: 22px;
+    margin-bottom: 5px;
+}
+
+.task-overview-time {
+    font-size: 20px;
+}
+
+

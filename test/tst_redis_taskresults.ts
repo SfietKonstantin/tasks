@@ -27,23 +27,31 @@ describe("Redis", () => {
     })
     describe("getTaskResults", () => {
         it("Should add some testing data", (done) => {
-            let project = new Project(null)
-            project.name = "Project"
-            project.description = "Description"
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
 
             db.addProject(project).then((projectId: number) => {
                 chai.expect(projectId).to.equals(1)
                 
-                let task = new Task(null, projectId)
-                task.name = "Task"
-                task.description = "Description"
-                task.estimatedStartDate = new Date(2016, 9, 1)
-                task.estimatedDuration = 30
+                const task: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task",
+                    description: "Description",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
                 
                 return db.addTask(projectId, task).then((taskId: number) => {
                     chai.expect(taskId).to.equals(1)
 
-                    return db.setTasksResults([new TaskResults(taskId, new Date(2016, 9, 15), 40)])
+                    let taskResults: Array<TaskResults> = [
+                        {taskId: taskId, startDate: new Date(2016, 9, 15), duration: 40}
+                    ]
+                    return db.setTasksResults(taskResults)
                 }).then(() => {
                     done()
                 })
@@ -119,24 +127,31 @@ describe("Redis", () => {
     })
     describe("setTasksResults", () => {
         it("Should add some testing data", (done) => {
-            let project = new Project(null)
-            project.name = "Project"
-            project.description = "Description"
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
 
             db.addProject(project).then((projectId: number) => {
                 chai.expect(projectId).to.equals(1)
                 
-                let task1 = new Task(null, projectId)
-                task1.name = "Task 1"
-                task1.description = "Description 1"
-                task1.estimatedStartDate = new Date(2016, 9, 1)
-                task1.estimatedDuration = 30
-
-                let task2 = new Task(null, projectId)
-                task2.name = "Task 2"
-                task2.description = "Description 2"
-                task2.estimatedStartDate = new Date(2016, 9, 15)
-                task2.estimatedDuration = 15
+                const task1: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                const task2: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 2",
+                    description: "Description 2",
+                    estimatedStartDate: new Date(2016, 9, 15),
+                    estimatedDuration: 15
+                }
                 
                 return db.addTask(projectId, task1).then((result: number) => {
                     chai.expect(result).to.equals(1)
@@ -151,20 +166,22 @@ describe("Redis", () => {
             })
         })
         it("Should set task results", (done) => {
-            db.setTasksResults([
-                new TaskResults(1, new Date(2016, 9, 15), 40),
-                new TaskResults(2, new Date(2016, 10, 1), 60)
-            ]).then(() => {
+            let taskResults: Array<TaskResults> = [
+                {taskId: 1, startDate: new Date(2016, 9, 15), duration: 40},
+                {taskId: 2, startDate: new Date(2016, 10, 1), duration: 60}
+            ]
+            db.setTasksResults(taskResults).then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get and set task results", (done) => {
-            db.setTasksResults([
-                new TaskResults(2, new Date(2016, 10, 2), 61),
-                new TaskResults(1, new Date(2016, 9, 16), 45)
-            ]).then(() => {
+            let taskResults: Array<TaskResults> = [
+                {taskId: 2, startDate: new Date(2016, 10, 2), duration: 61},
+                {taskId: 1, startDate: new Date(2016, 9, 16), duration: 45}
+            ]
+            db.setTasksResults(taskResults).then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -188,10 +205,11 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.setTasksResults([
-                new TaskResults(2, new Date(2016, 10, 1), 60),
-                new TaskResults(3, new Date(2016, 9, 15), 40)
-            ]).then(() => {
+            let taskResults: Array<TaskResults> = [
+                {taskId: 2, startDate: new Date(2016, 10, 1), duration: 60},
+                {taskId: 3, startDate: new Date(2016, 9, 15), duration: 40}
+            ]
+            db.setTasksResults(taskResults).then(() => {
                 done(new Error("setTasksResults should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
@@ -204,18 +222,21 @@ describe("Redis", () => {
             let otherDb = new RedisDataProvider(otherClient)
 
             db.watchTasksImpacts([1]).then(() => {
-                let impact = new Impact(null)
-                impact.name = "Transactional impact"
-                impact.description = "Transactional impact description"
-                impact.duration = 10
+                let impact: Impact = {
+                    id: null,
+                    name: "Transactional impact",
+                    description: "Transactional impact description",
+                    duration: 10
+                }
                 return otherDb.addImpact(impact)
             }).then((id: number) => {
                 return otherDb.setImpactForTask(id, 1)
             }).then(() => {
-                return db.setTasksResults([
-                    new TaskResults(1, new Date(2016, 9, 16), 45),
-                    new TaskResults(2, new Date(2016, 10, 2), 61)
-                ])
+                let taskResults: Array<TaskResults> = [
+                    {taskId: 1, startDate: new Date(2016, 9, 16), duration: 45},
+                    {taskId: 2, startDate: new Date(2016, 10, 2), duration: 61}
+                ]
+                return db.setTasksResults(taskResults)
             }).then(() => {
                 done(new Error("setTasksResults should not be a success"))
             }).catch((error: Error) => {
@@ -232,18 +253,21 @@ describe("Redis", () => {
             let otherDb = new RedisDataProvider(otherClient)
 
             db.watchTasksImpacts([1]).then(() => {
-                let impact = new Impact(null)
-                impact.name = "Transactional impact"
-                impact.description = "Transactional impact description"
-                impact.duration = 10
+                const impact: Impact = {
+                    id: null,
+                    name: "Transactional impact",
+                    description: "Transactional impact description",
+                    duration: 10
+                }
                 return otherDb.addImpact(impact)
             }).then((id: number) => {
                 return otherDb.setImpactForTask(id, 1)
             }).then(() => {
-                return db.setTasksResults([
-                    new TaskResults(1, new Date(2016, 9, 16), 45),
-                    new TaskResults(2, new Date(2016, 10, 2), 61)
-                ])
+                let taskResults: Array<TaskResults> = [
+                    {taskId: 1, startDate: new Date(2016, 9, 16), duration: 45},
+                    {taskId: 2, startDate: new Date(2016, 10, 2), duration: 61}
+                ]
+                return db.setTasksResults(taskResults)
             }).then(() => {
                 done(new Error("setTasksResults should not be a success"))
             }).catch((error: Error) => {

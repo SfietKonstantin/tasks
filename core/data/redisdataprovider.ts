@@ -40,7 +40,7 @@ class RedisTask {
         this.description = task.description
     }
     static save(task: Task, client: redis.RedisClient) : Promise<number> {
-        let redisTask = new RedisTask(task)
+        const redisTask = new RedisTask(task)
         const id = task.id
         return client.hmsetAsync("task:" + id, redisTask).then(() => {
             return client.multi().mset("task:" + id + ":estimatedStartDate", task.estimatedStartDate.getTime(),
@@ -50,7 +50,14 @@ class RedisTask {
         }).then((result: any) => { return id })
     }
     static load(id: number, client: redis.RedisClient) : Promise<Task> {
-        let task = new Task(+id, null)
+        const task: Task = {
+            id: id, 
+            projectId: null,
+            name: null, 
+            description: null, 
+            estimatedStartDate: null, 
+            estimatedDuration: null
+        }
         return client.hgetallAsync("task:" + id).then((result: any) => {
             task.projectId = result.hasOwnProperty("projectId") ? +(result["projectId"]) : null
             task.name = result.hasOwnProperty("name") ? result["name"] : null
@@ -77,14 +84,19 @@ class RedisImpact {
         this.description = impact.description
     }
     static save(impact: Impact, client: redis.RedisClient) : Promise<number> {
-        let redisImpact = new RedisImpact(impact)
+        const redisImpact = new RedisImpact(impact)
         const id = impact.id
         return client.multi().hmset("impact:" + id, redisImpact)
                              .set("impact:" + id + ":duration", impact.duration)
                              .execAsync().then((result: any) => { return id })
     }
     static load(id: number, client: redis.RedisClient) : Promise<Impact> {
-        let impact = new Impact(+id)
+        const impact: Impact = {
+            id: id,
+            name: null,
+            description: null,
+            duration: null
+        }
         return client.hgetallAsync("impact:" + id).then((result: any) => {
             impact.name = result.hasOwnProperty("name") ? result["name"] : null
             impact.description = result.hasOwnProperty("description") ? result["description"] : null
@@ -119,9 +131,11 @@ export class RedisDataProvider implements IRedisDataProvider {
         return this.projectExists(id).then(() => {
             return this.client.hgetallAsync("project:" + id)
         }).then((result: any) => {
-            let project = new Project(+id)
-            project.name = result.hasOwnProperty("name") ? result["name"] : null
-            project.description = result.hasOwnProperty("description") ? result["description"] : null 
+            const project: Project = {
+                id: id,
+                name: result.hasOwnProperty("name") ? result["name"] : null,
+                description: result.hasOwnProperty("description") ? result["description"] : null
+            }
             return project
         })
     }
@@ -213,9 +227,12 @@ export class RedisDataProvider implements IRedisDataProvider {
         return this.taskExists(id).then(() => {
             return this.client.mgetAsync("task:" + id + ":startDate", "task:" + id + ":duration")
         }).then((results: Array<string>) => {
-            const startDate = results[0] ? new Date(+results[0]) : null
-            const duration = results[1] ? +results[1] : null
-            return new TaskResults(id, startDate, duration)
+            const taskResults: TaskResults = {
+                taskId: id,
+                startDate: results[0] ? new Date(+results[0]) : null,
+                duration: results[1] ? +results[1] : null
+            }
+            return taskResults
         })
     }
     setTasksResults(results: Array<TaskResults>) : Promise<void> {
@@ -275,11 +292,17 @@ export class RedisDataProvider implements IRedisDataProvider {
         })
     }
     getImpactsValues(ids: Array<number>) : Promise<Array<number>> {
-        return this.client.mgetAsync(ids.map((id: number) => { 
-            return "impact:" + id + ":duration"
-        })).then((results: Array<any>) => {
-            return results.map((result) => { return result ? +result : null })
-        })
+        if (ids.length == 0) {
+            return new Promise<Array<number>>((resolve, reject) => {
+                resolve([])
+            })
+        } else {
+            return this.client.mgetAsync(ids.map((id: number) => { 
+                return "impact:" + id + ":duration"
+            })).then((results: Array<any>) => {
+                return results.map((result) => { return result ? +result : null })
+            })
+        }
     }
     watchTasksImpacts(ids: Array<number>) : Promise<void> {
         return this.client.watchAsync(ids.map((id: number) => {

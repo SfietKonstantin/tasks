@@ -9,9 +9,15 @@
     },
     "files": [
         "../typings/index.d.ts",
-        "./Hello.tsx",
-        "./index.tsx",
-        "./task.tsx"
+        "./task.tsx",
+        "./common/header.tsx",
+        "./common/tabs.tsx",
+        "./common/summary.tsx",
+        "./task/headertools.tsx",
+        "./task/breadcrumb.tsx",
+        "./task/header.tsx",
+        "./task/main.tsx",
+        "./task/overview.tsx"
     ]
 }
  

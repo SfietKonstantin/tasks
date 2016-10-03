@@ -1,0 +1,24 @@
+<%- include('header') -%>
+
+<div class="page-header navbar-default">
+    <div class="container page-header-container">
+        <div class="col-xs-11 col-md-8">
+            <h1><%= project.name %> <small>#<%= project.id %></small></h1>
+        </div>
+        <div id="task-header" class="col-xs-1 col-md-4"></div>
+        <div class="col-xs-12 col-md-8">
+            <ol class="breadcrumb">
+                <li><a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
+                <li class="active"><%= project.name %></li>
+            </ol>
+        </div>
+        <div class="col-xs-12 col-md-8">
+            <ul class="task-nav nav nav-tabs">
+                <li role="presentation" class="active"><a href="#">Overview</a></li>
+                <li role="presentation"><a href="#">Tasks</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<%- include('footer') -%>

@@ -1,45 +1,53 @@
 import { IDataProvider } from "./data/idataprovider"
 import { Project, Task } from "./types"
+import * as graph from "./graph/graph"
 
 function fillProjectsData(dataProvider: IDataProvider) : Promise<number> {
-    let project = new Project(1)
-    project.name = "Test project"
-    project.description = "Test project description"
+    const project: Project = {
+        id: 1,
+        name: "Test project",
+        description: "Test project description"
+    }
     return dataProvider.addProject(project)
 }
 
 function fillTasksData(dataProvider: IDataProvider, projectId: number) : Promise<void> {
-    let tasks = new Array<Task>();
+    let tasks: Array<Task> = [
+        {
+            id: null,
+            projectId: null,
+            name: "Root task",
+            description: "Project beginning",
+            estimatedStartDate: new Date(2016, 7, 15),
+            estimatedDuration: 31
+        },
+        {
+            id: null,
+            projectId: null,
+            name: "Long task",
+            description: "Some long task",
+            estimatedStartDate: new Date(2016, 8, 15),
+            estimatedDuration: 60
+        },
+        {
+            id: null,
+            projectId: null,
+            name: "Short task",
+            description: "Some short task",
+            estimatedStartDate: new Date(2016, 8, 15),
+            estimatedDuration: 31
+        },
+        {
+            id: null,
+            projectId: null,
+            name: "Reducing task",
+            description: "Task depending on two tasks",
+            estimatedStartDate: new Date(2016, 10, 16),
+            estimatedDuration: 30
+        }
+    ];
                 
-    let task1 = new Task(null, null)
-    task1.name = "Root task"
-    task1.description = "Project beginning"
-    task1.estimatedStartDate = new Date(2015, 9, 1)
-    task1.estimatedDuration = 31
-    tasks.push(task1)
-
-    let task2 = new Task(null, null)
-    task2.name = "Long task"
-    task2.description = "Some long task"
-    task2.estimatedStartDate = new Date(2015, 10, 1)
-    task2.estimatedDuration = 60
-    tasks.push(task2)
-
-    let task3 = new Task(null, null)
-    task3.name = "Short task"
-    task3.description = "Some short task"
-    task3.estimatedStartDate = new Date(2015, 10, 1)
-    task3.estimatedDuration = 31
-    tasks.push(task3)
-
-    let task4 = new Task(null, null)
-    task4.name = "Reducing task"
-    task4.description = "Task depending on two tasks"
-    task4.estimatedStartDate = new Date(2015, 12, 1)
-    task4.estimatedDuration = 30
-    tasks.push(task4)
-
-    let mappedTasks = tasks.map((task: Task) => { return dataProvider.addTask(projectId, task) })
+    const mappedTasks = tasks.map((task: Task) => { return dataProvider.addTask(projectId, task) })
     return Promise.all(mappedTasks).then((ids) => {})
 }
 
@@ -60,6 +68,14 @@ export function fillTestData(dataProvider: IDataProvider) {
                 return fillTasksData(dataProvider, id)
             }).then(() => {
                 return fillTaskRelations(dataProvider)
+            }).then(() => {
+                const persistance = new graph.GraphPersistence(dataProvider)
+                return persistance.loadGraph(1).then(() => {
+                    return persistance.loadData()
+                }).then(() => {
+                    graph.compute(persistance.root)
+                    return persistance.save()
+                })
             })
         }
     })

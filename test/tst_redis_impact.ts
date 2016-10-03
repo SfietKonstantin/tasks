@@ -27,31 +27,40 @@ describe("Redis", () => {
     })
     describe("getImpacts", () => {
         it("Should add some testing data", (done) => {
-            let project = new Project(null)
-            project.name = "Project"
-            project.description = "Description"
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
 
             db.addProject(project).then((projectId: number) => {
                 chai.expect(projectId).to.equals(1)
                 
-                let task = new Task(null, projectId)
-                task.name = "Task"
-                task.description = "Description"
-                task.estimatedStartDate = new Date(2016, 9, 1)
-                task.estimatedDuration = 30
+                let task: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task",
+                    description: "Description",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
                 
                 return db.addTask(projectId, task).then((taskId: number) => {
                     chai.expect(taskId).to.equals(1)
 
-                    let impact1 = new Impact(null)
-                    impact1.name = "Impact 1"
-                    impact1.description = "Description 1"
-                    impact1.duration = 40
+                    const impact1: Impact = {
+                        id: null,
+                        name: "Impact 1",
+                        description: "Description 1",
+                        duration: 40
+                    }
 
-                    let impact2 = new Impact(null)
-                    impact2.name = "Impact 2"
-                    impact2.description = "Description 2"
-                    impact2.duration = 10
+                    const impact2: Impact = {
+                        id: null,
+                        name: "Impact 2",
+                        description: "Description 2",
+                        duration: 10
+                    }
 
                     return db.addImpact(impact1).then(() => {
                         return db.addImpact(impact2)

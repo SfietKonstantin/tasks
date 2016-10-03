@@ -17,36 +17,47 @@ describe("Graph persistence", () => {
         graph = new GraphPersistence(db)
     })
     it("Should add some testing data", (done) => {
-        let project = new Project(null)
-        project.name = "Project"
-        project.description = "Description"
+        const project: Project = {
+            id: null,
+            name: "Project",
+            description: "Description"
+        }
 
         db.addProject(project).then((projectId: number) => {
-            let task1 = new Task(null, projectId)
-            task1.name = "Root"
-            task1.description = "Root task"
-            task1.estimatedStartDate = new Date(2016, 9, 1)
-            task1.estimatedDuration = 15
+            const task1: Task = {
+                id: null,
+                projectId: projectId,
+                name: "Root",
+                description: "Root task",
+                estimatedStartDate: new Date(2016, 9, 1),
+                estimatedDuration: 15
+            }
+            const task2: Task = {
+                id: null,
+                projectId: projectId,
+                name: "Short task",
+                description: "Short task",
+                estimatedStartDate: new Date(2016, 9, 16),
+                estimatedDuration: 15
+            }
+            const task3: Task = {
+                id: null,
+                projectId: projectId,
+                name: "Long task",
+                description: "Long task",
+                estimatedStartDate: new Date(2016, 9, 16),
+                estimatedDuration: 30
+            }
+            const task4: Task = {
+                id: null,
+                projectId: projectId,
+                name: "Reducing task",
+                description: "Reducing task",
+                estimatedStartDate: new Date(2016, 10, 15),
+                estimatedDuration: 15
+            }
 
-            let task2 = new Task(null, projectId)
-            task2.name = "Short task"
-            task2.description = "Short task"
-            task2.estimatedStartDate = new Date(2016, 9, 16)
-            task2.estimatedDuration = 15
-
-            let task3 = new Task(null, projectId)
-            task3.name = "Long task"
-            task3.description = "Long task"
-            task3.estimatedStartDate = new Date(2016, 9, 16)
-            task3.estimatedDuration = 30
-
-            let task4 = new Task(null, projectId)
-            task4.name = "Reducing task"
-            task4.description = "Reducing task"
-            task4.estimatedStartDate = new Date(2016, 10, 15)
-            task4.estimatedDuration = 15
-
-            let tasks = [task1, task2, task3, task4]
+            const tasks = [task1, task2, task3, task4]
             return Promise.all(tasks.map((task: Task) => {
                 return db.addTask(1, task)
             }))
@@ -56,12 +67,14 @@ describe("Graph persistence", () => {
         }).then(() => {
             return db.setProjectRootTask(1, 1)
         }).then(() => {
-            return db.setTasksResults([
-                new TaskResults(1, new Date(2016, 9, 2), 16),
-                new TaskResults(2, new Date(2016, 9, 18), 15),
-                new TaskResults(3, new Date(2016, 9, 18), 30),
-                new TaskResults(4, new Date(2016, 10, 17), 16)
-            ])
+            let taskResults: Array<TaskResults> = [
+                {taskId: 1, startDate: new Date(2016, 9, 2), duration: 16},
+                {taskId: 2, startDate: new Date(2016, 9, 18), duration: 15},
+                {taskId: 3, startDate: new Date(2016, 9, 18), duration: 30},
+                {taskId: 4, startDate: new Date(2016, 10, 17), duration: 16}
+            ]
+
+            return db.setTasksResults(taskResults)
         }).then(() => {
             done()
         }).catch((error: Error) => {
@@ -129,27 +142,35 @@ describe("Graph persistence", () => {
         })
     })
     it("Should add some testing data", (done) => {
-        let impact1 = new Impact(null)
-        impact1.name = "Impact 1"
-        impact1.description = "Description 1"
-        impact1.duration = 8
+        const impact1: Impact = {
+            id: null,
+            name: "Impact 1",
+            description: "Description 1",
+            duration: 8
+        }
 
-        let impact2_1 = new Impact(null)
-        impact2_1.name = "Impact 2, 1"
-        impact2_1.description = "Description 2, 1"
-        impact2_1.duration = 10
+        const impact2_1: Impact = {
+            id: null,
+            name: "Impact 2, 1",
+            description: "Description 2, 1",
+            duration: 10
+        }
 
-        let impact2_2 = new Impact(null)
-        impact2_2.name = "Impact 2, 2"
-        impact2_2.description = "Description 2, 2"
-        impact2_2.duration = 12
+        const impact2_2: Impact = {
+            id: null,
+            name: "Impact 2, 2",
+            description: "Description 2, 2",
+            duration: 12
+        }
 
-        let impact4 = new Impact(null)
-        impact4.name = "Impact 4"
-        impact4.description = "Description 4"
-        impact4.duration = 15
+        const impact4: Impact = {
+            id: null,
+            name: "Impact 4",
+            description: "Description 4",
+            duration: 15
+        }
 
-        let impacts = [impact1, impact2_1, impact2_2, impact4]
+        const impacts = [impact1, impact2_1, impact2_2, impact4]
         Promise.all(impacts.map(db.addImpact.bind(db))).then(() => {
             chai.expect(impact1.id).to.equals(1)
             chai.expect(impact2_1.id).to.equals(2)

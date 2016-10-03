@@ -10,6 +10,7 @@
         "typings/index.d.ts",
         "server.ts",
         "core/types.ts",
+        "core/apitypes.ts",
         "core/testdata.ts",
         "core/data/idataprovider.ts",
         "core/data/iredisdataprovider.ts",

@@ -11,14 +11,20 @@ export class Routes {
     index(req: express.Request, res: express.Response) {
         res.render('index');
     }
-    getTask(req: express.Request, res: express.Response) {
-        let id: number = Number(req.params.id)
-        this.dataProvider.getTask(id).then((task: Task) => {
-            return this.dataProvider.getProject(task.projectId).then((project: Project) => {
-                res.render('task', {project: project, task: task})
-            })
+    getProject(req: express.Request, res: express.Response) {
+        const id = Number(req.params.id)
+        this.dataProvider.getProject(id).then((project: Project) => {
+            res.render('project', {project: project})
         }).catch((error: Error) => {
             res.render('error')
         })
+    }
+    getTask(req: express.Request, res: express.Response) {
+        const id = +String(req.params.id)
+        if (!Number.isNaN(id)) {
+            res.render('task', {id: id})
+        } else {
+            res.render('error')
+        }
     }
 }

@@ -15,9 +15,9 @@ function buildGraphIndex(root: TaskNode, map: Map<number, TaskNode>): void {
 
 function computeDuration(node: TaskNode) : void {
     node.duration = node.estimatedDuration
-    node.duration += node.impacts.reduce((previous: number, current: number) => {
+    node.duration += Math.max(node.impacts.reduce((previous: number, current: number) => {
         return previous + current
-    }, 0)
+    }, 0), 0)
 }
 
 function defineStartDate(node: TaskNode) : void {
@@ -116,7 +116,12 @@ export class GraphPersistence {
     }
     save() : Promise<void> {
         let taskResults = Array.from(this.nodes.values(), (task: TaskNode) => {
-            return new TaskResults(task.id, task.startDate, task.duration)
+            let taskResult: TaskResults = {
+                taskId: task.id,
+                startDate: task.startDate,
+                duration: task.duration
+            }
+            return taskResult
         })
         return this.dataProvider.setTasksResults(taskResults)
     }

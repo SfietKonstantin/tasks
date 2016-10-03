@@ -42,7 +42,10 @@ export class Server {
         this.app.use(express.static(path.join(__dirname, 'public')))
 
         this.app.get('/', this.routes.index.bind(this.routes))
+        this.app.get('/project/:id', this.routes.getProject.bind(this.routes))
         this.app.get('/task/:id', this.routes.getTask.bind(this.routes))
+
+        // API
         this.app.get('/api/project/list', this.api.getProjects.bind(this.api))
         this.app.get('/api/project/:id', this.api.getProject.bind(this.api))
         this.app.get('/api/project/:id/task/list', this.api.getProjectTasks.bind(this.api))
@@ -64,8 +67,7 @@ export class Server {
     }
 
     private errorHandler(req: express.Request, res: express.Response, next: express.NextFunction) {
-        let error: HttpError
-        error = new HttpError(404, 'Not found')
+        const error: HttpError = new HttpError(404, 'Not found')
         next(error)
     }
 

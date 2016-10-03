@@ -1,70 +1,74 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as jquery from "jquery"
+import { TaskHeader } from "./task/header"
+import { TaskMain } from "./task/main"
+import { Project, Task, TaskResults } from "../core/types"
+import * as apitypes from "../core/apitypes"
 
-interface TaskToolsProperties {
-    taskId: number
+interface TaskComponentProperties {
+    id: number
 }
 
-interface TaskToolsState {
-    enabled: boolean
-    important: boolean
+interface TaskComponentState {
+    tabIndex: number
+    project: Project
+    task: Task
+    taskResults: TaskResults
 }
 
-class TaskHeaderTools extends React.Component<TaskToolsProperties, TaskToolsState> {
-    state = {
-        enabled: false,
-        important: false
+class TaskComponent extends React.Component<TaskComponentProperties, TaskComponentState> {
+    constructor(props: TaskComponentProperties) {
+        super(props)
+        this.state = {
+            tabIndex: 0,
+            project: null,
+            task: null,
+            taskResults: null
+        }
     }
     render() {
-        return <form className="task-header-tools" onSubmit={this.handleSubmit.bind(this)}> 
-        <button className={this.getClassName()} type="submit">
-        <span className="glyphicon glyphicon-star" aria-hidden="true"></span>
-        <span className="visible-md-inline visible-lg-inline"> {this.getLabel()}</span>
-        </button>
-        </form>
+        let taskHeader: JSX.Element = null
+        let tabContent: JSX.Element = null
+        if (this.state.project && this.state.task) {
+            taskHeader = <TaskHeader project={this.state.project} task={this.state.task}  
+                                     tabChangedCallback={this.handleTabChange.bind(this)} />
+            if (this.state.tabIndex == 0) {
+                tabContent = <TaskMain task={this.state.task} taskResults={this.state.taskResults} />
+            } 
+        }
+        return <div> 
+            {taskHeader}
+            {tabContent}
+        </div>
     }
     componentDidMount() {
         jquery.get({
-            url: "/api/task/" + this.props.taskId + "/important",
+            url: "/api/task/" + this.props.id + "",
             dataType: 'json',
             cache: false,
-            success: (data: TaskToolsState) => {
-                this.setState(TaskHeaderTools.makeState(data, true));
+            success: (data: apitypes.ApiTask) => {
+                this.setState({
+                    tabIndex: this.state.tabIndex,
+                    project: data.project,
+                    task: apitypes.createTaskFromApiTask(data),
+                    taskResults: apitypes.createTaskResultsFromApiTask(data)
+                });
             }
         })
     }
-    private handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-        if (this.state.enabled) {
-            this.setState(TaskHeaderTools.makeState(this.state, false));
-            jquery.ajax({
-                type: this.state.important ? "DELETE" : "PUT",
-                url: "/api/task/" + this.props.taskId + "/important",
-                success: (data: TaskToolsState) => {
-                    this.setState(TaskHeaderTools.makeState(data, true));
-                }
+    private handleTabChange(index: number) {
+        if (this.state.tabIndex != index) {
+            this.setState({
+                tabIndex: index,
+                project: this.state.project, 
+                task: this.state.task,
+                taskResults: this.state.taskResults
             })
         }
-    }
-    private getClassName() : string {
-        let className = this.state.important ? "btn btn-danger" : "btn btn-default"
-        if (!this.state.enabled) {
-            className += " disabled"
-        } 
-        return className 
-    }
-    private getLabel() : string {
-        return this.state.important ? "Important" : "Set as important"
-    }
-    private static makeState(state: TaskToolsState, enabled: boolean) {
-        return {important: state.important, enabled: enabled}
     }
 }
 
 export function render(id: number) {
-    ReactDOM.render(
-        <TaskHeaderTools taskId={id} />,
-        document.getElementById("task-header")
-    );
+    ReactDOM.render(<TaskComponent id={id} />, document.getElementById("content"))
 }

@@ -1,5 +1,6 @@
 import * as express from "express"
-import { Task, Project } from "../core/types"
+import { Project, Task, TaskResults } from "../core/types"
+import * as apitypes from "../core/apitypes"
 import { IDataProvider, NotFoundError } from "../core/data/idataprovider"
 import { TaskNode } from "../core/graph/types"
 
@@ -24,7 +25,7 @@ export class Api {
         })
     }
     getProject(req: express.Request, res: express.Response) {
-        let id: number = Number(req.params.id)
+        const id = +String(req.params.id)
         this.dataProvider.getProject(id).then((project: Project) => {
             res.json({projects: project})
         }).catch((error) => {
@@ -36,7 +37,7 @@ export class Api {
         })
     }
     getProjectTasks(req: express.Request, res: express.Response) {
-        let id: number = Number(req.params.id)
+        const id = +String(req.params.id)
         this.dataProvider.getProjectTasks(id).then((tasks: Array<Task>) => {
             return this.dataProvider.getProject(id).then((project: Project) => {
                 tasks.filter((value: Task) => { return !!value })
@@ -51,10 +52,13 @@ export class Api {
         })
     }
     getTask(req: express.Request, res: express.Response) {
-        let id: number = Number(req.params.id)
-        let task = this.dataProvider.getTask(id).then((task: Task) => {
+        const id = +String(req.params.id)
+        this.dataProvider.getTask(id).then((task: Task) => {
             return this.dataProvider.getProject(task.projectId).then((project: Project) => {
-                res.json({project: project, task: task})
+                return this.dataProvider.getTaskResults(task.id).then((taskResults: TaskResults) => {
+                    const apiTask = apitypes.createApiTask(project, task, taskResults)
+                    res.json(apiTask)
+                })
             })
         }).catch((error: Error) => {
             if (error instanceof NotFoundError) {
@@ -65,8 +69,8 @@ export class Api {
         })
     }
     isTaskImportant(req: express.Request, res: express.Response) {
-        let id: number = Number(req.params.id)
-        let important = this.dataProvider.isTaskImportant(id).then((result: boolean) => {
+        const id = +String(req.params.id)
+        this.dataProvider.isTaskImportant(id).then((result: boolean) => {
             res.json({important: result})
         }).catch((error: Error) => {
             if (error instanceof NotFoundError) {
@@ -83,7 +87,7 @@ export class Api {
        this.setTaskImportant(req, res, false) 
     }
     private setTaskImportant(req: express.Request, res: express.Response, important: boolean) {
-        let id: number = Number(req.params.id)
+        const id = +String(req.params.id)
         this.dataProvider.setTaskImportant(id, important).then(() => {
             res.json({important: important})
         }).catch((error: Error) => {

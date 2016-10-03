@@ -1,6 +1,5 @@
 module.exports = {
     entry: {
-        client: './client/index.tsx',
         task: './client/task.tsx'
     },
     output: {

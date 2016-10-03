@@ -26,24 +26,31 @@ describe("Redis", () => {
     })
     describe("getTasks", () => {
         it("Should add some testing data", (done) => {
-            let project = new Project(null)
-            project.name = "Project"
-            project.description = "Description"
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
 
             db.addProject(project).then((projectId: number) => {
                 chai.expect(projectId).to.equals(1)
                 
-                let task1 = new Task(null, projectId)
-                task1.name = "Task 1"
-                task1.description = "Description 1"
-                task1.estimatedStartDate = new Date(2016, 9, 1)
-                task1.estimatedDuration = 30
-
-                let task2 = new Task(null, projectId)
-                task2.name = "Task 2"
-                task2.description = "Description 2"
-                task2.estimatedStartDate = new Date(2016, 9, 15)
-                task2.estimatedDuration = 15
+                const task1: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                const task2: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 2",
+                    description: "Description 2",
+                    estimatedStartDate: new Date(2016, 9, 15),
+                    estimatedDuration: 15
+                }
                 
                 return db.addTask(projectId, task1).then((result: number) => {
                     chai.expect(result).to.equals(1)
@@ -121,24 +128,31 @@ describe("Redis", () => {
     })
     describe("getTask", () => {
         it("Should add some testing data", (done) => {
-            let project = new Project(null)
-            project.name = "Project"
-            project.description = "Description"
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
 
             db.addProject(project).then((projectId: number) => {
                 chai.expect(projectId).to.equals(1)
 
-                let task1 = new Task(null, projectId)
-                task1.name = "Task 1"
-                task1.description = "Description 1"
-                task1.estimatedStartDate = new Date(2016, 9, 1)
-                task1.estimatedDuration = 30
-
-                let task2 = new Task(null, projectId)
-                task2.name = "Task 2"
-                task2.description = "Description 2"
-                task2.estimatedStartDate = new Date(2016, 9, 15)
-                task2.estimatedDuration = 15
+                const task1: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                const task2: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 2",
+                    description: "Description 2",
+                    estimatedStartDate: new Date(2016, 9, 15),
+                    estimatedDuration: 15
+                }
                 
                 return db.addTask(projectId, task1).then((result: number) => {
                     chai.expect(result).to.equals(1)
@@ -212,9 +226,11 @@ describe("Redis", () => {
     })
     describe("addTask", () => {
         it("Should add some testing data", (done) => {
-            let project = new Project(null)
-            project.name = "Project"
-            project.description = "Description"
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
 
             db.addProject(project).then((id: number) => {
                 chai.expect(id).to.equals(1)
@@ -224,29 +240,35 @@ describe("Redis", () => {
             })
         })
         it("Should add task", (done) => {
-            let task = new Task(null, null)
-            task.name = "Task 1"
-            task.description = "Description 1"
-            task.estimatedStartDate = new Date(2016, 9, 1)
-            task.estimatedDuration = 30
+            const task1: Task = {
+                id: null,
+                projectId: null,
+                name: "Task 1",
+                description: "Description 1",
+                estimatedStartDate: new Date(2016, 9, 1),
+                estimatedDuration: 30
+            }
 
-            db.addTask(1, task).then((id: number) => {
+            db.addTask(1, task1).then((id: number) => {
                 chai.expect(id).to.equals(1)
-                chai.expect(task.id).to.equal(1)
-                chai.expect(task.projectId).to.equal(1)
+                chai.expect(task1.id).to.equal(1)
+                chai.expect(task1.projectId).to.equal(1)
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get an exception when adding task on invalid project", (done) => {
-            let task = new Task(null, null)
-            task.name = "Task 1"
-            task.description = "Description 1"
-            task.estimatedStartDate = new Date(2016, 9, 1)
-            task.estimatedDuration = 30
+            const task1: Task = {
+                id: null,
+                projectId: null,
+                name: "Task 1",
+                description: "Description 1",
+                estimatedStartDate: new Date(2016, 9, 1),
+                estimatedDuration: 30
+            }
 
-            db.addTask(2, task).then((id: number) => {
+            db.addTask(2, task1).then((id: number) => {
                 done(new Error("addTask should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(ProjectNotFoundError)
@@ -261,13 +283,16 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when adding task", (done) => {
-            let task = new Task(null, null)
-            task.name = "Task 2"
-            task.description = "Description 2"
-            task.estimatedStartDate = new Date(2016, 9, 15)
-            task.estimatedDuration = 15
+            const task2: Task = {
+                id: null,
+                projectId: null,
+                name: "Task 2",
+                description: "Description 2",
+                estimatedStartDate: new Date(2016, 9, 15),
+                estimatedDuration: 15
+            }
 
-            db.addTask(1, task).then((id: number) => {
+            db.addTask(1, task2).then((id: number) => {
                 done(new Error("addTask should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null
@@ -275,13 +300,16 @@ describe("Redis", () => {
             })
         })
         it("Should add next task", (done) => {
-            let task = new Task(null, null)
-            task.name = "Task 3"
-            task.description = "Description 3"
-            task.estimatedStartDate = new Date(2016, 10, 1)
-            task.estimatedDuration = 10
+            const task3: Task = {
+                id: null,
+                projectId: null,
+                name: "Task 3",
+                description: "Description 3",
+                estimatedStartDate: new Date(2016, 10, 1),
+                estimatedDuration: 10
+            }
 
-            db.addTask(1, task).then((id: number) => {
+            db.addTask(1, task3).then((id: number) => {
                 chai.expect(id).to.equals(3)
                 done()
             }).catch((error: Error) => {
@@ -298,11 +326,14 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when adding task", (done) => {
-            let task = new Task(null, null)
-            task.name = "Task"
-            task.description = "Description"
-            task.estimatedStartDate = new Date(2016, 12, 1)
-            task.estimatedDuration = 100
+            const task: Task = {
+                id: null,
+                projectId: null,
+                name: "Task",
+                description: "Description",
+                estimatedStartDate: new Date(2016, 12, 1),
+                estimatedDuration: 100
+            }
 
             db.addTask(1, task).then((id: number) => {
                 done(new Error("addTask should not be a success"))
@@ -317,24 +348,31 @@ describe("Redis", () => {
     })
     describe("setTaskRelation", () => {
         it("Should add some testing data", (done) => {
-            let project = new Project(null)
-            project.name = "Project"
-            project.description = "Description"
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
 
             db.addProject(project).then((projectId: number) => {
                 chai.expect(projectId).to.equals(1)
 
-                let task1 = new Task(null, projectId)
-                task1.name = "Task 1"
-                task1.description = "Description 1"
-                task1.estimatedStartDate = new Date(2016, 9, 1)
-                task1.estimatedDuration = 30
-
-                let task2 = new Task(null, projectId)
-                task2.name = "Task 2"
-                task2.description = "Description 2"
-                task2.estimatedStartDate = new Date(2016, 9, 15)
-                task2.estimatedDuration = 15
+                const task1: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                const task2: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 2",
+                    description: "Description 2",
+                    estimatedStartDate: new Date(2016, 9, 15),
+                    estimatedDuration: 15
+                }
                 
                 return db.addTask(projectId, task1).then((result: number) => {
                     chai.expect(result).to.equals(1)
@@ -421,30 +459,39 @@ describe("Redis", () => {
     })
     describe("getParentTaskIds", () => {
         it("Should add some testing data", (done) => {
-            let project = new Project(null)
-            project.name = "Project"
-            project.description = "Description"
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
 
             db.addProject(project).then((projectId: number) => {
                 chai.expect(projectId).to.equals(1)
 
-                let task1 = new Task(null, projectId)
-                task1.name = "Task 1"
-                task1.description = "Description 1"
-                task1.estimatedStartDate = new Date(2016, 9, 1)
-                task1.estimatedDuration = 30
-
-                let task2 = new Task(null, projectId)
-                task2.name = "Task 2"
-                task2.description = "Description 2"
-                task2.estimatedStartDate = new Date(2016, 9, 15)
-                task2.estimatedDuration = 15
-
-                let task3 = new Task(null, projectId)
-                task3.name = "Task 3"
-                task3.description = "Description 3"
-                task3.estimatedStartDate = new Date(2016, 10, 1)
-                task3.estimatedDuration = 10
+                const task1: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                const task2: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 2",
+                    description: "Description 2",
+                    estimatedStartDate: new Date(2016, 9, 15),
+                    estimatedDuration: 15
+                }
+                const task3: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 3",
+                    description: "Description 3",
+                    estimatedStartDate: new Date(2016, 10, 1),
+                    estimatedDuration: 10
+                }
                 
                 return db.addTask(projectId, task1).then((result: number) => {
                     chai.expect(result).to.equals(1)
@@ -506,30 +553,39 @@ describe("Redis", () => {
     })
     describe("getChildrenTaskIds", () => {
         it("Should add some testing data", (done) => {
-            let project = new Project(null)
-            project.name = "Project"
-            project.description = "Description"
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
 
             db.addProject(project).then((projectId: number) => {
                 chai.expect(projectId).to.equals(1)
 
-                let task1 = new Task(null, projectId)
-                task1.name = "Task 1"
-                task1.description = "Description 1"
-                task1.estimatedStartDate = new Date(2016, 9, 1)
-                task1.estimatedDuration = 30
-
-                let task2 = new Task(null, projectId)
-                task2.name = "Task 2"
-                task2.description = "Description 2"
-                task2.estimatedStartDate = new Date(2016, 9, 15)
-                task2.estimatedDuration = 15
-
-                let task3 = new Task(null, projectId)
-                task3.name = "Task 3"
-                task3.description = "Description 3"
-                task3.estimatedStartDate = new Date(2016, 10, 1)
-                task3.estimatedDuration = 10
+                const task1: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                const task2: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 2",
+                    description: "Description 2",
+                    estimatedStartDate: new Date(2016, 9, 15),
+                    estimatedDuration: 15
+                }
+                const task3: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 3",
+                    description: "Description 3",
+                    estimatedStartDate: new Date(2016, 10, 1),
+                    estimatedDuration: 10
+                }
                 
                 return db.addTask(projectId, task1).then((result: number) => {
                     chai.expect(result).to.equals(1)

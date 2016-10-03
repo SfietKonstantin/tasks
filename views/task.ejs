@@ -1,37 +1,11 @@
 <%- include('header') -%>
 
-<div class="page-header navbar-default">
-    <div class="task-header container-fluid">
-        <div class="col-xs-12 col-md-12">
-            <ol class="breadcrumb">
-                <li><a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
-                <li><a href="/project/<%= project.id %>"><%= project.name %></a></li>
-                <li class="active">Task #<%= task.id %></li>
-            </ol>
-        </div>
-        <div class="col-xs-11 col-md-8">
-            <h1><%= task.name %></h1>
-        </div>
-        <div id="task-header" class="col-xs-1 col-md-4"></div>
-    </div>
-</div>
-
-<div id="content" class="container-fluid">
-    <div id="main" class="col-sm-9 col-md-10 main">
-        <h2>Overview</h2>
-        <p>(Under construction)</p>
-    </div>
-
-    <div id="sidebar" class="col-sm-3 col-md-2 sidebar">
-        <h2>Tags</h2>
-        <p>(Under construction)</p>
-    </div>
-</div>
+<div id="content"></div>
 
 <script src="/task.bundle.js"></script>
 <script>
 window.onload = function() {
-    window.task.render(<%= task.id %>)
+    window.task.render(<%= id %>)
 }
 </script>
 <%- include('footer') -%>
