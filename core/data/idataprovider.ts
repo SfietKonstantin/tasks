@@ -1,7 +1,6 @@
 import { Project, Task, TaskResults, Impact } from "../types"
 
 export class NotFoundError extends Error implements Error {
-    name: string
     constructor(message: string) {
         super(message)
     }
@@ -54,6 +53,7 @@ export interface IDataProvider {
     isTaskImportant(id: number) : Promise<boolean>
     setTaskImportant(id: number, important: boolean) : Promise<void>
 
+    getTasksResults(ids: Array<number>) : Promise<Array<TaskResults>>
     getTaskResults(id: number) : Promise<TaskResults>
     setTasksResults(results: Array<TaskResults>) : Promise<void>
 

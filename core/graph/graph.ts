@@ -126,27 +126,25 @@ export class GraphPersistence {
         return this.dataProvider.setTasksResults(taskResults)
     }
     private loadNode(id: number, nodes: Map<number, TaskNode>) : Promise<void> {
-        if (nodes.has(id)) {
-            return
-        } else {
-            return this.dataProvider.getTask(id).then((task: Task) => {
-                let node = new TaskNode(id)
-                node.estimatedDuration = task.estimatedDuration
-                node.estimatedStartDate = task.estimatedStartDate
-                nodes.set(id, node)
+        return this.dataProvider.getTask(id).then((task: Task) => {
+            let node = new TaskNode(id)
+            node.estimatedDuration = task.estimatedDuration
+            node.estimatedStartDate = task.estimatedStartDate
+            nodes.set(id, node)
 
-                return this.dataProvider.getChildrenTaskIds(task.id).then((ids: Array<number>) => {
-                    const sorted = ids.sort(GraphPersistence.compareNumbers)
-                    return Promise.all(sorted.map((id: number) => {
-                        return this.loadNode(id, nodes)
-                    })).then(() => {
-                        sorted.forEach((id: number) => {
-                            node.addChild(nodes.get(id))
-                        })
+            return this.dataProvider.getChildrenTaskIds(task.id).then((ids: Array<number>) => {
+                const sorted = ids.sort(GraphPersistence.compareNumbers).filter((value: number) => {
+                    return !nodes.has(value)
+                })
+                return Promise.all(sorted.map((id: number) => {
+                    return this.loadNode(id, nodes)
+                })).then(() => {
+                    sorted.forEach((id: number) => {
+                        node.addChild(nodes.get(id))
                     })
                 })
             })
-        }
+        })
     }
     private static compareNumbers(first: number, second: number) : number {
         return first - second

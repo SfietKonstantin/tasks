@@ -1,5 +1,6 @@
 import * as chai from "chai"
 import { Task } from "../core/types"
+import { CyclicDependencyError } from "../core/graph/igraph"
 import * as graph from "../core/graph/graph"
 import { TaskNode } from "../core/graph/types"
 
@@ -113,6 +114,35 @@ describe("Graph", () => {
             chai.expect(node2.duration).to.equals(30)
             chai.expect(node3.startDate.getTime()).to.equals(new Date(2015, 9, 2 + 23 + 37).getTime())
             chai.expect(node3.duration).to.equals(30)
+        })
+    })
+    describe("Cyclic dependency", () => {
+        it("Should detect a cyclic dependency", (done) => {
+            let node0 = new TaskNode(1)
+            node0.estimatedStartDate = new Date(2015, 9, 1)
+            node0.estimatedDuration = 15
+
+            let node1 = new TaskNode(2)
+            node1.estimatedStartDate = new Date(2015, 9, 16)
+            node1.estimatedDuration = 15
+
+            let node2 = new TaskNode(3)
+            node2.estimatedStartDate = new Date(2015, 9, 16)
+            node2.estimatedDuration = 15
+
+            node0.addChild(node1)
+            node0.addChild(node2)
+            node1.addChild(node2)
+            node2.addChild(node1)
+
+            try {
+                graph.compute(node0)   
+            } catch (err) {
+                chai.expect(err).to.instanceof(Error)
+                done()
+                return
+            }
+            done(new Error("Cyclic dependency should not be a success"))
         })
     })
 })

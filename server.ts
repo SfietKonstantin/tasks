@@ -48,7 +48,6 @@ export class Server {
         // API
         this.app.get('/api/project/list', this.api.getProjects.bind(this.api))
         this.app.get('/api/project/:id', this.api.getProject.bind(this.api))
-        this.app.get('/api/project/:id/task/list', this.api.getProjectTasks.bind(this.api))
         this.app.get('/api/task/:id', this.api.getTask.bind(this.api))
         this.app.get('/api/task/:id/important', this.api.isTaskImportant.bind(this.api))
         this.app.put('/api/task/:id/important', this.api.putTaskImportant.bind(this.api))

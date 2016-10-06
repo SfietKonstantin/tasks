@@ -47,12 +47,12 @@ class TaskComponent extends React.Component<TaskComponentProperties, TaskCompone
             url: "/api/task/" + this.props.id + "",
             dataType: 'json',
             cache: false,
-            success: (data: apitypes.ApiTask) => {
+            success: (data: apitypes.ApiProjectAndTask) => {
                 this.setState({
                     tabIndex: this.state.tabIndex,
                     project: data.project,
-                    task: apitypes.createTaskFromApiTask(data),
-                    taskResults: apitypes.createTaskResultsFromApiTask(data)
+                    task: apitypes.createTaskFromApiTask(data.project, data.task),
+                    taskResults: apitypes.createTaskResultsFromApiTask(data.task)
                 });
             }
         })

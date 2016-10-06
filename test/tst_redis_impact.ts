@@ -72,6 +72,12 @@ describe("Redis", () => {
                 done(error)
             })
         })
+        it("Should get an empty list", (done) => {
+            db.getImpacts([]).then((impacts: Array<Impact>) => {
+                chai.expect(impacts).to.length(0)
+                done()
+            })
+        })
         it("Should get impacts", (done) => {
             db.getImpacts([2, 1]).then((impacts: Array<Impact>) => {
                 chai.expect(impacts).to.length(2)

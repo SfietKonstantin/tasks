@@ -64,6 +64,12 @@ describe("Redis", () => {
                 done(error)
             })
         })
+        it("Should get an empty list", (done) => {
+            db.getTasks([]).then((tasks: Array<Task>) => {
+                chai.expect(tasks).to.length(0)
+                done()
+            })
+        })
         it("Should get tasks", (done) => {
             db.getTasks([2, 1]).then((tasks: Array<Task>) => {
                 chai.expect(tasks).to.length(2)

@@ -223,6 +223,9 @@ export class RedisDataProvider implements IRedisDataProvider {
             }
         })
     }
+    getTasksResults(ids: Array<number>) : Promise<Array<TaskResults>> {
+        return Promise.all(ids.map(this.getMappedTaskResults.bind(this)))
+    }
     getTaskResults(id: number) : Promise<TaskResults> {
         return this.taskExists(id).then(() => {
             return this.client.mgetAsync("task:" + id + ":startDate", "task:" + id + ":duration")
@@ -358,7 +361,14 @@ export class RedisDataProvider implements IRedisDataProvider {
     private getMappedTask(id: number) : Promise<Task> {
         return this.getTask(id).then((task: Task) => {
             return task
-        }).catch((rror: Error) => {
+        }).catch((error: Error) => {
+            return null
+        })
+    }
+    private getMappedTaskResults(id: number) : Promise<TaskResults> {
+        return this.getTaskResults(id).then((taskResults: TaskResults) => {
+            return taskResults
+        }).catch((error: Error) => {
             return null
         })
     }

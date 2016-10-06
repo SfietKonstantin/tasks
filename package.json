@@ -7,7 +7,7 @@
     "build:ts:server": "tsc -p .",
     "build": "npm run build:ts:server && npm run build:webpack",
     "start": "node ./bin/www",
-    "test": "mocha --reporter spec"
+    "test": "istanbul cover _mocha"
   },
   "dependencies": {
     "bluebird": "^3.4.6",

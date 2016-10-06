@@ -27,23 +27,13 @@ export class Api {
     getProject(req: express.Request, res: express.Response) {
         const id = +String(req.params.id)
         this.dataProvider.getProject(id).then((project: Project) => {
-            res.json({projects: project})
-        }).catch((error) => {
-            if (error instanceof NotFoundError) {
-                res.status(404).json(error)
-            } else {
-                res.status(500).json(error)
-            }
-        })
-    }
-    getProjectTasks(req: express.Request, res: express.Response) {
-        const id = +String(req.params.id)
-        this.dataProvider.getProjectTasks(id).then((tasks: Array<Task>) => {
-            return this.dataProvider.getProject(id).then((project: Project) => {
+            return this.dataProvider.getProjectTasks(id).then((tasks: Array<Task>) => {
                 tasks.filter((value: Task) => { return !!value })
-                res.json({project: project, tasks: tasks})
+                return this.dataProvider.getTasksResults(tasks.map((task: Task) => { return task.id })).then((tasksResults: Array<TaskResults>) => {
+                    res.json(apitypes.createApiProjectAndTasks(project, tasks, tasksResults))
+                })
             })
-        }).catch((error: Error) => {
+        }).catch((error) => {
             if (error instanceof NotFoundError) {
                 res.status(404).json(error)
             } else {
@@ -56,7 +46,10 @@ export class Api {
         this.dataProvider.getTask(id).then((task: Task) => {
             return this.dataProvider.getProject(task.projectId).then((project: Project) => {
                 return this.dataProvider.getTaskResults(task.id).then((taskResults: TaskResults) => {
-                    const apiTask = apitypes.createApiTask(project, task, taskResults)
+                    const apiTask: apitypes.ApiProjectAndTask = {
+                        project: project,
+                        task: apitypes.createApiTask(task, taskResults)
+                    }
                     res.json(apiTask)
                 })
             })
