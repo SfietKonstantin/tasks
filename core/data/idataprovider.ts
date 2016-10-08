@@ -1,4 +1,4 @@
-import { Project, Task, TaskResults, Impact } from "../types"
+import { Project, Task, TaskResults, Modifier, Delay } from "../types"
 
 export class NullIdentifierError extends Error implements Error {
     constructor(message: string) {
@@ -30,13 +30,13 @@ export class TaskNotFoundError extends NotFoundError {
     }
 }
 
-export class ImpactNotFoundError extends NotFoundError {
+export class ModifierNotFoundError extends NotFoundError {
     constructor(message: string) {
         super(message)
     }
 }
 
-export class InvalidInputError extends Error implements Error {
+export class DelayNotFoundError extends NotFoundError {
     constructor(message: string) {
         super(message)
     }
@@ -68,11 +68,19 @@ export interface IDataProvider {
     getTaskResults(identifier: string) : Promise<TaskResults>
     setTasksResults(results: Array<TaskResults>) : Promise<void>
 
-    getImpacts(ids: Array<number>) : Promise<Array<Impact>>
-    getImpact(id: number): Promise<Impact>
-    getTaskImpactIds(identifier: string) : Promise<Array<number>>
-    getImpactedTaskIds(id: number) : Promise<Array<string>>
-    addImpact(impact: Impact) : Promise<number>
-    setImpactForTask(id: number, taskIdentifier: string) : Promise<void>
-    getImpactsValues(ids: Array<number>) : Promise<Array<number>>
+    getModifiers(ids: Array<number>) : Promise<Array<Modifier>>
+    getModifier(id: number): Promise<Modifier>
+    getTaskModifierIds(identifier: string) : Promise<Array<number>>
+    getModifieredTaskIds(id: number) : Promise<Array<string>>
+    addModifier(modifier: Modifier) : Promise<number>
+    setModifierForTask(id: number, taskIdentifier: string) : Promise<void>
+    getModifiersValues(ids: Array<number>) : Promise<Array<number>>
+
+    getDelays(identifiers: Array<string>) : Promise<Array<Delay>>
+    getDelay(identifier: string) : Promise<Delay>
+    addDelay(delay: Delay) : Promise<void>
+    getProjectDelays(identifier: string) : Promise<Array<Delay>>
+    setDelayTaskRelation(delayIdentifier: string, taskIdentifier: string) : Promise<void>
+    getTaskDelayIds(identifier: string) : Promise<Array<string>>
+    getDelayTaskIds(identifier: string) : Promise<Array<string>>
 } 

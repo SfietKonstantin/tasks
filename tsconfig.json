@@ -10,6 +10,7 @@
         "typings/index.d.ts",
         "server.ts",
         "core/types.ts",
+        "core/dateutils.ts",
         "core/apitypes.ts",
         "core/testdata.ts",
         "core/data/idataprovider.ts",
@@ -18,12 +19,16 @@
         "core/graph/types.ts",
         "core/graph/igraph.ts",
         "core/graph/graph.ts",
+        "core/graph/impact.ts",
+        "core/import/primavera/csv.ts",
         "routes/api.ts",
         "test/tst_graph.ts",
+        "test/tst_graph_persistence.ts",
+        "test/tst_impact.ts",
         "test/tst_redis_project.ts",
         "test/tst_redis_task.ts",
         "test/tst_redis_taskresults.ts",
-        "test/tst_redis_impact.ts",
-        "test/tst_graph_persistence.ts"
+        "test/tst_redis_modifier.ts",
+        "test/tst_redis_delay.ts"
     ]
 } 

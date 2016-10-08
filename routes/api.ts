@@ -1,5 +1,5 @@
 import * as express from "express"
-import { Project, Task, TaskResults, Impact } from "../core/types"
+import { Project, Task, TaskResults, Modifier } from "../core/types"
 import * as apitypes from "../core/apitypes"
 import { IDataProvider, NotFoundError } from "../core/data/idataprovider"
 import { TaskNode } from "../core/graph/types"
@@ -70,15 +70,15 @@ export class Api {
     deleteTaskImportant(req: express.Request, res: express.Response) {
        this.setTaskImportant(req, res, false) 
     }
-    postImpact(req: express.Request, res: express.Response) {
-        const impact = JSON.parse(req.body.impact) as Impact
+    postModifier(req: express.Request, res: express.Response) {
+        const modifier = JSON.parse(req.body.modifier) as Modifier
         const taskIdentifier = String(req.body.task)
 
         let graph: GraphPersistence = new GraphPersistence(this.dataProvider)
         this.dataProvider.hasTask(taskIdentifier).then(() => {
-            return this.dataProvider.addImpact(impact)
+            return this.dataProvider.addModifier(modifier)
         }).then((id: number) => {
-            return this.dataProvider.setImpactForTask(id, taskIdentifier)
+            return this.dataProvider.setModifierForTask(id, taskIdentifier)
         }).then(() => {
             return graph.loadGraph(taskIdentifier)
         }).then(() => {
@@ -112,12 +112,12 @@ export class Api {
         return this.dataProvider.getTask(identifier).then((task: Task) => {
             return this.dataProvider.getProject(task.projectIdentifier).then((project: Project) => {
                 return this.dataProvider.getTaskResults(task.identifier).then((taskResults: TaskResults) => {
-                    return this.dataProvider.getTaskImpactIds(identifier).then((ids: Array<number>) => {
-                        return this.dataProvider.getImpacts(ids).then((impacts: Array<Impact>) => {
-                            const apiTask: apitypes.ApiProjectTaskImpacts = {
+                    return this.dataProvider.getTaskModifierIds(identifier).then((ids: Array<number>) => {
+                        return this.dataProvider.getModifiers(ids).then((modifiers: Array<Modifier>) => {
+                            const apiTask: apitypes.ApiProjectTaskModifiers = {
                                 project: project,
                                 task: apitypes.createApiTask(task, taskResults),
-                                impacts: impacts
+                                modifiers: modifiers
                             }
                             res.json(apiTask)
                         })

@@ -1,8 +1,8 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Task, Impact, TaskResults } from "../core/types"
-import { TaskNotFoundError, InvalidInputError, TransactionError } from "../core/data/idataprovider"
+import { Project, Task, Modifier, TaskResults } from "../core/types"
+import { TaskNotFoundError, TransactionError } from "../core/data/idataprovider"
 import { RedisDataProvider } from "../core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -196,21 +196,21 @@ describe("Redis", () => {
                 done()
             })
         })
-        it("Should get an exception on transactional error (caused by adding impacts)", (done) => {
+        it("Should get an exception on transactional error (caused by adding modifiers)", (done) => {
             let otherClient = redis.createClient()
             otherClient.select(3)
             let otherDb = new RedisDataProvider(otherClient)
 
-            db.watchTasksImpacts(["task1"]).then(() => {
-                let impact: Impact = {
+            db.watchTasksModifiers(["task1"]).then(() => {
+                let modifier: Modifier = {
                     id: null,
-                    name: "Transactional impact",
-                    description: "Transactional impact description",
+                    name: "Transactional modifier",
+                    description: "Transactional modifier description",
                     duration: 10
                 }
-                return otherDb.addImpact(impact)
+                return otherDb.addModifier(modifier)
             }).then((id: number) => {
-                return otherDb.setImpactForTask(id, "task1")
+                return otherDb.setModifierForTask(id, "task1")
             }).then(() => {
                 let taskResults: Array<TaskResults> = [
                     {taskIdentifier: "task1", startDate: new Date(2016, 9, 16), duration: 45},
@@ -224,7 +224,7 @@ describe("Redis", () => {
                 done()
             })
         })
-        xit("Should get an exception on transactional error (caused by updating impacts)", (done) => {
+        xit("Should get an exception on transactional error (caused by updating modifiers)", (done) => {
             
         })
         it("Should get an exception on transactional error (caused by modifying node)", (done) => {
@@ -232,16 +232,16 @@ describe("Redis", () => {
             otherClient.select(3)
             let otherDb = new RedisDataProvider(otherClient)
 
-            db.watchTasksImpacts(["task1"]).then(() => {
-                const impact: Impact = {
+            db.watchTasksModifiers(["task1"]).then(() => {
+                const modifier: Modifier = {
                     id: null,
-                    name: "Transactional impact",
-                    description: "Transactional impact description",
+                    name: "Transactional modifier",
+                    description: "Transactional modifier description",
                     duration: 10
                 }
-                return otherDb.addImpact(impact)
+                return otherDb.addModifier(modifier)
             }).then((id: number) => {
-                return otherDb.setImpactForTask(id, "task1")
+                return otherDb.setModifierForTask(id, "task1")
             }).then(() => {
                 let taskResults: Array<TaskResults> = [
                     {taskIdentifier: "task1", startDate: new Date(2016, 9, 16), duration: 45},

@@ -1,5 +1,5 @@
 import * as chai from "chai"
-import { Project, Task, TaskResults, Impact } from "../core/types"
+import { Project, Task, TaskResults, Modifier } from "../core/types"
 import { TaskNode } from "../core/graph/types"
 import { GraphPersistence, compute } from "../core/graph/graph"
 import { RedisDataProvider } from "../core/data/redisdataprovider"
@@ -140,55 +140,55 @@ describe("Graph persistence", () => {
         })
     })
     it("Should add some testing data", (done) => {
-        const impact1: Impact = {
+        const modifier1: Modifier = {
             id: null,
-            name: "Impact 1",
+            name: "Modifier 1",
             description: "Description 1",
             duration: 8
         }
 
-        const impact2_1: Impact = {
+        const modifier2_1: Modifier = {
             id: null,
-            name: "Impact 2, 1",
+            name: "Modifier 2, 1",
             description: "Description 2, 1",
             duration: 10
         }
 
-        const impact2_2: Impact = {
+        const modifier2_2: Modifier = {
             id: null,
-            name: "Impact 2, 2",
+            name: "Modifier 2, 2",
             description: "Description 2, 2",
             duration: 12
         }
 
-        const impact4: Impact = {
+        const modifier4: Modifier = {
             id: null,
-            name: "Impact 4",
+            name: "Modifier 4",
             description: "Description 4",
             duration: 15
         }
 
-        const impacts = [impact1, impact2_1, impact2_2, impact4]
-        Promise.all(impacts.map(db.addImpact.bind(db))).then(() => {
-            chai.expect(impact1.id).to.equals(1)
-            chai.expect(impact2_1.id).to.equals(2)
-            chai.expect(impact2_2.id).to.equals(3)
-            chai.expect(impact4.id).to.equals(4)
+        const modifiers = [modifier1, modifier2_1, modifier2_2, modifier4]
+        Promise.all(modifiers.map(db.addModifier.bind(db))).then(() => {
+            chai.expect(modifier1.id).to.equals(1)
+            chai.expect(modifier2_1.id).to.equals(2)
+            chai.expect(modifier2_2.id).to.equals(3)
+            chai.expect(modifier4.id).to.equals(4)
         }).then(() => {
-            return db.setImpactForTask(1, "1root")
+            return db.setModifierForTask(1, "1root")
         }).then(() => {
-            return db.setImpactForTask(2, "2short")
+            return db.setModifierForTask(2, "2short")
         }).then(() => {
-            return db.setImpactForTask(3, "2short")
+            return db.setModifierForTask(3, "2short")
         }).then(() => {
-            return db.setImpactForTask(4, "4reducing")
+            return db.setModifierForTask(4, "4reducing")
         }).then(() => {
             done()
         }).catch((error: Error) => {
             done(error)
         })
     })
-    it("Should load all data (start date and impacts)", (done) => {
+    it("Should load all data (start date and modifiers)", (done) => {
         graph.loadData().then(() => {
             const node1 = graph.nodes.get("1root")
             const node2 = graph.nodes.get("2short")
@@ -196,17 +196,17 @@ describe("Graph persistence", () => {
             const node4 = graph.nodes.get("4reducing")
 
             chai.expect(node1.startDate.getTime()).to.equals(new Date(2016, 9, 2).getTime())
-            chai.expect(node1.impacts).to.length(1)
-            chai.expect(node1.impacts[0]).to.equals(8)
+            chai.expect(node1.modifiers).to.length(1)
+            chai.expect(node1.modifiers[0]).to.equals(8)
             chai.expect(node2.startDate.getTime()).to.equals(new Date(2016, 9, 18).getTime())
-            chai.expect(node2.impacts).to.length(2)
-            chai.expect(node2.impacts[0]).to.equals(10)
-            chai.expect(node2.impacts[1]).to.equals(12)
+            chai.expect(node2.modifiers).to.length(2)
+            chai.expect(node2.modifiers[0]).to.equals(10)
+            chai.expect(node2.modifiers[1]).to.equals(12)
             chai.expect(node3.startDate.getTime()).to.equals(new Date(2016, 9, 18).getTime())
-            chai.expect(node3.impacts).to.length(0)
+            chai.expect(node3.modifiers).to.length(0)
             chai.expect(node4.startDate.getTime()).to.equals(new Date(2016, 10, 17).getTime())
-            chai.expect(node4.impacts).to.length(1)
-            chai.expect(node4.impacts[0]).to.equals(15)
+            chai.expect(node4.modifiers).to.length(1)
+            chai.expect(node4.modifiers[0]).to.equals(15)
 
             done()
         }).catch((error: Error) => {

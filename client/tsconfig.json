@@ -11,7 +11,6 @@
         "../typings/index.d.ts",
         "./task.tsx",
         "./project.tsx",
-        "./common/dateutils.tsx",
         "./common/header.tsx",
         "./common/tabs.tsx",
         "./common/summary.tsx",
@@ -25,7 +24,7 @@
         "./task/main.tsx",
         "./task/overview.tsx",
         "./task/details.tsx",
-        "./task/impactbutton.tsx"
+        "./task/modifierbutton.tsx"
     ]
 }
  

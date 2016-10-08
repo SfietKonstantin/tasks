@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Task, Impact } from "../core/types"
+import { Project, Task, Modifier } from "../core/types"
 import { TaskNotFoundError } from "../core/data/idataprovider"
 import { RedisDataProvider } from "../core/data/redisdataprovider"
 
@@ -25,7 +25,7 @@ describe("Redis", () => {
 
         db = new RedisDataProvider(client)
     })
-    describe("getImpacts", () => {
+    describe("getModifiers", () => {
         it("Should add some testing data", (done) => {
             const project: Project = {
                 identifier: "project",
@@ -44,22 +44,22 @@ describe("Redis", () => {
                 }
                 
                 return db.addTask(task).then(() => {
-                    const impact1: Impact = {
+                    const modifier1: Modifier = {
                         id: null,
-                        name: "Impact 1",
+                        name: "Modifier 1",
                         description: "Description 1",
                         duration: 40
                     }
 
-                    const impact2: Impact = {
+                    const modifier2: Modifier = {
                         id: null,
-                        name: "Impact 2",
+                        name: "Modifier 2",
                         description: "Description 2",
                         duration: 10
                     }
 
-                    return db.addImpact(impact1).then(() => {
-                        return db.addImpact(impact2)
+                    return db.addModifier(modifier1).then(() => {
+                        return db.addModifier(modifier2)
                     })
                 }).then(() => {
                     done()
@@ -69,60 +69,60 @@ describe("Redis", () => {
             })
         })
         it("Should get an empty list", (done) => {
-            db.getImpacts([]).then((impacts: Array<Impact>) => {
-                chai.expect(impacts).to.length(0)
+            db.getModifiers([]).then((modifiers: Array<Modifier>) => {
+                chai.expect(modifiers).to.length(0)
                 done()
             })
         })
-        it("Should get impacts", (done) => {
-            db.getImpacts([2, 1]).then((impacts: Array<Impact>) => {
-                chai.expect(impacts).to.length(2)
-                chai.expect(impacts[0].id).to.equals(2)
-                chai.expect(impacts[0].name).to.equals("Impact 2")
-                chai.expect(impacts[0].description).to.equals("Description 2")
-                chai.expect(impacts[0].duration).to.equals(10)
-                chai.expect(impacts[1].id).to.equals(1)
-                chai.expect(impacts[1].name).to.equals("Impact 1")
-                chai.expect(impacts[1].description).to.equals("Description 1")
-                chai.expect(impacts[1].duration).to.equals(40)
+        it("Should get modifiers", (done) => {
+            db.getModifiers([2, 1]).then((modifiers: Array<Modifier>) => {
+                chai.expect(modifiers).to.length(2)
+                chai.expect(modifiers[0].id).to.equals(2)
+                chai.expect(modifiers[0].name).to.equals("Modifier 2")
+                chai.expect(modifiers[0].description).to.equals("Description 2")
+                chai.expect(modifiers[0].duration).to.equals(10)
+                chai.expect(modifiers[1].id).to.equals(1)
+                chai.expect(modifiers[1].name).to.equals("Modifier 1")
+                chai.expect(modifiers[1].description).to.equals("Description 1")
+                chai.expect(modifiers[1].duration).to.equals(40)
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
-        it("Should corrupt impact", (done) => {
-            client.delAsync("impact:1").then((result) => {
+        it("Should corrupt modifier", (done) => {
+            client.delAsync("modifier:1").then((result) => {
                 done()
             })
         })
-        it("Should get valid impacts", (done) => {
-            db.getImpacts([2, 1]).then((impacts: Array<Impact>) => {
-                chai.expect(impacts).to.length(2)
-                chai.expect(impacts[0].id).to.equals(2)
-                chai.expect(impacts[0].name).to.equals("Impact 2")
-                chai.expect(impacts[0].description).to.equals("Description 2")
-                chai.expect(impacts[0].duration).to.equals(10)
-                chai.expect(impacts[1]).to.null
+        it("Should get valid modifiers", (done) => {
+            db.getModifiers([2, 1]).then((modifiers: Array<Modifier>) => {
+                chai.expect(modifiers).to.length(2)
+                chai.expect(modifiers[0].id).to.equals(2)
+                chai.expect(modifiers[0].name).to.equals("Modifier 2")
+                chai.expect(modifiers[0].description).to.equals("Description 2")
+                chai.expect(modifiers[0].duration).to.equals(10)
+                chai.expect(modifiers[1]).to.null
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("impact:1", "test").then((result) => {
+            client.setAsync("modifier:1", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
-        it("Should get valid impacts", (done) => {
-            db.getImpacts([2, 1]).then((impacts: Array<Impact>) => {
-                chai.expect(impacts).to.length(2)
-                chai.expect(impacts[0].id).to.equals(2)
-                chai.expect(impacts[0].name).to.equals("Impact 2")
-                chai.expect(impacts[0].description).to.equals("Description 2")
-                chai.expect(impacts[0].duration).to.equals(10)
-                chai.expect(impacts[1]).to.null
+        it("Should get valid modifiers", (done) => {
+            db.getModifiers([2, 1]).then((modifiers: Array<Modifier>) => {
+                chai.expect(modifiers).to.length(2)
+                chai.expect(modifiers[0].id).to.equals(2)
+                chai.expect(modifiers[0].name).to.equals("Modifier 2")
+                chai.expect(modifiers[0].description).to.equals("Description 2")
+                chai.expect(modifiers[0].duration).to.equals(10)
+                chai.expect(modifiers[1]).to.null
                 done()
             }).catch((error: Error) => {
                 done(error)

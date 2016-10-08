@@ -1,21 +1,21 @@
 import * as React from "react"
 import { Col, Button, Modal, Form, FormGroup, FormControl, ControlLabel, InputGroup } from "react-bootstrap"
 import * as jquery from "jquery"
-import { Impact } from "../../core/types"
+import { Modifier } from "../../core/types"
 
-interface TaskImpactButtonProperties {
-    addImpactCallback: (impact: Impact) => void
+interface TaskModifierButtonProperties {
+    addModifierCallback: (modifier: Modifier) => void
 }
 
-interface TaskImpactButtonState {
+interface TaskModifierButtonState {
     show: boolean,
     name: string
     description: string,
     duration: number
 }
 
-export class TaskImpactButton extends React.Component<TaskImpactButtonProperties, TaskImpactButtonState> {
-    constructor(props: TaskImpactButtonProperties) {
+export class TaskModifierButton extends React.Component<TaskModifierButtonProperties, TaskModifierButtonState> {
+    constructor(props: TaskModifierButtonProperties) {
         super(props)
         this.state = {
             show: false,
@@ -28,7 +28,7 @@ export class TaskImpactButton extends React.Component<TaskImpactButtonProperties
         return <Button onClick={this.open.bind(this)}>
             <Modal show={this.state.show} bsSize="large" onHide={this.close.bind(this)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Add impact modifier</Modal.Title>
+                    <Modal.Title>Add task modifier</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form horizontal>
@@ -124,13 +124,13 @@ export class TaskImpactButton extends React.Component<TaskImpactButtonProperties
     }
     private handleSave(e: React.MouseEvent) {
         e.preventDefault()
-        const impact: Impact = {
+        const modifier: Modifier = {
             id: null,
             name: this.state.name,
             description: this.state.description,
             duration: this.state.duration
         }
-        this.props.addImpactCallback(impact)
+        this.props.addModifierCallback(modifier)
         this.close()
     }
 }

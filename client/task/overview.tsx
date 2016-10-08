@@ -2,7 +2,7 @@ import * as React from "react"
 import { Row, Col, Panel, ProgressBar, Label } from "react-bootstrap"
 import * as jquery from "jquery"
 import { Task, TaskResults } from "../../core/types"
-import * as dateutils from "../common/dateutils"
+import * as dateutils from "../../core/dateutils"
 
 interface TaskOverviewStateIndicatorProperties {
     icon: string

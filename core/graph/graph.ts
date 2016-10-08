@@ -1,9 +1,9 @@
-import { Task, TaskResults, Impact } from "../types"
+import { Task, TaskResults, Modifier } from "../types"
 import { CyclicDependencyError } from "./igraph"
 import { TaskNode } from "./types"
 import { IDataProvider, TaskNotFoundError } from "../data/idataprovider"
 
-function buildGraphIndex(root: TaskNode, map: Map<string, TaskNode>): void {
+export function buildGraphIndex(root: TaskNode, map: Map<string, TaskNode>): void {
     if (map.has(root.identifier)) {
         return
     }
@@ -15,7 +15,7 @@ function buildGraphIndex(root: TaskNode, map: Map<string, TaskNode>): void {
 
 function computeDuration(node: TaskNode) : void {
     node.duration = node.estimatedDuration
-    node.duration += Math.max(node.impacts.reduce((previous: number, current: number) => {
+    node.duration += Math.max(node.modifiers.reduce((previous: number, current: number) => {
         return previous + current
     }, 0), 0)
 }
@@ -84,25 +84,25 @@ export class GraphPersistence {
         })
     }
     loadData() : Promise<void> {
-        let impactMap = new Map<number, Array<string>>() // Map impact id to tasks
+        let modifierMap = new Map<number, Array<string>>() // Map modifier id to tasks
         return Promise.all(Array.from(this.nodes.values(), (node: TaskNode) => {
-            return this.dataProvider.getTaskImpactIds(node.identifier).then((ids: Array<number>) => {
+            return this.dataProvider.getTaskModifierIds(node.identifier).then((ids: Array<number>) => {
                 ids.forEach((identifier: number) => {
-                    if (!impactMap.has(identifier)) {
-                        impactMap.set(identifier, new Array<string>())
+                    if (!modifierMap.has(identifier)) {
+                        modifierMap.set(identifier, new Array<string>())
                     }
-                    impactMap.get(identifier).push(node.identifier)
+                    modifierMap.get(identifier).push(node.identifier)
                 })
             })
         })).then(() => {
-            let keys = Array.from(impactMap.keys()).sort()
-            return this.dataProvider.getImpactsValues(keys).then((values: Array<number>) => {
+            let keys = Array.from(modifierMap.keys()).sort()
+            return this.dataProvider.getModifiersValues(keys).then((values: Array<number>) => {
                 for (let i in keys) {
-                    let impactId = keys[i]
-                    let taskIds = impactMap.get(impactId)
+                    let modifierId = keys[i]
+                    let taskIds = modifierMap.get(modifierId)
 
                     taskIds.forEach((taskIdentifier: string) => {
-                        this.nodes.get(taskIdentifier).impacts.push(values[i])
+                        this.nodes.get(taskIdentifier).modifiers.push(values[i])
                     })
                 }
             })
@@ -110,6 +110,7 @@ export class GraphPersistence {
             return Promise.all(Array.from(this.nodes.values(), (node: TaskNode) => {
                 return this.dataProvider.getTaskResults(node.identifier).then((result: TaskResults) => {
                     node.startDate = result.startDate
+                    node.duration = result.duration
                 })
             }))
         }).then(() => {})

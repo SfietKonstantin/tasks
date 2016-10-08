@@ -6,7 +6,7 @@ export class TaskNode {
     duration: number
     parents: Array<TaskNode>
     children: Array<TaskNode>
-    impacts: Array<number>
+    modifiers: Array<number>
 
     constructor(identifier: string) {
         this.identifier = identifier
@@ -16,7 +16,7 @@ export class TaskNode {
         this.duration = null
         this.parents = new Array<TaskNode>()
         this.children = new Array<TaskNode>()
-        this.impacts = new Array<number>()
+        this.modifiers = new Array<number>()
     }
 
     addChild(child: TaskNode) {

@@ -75,19 +75,19 @@ describe("Graph", () => {
             chai.expect(node3.startDate.getTime()).to.equals(new Date(2015, 10, 15).getTime())
             chai.expect(node3.duration).to.equals(15)
         })
-        it("Should compute the correct start time with impact", () => {
+        it("Should compute the correct start time with modifier", () => {
             let node0 = new TaskNode("root")
             node0.estimatedStartDate = new Date(2015, 9, 1)
             node0.estimatedDuration = 15
-            node0.impacts.push(8)
+            node0.modifiers.push(8)
             node0.startDate = new Date(2015, 9, 2)
 
             let node1 = new TaskNode("short")
             node1.estimatedStartDate = new Date(2015, 9, 16)
             node1.estimatedDuration = 15
             node1.startDate = new Date(2015, 9, 18)
-            node1.impacts.push(10)
-            node1.impacts.push(12)
+            node1.modifiers.push(10)
+            node1.modifiers.push(12)
             node0.addChild(node1)
 
             let node2 = new TaskNode("long")
@@ -100,7 +100,7 @@ describe("Graph", () => {
             node3.estimatedStartDate = new Date(2015, 10, 15)
             node3.estimatedDuration = 15
             node3.startDate = new Date(2015, 10, 17)
-            node3.impacts.push(15)
+            node3.modifiers.push(15)
             node1.addChild(node3)
             node2.addChild(node3)
 

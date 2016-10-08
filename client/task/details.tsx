@@ -1,8 +1,8 @@
 import * as React from "react"
 import { Grid, Panel, Col, Label, Table } from "react-bootstrap"
 import * as jquery from "jquery"
-import * as dateutils from "../common/dateutils"
-import { Task, TaskResults, Impact } from "../../core/types"
+import * as dateutils from "../../core/dateutils"
+import { Task, TaskResults, Modifier } from "../../core/types"
 
 interface TaskDetailsMilestoneProperties {
     date: Date
@@ -35,7 +35,7 @@ interface TaskDetailsProperties {
     visible: boolean
     task: Task
     taskResults: TaskResults
-    impacts: Array<Impact>
+    modifiers: Array<Modifier>
 }
 
 export class TaskDetails extends React.Component<TaskDetailsProperties, {}> {
@@ -47,22 +47,22 @@ export class TaskDetails extends React.Component<TaskDetailsProperties, {}> {
         let startDelay: [JSX.Element, JSX.Element] = [null, null]
         const startDateDiff = dateutils.getDateDiff(this.props.task.estimatedStartDate, this.props.taskResults.startDate)
         if (startDateDiff != 0) {
-            startDelay = [<TaskDetailsDuration duration={"" + startDateDiff} label="Impact due to xxxx (TODO)" 
+            startDelay = [<TaskDetailsDuration duration={"" + startDateDiff} label="Modifier due to xxxx (TODO)" 
                                                color="warning" />,
                           <TaskDetailsMilestone date={this.props.taskResults.startDate} label="Start date" />]
         }
         let endDate = dateutils.addDays(this.props.taskResults.startDate, this.props.task.estimatedDuration)
-        let impacts = new Array<JSX.Element>()
-        impacts.push(<TaskDetailsMilestone date={endDate} label="" />)
-        this.props.impacts.forEach((value: Impact) => {
+        let modifiers = new Array<JSX.Element>()
+        modifiers.push(<TaskDetailsMilestone date={endDate} label="" />)
+        this.props.modifiers.forEach((value: Modifier) => {
             endDate = dateutils.addDays(endDate, value.duration)
             const color = value.duration > 0 ? "warning" : "success"
-            impacts.push(<TaskDetailsDuration duration={"" + value.duration} label={value.name}
+            modifiers.push(<TaskDetailsDuration duration={"" + value.duration} label={value.name}
                                               color={color} />)
-            impacts.push(<TaskDetailsMilestone date={endDate} label="" />)
+            modifiers.push(<TaskDetailsMilestone date={endDate} label="" />)
         })
 
-        impacts.pop()
+        modifiers.pop()
 
         return <Grid className={this.props.visible ? "" : "hidden"}>
             <Col id="main" xs={12} md={12}>
@@ -70,7 +70,7 @@ export class TaskDetails extends React.Component<TaskDetailsProperties, {}> {
                     <TaskDetailsMilestone date={this.props.task.estimatedStartDate} label="Planned start date" />
                     {startDelay}
                     <TaskDetailsDuration duration={"" + this.props.task.estimatedDuration} label="Planned duration" />
-                    {impacts}
+                    {modifiers}
                     <TaskDetailsMilestone date={this.getEndDate()} label="End date" />
                 </Panel>
             </Col>

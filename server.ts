@@ -52,7 +52,7 @@ export class Server {
         this.app.get('/api/task/:identifier/important', this.api.isTaskImportant.bind(this.api))
         this.app.put('/api/task/:identifier/important', this.api.putTaskImportant.bind(this.api))
         this.app.delete('/api/task/:identifier/important', this.api.deleteTaskImportant.bind(this.api))
-        this.app.post('/api/impact', this.api.postImpact.bind(this.api))
+        this.app.post('/api/modifier', this.api.postModifier.bind(this.api))
 
         this.app.use(this.errorHandler)
         this.registerErrorHandlers()

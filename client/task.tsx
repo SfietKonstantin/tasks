@@ -4,7 +4,7 @@ import * as jquery from "jquery"
 import { TaskHeader } from "./task/header"
 import { TaskMain } from "./task/main"
 import { TaskDetails } from "./task/details"
-import { Project, Task, TaskResults, Impact } from "../core/types"
+import { Project, Task, TaskResults, Modifier } from "../core/types"
 import * as apitypes from "../core/apitypes"
 
 interface TaskComponentProperties {
@@ -16,7 +16,7 @@ interface TaskComponentState {
     project: Project
     task: Task
     taskResults: TaskResults
-    impacts: Array<Impact>
+    modifiers: Array<Modifier>
 }
 
 class TaskComponent extends React.Component<TaskComponentProperties, TaskComponentState> {
@@ -27,7 +27,7 @@ class TaskComponent extends React.Component<TaskComponentProperties, TaskCompone
             project: null,
             task: null,
             taskResults: null,
-            impacts: null
+            modifiers: null
         }
     }
     render() {
@@ -37,11 +37,11 @@ class TaskComponent extends React.Component<TaskComponentProperties, TaskCompone
         if (this.state.project && this.state.task) {
             taskHeader = <TaskHeader project={this.state.project} task={this.state.task}  
                                      tabChangedCallback={this.handleTabChange.bind(this)} 
-                                     addImpactCallback={this.addImpact.bind(this)} />
+                                     addModifierCallback={this.addModifierCallback.bind(this)} />
             tab0 = <TaskMain visible={this.state.tabIndex==0} task={this.state.task} 
                              taskResults={this.state.taskResults} />
             tab1 = <TaskDetails visible={this.state.tabIndex==1} task={this.state.task} 
-                                taskResults={this.state.taskResults} impacts={this.state.impacts} />
+                                taskResults={this.state.taskResults} modifiers={this.state.modifiers} />
         }
         return <div> 
             {taskHeader}
@@ -59,7 +59,7 @@ class TaskComponent extends React.Component<TaskComponentProperties, TaskCompone
                 project: this.state.project, 
                 task: this.state.task,
                 taskResults: this.state.taskResults,
-                impacts: this.state.impacts
+                modifiers: this.state.modifiers
             })
         }
     }
@@ -68,33 +68,33 @@ class TaskComponent extends React.Component<TaskComponentProperties, TaskCompone
             url: "/api/task/" + this.props.identifier,
             dataType: 'json',
             cache: false,
-            success: (data: apitypes.ApiProjectTaskImpacts) => {
+            success: (data: apitypes.ApiProjectTaskModifiers) => {
                 this.setState({
                     tabIndex: this.state.tabIndex,
                     project: data.project,
                     task: apitypes.createTaskFromApiTask(data.project, data.task),
                     taskResults: apitypes.createTaskResultsFromApiTask(data.task),
-                    impacts: data.impacts
+                    modifiers: data.modifiers
                 })
             }
         })
     }
-    private addImpact(impact: Impact) {
+    private addModifierCallback(modifier: Modifier) {
         jquery.post({
-            url: "/api/impact/",
+            url: "/api/modifier/",
             dataType: 'json',
             data: {
-                "impact": JSON.stringify(impact),
+                "modifier": JSON.stringify(modifier),
                 "task": this.props.identifier
             },
             cache: false,
-            success: (data: apitypes.ApiProjectTaskImpacts) => {
+            success: (data: apitypes.ApiProjectTaskModifiers) => {
                 this.setState({
                     tabIndex: this.state.tabIndex,
                     project: data.project,
                     task: apitypes.createTaskFromApiTask(data.project, data.task),
                     taskResults: apitypes.createTaskResultsFromApiTask(data.task),
-                    impacts: data.impacts
+                    modifiers: data.modifiers
                 })
             }
         })

@@ -1,4 +1,4 @@
-import { Project, Task, TaskResults, Impact } from "./types"
+import { Project, Task, TaskResults, Modifier } from "./types"
 
 export interface ApiTask {
     identifier: string
@@ -10,10 +10,10 @@ export interface ApiTask {
     duration: number
 }
 
-export interface ApiProjectTaskImpacts {
+export interface ApiProjectTaskModifiers {
     project: Project
     task: ApiTask
-    impacts: Array<Impact>
+    modifiers: Array<Modifier>
 }
 
 export interface ApiProjectTasks {

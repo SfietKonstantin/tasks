@@ -21,9 +21,17 @@ export interface TaskResults {
     duration: number
 }
 
-export interface Impact {
+export interface Modifier {
     id: number
     name: string
     description: string
     duration: number
+}
+
+export interface Delay {
+    projectIdentifier: string
+    identifier: string
+    name: string
+    description: string
+    date: Date
 }

@@ -1,12 +1,12 @@
 import * as React from "react"
 import { Col, Button, ButtonGroup } from "react-bootstrap"
-import { TaskImpactButton } from "./impactbutton"
+import { TaskModifierButton } from "./modifierbutton"
 import * as jquery from "jquery"
-import { Impact } from "../../core/types"
+import { Modifier } from "../../core/types"
 
 interface TaskToolsProperties {
     taskIdentifier: string
-    addImpactCallback: (impact: Impact) => void
+    addModifierCallback: (modifier: Modifier) => void
 }
 
 interface TaskToolsState {
@@ -26,10 +26,10 @@ export class TaskHeaderTools extends React.Component<TaskToolsProperties, TaskTo
         return <Col xs={4} md={4}> 
             <div className="task-header-tools"> 
                 <ButtonGroup>
-                    <TaskImpactButton addImpactCallback={this.props.addImpactCallback}>
+                    <TaskModifierButton addModifierCallback={this.props.addModifierCallback}>
                         <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
                         <span className="visible-md-inline visible-lg-inline"> Add duration modifier</span>
-                    </TaskImpactButton>
+                    </TaskModifierButton>
                     <Button bsStyle={this.getImportantStyle()} onClick={this.handleImportant.bind(this)} 
                             disabled={!this.state.importantEnabled} >
                         <span className="glyphicon glyphicon-star" aria-hidden="true"></span>
