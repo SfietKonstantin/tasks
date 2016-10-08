@@ -146,7 +146,4 @@ export class GraphPersistence {
             })
         })
     }
-    private static compareNumbers(first: number, second: number) : number {
-        return first - second
-    }
 }
