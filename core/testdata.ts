@@ -45,7 +45,7 @@ function fillTasksData(dataProvider: IDataProvider, projectId: number) : Promise
             estimatedStartDate: new Date(2016, 10, 16),
             estimatedDuration: 30
         }
-    ];
+    ]
                 
     const mappedTasks = tasks.map((task: Task) => { return dataProvider.addTask(projectId, task) })
     return Promise.all(mappedTasks).then((ids) => {})

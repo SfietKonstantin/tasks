@@ -18,6 +18,7 @@ module.exports = {
     externals: {
         "react": "React",
         "react-dom": "ReactDOM",
+        "react-bootstrap": "ReactBootstrap",
         "jquery": "jQuery"
     }
 }

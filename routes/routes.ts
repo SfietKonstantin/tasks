@@ -9,7 +9,7 @@ export class Routes {
         this.dataProvider = dataProvider
     }
     index(req: express.Request, res: express.Response) {
-        res.render('index');
+        res.render('index')
     }
     getProject(req: express.Request, res: express.Response) {
         const id = +String(req.params.id)

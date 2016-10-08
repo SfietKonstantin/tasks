@@ -1,8 +1,9 @@
 import * as express from "express"
-import { Project, Task, TaskResults } from "../core/types"
+import { Project, Task, TaskResults, Impact } from "../core/types"
 import * as apitypes from "../core/apitypes"
 import { IDataProvider, NotFoundError } from "../core/data/idataprovider"
 import { TaskNode } from "../core/graph/types"
+import { compute, GraphPersistence } from "../core/graph/graph"
 
 class RequestError {
     message: string
@@ -43,17 +44,7 @@ export class Api {
     }
     getTask(req: express.Request, res: express.Response) {
         const id = +String(req.params.id)
-        this.dataProvider.getTask(id).then((task: Task) => {
-            return this.dataProvider.getProject(task.projectId).then((project: Project) => {
-                return this.dataProvider.getTaskResults(task.id).then((taskResults: TaskResults) => {
-                    const apiTask: apitypes.ApiProjectAndTask = {
-                        project: project,
-                        task: apitypes.createApiTask(task, taskResults)
-                    }
-                    res.json(apiTask)
-                })
-            })
-        }).catch((error: Error) => {
+        this.sendTask(id, res).catch((error: Error) => {
             if (error instanceof NotFoundError) {
                 res.status(404).json(error)
             } else {
@@ -79,6 +70,32 @@ export class Api {
     deleteTaskImportant(req: express.Request, res: express.Response) {
        this.setTaskImportant(req, res, false) 
     }
+    postImpact(req: express.Request, res: express.Response) {
+        const impact = JSON.parse(req.body.impact) as Impact
+        const taskId = +Number(req.body.task)
+
+        let graph: GraphPersistence = new GraphPersistence(this.dataProvider)
+        this.dataProvider.hasTask(taskId).then(() => {
+            return this.dataProvider.addImpact(impact)
+        }).then((id: number) => {
+            return this.dataProvider.setImpactForTask(id, taskId)
+        }).then(() => {
+            return graph.loadGraph(taskId)
+        }).then(() => {
+            return graph.loadData()
+        }).then(() => {
+            compute(graph.root)
+            return graph.save()
+        }).then(() => {
+            return this.sendTask(taskId, res)
+        }).catch((error: Error) => {
+            if (error instanceof NotFoundError) {
+                res.status(404).json(error)
+            } else {
+                res.status(500).json(error)
+            }
+        })
+    }
     private setTaskImportant(req: express.Request, res: express.Response, important: boolean) {
         const id = +String(req.params.id)
         this.dataProvider.setTaskImportant(id, important).then(() => {
@@ -89,6 +106,24 @@ export class Api {
             } else {
                 res.status(500).json(error)
             }
+        })
+    }
+    private sendTask(id: number, res: express.Response) : Promise<void> {
+        return this.dataProvider.getTask(id).then((task: Task) => {
+            return this.dataProvider.getProject(task.projectId).then((project: Project) => {
+                return this.dataProvider.getTaskResults(task.id).then((taskResults: TaskResults) => {
+                    return this.dataProvider.getTaskImpactIds(id).then((ids: Array<number>) => {
+                        return this.dataProvider.getImpacts(ids).then((impacts: Array<Impact>) => {
+                            const apiTask: apitypes.ApiProjectTaskImpacts = {
+                                project: project,
+                                task: apitypes.createApiTask(task, taskResults),
+                                impacts: impacts
+                            }
+                            res.json(apiTask)
+                        })
+                    })
+                })
+            })
         })
     }
 }

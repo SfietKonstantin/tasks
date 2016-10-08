@@ -5,14 +5,14 @@ import { Project, Task, Impact, TaskResults } from "../core/types"
 import { TaskNotFoundError, InvalidInputError, TransactionError } from "../core/data/idataprovider"
 import { RedisDataProvider } from "../core/data/redisdataprovider"
 
-const redisAsync: any = bluebird.promisifyAll(redis);
+const redisAsync: any = bluebird.promisifyAll(redis)
 
 declare module 'redis' {
     export interface RedisClient extends NodeJS.EventEmitter {
-        setAsync(...args: any[]): Promise<any>;
-        delAsync(...args: any[]): Promise<any>;
-        hmsetAsync(...args: any[]): Promise<any>;
-        hdelAsync(...args: any[]): Promise<any>;
+        setAsync(...args: any[]): Promise<any>
+        delAsync(...args: any[]): Promise<any>
+        hmsetAsync(...args: any[]): Promise<any>
+        hdelAsync(...args: any[]): Promise<any>
     }
 }
 

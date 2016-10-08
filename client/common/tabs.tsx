@@ -1,5 +1,6 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import * as React from "react"
+import * as ReactDOM from "react-dom"
+import {Col, Nav, NavItem} from "react-bootstrap"
 
 interface TabBarProperties {
     tabs: Array<String>
@@ -21,22 +22,23 @@ export class TabBar extends React.Component<TabBarProperties, TabBarState> {
             let label = this.props.tabs[i]
             let className = (i == this.state.currentTab ? "active" : "")
             tabs.push(
-                <li role="presentation" className={className}>
+                <NavItem eventKey={i}>{label}</NavItem>
+                /*<li role="presentation" className={className}>
                     <a href="#" onClick={this.handleClick.bind(this, i)}>{label}</a>
-                </li>
+                </li>*/
             )
         }
-        return <div id="page-header-tabs" className="col-xs-12 col-md-8">
-            <ul className="page-header-nav nav nav-tabs">
+        return <Col id="page-header-tabs" xs={12} md={8}>
+            <Nav bsStyle="tabs" activeKey={this.state.currentTab} 
+                 className="page-header-nav" onSelect={this.handleClick.bind(this)}>
                 {tabs}
-            </ul>
-        </div>
+            </Nav>
+        </Col>
     }
     componentDidMount() {
         this.props.tabChangedCallback(this.state.currentTab)
     }
-    private handleClick(index: number, e: React.MouseEvent) {
-        e.preventDefault()
+    private handleClick(index: number) {
         this.props.tabChangedCallback(index)
         this.setState({currentTab: index})
     }

@@ -1,8 +1,10 @@
 import * as React from "react"
+import { Grid, Col, Button, ButtonGroup, ListGroup, ListGroupItem } from "react-bootstrap"
 import * as jquery from "jquery"
-import * as apitypes from "../../core/apitypes"
+import * as apitypes from "../../core/apitypes" 
 
 interface ProjectAllTasksProperties {
+    visible: boolean
     notStarted: Array<apitypes.ApiTask>
     inProgress: Array<apitypes.ApiTask>
     done: Array<apitypes.ApiTask>
@@ -22,44 +24,40 @@ export class ProjectAllTasks extends React.Component<ProjectAllTasksProperties, 
         this.state = this.makeState(true, true, false)
     }
     render() {
-        const notStartedChecked = ProjectAllTasks.getButtonClassName(this.state.notStartedChecked)
-        const inProgressChecked = ProjectAllTasks.getButtonClassName(this.state.inProgressChecked)
-        const doneChecked = ProjectAllTasks.getButtonClassName(this.state.doneChecked)
+        const notStartedChecked = ProjectAllTasks.getButtonStyle(this.state.notStartedChecked)
+        const inProgressChecked = ProjectAllTasks.getButtonStyle(this.state.inProgressChecked)
+        const doneChecked = ProjectAllTasks.getButtonStyle(this.state.doneChecked)
         const content = this.state.tasks.map((value: apitypes.ApiTask) => {
             const taskLink = "/task/" + value.id
-            return <tr>
-                <td>
-                    <a href={taskLink}><b>{value.name}</b></a>
-                </td>
-            </tr>
+            return <ListGroupItem href={taskLink}>
+                {value.name}
+            </ListGroupItem>
         })
-        return <div className="container">
-            <div id="main" className="col-xs-12 col-md-12">
-                <div className="panel panel-default project-alltasks-table">
+        return <Grid className={this.props.visible ? "" : "hidden"}>
+            <Col id="main" xs={12} md={12}>
+                <div className="panel panel-default tab-table">
                     <div className="panel-heading">
-                        <div className="btn-group">
-                            <button type="button" className={notStartedChecked} onClick={this.handleNotStartedClicked.bind(this)}>
+                        <ButtonGroup>
+                            <Button bsStyle={notStartedChecked} onClick={this.handleNotStartedClicked.bind(this)}>
                                 <span className="glyphicon glyphicon-time" aria-hidden="true"></span> Not started
-                            </button>
-                            <button type="button" className={inProgressChecked} onClick={this.handleInProgress.bind(this)}>
+                            </Button>
+                            <Button bsStyle={inProgressChecked} onClick={this.handleInProgress.bind(this)}>
                                 <span className="glyphicon glyphicon-plane" aria-hidden="true"></span> In progress
-                            </button>
-                            <button type="button" className={doneChecked} onClick={this.handleDoneClicked.bind(this)}>
+                            </Button>
+                            <Button bsStyle={doneChecked} onClick={this.handleDoneClicked.bind(this)}>
                                 <span className="glyphicon glyphicon-ok" aria-hidden="true"></span> Done
-                            </button>
-                        </div>
+                            </Button>
+                        </ButtonGroup>
                     </div>
-                    <table className="table table-hover">
-                        <tbody>
-                            {content}
-                        </tbody>
-                    </table>
+                    <ListGroup fill hover>
+                        {content}
+                    </ListGroup>
                 </div>
-            </div>
-        </div>
+            </Col>
+        </Grid>
     }
-    private static getButtonClassName(checked: boolean) : string {
-        return checked ? "btn btn-primary" : "btn btn-default"
+    private static getButtonStyle(checked: boolean) : string {
+        return checked ? "primary" : "default"
     }
     private makeState(notStartedChecked: boolean, inProgressChecked: boolean, doneChecked: boolean) : ProjectAllTasksState {
         let state: ProjectAllTasksState = {

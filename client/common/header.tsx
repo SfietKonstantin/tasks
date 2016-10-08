@@ -1,5 +1,6 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import * as React from "react"
+import * as ReactDOM from "react-dom"
+import { Grid, Col } from "react-bootstrap"
 
 interface HeaderProperties {
     id: number
@@ -10,12 +11,12 @@ interface HeaderProperties {
 export class Header extends React.Component<HeaderProperties, {}> {
     render() {
         return <div className="page-header navbar-default">
-            <div className="container page-header-container">
-                <div className="col-xs-11 col-md-8">
+            <Grid className="page-header-container">
+                <Col xs={8} md={8}>
                     <h1>{this.props.name} <small>#{+this.props.id}</small></h1>
-                </div>
+                </Col>
                 {this.props.children}
-            </div>
+            </Grid>
         </div>
     }
 }

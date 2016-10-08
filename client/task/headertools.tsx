@@ -1,29 +1,43 @@
 import * as React from "react"
+import { Col, Button, ButtonGroup } from "react-bootstrap"
+import { TaskImpactButton } from "./impactbutton"
 import * as jquery from "jquery"
+import { Impact } from "../../core/types"
 
 interface TaskToolsProperties {
     taskId: number
+    addImpactCallback: (impact: Impact) => void
 }
 
 interface TaskToolsState {
-    enabled: boolean
+    importantEnabled: boolean
     important: boolean
 }
 
 export class TaskHeaderTools extends React.Component<TaskToolsProperties, TaskToolsState> {
     constructor(props: TaskToolsProperties) {
         super(props)
-        this.state = { enabled: false, important: false}
+        this.state = { 
+            importantEnabled: false, 
+            important: false
+        }
     }
     render() {
-        return <div className="col-xs-1 col-md-4"> 
-            <form className="task-header-tools" onSubmit={this.handleSubmit.bind(this)}> 
-                <button className={this.getClassName()} type="submit">
-                    <span className="glyphicon glyphicon-star" aria-hidden="true"></span>
-                    <span className="visible-md-inline visible-lg-inline"> {this.getLabel()}</span>
-                </button>
-            </form>
-        </div>
+        return <Col xs={4} md={4}> 
+            <div className="task-header-tools"> 
+                <ButtonGroup>
+                    <TaskImpactButton addImpactCallback={this.props.addImpactCallback}>
+                        <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        <span className="visible-md-inline visible-lg-inline"> Add duration modifier</span>
+                    </TaskImpactButton>
+                    <Button bsStyle={this.getImportantStyle()} onClick={this.handleImportant.bind(this)} 
+                            disabled={!this.state.importantEnabled} >
+                        <span className="glyphicon glyphicon-star" aria-hidden="true"></span>
+                        <span className="visible-md-inline visible-lg-inline"> {this.getLabel()}</span>
+                    </Button>
+                </ButtonGroup>
+            </div>
+        </Col>
     }
     componentDidMount() {
         jquery.get({
@@ -31,34 +45,36 @@ export class TaskHeaderTools extends React.Component<TaskToolsProperties, TaskTo
             dataType: 'json',
             cache: false,
             success: (data: TaskToolsState) => {
-                this.setState(TaskHeaderTools.makeState(data, true));
+                this.setState({
+                    important: this.state.important, 
+                    importantEnabled: true
+                })
             }
         })
     }
-    private handleSubmit(e: React.FormEvent) {
+    private handleImportant(e: React.FormEvent) {
         e.preventDefault()
-        if (this.state.enabled) {
-            this.setState(TaskHeaderTools.makeState(this.state, false));
+        if (this.state.importantEnabled) {
+            this.setState({
+                important: this.state.important, 
+                importantEnabled: false
+            })
             jquery.ajax({
                 type: this.state.important ? "DELETE" : "PUT",
                 url: "/api/task/" + this.props.taskId + "/important",
                 success: (data: TaskToolsState) => {
-                    this.setState(TaskHeaderTools.makeState(data, true));
+                    this.setState({
+                        important: this.state.important, 
+                        importantEnabled: true
+                    })
                 }
             })
         }
     }
-    private getClassName() : string {
-        let className = this.state.important ? "btn btn-danger" : "btn btn-default"
-        if (!this.state.enabled) {
-            className += " disabled"
-        } 
-        return className 
+    private getImportantStyle() : string {
+        return this.state.important ? "danger" : "default"
     }
     private getLabel() : string {
         return this.state.important ? "Important" : "Set as important"
-    }
-    private static makeState(state: TaskToolsState, enabled: boolean) {
-        return {important: state.important, enabled: enabled}
     }
 }

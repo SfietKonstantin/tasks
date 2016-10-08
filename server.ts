@@ -31,7 +31,7 @@ export class Server {
         this.api = new Api(this.dataProvider)
         this.routes = new Routes(this.dataProvider)
         this.app = express()
-        this.app.set('view engine', 'ejs');
+        this.app.set('view engine', 'ejs')
         this.app.set('views', path.join(__dirname, 'views'))
 
         // uncomment after placing your favicon in /public
@@ -52,6 +52,7 @@ export class Server {
         this.app.get('/api/task/:id/important', this.api.isTaskImportant.bind(this.api))
         this.app.put('/api/task/:id/important', this.api.putTaskImportant.bind(this.api))
         this.app.delete('/api/task/:id/important', this.api.deleteTaskImportant.bind(this.api))
+        this.app.post('/api/impact', this.api.postImpact.bind(this.api))
 
         this.app.use(this.errorHandler)
         this.registerErrorHandlers()
@@ -59,10 +60,10 @@ export class Server {
 
     public start(port: number) {
         this.app.set('port', port)
-        this.server = http.createServer(this.app);
-        this.server.listen(port);
-        this.server.on('error', this.onServerError.bind(this));
-        this.server.on('listening', this.onServerListening.bind(this));
+        this.server = http.createServer(this.app)
+        this.server.listen(port)
+        this.server.on('error', this.onServerError.bind(this))
+        this.server.on('listening', this.onServerListening.bind(this))
     }
 
     private errorHandler(req: express.Request, res: express.Response, next: express.NextFunction) {

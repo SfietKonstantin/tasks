@@ -43,6 +43,7 @@ export interface IDataProvider {
     setProjectRootTask(projectId: number, taskId: number) : Promise<void>
     getProjectRootTask(projectId: number) : Promise<number>
 
+    hasTask(id: number) : Promise<void>
     getTasks(ids: Array<number>) : Promise<Array<Task>>
     getTask(id: number) : Promise<Task>
     getProjectTasks(id: number) : Promise<Array<Task>>

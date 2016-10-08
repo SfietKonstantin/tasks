@@ -5,13 +5,13 @@ import { Project, Task } from "../core/types"
 import { ProjectNotFoundError, TaskNotFoundError } from "../core/data/idataprovider"
 import { RedisDataProvider } from "../core/data/redisdataprovider"
 
-const redisAsync: any = bluebird.promisifyAll(redis);
+const redisAsync: any = bluebird.promisifyAll(redis)
 
 declare module 'redis' {
     export interface RedisClient extends NodeJS.EventEmitter {
-        setAsync(...args: any[]): Promise<any>;
-        delAsync(...args: any[]): Promise<any>;
-        hdelAsync(...args: any[]): Promise<any>;
+        setAsync(...args: any[]): Promise<any>
+        delAsync(...args: any[]): Promise<any>
+        hdelAsync(...args: any[]): Promise<any>
     }
 }
 
@@ -23,6 +23,65 @@ describe("Redis", () => {
         client.select(3)
 
         db = new RedisDataProvider(client)
+    })
+    describe("hasTask", () => {
+        it("Should add some testing data", (done) => {
+            const project: Project = {
+                id: null,
+                name: "Project",
+                description: "Description"
+            }
+
+            db.addProject(project).then((projectId: number) => {
+                chai.expect(projectId).to.equals(1)
+
+                const task1: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                const task2: Task = {
+                    id: null,
+                    projectId: projectId,
+                    name: "Task 2",
+                    description: "Description 2",
+                    estimatedStartDate: new Date(2016, 9, 15),
+                    estimatedDuration: 15
+                }
+                
+                return db.addTask(projectId, task1).then((result: number) => {
+                    chai.expect(result).to.equals(1)
+                }).then(() => {
+                    return db.addTask(projectId, task2)
+                }).then((result: number) => {
+                    chai.expect(result).to.equals(2)
+                    done()
+                })
+            }).catch((error: Error) => {
+                done(error)
+            })
+        })
+        it("Should have task", (done) => {
+            db.hasTask(1).then(() => {
+                done()
+            }).catch((error: Error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on invalid task", (done) => {
+            db.hasTask(3).then(() => {
+                done(new Error("getTask should not be a success"))
+            }).catch((error: Error) => {
+                chai.expect(error).to.instanceOf(TaskNotFoundError)
+                done()
+            })
+        })
+        after(() => {
+            client.flushdb()
+        })
     })
     describe("getTasks", () => {
         it("Should add some testing data", (done) => {

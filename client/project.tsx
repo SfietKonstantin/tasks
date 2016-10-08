@@ -1,5 +1,5 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import * as React from "react"
+import * as ReactDOM from "react-dom"
 import * as jquery from "jquery"
 import { ProjectHeader } from "./project/header"
 import { ProjectMain } from "./project/main"
@@ -28,20 +28,19 @@ class ProjectComponent extends React.Component<ProjectComponentProperties, Proje
     }
     render() {
         let taskHeader: JSX.Element = null
-        let tabContent: JSX.Element = null
+        let tab0: JSX.Element = null
+        let tab1: JSX.Element = null
         if (this.state.project) {
-            taskHeader = <ProjectHeader project={this.state.project}  
+            const properties = ProjectComponent.makeProperties(this.state.tasks)
+            taskHeader = <ProjectHeader project={this.state.project}
                                         tabChangedCallback={this.handleTabChange.bind(this)} />
-            if (this.state.tabIndex == 0) {
-                tabContent = <ProjectMain project={this.state.project} />
-            } else if (this.state.tabIndex == 1) {
-                const properties = ProjectComponent.makeProperties(this.state.tasks)
-                tabContent = <ProjectAllTasks notStarted={properties[0]} inProgress={properties[1]} done={properties[2]} />
-            }
+            tab0 = <ProjectMain visible={this.state.tabIndex==0} project={this.state.project} />
+            tab1 = <ProjectAllTasks visible={this.state.tabIndex==1} notStarted={properties[0]} inProgress={properties[1]} done={properties[2]} />
         }
         return <div> 
             {taskHeader}
-            {tabContent}
+            {tab0}
+            {tab1}
         </div>
     }
     componentDidMount() {
@@ -49,12 +48,12 @@ class ProjectComponent extends React.Component<ProjectComponentProperties, Proje
             url: "/api/project/" + this.props.id + "",
             dataType: 'json',
             cache: false,
-            success: (project: apitypes.ApiProjectAndTasks) => {
+            success: (project: apitypes.ApiProjectTasks) => {
                 this.setState({
                     tabIndex: this.state.tabIndex,
                     project: project.project,
                     tasks: project.tasks
-                });
+                })
             }
         })
     }

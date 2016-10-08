@@ -1,6 +1,8 @@
 import * as React from "react"
+import { Row, Col, Panel, ProgressBar, Label } from "react-bootstrap"
 import * as jquery from "jquery"
 import { Task, TaskResults } from "../../core/types"
+import * as dateutils from "../common/dateutils"
 
 interface TaskOverviewStateIndicatorProperties {
     icon: string
@@ -16,21 +18,6 @@ class TaskOverviewStateIndicator extends React.Component<TaskOverviewStateIndica
     }
 }
 
-interface TaskOverviewProgressProperties {
-    progress: number
-}
-
-class TaskOverviewProgress extends React.Component<TaskOverviewProgressProperties, {}> {
-    render() {
-        const css: React.CSSProperties = {
-            width: +this.props.progress + "%"
-        }
-        return <div className="task-overview-progress progress">
-            <div className="progress-bar" role="progressbar" style={css}></div>
-        </div>
-    }
-}
-
 interface TaskOverviewTimeProperties {
     className: string
     color: string
@@ -41,15 +28,13 @@ interface TaskOverviewTimeProperties {
 
 class TaskOverviewTime extends React.Component<TaskOverviewTimeProperties, {}> {
     render() {
-        const className = "col-xs-12 col-md-6 " + this.props.className
-        const stateClassName = "label label-" + this.props.color
-        return <div className={className}>
+        return <Col className={this.props.className} xs={12} md={6}>
             <div className="task-overview-label">
-                <span className={stateClassName}>{this.props.state}</span>
+                <Label bsStyle={this.props.color}>{this.props.state}</Label>
             </div>
             <div className="task-overview-time">{this.props.date}</div>
             <div>{this.props.days}</div>
-        </div>
+        </Col>
     }
 }
 
@@ -58,58 +43,31 @@ interface TaskOverviewProperties {
     taskResults: TaskResults
 }
 
-interface TaskOverviewState {
-    started: boolean,
-    done: boolean,
-    daysBeforeStart: number
-    daysBeforeEnd: number
-}
-
-export class TaskOverview extends React.Component<TaskOverviewProperties, TaskOverviewState> {
-    constructor(props: TaskOverviewProperties) {
-        super(props)
-        let daysBeforeStart = this.getDaysBeforeStart()
-        let daysBeforeEnd = this.getDaysBeforeEnd()
-        this.state = {
-            started: daysBeforeStart < 0,
-            done: daysBeforeEnd < 0,
-            daysBeforeStart: daysBeforeStart,
-            daysBeforeEnd: daysBeforeEnd
-        }
-    }
+export class TaskOverview extends React.Component<TaskOverviewProperties, {}> {
     render() {
-        const stateInfo = this.getStateInfo()
-        const progressInfo = this.getProgressInfo()
-        const startInfo = this.getStartInfo()
-        const endInfo = this.getEndInfo()
+        const daysBeforeStart = this.getDaysBeforeStart()
+        const daysBeforeEnd = this.getDaysBeforeEnd()
+        const started = daysBeforeStart < 0
+        const done = daysBeforeEnd < 0
 
-        return <div className="task-overview panel panel-default">
-            <div className="panel-body">
-                <TaskOverviewStateIndicator icon={stateInfo[0]} text={stateInfo[1]} />
-                <TaskOverviewProgress progress={progressInfo[0]} />
-                <div className="row">
-                    <TaskOverviewTime className="task-overview-start" color={startInfo[0]} state={startInfo[1]}
-                                        date={startInfo[2]} days={startInfo[3]} />
-                    <TaskOverviewTime className="task-overview-end" color={endInfo[0]} state={endInfo[1]}
-                                        date={endInfo[2]} days={endInfo[3]} />
-                </div>
-            </div>
-        </div>
-    }
-    private static computeDateDiff(first: Date, second: Date) {
-        const MS_PER_DAY = 1000 * 60 * 60 * 24;
+        const stateInfo = this.getStateInfo(started, done)
+        const progressInfo = this.getProgressInfo(started, done)
+        const startInfo = this.getStartInfo(started)
+        const endInfo = this.getEndInfo(done)
 
-        // Discard the time and time-zone information.
-        var utcFirst = Date.UTC(first.getFullYear(), first.getMonth(), first.getDate());
-        var utcSecond = Date.UTC(second.getFullYear(), second.getMonth(), second.getDate());
-
-        return Math.floor((utcSecond - utcFirst) / MS_PER_DAY);
-    }
-    private static getDateLabel(date: Date) { 
-        return "" + date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
+        return <Panel className="task-overview">
+            <TaskOverviewStateIndicator icon={stateInfo[0]} text={stateInfo[1]} />
+            <ProgressBar className="task-overview-progress" now={progressInfo[0]} />
+            <Row>
+                <TaskOverviewTime className="task-overview-start" color={startInfo[0]} state={startInfo[1]}
+                                    date={startInfo[2]} days={startInfo[3]} />
+                <TaskOverviewTime className="task-overview-end" color={endInfo[0]} state={endInfo[1]}
+                                    date={endInfo[2]} days={endInfo[3]} />
+            </Row>
+        </Panel>
     }
     private getDaysBeforeStart() {
-        return TaskOverview.computeDateDiff(new Date(), this.props.taskResults.startDate)
+        return dateutils.getDateDiff(new Date(), this.props.taskResults.startDate)
     }
     private getEndDate() {
         let returned = new Date(this.props.taskResults.startDate.valueOf())
@@ -122,23 +80,23 @@ export class TaskOverview extends React.Component<TaskOverviewProperties, TaskOv
         return returned
     }
     private getDaysBeforeEnd() {
-        return TaskOverview.computeDateDiff(new Date(), this.getEndDate())
+        return dateutils.getDateDiff(new Date(), this.getEndDate())
     }
-    private getStateInfo(): [string, string] {
-        if (!this.state.started) {
+    private getStateInfo(started: boolean, done: boolean): [string, string] {
+        if (!started) {
             return ["time", "Not started"]
-        } else if (this.state.started && !this.state.done) {
+        } else if (started && !done) {
             return ["plane", "In progress"]
-        } else if (this.state.done) {
+        } else if (done) {
             return ["ok", "Done"]
         } else {
             return ["remove", "Unknown state :()"]
         }
     }
-    private getProgressInfo(): [number] {
-        if (!this.state.started) {
+    private getProgressInfo(started: boolean, done: boolean): [number] {
+        if (!started) {
             return [0]
-        } else if (this.state.started && !this.state.done) {
+        } else if (started && !done) {
             const startTime = this.props.taskResults.startDate.getTime()
             const endTime = this.getEndDate().getTime()
             const currentTime = (new Date()).getTime()
@@ -146,21 +104,21 @@ export class TaskOverview extends React.Component<TaskOverviewProperties, TaskOv
             const ratio = Math.round(100 * (currentTime - startTime) / (endTime - startTime))
 
             return [ratio]
-        } else if (this.state.done) {
+        } else if (done) {
             return [100]
         } else {
             return null
         }
     }
-    private getStartInfo() : [string, string, string, string] {
+    private getStartInfo(started: boolean) : [string, string, string, string] {
         let color: string = null
         let state: string = null
         let date: string = null
         let days: string = null
 
-        const startDateLabel = TaskOverview.getDateLabel(this.props.taskResults.startDate)
-        const diff = TaskOverview.computeDateDiff(this.props.task.estimatedStartDate, this.props.taskResults.startDate)
-        const todayDiff = TaskOverview.computeDateDiff(new Date(), this.props.taskResults.startDate)
+        const startDateLabel = dateutils.getDateLabel(this.props.taskResults.startDate)
+        const diff = dateutils.getDateDiff(this.props.task.estimatedStartDate, this.props.taskResults.startDate)
+        const todayDiff = dateutils.getDateDiff(new Date(), this.props.taskResults.startDate)
         
         if (diff <= 0) {
             color = "success"
@@ -170,7 +128,7 @@ export class TaskOverview extends React.Component<TaskOverviewProperties, TaskOv
             state = "Late " + diff + " days"
         }
 
-        if (this.state.started) {
+        if (started) {
             date = "Started the " + startDateLabel
         } else {
             date = "Starting the " + startDateLabel
@@ -184,16 +142,16 @@ export class TaskOverview extends React.Component<TaskOverviewProperties, TaskOv
         
         return [color, state, date, days]
     }
-    private getEndInfo() : [string, string, string, string] {
+    private getEndInfo(done: boolean) : [string, string, string, string] {
         let color: string = null
         let state: string = null
         let date: string = null
         let days: string = null
 
         const endDate = this.getEndDate()
-        const endDateLabel = TaskOverview.getDateLabel(endDate)
-        const diff = TaskOverview.computeDateDiff(this.getEstimatedEndDate(), endDate)
-        const todayDiff = TaskOverview.computeDateDiff(new Date(), endDate)
+        const endDateLabel = dateutils.getDateLabel(endDate)
+        const diff = dateutils.getDateDiff(this.getEstimatedEndDate(), endDate)
+        const todayDiff = dateutils.getDateDiff(new Date(), endDate)
         
         if (diff <= 0) {
             color = "success"
@@ -203,7 +161,7 @@ export class TaskOverview extends React.Component<TaskOverviewProperties, TaskOv
             state = "Late " + diff + " days"
         }
 
-        if (this.state.done) {
+        if (done) {
             date = "Done the " + endDateLabel
         } else {
             date = "Ending the " + endDateLabel

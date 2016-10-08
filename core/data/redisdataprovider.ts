@@ -4,26 +4,26 @@ import { Project, Task, TaskResults, Impact } from "../types"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 
-const redisAsync: any = bluebird.promisifyAll(redis);
+const redisAsync: any = bluebird.promisifyAll(redis)
 
 declare module 'redis' {
     export interface RedisClient extends NodeJS.EventEmitter {
-        setAsync(...args: any[]): Promise<any>;
-        getAsync(...args: any[]): Promise<any>;
-        mgetAsync(...args: any[]): Promise<any>;
-        msetAsync(...args: any[]): Promise<any>;
-        incrAsync(...args: any[]): Promise<any>;
-        sismemberAsync(...args: any[]): Promise<any>;
-        saddAsync(...args: any[]): Promise<any>;
-        sremAsync(...args: any[]): Promise<any>;
-        smembersAsync(...args: any[]): Promise<any>;
-        hmsetAsync(...args: any[]): Promise<any>;
-        hgetallAsync(...args: any[]): Promise<any>;
-        existsAsync(...args: any[]): Promise<number>;
-        watchAsync(...args: any[]): Promise<any>;
+        setAsync(...args: any[]): Promise<any>
+        getAsync(...args: any[]): Promise<any>
+        mgetAsync(...args: any[]): Promise<any>
+        msetAsync(...args: any[]): Promise<any>
+        incrAsync(...args: any[]): Promise<any>
+        sismemberAsync(...args: any[]): Promise<any>
+        saddAsync(...args: any[]): Promise<any>
+        sremAsync(...args: any[]): Promise<any>
+        smembersAsync(...args: any[]): Promise<any>
+        hmsetAsync(...args: any[]): Promise<any>
+        hgetallAsync(...args: any[]): Promise<any>
+        existsAsync(...args: any[]): Promise<number>
+        watchAsync(...args: any[]): Promise<any>
     }
     export interface Multi {
-        execAsync(): Promise<any>;
+        execAsync(): Promise<any>
     }
 }
 
@@ -128,7 +128,7 @@ export class RedisDataProvider implements IRedisDataProvider {
         })
     }
     getProject(id: number) : Promise<Project> {
-        return this.projectExists(id).then(() => {
+        return this.hasProject(id).then(() => {
             return this.client.hgetallAsync("project:" + id)
         }).then((result: any) => {
             const project: Project = {
@@ -146,29 +146,36 @@ export class RedisDataProvider implements IRedisDataProvider {
         })
     }
     setProjectRootTask(projectId: number, taskId: number) : Promise<void> {
-        return this.projectExists(projectId).then(() => {
-            return this.taskExists(taskId)
+        return this.hasProject(projectId).then(() => {
+            return this.hasTask(taskId)
         }).then(() => {
             return this.client.setAsync("project:" + projectId + ":root", taskId)
         })
     }
     getProjectRootTask(projectId: number) : Promise<number> {
-        return this.projectExists(projectId).then(() => {
+        return this.hasProject(projectId).then(() => {
             return this.client.getAsync("project:" + projectId + ":root")
         }).then((id: string) => {
             return id ? +id : null
+        })
+    }
+    hasTask(id: number) : Promise<void> {
+        return this.client.existsAsync("task:" + id).then((result: number) => {
+            if (result != 1) {
+                throw new TaskNotFoundError("Task " + id + " not found")
+            }
         })
     }
     getTasks(ids: Array<number>) : Promise<Array<Task>> {
         return Promise.all(ids.map(this.getMappedTask.bind(this)))
     }
     getTask(id: number) : Promise<Task> {
-        return this.taskExists(id).then(() => {
+        return this.hasTask(id).then(() => {
             return RedisTask.load(id, this.client)
         })
     }
     getProjectTasks(id: number) : Promise<Array<Task>> {
-        return this.projectExists(id).then(() => {
+        return this.hasProject(id).then(() => {
             return this.client.smembersAsync("project:" + id + ":tasks")
         }).then((ids: Array<String>) => {
             return this.getTasks(ids.map(RedisDataProvider.indexFromString)
@@ -176,7 +183,7 @@ export class RedisDataProvider implements IRedisDataProvider {
         })
     }
     addTask(projectId: number, task: Task) : Promise<number> {
-        return this.projectExists(projectId).then(() => {
+        return this.hasProject(projectId).then(() => {
             return this.getNextId("task")
         }).then((id: number) => {
             task.id = id
@@ -185,8 +192,8 @@ export class RedisDataProvider implements IRedisDataProvider {
         })
     }
     setTaskRelation(parentTaskId: number, childTaskId: number) : Promise<void> {
-        return this.taskExists(parentTaskId).then(() => {
-            return this.taskExists(childTaskId)
+        return this.hasTask(parentTaskId).then(() => {
+            return this.hasTask(childTaskId)
         }).then(() => {
             return this.client.multi().sadd("task:" + parentTaskId + ":children", childTaskId)
                                       .sadd("task:" + childTaskId + ":parents", parentTaskId)
@@ -194,28 +201,28 @@ export class RedisDataProvider implements IRedisDataProvider {
         })
     }
     getParentTaskIds(id: number) : Promise<Array<number>> {
-        return this.taskExists(id).then(() => {
+        return this.hasTask(id).then(() => {
             return this.client.smembersAsync("task:" + id + ":parents")
         }).then((ids: Array<string>) => {
             return ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
         })
     }
     getChildrenTaskIds(id: number) : Promise<Array<number>> {
-        return this.taskExists(id).then(() => {
+        return this.hasTask(id).then(() => {
             return this.client.smembersAsync("task:" + id + ":children")
         }).then((ids: Array<string>) => {
             return ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
         })
     }
     isTaskImportant(id: number) : Promise<boolean> {
-        return this.taskExists(id).then(() => {
+        return this.hasTask(id).then(() => {
             return this.client.sismemberAsync("task:important", id)
         }).then((result: number) => {
             return (result != 0)
         })
     }
     setTaskImportant(id: number, important: boolean) : Promise<void> {
-        return this.taskExists(id).then(() => {
+        return this.hasTask(id).then(() => {
             if (important) {
                 return this.client.saddAsync("task:important", id)
             } else {
@@ -227,7 +234,7 @@ export class RedisDataProvider implements IRedisDataProvider {
         return Promise.all(ids.map(this.getMappedTaskResults.bind(this)))
     }
     getTaskResults(id: number) : Promise<TaskResults> {
-        return this.taskExists(id).then(() => {
+        return this.hasTask(id).then(() => {
             return this.client.mgetAsync("task:" + id + ":startDate", "task:" + id + ":duration")
         }).then((results: Array<string>) => {
             const taskResults: TaskResults = {
@@ -240,7 +247,7 @@ export class RedisDataProvider implements IRedisDataProvider {
     }
     setTasksResults(results: Array<TaskResults>) : Promise<void> {
         return Promise.all(results.map((results: TaskResults) => {
-            return this.taskExists(results.taskId)
+            return this.hasTask(results.taskId)
         })).then(() => {
             let set = new Array<string>()
             for (let result of results) {
@@ -261,19 +268,19 @@ export class RedisDataProvider implements IRedisDataProvider {
         return Promise.all(ids.map(this.getMappedImpact.bind(this)))
     }
     getImpact(id: number): Promise<Impact> {
-        return this.impactExists(id).then(() => {
+        return this.hasImpact(id).then(() => {
             return RedisImpact.load(id, this.client)
         })
     }
     getTaskImpactIds(id: number) : Promise<Array<number>> {
-        return this.taskExists(id).then(() => {
+        return this.hasTask(id).then(() => {
             return this.client.smembersAsync("task:" + id + ":impacts")
         }).then((ids: Array<string>) => {
             return ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
         })
     }
     getImpactedTaskIds(id: number) : Promise<Array<number>> {
-        return this.impactExists(id).then(() => {
+        return this.hasImpact(id).then(() => {
             return this.client.smembersAsync("impact:" + id + ":tasks")
         }).then((ids: Array<string>) => {
             return ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
@@ -286,8 +293,8 @@ export class RedisDataProvider implements IRedisDataProvider {
         })
     }
     setImpactForTask(id: number, taskId: number) : Promise<void> {
-        return this.impactExists(id).then(() => {
-            return this.taskExists(taskId)
+        return this.hasImpact(id).then(() => {
+            return this.hasTask(taskId)
         }).then(() => {
             return this.client.multi().sadd("impact:" + id + ":tasks", taskId)
                                       .sadd("task:" + taskId + ":impacts", id)
@@ -337,21 +344,14 @@ export class RedisDataProvider implements IRedisDataProvider {
             })
         })
     }
-    private projectExists(id: number) : Promise<void> {
+    private hasProject(id: number) : Promise<void> {
         return this.client.existsAsync("project:" + id).then((result: number) => {
             if (result != 1) {
                 throw new ProjectNotFoundError("Project " + id + " not found")
             }
         })
     }
-    private taskExists(id: number) : Promise<void> {
-        return this.client.existsAsync("task:" + id).then((result: number) => {
-            if (result != 1) {
-                throw new TaskNotFoundError("Task " + id + " not found")
-            }
-        })
-    }
-    private impactExists(id: number) : Promise<void> {
+    private hasImpact(id: number) : Promise<void> {
         return this.client.existsAsync("impact:" + id).then((result: number) => {
             if (result != 1) {
                 throw new ImpactNotFoundError("Impact " + id + " not found")

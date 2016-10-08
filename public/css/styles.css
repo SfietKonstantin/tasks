@@ -1,3 +1,5 @@
+/* Overrides */
+
 .navbar {
     min-height: 30px;
     border-radius: 0px;
@@ -40,6 +42,12 @@ h2 {
     border-left: 1px solid #eee
 }*/
 
+/* Utils */
+
+.hidden {
+    display: none
+}
+
 /* Page header */
 .page-header {
     padding-bottom: 0px;
@@ -56,9 +64,7 @@ h2 {
     border-bottom-width: 0px;
 }
 
-/* Project */
-
-.project-alltasks-table {
+.tab-table {
     margin-top: 30px;
 }
 
@@ -97,4 +103,15 @@ h2 {
     font-size: 20px;
 }
 
-
+.task-details-milestone {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+}
+.task-details-duration {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-left: 40px;
+    border-left: 2px solid #333;
+}

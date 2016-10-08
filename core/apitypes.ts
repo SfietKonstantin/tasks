@@ -1,4 +1,4 @@
-import { Project, Task, TaskResults } from "./types"
+import { Project, Task, TaskResults, Impact } from "./types"
 
 export interface ApiTask {
     id: number
@@ -10,12 +10,13 @@ export interface ApiTask {
     duration: number
 }
 
-export interface ApiProjectAndTask {
+export interface ApiProjectTaskImpacts {
     project: Project
     task: ApiTask
+    impacts: Array<Impact>
 }
 
-export interface ApiProjectAndTasks {
+export interface ApiProjectTasks {
     project: Project
     tasks: Array<ApiTask> 
 }
@@ -51,7 +52,7 @@ export function createTaskResultsFromApiTask(apiTask: ApiTask) : TaskResults {
     }
 }
 
-export function createApiProjectAndTasks(project: Project, tasks: Array<Task>, tasksResults: Array<TaskResults>) : ApiProjectAndTasks {
+export function createApiProjectAndTasks(project: Project, tasks: Array<Task>, tasksResults: Array<TaskResults>) : ApiProjectTasks {
     if (tasks.length == tasksResults.length) {
         let apiTasks = new Array<ApiTask>()
         for (let i = 0; i < tasks.length; ++i) {
