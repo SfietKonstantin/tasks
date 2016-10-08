@@ -1,5 +1,5 @@
 export class TaskNode {
-    id: number
+    identifier: string
     estimatedStartDate: Date
     estimatedDuration: number
     startDate: Date
@@ -8,8 +8,8 @@ export class TaskNode {
     children: Array<TaskNode>
     impacts: Array<number>
 
-    constructor(id: number) {
-        this.id = id
+    constructor(identifier: string) {
+        this.identifier = identifier
         this.estimatedStartDate = null
         this.estimatedDuration = null
         this.startDate = null

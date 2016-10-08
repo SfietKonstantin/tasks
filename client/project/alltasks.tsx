@@ -28,7 +28,7 @@ export class ProjectAllTasks extends React.Component<ProjectAllTasksProperties, 
         const inProgressChecked = ProjectAllTasks.getButtonStyle(this.state.inProgressChecked)
         const doneChecked = ProjectAllTasks.getButtonStyle(this.state.doneChecked)
         const content = this.state.tasks.map((value: apitypes.ApiTask) => {
-            const taskLink = "/task/" + value.id
+            const taskLink = "/task/" + value.identifier
             return <ListGroupItem href={taskLink}>
                 {value.name}
             </ListGroupItem>
@@ -77,7 +77,7 @@ export class ProjectAllTasks extends React.Component<ProjectAllTasksProperties, 
             state.tasks = state.tasks.concat(this.props.done)
         }
         state.tasks.sort((first: apitypes.ApiTask, second: apitypes.ApiTask) => {
-            return first.id - second.id
+            return new Date(first.estimatedStartDate).valueOf() - new Date(second.estimatedStartDate).valueOf()
         })
         return state
     }

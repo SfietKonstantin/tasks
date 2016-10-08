@@ -42,16 +42,16 @@ export class Server {
         this.app.use(express.static(path.join(__dirname, 'public')))
 
         this.app.get('/', this.routes.index.bind(this.routes))
-        this.app.get('/project/:id', this.routes.getProject.bind(this.routes))
-        this.app.get('/task/:id', this.routes.getTask.bind(this.routes))
+        this.app.get('/project/:identifier', this.routes.getProject.bind(this.routes))
+        this.app.get('/task/:identifier', this.routes.getTask.bind(this.routes))
 
         // API
         this.app.get('/api/project/list', this.api.getProjects.bind(this.api))
-        this.app.get('/api/project/:id', this.api.getProject.bind(this.api))
-        this.app.get('/api/task/:id', this.api.getTask.bind(this.api))
-        this.app.get('/api/task/:id/important', this.api.isTaskImportant.bind(this.api))
-        this.app.put('/api/task/:id/important', this.api.putTaskImportant.bind(this.api))
-        this.app.delete('/api/task/:id/important', this.api.deleteTaskImportant.bind(this.api))
+        this.app.get('/api/project/:identifier', this.api.getProject.bind(this.api))
+        this.app.get('/api/task/:identifier', this.api.getTask.bind(this.api))
+        this.app.get('/api/task/:identifier/important', this.api.isTaskImportant.bind(this.api))
+        this.app.put('/api/task/:identifier/important', this.api.putTaskImportant.bind(this.api))
+        this.app.delete('/api/task/:identifier/important', this.api.deleteTaskImportant.bind(this.api))
         this.app.post('/api/impact', this.api.postImpact.bind(this.api))
 
         this.app.use(this.errorHandler)

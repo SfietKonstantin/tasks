@@ -1,7 +1,7 @@
 import { Project, Task, TaskResults, Impact } from "./types"
 
 export interface ApiTask {
-    id: number
+    identifier: string
     name: string
     description: string
     estimatedStartDate: string
@@ -23,7 +23,7 @@ export interface ApiProjectTasks {
 
 export function createApiTask(task: Task, taskResults: TaskResults) : ApiTask {
     return {
-        id: task.id,
+        identifier: task.identifier,
         name: task.name,
         description: task.description,
         estimatedStartDate: task.estimatedStartDate.toISOString(),
@@ -35,8 +35,8 @@ export function createApiTask(task: Task, taskResults: TaskResults) : ApiTask {
 
 export function createTaskFromApiTask(project: Project, apiTask: ApiTask) : Task {
     return {
-        id: apiTask.id,
-        projectId: project.id,
+        identifier: apiTask.identifier,
+        projectIdentifier: project.identifier,
         name: apiTask.name,
         description: apiTask.description,
         estimatedStartDate: new Date(apiTask.estimatedStartDate),
@@ -46,7 +46,7 @@ export function createTaskFromApiTask(project: Project, apiTask: ApiTask) : Task
 
 export function createTaskResultsFromApiTask(apiTask: ApiTask) : TaskResults {
     return {
-        taskId: apiTask.id,
+        taskIdentifier: apiTask.identifier,
         startDate: new Date(apiTask.startDate),
         duration: apiTask.duration
     }

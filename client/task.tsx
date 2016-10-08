@@ -8,7 +8,7 @@ import { Project, Task, TaskResults, Impact } from "../core/types"
 import * as apitypes from "../core/apitypes"
 
 interface TaskComponentProperties {
-    id: number
+    identifier: string
 }
 
 interface TaskComponentState {
@@ -65,7 +65,7 @@ class TaskComponent extends React.Component<TaskComponentProperties, TaskCompone
     }
     private update() {
         jquery.get({
-            url: "/api/task/" + this.props.id,
+            url: "/api/task/" + this.props.identifier,
             dataType: 'json',
             cache: false,
             success: (data: apitypes.ApiProjectTaskImpacts) => {
@@ -85,7 +85,7 @@ class TaskComponent extends React.Component<TaskComponentProperties, TaskCompone
             dataType: 'json',
             data: {
                 "impact": JSON.stringify(impact),
-                "task": this.props.id
+                "task": this.props.identifier
             },
             cache: false,
             success: (data: apitypes.ApiProjectTaskImpacts) => {
@@ -101,6 +101,6 @@ class TaskComponent extends React.Component<TaskComponentProperties, TaskCompone
     }
 }
 
-export function render(id: number) {
-    ReactDOM.render(<TaskComponent id={id} />, document.getElementById("content"))
+export function render(identifier: string) {
+    ReactDOM.render(<TaskComponent identifier={identifier} />, document.getElementById("content"))
 }

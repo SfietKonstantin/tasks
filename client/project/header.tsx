@@ -13,7 +13,7 @@ interface ProjectHeaderProperties {
 export class ProjectHeader extends React.Component<ProjectHeaderProperties, {}> {
     render() {
         let tabs = ["Overview", "Tasks"]
-        return <Header id={this.props.project.id} name={this.props.project.name}>
+        return <Header identifier={this.props.project.identifier} name={this.props.project.name}>
             <Col xs={12} md={8}>
                 <ProjectBreadcrumb project={this.props.project} />
             </Col>

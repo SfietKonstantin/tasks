@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom"
 import { Grid, Col } from "react-bootstrap"
 
 interface HeaderProperties {
-    id: number
+    identifier: string
     name: string
     content?: JSX.Element
 }
@@ -13,7 +13,7 @@ export class Header extends React.Component<HeaderProperties, {}> {
         return <div className="page-header navbar-default">
             <Grid className="page-header-container">
                 <Col xs={8} md={8}>
-                    <h1>{this.props.name} <small>#{+this.props.id}</small></h1>
+                    <h1>{this.props.name} <small>#{this.props.identifier}</small></h1>
                 </Col>
                 {this.props.children}
             </Grid>

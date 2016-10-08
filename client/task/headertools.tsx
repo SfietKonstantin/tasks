@@ -5,7 +5,7 @@ import * as jquery from "jquery"
 import { Impact } from "../../core/types"
 
 interface TaskToolsProperties {
-    taskId: number
+    taskIdentifier: string
     addImpactCallback: (impact: Impact) => void
 }
 
@@ -41,7 +41,7 @@ export class TaskHeaderTools extends React.Component<TaskToolsProperties, TaskTo
     }
     componentDidMount() {
         jquery.get({
-            url: "/api/task/" + this.props.taskId + "/important",
+            url: "/api/task/" + this.props.taskIdentifier + "/important",
             dataType: 'json',
             cache: false,
             success: (data: TaskToolsState) => {
@@ -61,7 +61,7 @@ export class TaskHeaderTools extends React.Component<TaskToolsProperties, TaskTo
             })
             jquery.ajax({
                 type: this.state.important ? "DELETE" : "PUT",
-                url: "/api/task/" + this.props.taskId + "/important",
+                url: "/api/task/" + this.props.taskIdentifier + "/important",
                 success: (data: TaskToolsState) => {
                     this.setState({
                         important: this.state.important, 

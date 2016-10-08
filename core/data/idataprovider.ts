@@ -1,5 +1,17 @@
 import { Project, Task, TaskResults, Impact } from "../types"
 
+export class NullIdentifierError extends Error implements Error {
+    constructor(message: string) {
+        super(message)
+    }
+}
+
+export class ExistsError extends Error implements Error {
+    constructor(message: string) {
+        super(message)
+    }
+}
+
 export class NotFoundError extends Error implements Error {
     constructor(message: string) {
         super(message)
@@ -38,31 +50,29 @@ export class TransactionError extends Error implements Error {
 
 export interface IDataProvider {
     getAllProjects() : Promise<Array<Project>>
-    getProject(id: number) : Promise<Project>
-    addProject(project: Project) : Promise<number>
-    setProjectRootTask(projectId: number, taskId: number) : Promise<void>
-    getProjectRootTask(projectId: number) : Promise<number>
+    getProject(identifier: string) : Promise<Project>
+    addProject(project: Project) : Promise<void>
 
-    hasTask(id: number) : Promise<void>
-    getTasks(ids: Array<number>) : Promise<Array<Task>>
-    getTask(id: number) : Promise<Task>
-    getProjectTasks(id: number) : Promise<Array<Task>>
-    addTask(projectId: number, task: Task) : Promise<number>
-    setTaskRelation(parentTaskId: number, childTaskId: number) : Promise<void>
-    getParentTaskIds(id: number) : Promise<Array<number>>
-    getChildrenTaskIds(id: number) : Promise<Array<number>>
-    isTaskImportant(id: number) : Promise<boolean>
-    setTaskImportant(id: number, important: boolean) : Promise<void>
+    hasTask(identifier: string) : Promise<void>
+    getTasks(identifiers: Array<string>) : Promise<Array<Task>>
+    getTask(identifier: string) : Promise<Task>
+    getProjectTasks(identifier: string) : Promise<Array<Task>>
+    addTask(task: Task) : Promise<void>
+    setTaskRelation(parentTaskIdentifier: string, childTaskIdentifier: string) : Promise<void>
+    getParentTaskIdentifiers(identifier: string) : Promise<Array<string>>
+    getChildrenTaskIdentifiers(identifier: string) : Promise<Array<string>>
+    isTaskImportant(identifier: string) : Promise<boolean>
+    setTaskImportant(identifier: string, important: boolean) : Promise<void>
 
-    getTasksResults(ids: Array<number>) : Promise<Array<TaskResults>>
-    getTaskResults(id: number) : Promise<TaskResults>
+    getTasksResults(identifiers: Array<string>) : Promise<Array<TaskResults>>
+    getTaskResults(identifier: string) : Promise<TaskResults>
     setTasksResults(results: Array<TaskResults>) : Promise<void>
 
     getImpacts(ids: Array<number>) : Promise<Array<Impact>>
     getImpact(id: number): Promise<Impact>
-    getTaskImpactIds(id: number) : Promise<Array<number>>
-    getImpactedTaskIds(id: number) : Promise<Array<number>>
+    getTaskImpactIds(identifier: string) : Promise<Array<number>>
+    getImpactedTaskIds(id: number) : Promise<Array<string>>
     addImpact(impact: Impact) : Promise<number>
-    setImpactForTask(id: number, taskId: number) : Promise<void>
+    setImpactForTask(id: number, taskIdentifier: string) : Promise<void>
     getImpactsValues(ids: Array<number>) : Promise<Array<number>>
 } 

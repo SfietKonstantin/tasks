@@ -28,26 +28,22 @@ describe("Redis", () => {
     describe("getImpacts", () => {
         it("Should add some testing data", (done) => {
             const project: Project = {
-                id: null,
+                identifier: "project",
                 name: "Project",
                 description: "Description"
             }
 
-            db.addProject(project).then((projectId: number) => {
-                chai.expect(projectId).to.equals(1)
-                
-                let task: Task = {
-                    id: null,
-                    projectId: projectId,
+            db.addProject(project).then(() => {
+                const task: Task = {
+                    identifier: "task",
+                    projectIdentifier: "project",
                     name: "Task",
                     description: "Description",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
                 
-                return db.addTask(projectId, task).then((taskId: number) => {
-                    chai.expect(taskId).to.equals(1)
-
+                return db.addTask(task).then(() => {
                     const impact1: Impact = {
                         id: null,
                         name: "Impact 1",

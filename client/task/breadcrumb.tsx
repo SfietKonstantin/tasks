@@ -8,7 +8,7 @@ interface TaskBreadcrumbProperties {
 
 export class TaskBreadcrumb extends React.Component<TaskBreadcrumbProperties, {}> {
     render() {
-        let projectPath = "/project/" + this.props.project.id
+        let projectPath = "/project/" + this.props.project.identifier
         return <ol className="breadcrumb">
             <li><a href="/"><span className="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
             <li><a href={projectPath}>{this.props.project.name}</a></li>

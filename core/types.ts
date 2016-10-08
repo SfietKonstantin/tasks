@@ -1,13 +1,14 @@
+export interface Identifiable {
+    identifier: string
+}
 
-export interface Project {
-    id: number
+export interface Project extends Identifiable {
     name: string
     description: string
 }
 
-export interface Task {
-    id: number
-    projectId: number
+export interface Task extends Identifiable {
+    projectIdentifier: string
     name: string
     description: string
     estimatedStartDate: Date
@@ -15,7 +16,7 @@ export interface Task {
 }
 
 export interface TaskResults {
-    taskId: number
+    taskIdentifier: string
     startDate: Date
     duration: number
 }

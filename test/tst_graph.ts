@@ -7,11 +7,11 @@ import { TaskNode } from "../core/graph/types"
 describe("Graph", () => {
     describe("Simple compute test", () => {
         it("Should compute the correct start time", () => {
-            let node0 = new TaskNode(1)
+            let node0 = new TaskNode("task1")
             node0.estimatedStartDate = new Date(2015, 9, 1)
             node0.estimatedDuration = 15
 
-            let node1 = new TaskNode(2)
+            let node1 = new TaskNode("task2")
             node1.estimatedStartDate = new Date(2015, 9, 16)
             node1.estimatedDuration = 15
             node0.addChild(node1)
@@ -24,11 +24,11 @@ describe("Graph", () => {
             chai.expect(node1.duration).to.equals(15)
         })
         it("Should compute the correct start time depending on old start time", () => {
-            let node0 = new TaskNode(1)
+            let node0 = new TaskNode("task1")
             node0.estimatedStartDate = new Date(2015, 9, 1)
             node0.estimatedDuration = 15
 
-            let node1 = new TaskNode(2)
+            let node1 = new TaskNode("task2")
             node1.estimatedStartDate = new Date(2015, 9, 16)
             node1.estimatedDuration = 15
             node1.startDate = new Date(2015, 9, 20)
@@ -44,21 +44,21 @@ describe("Graph", () => {
     })
     describe("Dependencies compute test", () => {
         it("Should compute the correct start time", () => {
-            let node0 = new TaskNode(1)
+            let node0 = new TaskNode("root")
             node0.estimatedStartDate = new Date(2015, 9, 1)
             node0.estimatedDuration = 15
 
-            let node1 = new TaskNode(2)
+            let node1 = new TaskNode("short")
             node1.estimatedStartDate = new Date(2015, 9, 16)
             node1.estimatedDuration = 15
             node0.addChild(node1)
 
-            let node2 = new TaskNode(3)
+            let node2 = new TaskNode("long")
             node2.estimatedStartDate = new Date(2015, 9, 16)
             node2.estimatedDuration = 30
             node0.addChild(node2)
 
-            let node3 = new TaskNode(4)
+            let node3 = new TaskNode("reducing")
             node3.estimatedStartDate = new Date(2015, 10, 15)
             node3.estimatedDuration = 15
             node1.addChild(node3)
@@ -76,13 +76,13 @@ describe("Graph", () => {
             chai.expect(node3.duration).to.equals(15)
         })
         it("Should compute the correct start time with impact", () => {
-            let node0 = new TaskNode(1)
+            let node0 = new TaskNode("root")
             node0.estimatedStartDate = new Date(2015, 9, 1)
             node0.estimatedDuration = 15
             node0.impacts.push(8)
             node0.startDate = new Date(2015, 9, 2)
 
-            let node1 = new TaskNode(2)
+            let node1 = new TaskNode("short")
             node1.estimatedStartDate = new Date(2015, 9, 16)
             node1.estimatedDuration = 15
             node1.startDate = new Date(2015, 9, 18)
@@ -90,13 +90,13 @@ describe("Graph", () => {
             node1.impacts.push(12)
             node0.addChild(node1)
 
-            let node2 = new TaskNode(3)
+            let node2 = new TaskNode("long")
             node2.estimatedStartDate = new Date(2015, 9, 16)
             node2.estimatedDuration = 30
             node2.startDate = new Date(2015, 9, 18)
             node0.addChild(node2)
 
-            let node3 = new TaskNode(4)
+            let node3 = new TaskNode("reducing")
             node3.estimatedStartDate = new Date(2015, 10, 15)
             node3.estimatedDuration = 15
             node3.startDate = new Date(2015, 10, 17)
@@ -118,15 +118,15 @@ describe("Graph", () => {
     })
     describe("Cyclic dependency", () => {
         it("Should detect a cyclic dependency", (done) => {
-            let node0 = new TaskNode(1)
+            let node0 = new TaskNode("task1")
             node0.estimatedStartDate = new Date(2015, 9, 1)
             node0.estimatedDuration = 15
 
-            let node1 = new TaskNode(2)
+            let node1 = new TaskNode("task2")
             node1.estimatedStartDate = new Date(2015, 9, 16)
             node1.estimatedDuration = 15
 
-            let node2 = new TaskNode(3)
+            let node2 = new TaskNode("task3")
             node2.estimatedStartDate = new Date(2015, 9, 16)
             node2.estimatedDuration = 15
 

@@ -16,8 +16,8 @@ interface TaskHeaderProperties {
 export class TaskHeader extends React.Component<TaskHeaderProperties, {}> {
     render() {
         let tabs = ["Overview", "Duration details"]
-        return <Header id={this.props.task.id} name={this.props.task.name}>
-            <TaskHeaderTools taskId={this.props.task.id} addImpactCallback={this.props.addImpactCallback} />
+        return <Header identifier={this.props.task.identifier} name={this.props.task.name}>
+            <TaskHeaderTools taskIdentifier={this.props.task.identifier} addImpactCallback={this.props.addImpactCallback} />
             <Col xs={12} md={8}>
                 <TaskBreadcrumb project={this.props.project} task={this.props.task} />
             </Col>

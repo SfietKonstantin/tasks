@@ -1,6 +1,6 @@
 import { IDataProvider } from "./idataprovider"
 
 export interface IRedisDataProvider extends IDataProvider {
-    watchTasksImpacts(ids: Array<number>) : Promise<void>
-    watchImpactsDurations(id: Array<number>) : Promise<void>
+    watchTasksImpacts(identifiers: Array<string>) : Promise<void>
+    watchImpactsDurations(identifiers: Array<string>) : Promise<void>
 } 

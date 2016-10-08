@@ -2,44 +2,44 @@ import { IDataProvider } from "./data/idataprovider"
 import { Project, Task } from "./types"
 import * as graph from "./graph/graph"
 
-function fillProjectsData(dataProvider: IDataProvider) : Promise<number> {
+function fillProjectsData(dataProvider: IDataProvider) : Promise<void> {
     const project: Project = {
-        id: 1,
+        identifier: "project",
         name: "Test project",
         description: "Test project description"
     }
     return dataProvider.addProject(project)
 }
 
-function fillTasksData(dataProvider: IDataProvider, projectId: number) : Promise<void> {
+function fillTasksData(dataProvider: IDataProvider) : Promise<void> {
     let tasks: Array<Task> = [
         {
-            id: null,
-            projectId: null,
+            identifier: "root",
+            projectIdentifier: "project",
             name: "Root task",
             description: "Project beginning",
             estimatedStartDate: new Date(2016, 7, 15),
             estimatedDuration: 31
         },
         {
-            id: null,
-            projectId: null,
+            identifier: "long",
+            projectIdentifier: "project",
             name: "Long task",
             description: "Some long task",
             estimatedStartDate: new Date(2016, 8, 15),
             estimatedDuration: 60
         },
         {
-            id: null,
-            projectId: null,
+            identifier: "short",
+            projectIdentifier: "project",
             name: "Short task",
             description: "Some short task",
             estimatedStartDate: new Date(2016, 8, 15),
             estimatedDuration: 31
         },
         {
-            id: null,
-            projectId: null,
+            identifier: "reduce",
+            projectIdentifier: "project",
             name: "Reducing task",
             description: "Task depending on two tasks",
             estimatedStartDate: new Date(2016, 10, 16),
@@ -47,30 +47,30 @@ function fillTasksData(dataProvider: IDataProvider, projectId: number) : Promise
         }
     ]
                 
-    const mappedTasks = tasks.map((task: Task) => { return dataProvider.addTask(projectId, task) })
+    const mappedTasks = tasks.map((task: Task) => { return dataProvider.addTask(task) })
     return Promise.all(mappedTasks).then((ids) => {})
 }
 
 function fillTaskRelations(dataProvider: IDataProvider) : Promise<void> {
-    return dataProvider.setTaskRelation(1, 2).then(() => {
-        return dataProvider.setTaskRelation(1, 3)
+    return dataProvider.setTaskRelation("root", "long").then(() => {
+        return dataProvider.setTaskRelation("root", "short")
     }).then(() => {
-        return dataProvider.setTaskRelation(2, 4)
+        return dataProvider.setTaskRelation("long", "reduce")
     }).then(() => {
-        return dataProvider.setTaskRelation(3, 4)
+        return dataProvider.setTaskRelation("long", "reduce")
     })
 }
 
 export function fillTestData(dataProvider: IDataProvider) {
     dataProvider.getAllProjects().then((projects: Array<Project>) => {
         if (projects.length == 0) {
-            return fillProjectsData(dataProvider).then((id: number) => {
-                return fillTasksData(dataProvider, id)
+            return fillProjectsData(dataProvider).then(() => {
+                return fillTasksData(dataProvider)
             }).then(() => {
                 return fillTaskRelations(dataProvider)
             }).then(() => {
                 const persistance = new graph.GraphPersistence(dataProvider)
-                return persistance.loadGraph(1).then(() => {
+                return persistance.loadGraph("root").then(() => {
                     return persistance.loadData()
                 }).then(() => {
                     graph.compute(persistance.root)

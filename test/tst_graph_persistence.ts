@@ -18,39 +18,39 @@ describe("Graph persistence", () => {
     })
     it("Should add some testing data", (done) => {
         const project: Project = {
-            id: null,
+            identifier: "project",
             name: "Project",
             description: "Description"
         }
 
-        db.addProject(project).then((projectId: number) => {
+        db.addProject(project).then(() => {
             const task1: Task = {
-                id: null,
-                projectId: projectId,
+                identifier: "1root",
+                projectIdentifier: "project",
                 name: "Root",
                 description: "Root task",
                 estimatedStartDate: new Date(2016, 9, 1),
                 estimatedDuration: 15
             }
             const task2: Task = {
-                id: null,
-                projectId: projectId,
+                identifier: "2short",
+                projectIdentifier: "project",
                 name: "Short task",
                 description: "Short task",
                 estimatedStartDate: new Date(2016, 9, 16),
                 estimatedDuration: 15
             }
             const task3: Task = {
-                id: null,
-                projectId: projectId,
+                identifier: "3long",
+                projectIdentifier: "project",
                 name: "Long task",
                 description: "Long task",
                 estimatedStartDate: new Date(2016, 9, 16),
                 estimatedDuration: 30
             }
             const task4: Task = {
-                id: null,
-                projectId: projectId,
+                identifier: "4reducing",
+                projectIdentifier: "project",
                 name: "Reducing task",
                 description: "Reducing task",
                 estimatedStartDate: new Date(2016, 10, 15),
@@ -59,19 +59,17 @@ describe("Graph persistence", () => {
 
             const tasks = [task1, task2, task3, task4]
             return Promise.all(tasks.map((task: Task) => {
-                return db.addTask(1, task)
+                return db.addTask(task)
             }))
         }).then(() => {
-            return Promise.all([db.setTaskRelation(1, 2), db.setTaskRelation(1, 3),
-                                db.setTaskRelation(2, 4), db.setTaskRelation(3, 4)])
-        }).then(() => {
-            return db.setProjectRootTask(1, 1)
+            return Promise.all([db.setTaskRelation("1root", "2short"), db.setTaskRelation("1root", "3long"),
+                                db.setTaskRelation("2short", "4reducing"), db.setTaskRelation("3long", "4reducing")])
         }).then(() => {
             let taskResults: Array<TaskResults> = [
-                {taskId: 1, startDate: new Date(2016, 9, 2), duration: 16},
-                {taskId: 2, startDate: new Date(2016, 9, 18), duration: 15},
-                {taskId: 3, startDate: new Date(2016, 9, 18), duration: 30},
-                {taskId: 4, startDate: new Date(2016, 10, 17), duration: 16}
+                {taskIdentifier: "1root", startDate: new Date(2016, 9, 2), duration: 16},
+                {taskIdentifier: "2short", startDate: new Date(2016, 9, 18), duration: 15},
+                {taskIdentifier: "3long", startDate: new Date(2016, 9, 18), duration: 30},
+                {taskIdentifier: "4reducing", startDate: new Date(2016, 10, 17), duration: 16}
             ]
 
             return db.setTasksResults(taskResults)
@@ -82,30 +80,30 @@ describe("Graph persistence", () => {
         })
     })
     it("Should load the whole graph", (done) => {
-        graph.loadGraph(1).then(() => {
-            const node1 = graph.nodes.get(1)
-            chai.expect(node1.id).to.equals(1)
+        graph.loadGraph("1root").then(() => {
+            const node1 = graph.nodes.get("1root")
+            chai.expect(node1.identifier).to.equals("1root")
             chai.expect(node1.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 1).getTime())
             chai.expect(node1.estimatedDuration).to.equals(15)
             chai.expect(node1.startDate).to.null
             chai.expect(node1.duration).to.null
 
-            const node2 = graph.nodes.get(2)
-            chai.expect(node2.id).to.equals(2)
+            const node2 = graph.nodes.get("2short")
+            chai.expect(node2.identifier).to.equals("2short")
             chai.expect(node2.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 16).getTime())
             chai.expect(node2.estimatedDuration).to.equals(15)
             chai.expect(node2.startDate).to.null
             chai.expect(node2.duration).to.null
 
-            const node3 = graph.nodes.get(3)
-            chai.expect(node3.id).to.equals(3)
+            const node3 = graph.nodes.get("3long")
+            chai.expect(node3.identifier).to.equals("3long")
             chai.expect(node3.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 16).getTime())
             chai.expect(node3.estimatedDuration).to.equals(30)
             chai.expect(node3.startDate).to.null
             chai.expect(node3.duration).to.null
 
-            const node4 = graph.nodes.get(4)
-            chai.expect(node4.id).to.equals(4)
+            const node4 = graph.nodes.get("4reducing")
+            chai.expect(node4.identifier).to.equals("4reducing")
             chai.expect(node4.estimatedStartDate.getTime()).to.equals(new Date(2016, 10, 15).getTime())
             chai.expect(node4.estimatedDuration).to.equals(15)
             chai.expect(node4.startDate).to.null
@@ -177,13 +175,13 @@ describe("Graph persistence", () => {
             chai.expect(impact2_2.id).to.equals(3)
             chai.expect(impact4.id).to.equals(4)
         }).then(() => {
-            return db.setImpactForTask(1, 1)
+            return db.setImpactForTask(1, "1root")
         }).then(() => {
-            return db.setImpactForTask(2, 2)
+            return db.setImpactForTask(2, "2short")
         }).then(() => {
-            return db.setImpactForTask(3, 2)
+            return db.setImpactForTask(3, "2short")
         }).then(() => {
-            return db.setImpactForTask(4, 4)
+            return db.setImpactForTask(4, "4reducing")
         }).then(() => {
             done()
         }).catch((error: Error) => {
@@ -192,10 +190,10 @@ describe("Graph persistence", () => {
     })
     it("Should load all data (start date and impacts)", (done) => {
         graph.loadData().then(() => {
-            const node1 = graph.nodes.get(1)
-            const node2 = graph.nodes.get(2)
-            const node3 = graph.nodes.get(3)
-            const node4 = graph.nodes.get(4)
+            const node1 = graph.nodes.get("1root")
+            const node2 = graph.nodes.get("2short")
+            const node3 = graph.nodes.get("3long")
+            const node4 = graph.nodes.get("4reducing")
 
             chai.expect(node1.startDate.getTime()).to.equals(new Date(2016, 9, 2).getTime())
             chai.expect(node1.impacts).to.length(1)
@@ -218,10 +216,10 @@ describe("Graph persistence", () => {
     it("Should compute the graph", (done) => {
         compute(graph.root)
 
-        const node1 = graph.nodes.get(1)
-        const node2 = graph.nodes.get(2)
-        const node3 = graph.nodes.get(3)
-        const node4 = graph.nodes.get(4)
+        const node1 = graph.nodes.get("1root")
+        const node2 = graph.nodes.get("2short")
+        const node3 = graph.nodes.get("3long")
+        const node4 = graph.nodes.get("4reducing")
 
         chai.expect(node1.startDate.getTime()).to.equals(new Date(2016, 9, 2).getTime())
         chai.expect(node1.duration).to.equals(23)
@@ -243,13 +241,13 @@ describe("Graph persistence", () => {
     })
     it("Should check that data has been save", (done) => {
         let newGraph = new GraphPersistence(db)
-        newGraph.loadGraph(1).then(() => {
+        newGraph.loadGraph("1root").then(() => {
             return newGraph.loadData()
         }).then(() => {
-            const node1 = graph.nodes.get(1)
-            const node2 = graph.nodes.get(2)
-            const node3 = graph.nodes.get(3)
-            const node4 = graph.nodes.get(4)
+            const node1 = graph.nodes.get("1root")
+            const node2 = graph.nodes.get("2short")
+            const node3 = graph.nodes.get("3long")
+            const node4 = graph.nodes.get("4reducing")
             
             chai.expect(node1.startDate.getTime()).to.equals(new Date(2016, 9, 2).getTime())
             chai.expect(node1.duration).to.equals(23)

@@ -8,7 +8,7 @@ import { Project } from "../core/types"
 import * as apitypes from "../core/apitypes"
 
 interface ProjectComponentProperties {
-    id: number
+    identifier: string
 }
 
 interface ProjectComponentState {
@@ -45,7 +45,7 @@ class ProjectComponent extends React.Component<ProjectComponentProperties, Proje
     }
     componentDidMount() {
         jquery.get({
-            url: "/api/project/" + this.props.id + "",
+            url: "/api/project/" + this.props.identifier + "",
             dataType: 'json',
             cache: false,
             success: (project: apitypes.ApiProjectTasks) => {
@@ -91,6 +91,6 @@ class ProjectComponent extends React.Component<ProjectComponentProperties, Proje
     }
 }
 
-export function render(id: number) {
-    ReactDOM.render(<ProjectComponent id={id} />, document.getElementById("content"))
+export function render(identifier: string) {
+    ReactDOM.render(<ProjectComponent identifier={identifier} />, document.getElementById("content"))
 }

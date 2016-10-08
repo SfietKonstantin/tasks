@@ -12,19 +12,11 @@ export class Routes {
         res.render('index')
     }
     getProject(req: express.Request, res: express.Response) {
-        const id = +String(req.params.id)
-        if (!Number.isNaN(id)) {
-            res.render('project', {id: id})
-        } else {
-            res.render('error')
-        }
+        const identifier = String(req.params.identifier)
+        res.render('project', {identifier: identifier})
     }
     getTask(req: express.Request, res: express.Response) {
-        const id = +String(req.params.id)
-        if (!Number.isNaN(id)) {
-            res.render('task', {id: id})
-        } else {
-            res.render('error')
-        }
+        const identifier = String(req.params.identifier)
+        res.render('task', {identifier: identifier})
     }
 }

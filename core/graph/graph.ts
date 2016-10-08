@@ -3,11 +3,11 @@ import { CyclicDependencyError } from "./igraph"
 import { TaskNode } from "./types"
 import { IDataProvider, TaskNotFoundError } from "../data/idataprovider"
 
-function buildGraphIndex(root: TaskNode, map: Map<number, TaskNode>): void {
-    if (map.has(root.id)) {
+function buildGraphIndex(root: TaskNode, map: Map<string, TaskNode>): void {
+    if (map.has(root.identifier)) {
         return
     }
-    map.set(root.id, root)
+    map.set(root.identifier, root)
     for (let child of root.children) {
         buildGraphIndex(child, map)
     }
@@ -27,7 +27,7 @@ function defineStartDate(node: TaskNode) : void {
 }
 
 export function compute(root: TaskNode): void {
-    let map = new Map<number, TaskNode>()
+    let map = new Map<string, TaskNode>()
     buildGraphIndex(root, map)
     
     // Compute durations and define start dates
@@ -35,11 +35,11 @@ export function compute(root: TaskNode): void {
     Array.from(map.values(), defineStartDate)
 
     // Compute start time
-    let toBeComputed = new Set<number>(map.keys())
-    toBeComputed.delete(root.id) // root should not be computed
+    let toBeComputed = new Set<string>(map.keys())
+    toBeComputed.delete(root.identifier) // root should not be computed
 
     let queue = Array.from(toBeComputed)
-    let deferred = new Array<number>()
+    let deferred = new Array<string>()
 
     let lastDeferredLength = queue.length
     while (queue.length > 0 || deferred.length > 0) {
@@ -53,7 +53,7 @@ export function compute(root: TaskNode): void {
         }
         const id = queue.shift()
         let node = map.get(id)
-        if (node.parents.filter((parent: TaskNode) => { return toBeComputed.has(parent.id)}).length > 0) {
+        if (node.parents.filter((parent: TaskNode) => { return toBeComputed.has(parent.identifier)}).length > 0) {
             deferred.push(id)
         } else {
             let endDates = node.parents.map((parent: TaskNode) => {
@@ -70,28 +70,28 @@ export function compute(root: TaskNode): void {
 
 export class GraphPersistence {
     root: TaskNode
-    nodes: Map<number, TaskNode>
+    nodes: Map<string, TaskNode>
     private dataProvider: IDataProvider
     constructor(dataProvider: IDataProvider) {
         this.dataProvider = dataProvider
     }
-    loadGraph(id: number) : Promise<void> {
-        let nodes = new Map<number, TaskNode>()
-        return this.loadNode(id, nodes).then(() => {
-            let node = nodes.get(id)
+    loadGraph(identifier: string) : Promise<void> {
+        let nodes = new Map<string, TaskNode>()
+        return this.loadNode(identifier, nodes).then(() => {
+            let node = nodes.get(identifier)
             this.root = node
             this.nodes = nodes
         })
     }
     loadData() : Promise<void> {
-        let impactMap = new Map<number, Array<number>>() // Map impact id to tasks
+        let impactMap = new Map<number, Array<string>>() // Map impact id to tasks
         return Promise.all(Array.from(this.nodes.values(), (node: TaskNode) => {
-            return this.dataProvider.getTaskImpactIds(node.id).then((ids: Array<number>) => {
-                ids.forEach((id: number) => {
-                    if (!impactMap.has(id)) {
-                        impactMap.set(id, new Array<number>())
+            return this.dataProvider.getTaskImpactIds(node.identifier).then((ids: Array<number>) => {
+                ids.forEach((identifier: number) => {
+                    if (!impactMap.has(identifier)) {
+                        impactMap.set(identifier, new Array<string>())
                     }
-                    impactMap.get(id).push(node.id)
+                    impactMap.get(identifier).push(node.identifier)
                 })
             })
         })).then(() => {
@@ -101,14 +101,14 @@ export class GraphPersistence {
                     let impactId = keys[i]
                     let taskIds = impactMap.get(impactId)
 
-                    taskIds.forEach((taskId: number) => {
-                        this.nodes.get(taskId).impacts.push(values[i])
+                    taskIds.forEach((taskIdentifier: string) => {
+                        this.nodes.get(taskIdentifier).impacts.push(values[i])
                     })
                 }
             })
         }).then(() => {
             return Promise.all(Array.from(this.nodes.values(), (node: TaskNode) => {
-                return this.dataProvider.getTaskResults(node.id).then((result: TaskResults) => {
+                return this.dataProvider.getTaskResults(node.identifier).then((result: TaskResults) => {
                     node.startDate = result.startDate
                 })
             }))
@@ -117,7 +117,7 @@ export class GraphPersistence {
     save() : Promise<void> {
         let taskResults = Array.from(this.nodes.values(), (task: TaskNode) => {
             let taskResult: TaskResults = {
-                taskId: task.id,
+                taskIdentifier: task.identifier,
                 startDate: task.startDate,
                 duration: task.duration
             }
@@ -125,21 +125,21 @@ export class GraphPersistence {
         })
         return this.dataProvider.setTasksResults(taskResults)
     }
-    private loadNode(id: number, nodes: Map<number, TaskNode>) : Promise<void> {
-        return this.dataProvider.getTask(id).then((task: Task) => {
-            let node = new TaskNode(id)
+    private loadNode(identifier: string, nodes: Map<string, TaskNode>) : Promise<void> {
+        return this.dataProvider.getTask(identifier).then((task: Task) => {
+            let node = new TaskNode(identifier)
             node.estimatedDuration = task.estimatedDuration
             node.estimatedStartDate = task.estimatedStartDate
-            nodes.set(id, node)
+            nodes.set(identifier, node)
 
-            return this.dataProvider.getChildrenTaskIds(task.id).then((ids: Array<number>) => {
-                const sorted = ids.sort(GraphPersistence.compareNumbers).filter((value: number) => {
+            return this.dataProvider.getChildrenTaskIdentifiers(task.identifier).then((ids: Array<string>) => {
+                const sorted = ids.sort().filter((value: string) => {
                     return !nodes.has(value)
                 })
-                return Promise.all(sorted.map((id: number) => {
+                return Promise.all(sorted.map((id: string) => {
                     return this.loadNode(id, nodes)
                 })).then(() => {
-                    sorted.forEach((id: number) => {
+                    sorted.forEach((id: string) => {
                         node.addChild(nodes.get(id))
                     })
                 })

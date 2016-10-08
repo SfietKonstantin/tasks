@@ -2,7 +2,7 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task } from "../core/types"
-import { ProjectNotFoundError, TaskNotFoundError } from "../core/data/idataprovider"
+import { NullIdentifierError, ExistsError, ProjectNotFoundError } from "../core/data/idataprovider"
 import { RedisDataProvider } from "../core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -36,25 +36,20 @@ describe("Redis", () => {
         })
         it("Should add some testing data", (done) => {
             const project1: Project = {
-                id: null,
+                identifier: "project1",
                 name: "Project 1",
                 description: "Description 1"
             }
 
             const project2: Project = {
-                id: null,
+                identifier: "project2",
                 name: "Project 2",
                 description: "Description 2"
             }
 
-            db.addProject(project1).then((result: number) => {
-                chai.expect(project1.id).to.equals(1)
-                chai.expect(result).to.equals(1)
-            }).then(() => {
+            db.addProject(project1).then(() => {
                 return db.addProject(project2)
-            }).then((result: number) => {
-                chai.expect(project2.id).to.equals(2)
-                chai.expect(result).to.equals(2)
+            }).then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -63,10 +58,10 @@ describe("Redis", () => {
         it("Should get all projects", (done) => {
             db.getAllProjects().then((projects: Array<Project>) => {
                 chai.expect(projects).to.length(2)
-                chai.expect(projects[0].id).to.equals(1)
+                chai.expect(projects[0].identifier).to.equals("project1")
                 chai.expect(projects[0].name).to.equals("Project 1")
                 chai.expect(projects[0].description).to.equals("Description 1")
-                chai.expect(projects[1].id).to.equals(2)
+                chai.expect(projects[1].identifier).to.equals("project2")
                 chai.expect(projects[1].name).to.equals("Project 2")
                 chai.expect(projects[1].description).to.equals("Description 2")
                 done()
@@ -75,14 +70,14 @@ describe("Redis", () => {
             })
         })
         it("Should remove project", (done) => {
-            client.delAsync("project:1").then((result) => {
+            client.delAsync("project:project1").then((result) => {
                 done()
             })
         })
         it("Should get all valid projects", (done) => {
             db.getAllProjects().then((projects: Array<Project>) => {
                 chai.expect(projects).to.length(1)
-                chai.expect(projects[0].id).to.equals(2)
+                chai.expect(projects[0].identifier).to.equals("project2")
                 chai.expect(projects[0].name).to.equals("Project 2")
                 chai.expect(projects[0].description).to.equals("Description 2")
                 done()
@@ -91,7 +86,7 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt project properties", (done) => {
-            client.setAsync("project:1", "test").then((result) => {
+            client.setAsync("project:project1", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -100,7 +95,7 @@ describe("Redis", () => {
         it("Should get all non-corrupted projects", (done) => {
             db.getAllProjects().then((projects: Array<Project>) => {
                 chai.expect(projects).to.length(1)
-                chai.expect(projects[0].id).to.equals(2)
+                chai.expect(projects[0].identifier).to.equals("project2")
                 chai.expect(projects[0].name).to.equals("Project 2")
                 chai.expect(projects[0].description).to.equals("Description 2")
                 done()
@@ -132,33 +127,29 @@ describe("Redis", () => {
     describe("getProject", () => {
         it("Should add some testing data", (done) => {
             const project1: Project = {
-                id: null,
+                identifier: "project1",
                 name: "Project 1",
                 description: "Description 1"
             }
 
             const project2: Project = {
-                id: null,
+                identifier: "project2",
                 name: "Project 2",
                 description: "Description 2"
             }
 
-            db.addProject(project1).then((result: number) => {
-                chai.expect(project1.id).to.equals(1)
-                chai.expect(result).to.equals(1)
+            db.addProject(project1).then(() => {
             }).then(() => {
                 return db.addProject(project2)
-            }).then((result: number) => {
-                chai.expect(project2.id).to.equals(2)
-                chai.expect(result).to.equals(2)
+            }).then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get project", (done) => {
-            db.getProject(1).then((project: Project) => {
-                chai.expect(project.id).to.equals(1)
+            db.getProject("project1").then((project: Project) => {
+                chai.expect(project.identifier).to.equals("project1")
                 chai.expect(project.name).to.equals("Project 1")
                 chai.expect(project.description).to.equals("Description 1")
                 done()
@@ -167,7 +158,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid project", (done) => {
-            db.getProject(3).then((project: Project) => {
+            db.getProject("project3").then((project: Project) => {
                 done(new Error("getProject should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(ProjectNotFoundError)
@@ -175,15 +166,15 @@ describe("Redis", () => {
             })
         })
         it("Should remove project properties", (done) => {
-            client.hdelAsync("project:1", "name").then((result: number) => {
+            client.hdelAsync("project:project1", "name").then((result: number) => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get project", (done) => {
-            db.getProject(1).then((project: Project) => {
-                chai.expect(project.id).to.equals(1)
+            db.getProject("project1").then((project: Project) => {
+                chai.expect(project.identifier).to.equals("project1")
                 chai.expect(project.name).to.null
                 chai.expect(project.description).to.equals("Description 1")
                 done()
@@ -192,14 +183,14 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt project properties", (done) => {
-            client.setAsync("project:3", "test").then((result) => {
+            client.setAsync("project:project3", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted project", (done) => {
-            db.getProject(3).then((project: Project) => {
+            db.getProject("project3").then((project: Project) => {
                 done(new Error("getProject should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null
@@ -213,231 +204,47 @@ describe("Redis", () => {
     describe("addProject", () => {
         it("Should add project", (done) => {
             const project1: Project = {
-                id: null,
+                identifier: "project1",
                 name: "Project 1",
                 description: "Description 1"
             }
 
-            db.addProject(project1).then((id: number) => {
-                chai.expect(id).to.equals(1)
-                chai.expect(project1.id).to.equal(1)
+            db.addProject(project1).then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
-        it("Should corrupt next project properties", (done) => {
-            client.setAsync("project:2", "test").then((result) => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception when adding project", (done) => {
+        it("Should get an exception when adding a project with null identifier", (done) => {
             const project2: Project = {
-                id: null,
+                identifier: null,
                 name: "Project 2",
                 description: "Description 2"
             }
 
-            db.addProject(project2).then((id: number) => {
+            db.addProject(project2).then(() => {
                 done(new Error("addProject should not be a success"))
             }).catch((error: Error) => {
-                chai.expect(error).to.not.null
+                chai.expect(error).to.instanceOf(NullIdentifierError)
                 done()
             })
         })
-        it("Should add next project", (done) => {
-            const project3: Project = {
-                id: null,
-                name: "Project 3",
-                description: "Description 3"
+        it("Should get an exception when adding existing project", (done) => {
+            const project1_2: Project = {
+                identifier: "project1",
+                name: "Project 2",
+                description: "Description 2"
             }
 
-            db.addProject(project3).then((id: number) => {
-                chai.expect(id).to.equals(3)
-                chai.expect(project3.id).to.equal(3)
-                done()
-            }).catch((error: Error) => {
-                done(error)
-            })
-        })
-        it("Should corrupt project id properties", (done) => {
-            client.delAsync("project:ids").then((result) => {
-                client.setAsync("project:ids", "test")
-            }).then((result) => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception when adding project", (done) => {
-            const project: Project = {
-                id: null,
-                name: "Project",
-                description: "Description"
-            }
-
-            db.addProject(project).then((id: number) => {
+            db.addProject(project1_2).then(() => {
                 done(new Error("addProject should not be a success"))
             }).catch((error: Error) => {
-                chai.expect(error).to.not.null
+                chai.expect(error).to.instanceOf(ExistsError)
                 done()
             })
-        })      
+        })  
         after(() => {
             client.flushdb()
-        })
-    })
-    describe("setProjectRootTask", () => {
-        it("Should add some testing data", (done) => {
-            const project: Project = {
-                id: null,
-                name: "Project",
-                description: "Description"
-            }
-
-            db.addProject(project).then((projectId: number) => {
-                chai.expect(projectId).to.equals(1)
-
-                const task: Task = {
-                    id: null,
-                    projectId: projectId,
-                    name: "Task",
-                    description: "Description",
-                    estimatedStartDate: new Date(2016, 9, 1),
-                    estimatedDuration: 30
-                }
-                
-                return db.addTask(projectId, task).then((id: number) => {
-                    chai.expect(id).to.equal(1)
-                    done()
-                })
-            }).catch((error: Error) => {
-                done(error)
-            })
-        })
-        it("Should set project root task", (done) => {
-            db.setProjectRootTask(1, 1).then(() => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception on invalid project", (done) => {
-            db.setProjectRootTask(2, 1).then(() => {
-                done(new Error("setProjectRootTask should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(ProjectNotFoundError)
-                done()
-            })
-        })
-        it("Should get an exception on invalid task", (done) => {
-            db.setProjectRootTask(1, 2).then(() => {
-                done(new Error("setProjectRootTask should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TaskNotFoundError)
-                done()
-            })
-        })
-        it("Should corrupt project properties", (done) => {
-            client.delAsync("project:1:root").then((result) => {
-                return client.hmsetAsync("project:1:root", {"test": "test"})
-            }).then((result) => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should set project root task", (done) => {
-            db.setProjectRootTask(1, 1).then(() => {
-                done()
-            }).catch((error: Error) => {
-                done(error)
-            })
-        })
-        after(() => {
-            client.flushdb()
-        })
-    })
-    describe("getProjectRootTask", () => {
-        it("Should add some testing data", (done) => {
-            const project: Project = {
-                id: null,
-                name: "Project",
-                description: "Description"
-            }
-
-            db.addProject(project).then((projectId: number) => {
-                chai.expect(projectId).to.equals(1)
-
-                const task1: Task = {
-                    id: null,
-                    projectId: projectId,
-                    name: "Task 1",
-                    description: "Description 1",
-                    estimatedStartDate: new Date(2016, 9, 1),
-                    estimatedDuration: 30
-                }
-                const task2: Task = {
-                    id: null,
-                    projectId: projectId,
-                    name: "Task 2",
-                    description: "Description 2",
-                    estimatedStartDate: new Date(2016, 9, 15),
-                    estimatedDuration: 15
-                }
-
-                return db.addTask(projectId, task1).then((result: number) => {
-                    chai.expect(result).to.equals(1)
-                }).then(() => {
-                    return db.addTask(projectId, task2)
-                }).then((result: number) => {
-                    chai.expect(result).to.equals(2)
-                }).then(() => {
-                    return db.setProjectRootTask(projectId, 2)
-                }).then(() => {
-                    done()
-                })
-            }).catch((error: Error) => {
-                done(error)
-            })
-        })
-        it("Should get project root task", (done) => {
-            db.getProjectRootTask(1).then((id: number) => {
-                chai.expect(id).to.equals(2)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception on invalid project", (done) => {
-            db.getProjectRootTask(2).then(() => {
-                done(new Error("getProjectRootTask should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(ProjectNotFoundError)
-                done()
-            })
-        })
-        it("Should corrupt project properties", (done) => {
-            client.delAsync("project:1:root").then((result) => {
-                return client.hmsetAsync("project:1:root", {"test": "test"})
-            }).then((result) => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        after(() => {
-            client.flushdb()
-        })
-        it("Should get an exception on corrupted project", (done) => {
-            db.getProjectRootTask(1).then((id: number) => {
-                done(new Error("getProjectRootTask should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.not.null
-                done()
-            })
         })
     })
 })
