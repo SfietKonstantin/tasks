@@ -1,12 +1,12 @@
 module.exports = {
     entry: {
-        project: './client/project.tsx',
-        task: './client/task.tsx',
-        imports: './client/imports.tsx'
+        project: './src/client/project.tsx',
+        task: './src/client/task.tsx',
+        imports: './src/client/imports.tsx'
     },
     output: {
         library: "[name]",
-        filename: 'public/[name].bundle.js'
+        filename: './src/server/public/[name].bundle.js'
     },
     resolve: {
         extensions: ['', '.webpack.js', '.web.js', '.tsx', '.js']

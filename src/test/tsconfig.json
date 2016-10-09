@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true
+    },
+    "files": [
+        "../../typings/index.d.ts",
+        "tst_graph.ts",
+        "tst_graph_persistence.ts",
+        "tst_impact.ts",
+        "tst_redis_project.ts",
+        "tst_redis_task.ts",
+        "tst_redis_taskresults.ts",
+        "tst_redis_modifier.ts",
+        "tst_redis_delay.ts"
+    ]
+} 
