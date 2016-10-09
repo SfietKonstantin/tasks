@@ -11,6 +11,7 @@
         "../typings/index.d.ts",
         "./task.tsx",
         "./project.tsx",
+        "./imports.tsx",
         "./common/header.tsx",
         "./common/tabs.tsx",
         "./common/summary.tsx",
@@ -24,7 +25,8 @@
         "./task/main.tsx",
         "./task/overview.tsx",
         "./task/details.tsx",
-        "./task/modifierbutton.tsx"
+        "./task/modifierbutton.tsx",
+        "./imports/primavera/primavera.tsx"
     ]
 }
  

@@ -19,4 +19,12 @@ export class Routes {
         const identifier = String(req.params.identifier)
         res.render('task', {identifier: identifier})
     }
+    getImport(req: express.Request, res: express.Response) {
+        const source = String(req.params.source)
+        if (source == "primavera") {
+            res.render('import', {source: source})
+        } else {
+            res.status(404).render('error', {})
+        }
+    }
 }

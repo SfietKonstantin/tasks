@@ -46,7 +46,7 @@ export class TaskHeaderTools extends React.Component<TaskToolsProperties, TaskTo
             cache: false,
             success: (data: TaskToolsState) => {
                 this.setState({
-                    important: this.state.important, 
+                    important: data.important, 
                     importantEnabled: true
                 })
             }
@@ -64,7 +64,7 @@ export class TaskHeaderTools extends React.Component<TaskToolsProperties, TaskTo
                 url: "/api/task/" + this.props.taskIdentifier + "/important",
                 success: (data: TaskToolsState) => {
                     this.setState({
-                        important: this.state.important, 
+                        important: data.important, 
                         importantEnabled: true
                     })
                 }

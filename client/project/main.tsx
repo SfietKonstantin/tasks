@@ -12,7 +12,7 @@ export class ProjectMain extends React.Component<ProjectMainProperties, {}> {
     render() {
         return <Grid className={this.props.visible ? "" : "hidden"}>
             <Col id="main" xs={12} md={10}>
-                <h2>Overview</h2>
+                <h2 className="title-h2">Overview</h2>
                 <p>(Under construction)</p>
             </Col>
         </Grid>

@@ -1,0 +1,12 @@
+<%- include('header') -%>
+
+<div id="content"></div>
+
+<script src="/imports.bundle.js"></script>
+<script>
+window.onload = function() {
+    window.imports.render("<%= source %>")
+}
+</script>
+
+<%- include('footer') -%>

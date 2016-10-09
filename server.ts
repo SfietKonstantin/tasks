@@ -44,6 +44,7 @@ export class Server {
         this.app.get('/', this.routes.index.bind(this.routes))
         this.app.get('/project/:identifier', this.routes.getProject.bind(this.routes))
         this.app.get('/task/:identifier', this.routes.getTask.bind(this.routes))
+        this.app.get('/import/:source', this.routes.getImport.bind(this.routes))
 
         // API
         this.app.get('/api/project/list', this.api.getProjects.bind(this.api))

@@ -28,21 +28,21 @@
     padding: 8px 0px;
 }
 
-h1 {
-    margin-top: 0px;
-    margin-bottom: 0px;
-    font-size: 30px;
-}
-
-h2 {
-    font-size: 20px;
-}
-
 /*.sidebar {
     border-left: 1px solid #eee
 }*/
 
 /* Utils */
+
+.title-h1 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-size: 30px;
+}
+
+.title-h2 {
+    font-size: 20px;
+}
 
 .hidden {
     display: none
@@ -75,10 +75,10 @@ h2 {
 
 .task-overview {
     margin-top: 10px;
-    text-align: center;
 }
 
 .task-overview-state {
+    text-align: center;
     font-size: 35px;
 }
 

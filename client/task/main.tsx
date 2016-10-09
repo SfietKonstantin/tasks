@@ -14,11 +14,11 @@ export class TaskMain extends React.Component<TaskMainProperties, {}> {
     render() {
         return <Grid className={this.props.visible ? "" : "hidden"}>
             <Col id="main" xs={12} md={10}>
-                <h2>Overview</h2>
+                <h2 className="title-h2">Overview</h2>
                 <TaskOverview task={this.props.task} taskResults={this.props.taskResults} />
             </Col>
             <Col id="sidebar" xs={3} md={2}>
-                <h2>Tags</h2>
+                <h2 className="title-h2">Tags</h2>
                 <p>(Under construction)</p>
             </Col>
         </Grid>

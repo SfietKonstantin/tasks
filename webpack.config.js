@@ -1,7 +1,8 @@
 module.exports = {
     entry: {
         project: './client/project.tsx',
-        task: './client/task.tsx'
+        task: './client/task.tsx',
+        imports: './client/imports.tsx'
     },
     output: {
         library: "[name]",

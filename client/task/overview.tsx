@@ -12,9 +12,9 @@ interface TaskOverviewStateIndicatorProperties {
 class TaskOverviewStateIndicator extends React.Component<TaskOverviewStateIndicatorProperties, {}> {
     render() {
         const className = "glyphicon glyphicon-" + this.props.icon
-        return <span className="task-overview-state">
+        return <div className="task-overview-state">
             <span className={className} aria-hidden="true"></span> {this.props.text}
-        </span>
+        </div>
     }
 }
 
