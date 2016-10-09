@@ -1,6 +1,4 @@
 node_modules
 .vscode
-jsconfig.json
-typings
-*.js
+tests
 coverage

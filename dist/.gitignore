@@ -1,0 +1,7 @@
+*
+
+!.gitignore
+!www
+!public/css
+!public/fonts
+!public/lib

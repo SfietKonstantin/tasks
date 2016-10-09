@@ -19,14 +19,7 @@ export class TabBar extends React.Component<TabBarProperties, TabBarState> {
     render() {
         let tabs = Array<JSX.Element>()
         for (let i = 0; i < this.props.tabs.length; ++i) {
-            let label = this.props.tabs[i]
-            let className = (i == this.state.currentTab ? "active" : "")
-            tabs.push(
-                <NavItem eventKey={i}>{label}</NavItem>
-                /*<li role="presentation" className={className}>
-                    <a href="#" onClick={this.handleClick.bind(this, i)}>{label}</a>
-                </li>*/
-            )
+            tabs.push(<NavItem eventKey={i}>{this.props.tabs[i]}</NavItem>)
         }
         return <Col id="page-header-tabs" xs={12} md={8}>
             <Nav bsStyle="tabs" activeKey={this.state.currentTab} 

@@ -32,14 +32,14 @@ export class Server {
         this.routes = new Routes(this.dataProvider)
         this.app = express()
         this.app.set('view engine', 'ejs')
-        this.app.set('views', path.join(__dirname, 'views'))
+        this.app.set('views', path.join(__dirname, '..', 'views'))
 
         // uncomment after placing your favicon in /public
         //this.app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
         this.app.use(logger('dev'))
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({extended: false}))
-        this.app.use(express.static(path.join(__dirname, 'public')))
+        this.app.use(express.static(path.join(__dirname, '..', 'public')))
 
         this.app.get('/', this.routes.index.bind(this.routes))
         this.app.get('/project/:identifier', this.routes.getProject.bind(this.routes))
@@ -49,6 +49,7 @@ export class Server {
         // API
         this.app.get('/api/project/list', this.api.getProjects.bind(this.api))
         this.app.get('/api/project/:identifier', this.api.getProject.bind(this.api))
+        this.app.get('/api/project/:identifier/tasks', this.api.getProjectTasks.bind(this.api))
         this.app.get('/api/task/:identifier', this.api.getTask.bind(this.api))
         this.app.get('/api/task/:identifier/important', this.api.isTaskImportant.bind(this.api))
         this.app.put('/api/task/:identifier/important', this.api.putTaskImportant.bind(this.api))

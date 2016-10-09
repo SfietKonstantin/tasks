@@ -3,14 +3,13 @@ import * as ReactDOM from "react-dom"
 import * as Redux from "redux"
 import * as ReduxThunk from "redux-thunk"
 import { Provider } from 'react-redux'
-import { State } from "./project/types"
-import { mainReducer } from './project/reducers/main'
-import { Main } from "./project/containers/main"
-import { ApiTask } from "../common/apitypes"
+import { State } from "./primavera/types"
+import { mainReducer } from './primavera/reducers/main'
+import { Main } from "./primavera/containers/main"
+import { Project, Task } from "../../common/types"
 
 interface RootProperties {
     store: Redux.Store<State>
-    identifier: string
 }
 
 class Root extends React.Component<RootProperties, {}> {
@@ -21,24 +20,22 @@ class Root extends React.Component<RootProperties, {}> {
     }
 }
 
-export function render(identifier: string) {
+export function render() {
     const initialState: State = {
-        identifier,
         project: {
-            isFetching: false,
-            project: null
+            identifier: "",
+            name: "",
+            description: ""
         },
         tasks: {
-            isFetching: false,
-            tasks: new Array<ApiTask>(),
-            filters: [true, true, false],
-            today: new Date(),
-            filteredTasks: new Array<ApiTask>()
+            isImporting: false,
+            tasks: new Array<Task>(),
+            invalidFormat: false
         }
     }
     const store = Redux.createStore(
         mainReducer, initialState, 
         Redux.applyMiddleware(ReduxThunk.default)
     )
-    ReactDOM.render(<Root store={store} identifier={identifier} />, document.getElementById("content"))
+    ReactDOM.render(<Root store={store} />, document.getElementById("content"))
 }

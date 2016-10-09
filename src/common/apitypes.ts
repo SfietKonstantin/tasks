@@ -16,11 +16,6 @@ export interface ApiProjectTaskModifiers {
     modifiers: Array<Modifier>
 }
 
-export interface ApiProjectTasks {
-    project: Project
-    tasks: Array<ApiTask> 
-}
-
 export function createApiTask(task: Task, taskResults: TaskResults) : ApiTask {
     return {
         identifier: task.identifier,
@@ -52,16 +47,13 @@ export function createTaskResultsFromApiTask(apiTask: ApiTask) : TaskResults {
     }
 }
 
-export function createApiProjectAndTasks(project: Project, tasks: Array<Task>, tasksResults: Array<TaskResults>) : ApiProjectTasks {
+export function createApiTasks(tasks: Array<Task>, tasksResults: Array<TaskResults>) : Array<ApiTask> {
     if (tasks.length == tasksResults.length) {
-        let apiTasks = new Array<ApiTask>()
+        let returned = new Array<ApiTask>()
         for (let i = 0; i < tasks.length; ++i) {
-            apiTasks.push(createApiTask(tasks[i], tasksResults[i]))
+            returned.push(createApiTask(tasks[i], tasksResults[i]))
         }
-        return {
-            project: project,
-            tasks: apiTasks
-        }
+        return returned
     } else {
         return null
     }

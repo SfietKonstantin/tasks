@@ -28,11 +28,21 @@ export class Api {
     getProject(req: express.Request, res: express.Response) {
         const identifier = String(req.params.identifier)
         this.dataProvider.getProject(identifier).then((project: Project) => {
-            return this.dataProvider.getProjectTasks(identifier).then((tasks: Array<Task>) => {
-                tasks.filter((value: Task) => { return !!value })
-                return this.dataProvider.getTasksResults(tasks.map((task: Task) => { return task.identifier })).then((tasksResults: Array<TaskResults>) => {
-                    res.json(apitypes.createApiProjectAndTasks(project, tasks, tasksResults))
-                })
+            res.json(project)
+        }).catch((error) => {
+            if (error instanceof NotFoundError) {
+                res.status(404).json(error)
+            } else {
+                res.status(500).json(error)
+            }
+        })
+    }
+    getProjectTasks(req: express.Request, res: express.Response) {
+        const identifier = String(req.params.identifier)
+        this.dataProvider.getProjectTasks(identifier).then((tasks: Array<Task>) => {
+            tasks.filter((value: Task) => { return !!value })
+            return this.dataProvider.getTasksResults(tasks.map((task: Task) => { return task.identifier })).then((tasksResults: Array<TaskResults>) => {
+                res.json(apitypes.createApiTasks(tasks, tasksResults))
             })
         }).catch((error) => {
             if (error instanceof NotFoundError) {
@@ -71,8 +81,8 @@ export class Api {
        this.setTaskImportant(req, res, false) 
     }
     postModifier(req: express.Request, res: express.Response) {
-        const modifier = JSON.parse(req.body.modifier) as Modifier
-        const taskIdentifier = String(req.body.task)
+        const modifier = req.body.modifier as Modifier
+        const taskIdentifier = String(req.body.identifier)
 
         let graph: GraphPersistence = new GraphPersistence(this.dataProvider)
         this.dataProvider.hasTask(taskIdentifier).then(() => {

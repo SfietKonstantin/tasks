@@ -5,7 +5,6 @@ import { Grid, Col } from "react-bootstrap"
 interface HeaderProperties {
     identifier: string
     name: string
-    content?: JSX.Element
 }
 
 export class Header extends React.Component<HeaderProperties, {}> {
