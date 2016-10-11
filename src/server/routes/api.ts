@@ -1,9 +1,10 @@
 import * as express from "express"
 import { Project, Task, TaskResults, Modifier } from "../../common/types"
 import * as apitypes from "../../common//apitypes"
-import { IDataProvider, NotFoundError } from "../core/data/idataprovider"
+import { IDataProvider, NotFoundError, ExistsError } from "../core/data/idataprovider"
 import { TaskNode } from "../core/graph/types"
 import { compute, GraphPersistence } from "../core/graph/graph"
+import * as testdata from "../core/testdata"
 
 class RequestError {
     message: string
@@ -23,6 +24,19 @@ export class Api {
             res.json({projects: projects})
         }).catch((error) => {
             res.status(500).json(error)
+        })
+    }
+    putProject(req: express.Request, res: express.Response) {
+        const project = req.body.project as Project
+
+        this.dataProvider.addProject(project).then(() => {
+            res.sendStatus(301)
+        }).catch((error: Error) => {
+            if (error instanceof ExistsError) {
+                res.status(400).json(error)
+            } else {
+                res.status(500).json(error)
+            }
         })
     }
     getProject(req: express.Request, res: express.Response) {
@@ -45,8 +59,31 @@ export class Api {
                 res.json(apitypes.createApiTasks(tasks, tasksResults))
             })
         }).catch((error) => {
+            console.log(error)
             if (error instanceof NotFoundError) {
                 res.status(404).json(error)
+            } else {
+                res.status(500).json(error)
+            }
+        })
+    }
+    putTask(req: express.Request, res: express.Response) {
+        const apiTask = req.body.task as apitypes.ApiImportTask
+        const task = apitypes.createTaskFromApiImportTask(apiTask)
+        this.dataProvider.addTask(task).then(() => {
+            return this.dataProvider.setTasksResults([{
+                taskIdentifier: task.identifier,
+                startDate: task.estimatedStartDate,
+                duration: task.estimatedDuration
+            }])
+        }).then(() => {
+            res.sendStatus(301)
+        }).catch((error: Error) => {
+            console.log(error)
+            if (error instanceof NotFoundError) {
+                res.status(404).json(error)
+            } else if (error instanceof ExistsError) {
+                res.status(400).json(error)
             } else {
                 res.status(500).json(error)
             }
@@ -80,7 +117,7 @@ export class Api {
     deleteTaskImportant(req: express.Request, res: express.Response) {
        this.setTaskImportant(req, res, false) 
     }
-    postModifier(req: express.Request, res: express.Response) {
+    putModifier(req: express.Request, res: express.Response) {
         const modifier = req.body.modifier as Modifier
         const taskIdentifier = String(req.body.identifier)
 
@@ -105,6 +142,10 @@ export class Api {
                 res.status(500).json(error)
             }
         })
+    }
+    getDemoData(req: express.Request, res: express.Response) {
+        testdata.fillTestData(this.dataProvider)
+        res.sendStatus(200)
     }
     private setTaskImportant(req: express.Request, res: express.Response, important: boolean) {
         const identifier = String(req.params.identifier)

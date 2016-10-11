@@ -1,6 +1,6 @@
 import { Action } from "redux"
 import { Project } from "../../../../common/types"
-import { ProjectAction, PROJECT_DEFINE } from "../actions/project"
+import { ProjectAction, PROJECT_DEFINE, PROJECT_REQUEST_ADD, PROJECT_RECEIVE_ADD } from "../actions/project"
 
 
 const initialState: Project = {
@@ -9,14 +9,19 @@ const initialState: Project = {
     description: ""
 }
 
-export const projectReducer = (state: Project = initialState, action: ProjectAction) : Project => {
+export const projectReducer = (state: Project = initialState, action: Action) : Project => {
     switch (action.type) {
         case PROJECT_DEFINE:
-            return { 
-                identifier: action.identifier,
-                name: action.name,
-                description: action.description
+            const projectAction = action as ProjectAction
+            return {
+                identifier: projectAction.identifier,
+                name: projectAction.name,
+                description: projectAction.description
             }
+        case PROJECT_REQUEST_ADD:
+            return state
+        case PROJECT_RECEIVE_ADD:
+            return state
         default:
             return state
     }

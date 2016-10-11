@@ -1,7 +1,14 @@
-import { Project, Task, TaskResults, Modifier } from "./types"
+import { Identifiable, Project, Task, TaskResults, Modifier } from "./types"
 
-export interface ApiTask {
-    identifier: string
+export interface ApiImportTask extends Identifiable {
+    projectIdentifier: string,
+    name: string
+    description: string
+    estimatedStartDate: string
+    estimatedDuration: number
+}
+
+export interface ApiTask extends Identifiable {
     name: string
     description: string
     estimatedStartDate: string
@@ -14,6 +21,17 @@ export interface ApiProjectTaskModifiers {
     project: Project
     task: ApiTask
     modifiers: Array<Modifier>
+}
+
+export function createTaskFromApiImportTask(apiImportTask: ApiImportTask) : Task {
+    return {
+        identifier: apiImportTask.identifier,
+        projectIdentifier: apiImportTask.projectIdentifier,
+        name: apiImportTask.name,
+        description: apiImportTask.description,
+        estimatedStartDate: new Date(apiImportTask.estimatedStartDate),
+        estimatedDuration: apiImportTask.estimatedDuration
+    }
 }
 
 export function createApiTask(task: Task, taskResults: TaskResults) : ApiTask {

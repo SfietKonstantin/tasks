@@ -59,7 +59,7 @@ export const addModifier = (identifier: string, modifier: Modifier) => {
     return function(dispatch: Dispatch<State>) {
         dispatch(requestAddModifier(identifier, modifier))
         const requestInit: RequestInit = {
-            method: "POST",
+            method: "PUT",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json"

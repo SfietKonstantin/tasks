@@ -1,4 +1,5 @@
-import { Project, Task } from "../../../common/types"
+import { Project } from "../../../common/types"
+import { ApiImportTask } from "../../../common/apitypes"
 
 export interface State {
     project: Project
@@ -7,7 +8,8 @@ export interface State {
 }
 
 export interface TasksState {
-    tasks: Array<Task>
+    tasks: Map<string, ApiImportTask>
+    warnings: Array<string>
     isImporting: boolean
     invalidFormat: boolean
 }

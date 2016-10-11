@@ -9,9 +9,9 @@ var exec = require('child_process').exec;
 
 var webpackClientConfig = {
     entry: {
-        project: './src/client/project.tsx',
-        task: './src/client/task.tsx',
-        imports: './src/client/imports.tsx'
+        project: ['babel-polyfill', './src/client/project.tsx'],
+        task: ['babel-polyfill', './src/client/task.tsx'],
+        imports: ['babel-polyfill', './src/client/imports.tsx']
     },
     output: {
         library: "[name]",

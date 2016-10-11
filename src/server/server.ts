@@ -7,7 +7,6 @@ import { Api } from "./routes/api"
 import { Routes } from "./routes/routes"
 import { IDataProvider } from "./core/data/idataprovider"
 import { RedisDataProvider } from "./core/data/redisdataprovider"
-import * as testdata from "./core/testdata"
 
 class HttpError extends Error {
     constructor(status: number, message: string) {
@@ -26,7 +25,6 @@ export class Server {
 
     public constructor() {
         this.dataProvider = new RedisDataProvider(RedisDataProvider.getDefaultClient())
-        testdata.fillTestData(this.dataProvider)
 
         this.api = new Api(this.dataProvider)
         this.routes = new Routes(this.dataProvider)
@@ -47,14 +45,19 @@ export class Server {
         this.app.get('/import/:source', this.routes.getImport.bind(this.routes))
 
         // API
+        this.app.put('/api/project', this.api.putProject.bind(this.api))
         this.app.get('/api/project/list', this.api.getProjects.bind(this.api))
         this.app.get('/api/project/:identifier', this.api.getProject.bind(this.api))
         this.app.get('/api/project/:identifier/tasks', this.api.getProjectTasks.bind(this.api))
+        this.app.put('/api/task', this.api.putTask.bind(this.api))
         this.app.get('/api/task/:identifier', this.api.getTask.bind(this.api))
         this.app.get('/api/task/:identifier/important', this.api.isTaskImportant.bind(this.api))
         this.app.put('/api/task/:identifier/important', this.api.putTaskImportant.bind(this.api))
         this.app.delete('/api/task/:identifier/important', this.api.deleteTaskImportant.bind(this.api))
-        this.app.post('/api/modifier', this.api.postModifier.bind(this.api))
+        this.app.put('/api/modifier', this.api.putModifier.bind(this.api))
+
+        // Demo
+        this.app.get('/demo/data', this.api.getDemoData.bind(this.api))
 
         this.app.use(this.errorHandler)
         this.registerErrorHandlers()

@@ -6,7 +6,8 @@ import { Provider } from 'react-redux'
 import { State } from "./primavera/types"
 import { mainReducer } from './primavera/reducers/main'
 import { Main } from "./primavera/containers/main"
-import { Project, Task } from "../../common/types"
+import { Project } from "../../common/types"
+import { ApiImportTask } from "../../common/apitypes"
 
 interface RootProperties {
     store: Redux.Store<State>
@@ -28,8 +29,9 @@ export function render() {
             description: ""
         },
         tasks: {
+            tasks: new Map<string, ApiImportTask>(),
+            warnings: new Array<string>(),
             isImporting: false,
-            tasks: new Array<Task>(),
             invalidFormat: false
         }
     }
