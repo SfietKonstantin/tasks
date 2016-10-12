@@ -2,7 +2,9 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Delay } from "../../common/types"
-import { NullIdentifierError, ExistsError, ProjectNotFoundError, DelayNotFoundError } from "../../server/core/data/idataprovider"
+import {
+    NullIdentifierError, CorruptedError, ExistsError, ProjectNotFoundError, DelayNotFoundError
+} from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -47,7 +49,7 @@ describe("Redis", () => {
                     description: "Description 2",
                     date: new Date(2016, 9, 15)
                 }
-                
+
                 return db.addDelay(delay1).then(() => {
                 }).then(() => {
                     return db.addDelay(delay2)
@@ -145,7 +147,7 @@ describe("Redis", () => {
                     description: "Description 2",
                     date: new Date(2016, 9, 15)
                 }
-                
+
                 return db.addDelay(delay1).then(() => {
                 }).then(() => {
                     return db.addDelay(delay2)
@@ -182,15 +184,13 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should get delay", (done) => {
+        it("Should get an exception on corrupted delay", (done) => {
             db.getDelay("delay1").then((delay: Delay) => {
-                chai.expect(delay.identifier).to.equals("delay1")
-                chai.expect(delay.name).to.null
-                chai.expect(delay.description).to.equals("Description 1")
-                chai.expect(delay.date.getTime()).to.equals(new Date(2016, 9, 1).getTime())
+                done(new Error("getDelay should not be a success"))
                 done()
             }).catch((error: Error) => {
-                done(error)
+                chai.expect(error).to.instanceOf(CorruptedError)
+                done()
             })
         })
         it("Should corrupt delay properties", (done) => {

@@ -46,7 +46,7 @@ function fillTasksData(dataProvider: IDataProvider) : Promise<void> {
             estimatedDuration: 30
         }
     ]
-                
+
     const mappedTasks = tasks.map((task: Task) => { return dataProvider.addTask(task) })
     return Promise.all(mappedTasks).then((ids) => {})
 }

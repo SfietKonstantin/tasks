@@ -1,5 +1,6 @@
 import { 
-    NullIdentifierError, ExistsError, ProjectNotFoundError, TaskNotFoundError, ModifierNotFoundError, 
+    CorruptedError, NullIdentifierError, ExistsError, 
+    ProjectNotFoundError, TaskNotFoundError, ModifierNotFoundError, 
     DelayNotFoundError, TransactionError 
 } from "./idataprovider"
 import { IRedisDataProvider } from "./iredisdataprovider"
@@ -50,14 +51,19 @@ class RedisProject {
     }
 
     static load(identifier: string, client: redis.RedisClient) : Promise<Project> {
-        const project: Project = {
-            identifier: identifier, 
-            name: null, 
-            description: null, 
-        }
+
         return client.hgetallAsync("project:" + identifier).then((result: any) => {
-            project.name = result.hasOwnProperty("name") ? result["name"] : null
-            project.description = result.hasOwnProperty("description") ? result["description"] : null
+            if (!result.hasOwnProperty("name")) {
+                throw new CorruptedError("Project " + identifier + " do not have property name")
+            }
+            if (!result.hasOwnProperty("description")) {
+                throw new CorruptedError("Project " + identifier + " do not have property description")
+            }
+            const project: Project = {
+                identifier,
+                name: result["name"] as string,
+                description: result["description"] as string
+            }
             return project
         })
     }
@@ -85,24 +91,39 @@ class RedisTask {
                              .execAsync().then((result: any) => {})
     }
     static load(identifier: string, client: redis.RedisClient) : Promise<Task> {
-        const task: Task = {
-            identifier: identifier, 
-            projectIdentifier: null,
-            name: null, 
-            description: null, 
-            estimatedStartDate: null, 
-            estimatedDuration: null
-        }
         return client.hgetallAsync("task:" + identifier).then((result: any) => {
-            task.projectIdentifier = result.hasOwnProperty("projectIdentifier") ? result["projectIdentifier"] : null
-            task.name = result.hasOwnProperty("name") ? result["name"] : null
-            task.description = result.hasOwnProperty("description") ? result["description"] : null
+            if (!result.hasOwnProperty("name")) {
+                throw new CorruptedError("Task " + identifier + " do not have property projectIdentifier")
+            }
+            if (!result.hasOwnProperty("name")) {
+                throw new CorruptedError("Task " + identifier + " do not have property name")
+            }
+            if (!result.hasOwnProperty("description")) {
+                throw new CorruptedError("Task " + identifier + " do not have property description")
+            }
+            const projectIdentifier: string = result["projectIdentifier"]
+            const name: string = result["name"]
+            const description: string = result["description"]
             return client.mgetAsync("task:" + identifier + ":estimatedStartDate", 
                                     "task:" + identifier + ":estimatedDuration")
-        }).then((result: Array<string>) => { 
-            task.estimatedStartDate = result[0] ? new Date(+result[0]) : null
-            task.estimatedDuration = result[1] ? +(result[1]) : null
-            return task
+                         .then((result: Array<string>) => {
+                if (!result[0]) {
+                    throw new CorruptedError("Task " + identifier + " do not have property estimatedStartDate")
+                }
+                if (!result[1]) {
+                    throw new CorruptedError("Task " + identifier + " do not have property estimatedDuration")
+                }
+
+                const task: Task = {
+                    identifier,
+                    projectIdentifier,
+                    name,
+                    description,
+                    estimatedStartDate: new Date(+result[0]),
+                    estimatedDuration: +result[1]
+                }
+                return task
+            })
         })
     }
 }
@@ -126,19 +147,27 @@ class RedisModifier {
                              .execAsync().then((result: any) => { return id })
     }
     static load(id: number, client: redis.RedisClient) : Promise<Modifier> {
-        const modifier: Modifier = {
-            id: id,
-            name: null,
-            description: null,
-            duration: null
-        }
         return client.hgetallAsync("modifier:" + id).then((result: any) => {
-            modifier.name = result.hasOwnProperty("name") ? result["name"] : null
-            modifier.description = result.hasOwnProperty("description") ? result["description"] : null
-            return client.getAsync("modifier:" + id + ":duration")
-        }).then((result: string) => { 
-            modifier.duration = result ? +result : null
-            return modifier
+            if (!result.hasOwnProperty("name")) {
+                throw new CorruptedError("Modifier " + id + " do not have property name")
+            }
+            if (!result.hasOwnProperty("description")) {
+                throw new CorruptedError("Modifier " + id + " do not have property description")
+            }
+            const name: string = result["name"]
+            const description: string = result["description"]
+            return client.getAsync("modifier:" + id + ":duration").then((result: string) => { 
+                if (!result) {
+                    throw new CorruptedError("Modifier " + id + " do not have property duration")
+                }
+                const modifier: Modifier = {
+                    id,
+                    name,
+                    description,
+                    duration: +result
+                }
+                return modifier
+            })
         })
     }
 }
@@ -165,18 +194,30 @@ class RedisDelay {
                              .execAsync().then((result: any) => {})
     }
     static load(identifier: string, client: redis.RedisClient) : Promise<Delay> {
-        const delay: Delay = {
-            identifier: identifier, 
-            projectIdentifier: null,
-            name: null, 
-            description: null, 
-            date: null, 
-        }
         return client.hgetallAsync("delay:" + identifier).then((result: any) => {
-            delay.projectIdentifier = result.hasOwnProperty("projectIdentifier") ? result["projectIdentifier"] : null
-            delay.name = result.hasOwnProperty("name") ? result["name"] : null
-            delay.description = result.hasOwnProperty("description") ? result["description"] : null
-            delay.date = result.hasOwnProperty("date") ? new Date(+result["date"]) : null
+            if (!result.hasOwnProperty("projectIdentifier")) {
+                throw new CorruptedError("Delay " + identifier + " do not have property projectIdentifier")
+            }
+            if (!result.hasOwnProperty("name")) {
+                throw new CorruptedError("Delay " + identifier + " do not have property name")
+            }
+            if (!result.hasOwnProperty("description")) {
+                throw new CorruptedError("Delay " + identifier + " do not have property description")
+            }
+            if (!result.hasOwnProperty("date")) {
+                throw new CorruptedError("Delay " + identifier + " do not have property date")
+            }
+            const projectIdentifier: string = result["projectIdentifier"]
+            const name: string = result["name"]
+            const description: string = result["description"]
+
+            const delay: Delay = {
+                identifier: identifier, 
+                projectIdentifier,
+                name, 
+                description, 
+                date: new Date(+result["date"]), 
+            }
             return delay
         })
     }
@@ -292,10 +333,16 @@ export class RedisDataProvider implements IRedisDataProvider {
         return this.hasTask(identifier).then(() => {
             return this.client.mgetAsync("task:" + identifier + ":startDate", "task:" + identifier + ":duration")
         }).then((results: Array<string>) => {
+            if (!results[0]) {
+                throw new CorruptedError("Task " + identifier + " do not have property startDate")
+            }
+            if (!results[1]) {
+                throw new CorruptedError("Task " + identifier + " do not have property duration")
+            }
             const taskResults: TaskResults = {
                 taskIdentifier: identifier,
-                startDate: results[0] ? new Date(+results[0]) : null,
-                duration: results[1] ? +results[1] : null
+                startDate: new Date(+results[0]),
+                duration: +results[1]
             }
             return taskResults
         })

@@ -2,7 +2,9 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task } from "../../common/types"
-import { NullIdentifierError, ExistsError, ProjectNotFoundError, TaskNotFoundError } from "../../server/core/data/idataprovider"
+import {
+    NullIdentifierError, CorruptedError, ExistsError, ProjectNotFoundError, TaskNotFoundError
+} from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -49,7 +51,7 @@ describe("Redis", () => {
                     estimatedStartDate: new Date(2016, 9, 15),
                     estimatedDuration: 15
                 }
-                
+
                 return db.addTask(task1).then(() => {
                 }).then(() => {
                     return db.addTask(task2)
@@ -104,7 +106,7 @@ describe("Redis", () => {
                     estimatedStartDate: new Date(2016, 9, 15),
                     estimatedDuration: 15
                 }
-                
+
                 return db.addTask(task1).then(() => {
                 }).then(() => {
                     return db.addTask(task2)
@@ -208,7 +210,7 @@ describe("Redis", () => {
                     estimatedStartDate: new Date(2016, 9, 15),
                     estimatedDuration: 15
                 }
-                
+
                 return db.addTask(task1).then(() => {
                 }).then(() => {
                     return db.addTask(task2)
@@ -246,16 +248,13 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should get task", (done) => {
+        it("Should get an exception on corrupted task", (done) => {
             db.getTask("task1").then((task: Task) => {
-                chai.expect(task.identifier).to.equals("task1")
-                chai.expect(task.name).to.null
-                chai.expect(task.description).to.equals("Description 1")
-                chai.expect(task.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 1).getTime())
-                chai.expect(task.estimatedDuration).to.equals(30)
+                done(new Error("getDelay should not be a success"))
                 done()
             }).catch((error: Error) => {
-                done(error)
+                chai.expect(error).to.instanceOf(CorruptedError)
+                done()
             })
         })
         it("Should corrupt task properties", (done) => {
@@ -387,7 +386,7 @@ describe("Redis", () => {
                     estimatedStartDate: new Date(2016, 9, 15),
                     estimatedDuration: 15
                 }
-                
+
                 return db.addTask(task1).then(() => {
                     return db.addTask(task2)
                 }).then(() => {
@@ -501,7 +500,7 @@ describe("Redis", () => {
                     estimatedStartDate: new Date(2016, 10, 1),
                     estimatedDuration: 10
                 }
-                
+
                 return db.addTask(task1).then(() => {
                     return db.addTask(task2)
                 }).then(() => {
@@ -587,7 +586,7 @@ describe("Redis", () => {
                     estimatedStartDate: new Date(2016, 10, 1),
                     estimatedDuration: 10
                 }
-                
+
                 return db.addTask(task1).then(() => {
                     return db.addTask(task2)
                 }).then(() => {

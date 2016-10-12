@@ -2,7 +2,9 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task } from "../../common/types"
-import { NullIdentifierError, ExistsError, ProjectNotFoundError } from "../../server/core/data/idataprovider"
+import {
+    NullIdentifierError, CorruptedError, ExistsError, ProjectNotFoundError
+} from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -172,14 +174,12 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should get project", (done) => {
+        it("Should get an exception on corrupted project", (done) => {
             db.getProject("project1").then((project: Project) => {
-                chai.expect(project.identifier).to.equals("project1")
-                chai.expect(project.name).to.null
-                chai.expect(project.description).to.equals("Description 1")
-                done()
+                done(new Error("getProject should not be a success"))
             }).catch((error: Error) => {
-                done(error)
+                chai.expect(error).to.instanceOf(CorruptedError)
+                done()
             })
         })
         it("Should corrupt project properties", (done) => {
@@ -242,7 +242,7 @@ describe("Redis", () => {
                 chai.expect(error).to.instanceOf(ExistsError)
                 done()
             })
-        })  
+        })
         after(() => {
             client.flushdb()
         })

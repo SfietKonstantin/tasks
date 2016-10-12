@@ -39,7 +39,7 @@ function tasksImportInvalidFormat() : Action {
 function convertDate(date: string) : Date {
     const convertedDate = date.replace(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+):(\d+)/,"$2/$1/$3")
     const returned = new Date(convertedDate)
-    return Number.isNaN(returned.valueOf()) ? null : returned
+    return Number.isNaN(returned.getTime()) ? null : returned
 }
 
 function parseTasks(reader: FileReader, dispatch: Dispatch<State>, resolve: () => void) {

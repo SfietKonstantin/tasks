@@ -71,7 +71,6 @@ describe("Graph persistence", () => {
                 {taskIdentifier: "3long", startDate: new Date(2016, 9, 18), duration: 30},
                 {taskIdentifier: "4reducing", startDate: new Date(2016, 10, 17), duration: 16}
             ]
-
             return db.setTasksResults(taskResults)
         }).then(() => {
             done()

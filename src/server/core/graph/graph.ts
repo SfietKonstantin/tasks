@@ -1,7 +1,14 @@
 import { Task, TaskResults, Modifier } from "../../../common/types"
+import * as maputils from "../../../common/maputils"
 import { CyclicDependencyError } from "./igraph"
 import { TaskNode } from "./types"
 import { IDataProvider, TaskNotFoundError } from "../data/idataprovider"
+
+export class NotComputed extends Error implements Error {
+    constructor(node: TaskNode) {
+        super("StartDate or duration is computed for node " + node.identifier)
+    }
+} 
 
 export function buildGraphIndex(root: TaskNode, map: Map<string, TaskNode>): void {
     if (map.has(root.identifier)) {
@@ -22,7 +29,7 @@ function computeDuration(node: TaskNode) : void {
 
 function defineStartDate(node: TaskNode) : void {
     if (!node.startDate) {
-        node.startDate = new Date(node.estimatedStartDate.valueOf())
+        node.startDate = new Date(node.estimatedStartDate.getTime())
     }
 }
 
@@ -51,19 +58,22 @@ export function compute(root: TaskNode): void {
             queue = queue.concat(deferred)
             deferred.splice(0)
         }
-        const id = queue.shift()
-        let node = map.get(id)
+        const identifier = queue.shift() as string
+        let node = maputils.get(map, identifier)
         if (node.parents.filter((parent: TaskNode) => { return toBeComputed.has(parent.identifier)}).length > 0) {
-            deferred.push(id)
+            deferred.push(identifier)
         } else {
             let endDates = node.parents.map((parent: TaskNode) => {
-                let returned = new Date(parent.startDate.valueOf())
+                const parentStartDate = parent.startDate as Date // Never null
+                let returned = new Date(parentStartDate)
                 returned.setDate(returned.getDate() + parent.duration)
                 return returned
             })
-            endDates.push(node.startDate)
+            if (node.startDate != null) {
+                endDates.push(node.startDate)
+            }
             node.startDate = new Date(Math.max.apply(null, endDates))
-            toBeComputed.delete(id)
+            toBeComputed.delete(identifier)
         }
     }
 }
@@ -78,7 +88,7 @@ export class GraphPersistence {
     loadGraph(identifier: string) : Promise<void> {
         let nodes = new Map<string, TaskNode>()
         return this.loadNode(identifier, nodes).then(() => {
-            let node = nodes.get(identifier)
+            let node = maputils.get(nodes, identifier)
             this.root = node
             this.nodes = nodes
         })
@@ -87,11 +97,12 @@ export class GraphPersistence {
         let modifierMap = new Map<number, Array<string>>() // Map modifier id to tasks
         return Promise.all(Array.from(this.nodes.values(), (node: TaskNode) => {
             return this.dataProvider.getTaskModifierIds(node.identifier).then((ids: Array<number>) => {
-                ids.forEach((identifier: number) => {
-                    if (!modifierMap.has(identifier)) {
-                        modifierMap.set(identifier, new Array<string>())
+                ids.forEach((id: number) => {
+                    if (!modifierMap.has(id)) {
+                        modifierMap.set(id, new Array<string>())
                     }
-                    modifierMap.get(identifier).push(node.identifier)
+                    let modifier = modifierMap.get(id) as Array<string> // Never null
+                    modifier.push(node.identifier)
                 })
             })
         })).then(() => {
@@ -99,10 +110,11 @@ export class GraphPersistence {
             return this.dataProvider.getModifiersValues(keys).then((values: Array<number>) => {
                 for (let i in keys) {
                     let modifierId = keys[i]
-                    let taskIds = modifierMap.get(modifierId)
+                    const taskIds = maputils.get(modifierMap, modifierId) 
 
                     taskIds.forEach((taskIdentifier: string) => {
-                        this.nodes.get(taskIdentifier).modifiers.push(values[i])
+                        let taskNode = maputils.get(this.nodes, taskIdentifier)
+                        taskNode.modifiers.push(values[i])
                     })
                 }
             })
@@ -117,6 +129,9 @@ export class GraphPersistence {
     }
     save() : Promise<void> {
         let taskResults = Array.from(this.nodes.values(), (task: TaskNode) => {
+            if (task.startDate == null || task.duration == null) {
+                throw new NotComputed(task)
+            }
             let taskResult: TaskResults = {
                 taskIdentifier: task.identifier,
                 startDate: task.startDate,
@@ -128,9 +143,7 @@ export class GraphPersistence {
     }
     private loadNode(identifier: string, nodes: Map<string, TaskNode>) : Promise<void> {
         return this.dataProvider.getTask(identifier).then((task: Task) => {
-            let node = new TaskNode(identifier)
-            node.estimatedDuration = task.estimatedDuration
-            node.estimatedStartDate = task.estimatedStartDate
+            let node = new TaskNode(identifier, task.estimatedStartDate, task.estimatedDuration)
             nodes.set(identifier, node)
 
             return this.dataProvider.getChildrenTaskIdentifiers(task.identifier).then((ids: Array<string>) => {
@@ -141,7 +154,7 @@ export class GraphPersistence {
                     return this.loadNode(id, nodes)
                 })).then(() => {
                     sorted.forEach((id: string) => {
-                        node.addChild(nodes.get(id))
+                        node.addChild(maputils.get(nodes, id))
                     })
                 })
             })

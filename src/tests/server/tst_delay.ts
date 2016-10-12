@@ -2,11 +2,11 @@ import * as chai from "chai"
 import { Project, Task, TaskResults, Delay } from "../../common/types"
 import { TaskNode } from "../../server/core/graph/types"
 import { GraphPersistence } from "../../server/core/graph/graph"
-import * as impact from "../../server/core/graph/impact"
+import * as delay from "../../server/core/graph/delay"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 import * as redis from "redis"
 
-describe("Impact", () => {
+describe("Delay", () => {
     let client: redis.RedisClient
     let db: RedisDataProvider
     before(() => {
@@ -15,7 +15,7 @@ describe("Impact", () => {
 
         db = new RedisDataProvider(client)
     })
-    describe("Simple impact parsing test", () => {
+    describe("Simple delay parsing test", () => {
         it("Should add some testing data", (done) => {
             const project: Project = {
                 identifier: "project",
@@ -108,20 +108,20 @@ describe("Impact", () => {
                 done(error)
             })
         })
-        it("Should get impact info", (done) => {
+        it("Should get delay info", (done) => {
             let graph = new GraphPersistence(db)
             graph.loadGraph("1root").then(() => {
                 return graph.loadData()
             }).then(() => {
-                return impact.getImpactInfo(graph.root, db)
-            }).then((impacts: Array<impact.ImpactInfo>) => {
+                return delay.getImpactInfo(graph.root, db)
+            }).then((impacts: Array<delay.ImpactInfo>) => {
                 chai.expect(impacts).to.length(2)
-                chai.expect(impacts[0].type).to.equals(impact.ImpactInfoType.Error)
+                chai.expect(impacts[0].type).to.equals(delay.ImpactInfoType.Error)
                 chai.expect(impacts[0].taskIdentifier).to.equals("4reducing")
                 chai.expect(impacts[0].delayIdentifier).to.equals("delay4")
                 chai.expect(impacts[0].oldMargin).to.equals(2)
                 chai.expect(impacts[0].newMargin).to.equals(-1)
-                chai.expect(impacts[1].type).to.equals(impact.ImpactInfoType.Warning)
+                chai.expect(impacts[1].type).to.equals(delay.ImpactInfoType.Warning)
                 chai.expect(impacts[1].taskIdentifier).to.equals("1root")
                 chai.expect(impacts[1].delayIdentifier).to.equals("delay1")
                 chai.expect(impacts[1].oldMargin).to.equals(16)

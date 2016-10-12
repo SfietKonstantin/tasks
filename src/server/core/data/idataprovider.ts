@@ -6,6 +6,12 @@ export class NullIdentifierError extends Error implements Error {
     }
 }
 
+export class CorruptedError extends Error implements Error {
+    constructor(message: string) {
+        super(message)
+    }
+}
+
 export class ExistsError extends Error implements Error {
     constructor(message: string) {
         super(message)

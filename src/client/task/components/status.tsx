@@ -69,12 +69,12 @@ export class Status extends React.Component<StatusProperties, {}> {
         return dateutils.getDateDiff(new Date(), this.props.taskResults.startDate)
     }
     private getEndDate() {
-        let returned = new Date(this.props.taskResults.startDate.valueOf())
+        let returned = new Date(this.props.taskResults.startDate.getTime())
         returned.setDate(returned.getDate() + this.props.taskResults.duration)
         return returned
     }
     private getEstimatedEndDate() {
-        let returned = new Date(this.props.task.estimatedStartDate.valueOf())
+        let returned = new Date(this.props.task.estimatedStartDate.getTime())
         returned.setDate(returned.getDate() + this.props.task.estimatedDuration)
         return returned
     }

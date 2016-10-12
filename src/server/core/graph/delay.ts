@@ -1,6 +1,7 @@
 import { TaskNode } from "./types"
 import { Delay } from "../../../common/types"
-import { buildGraphIndex } from "./graph"
+import * as maputils from "../../../common/maputils"
+import { NotComputed, buildGraphIndex } from "./graph"
 import { IDataProvider } from "../data/idataprovider"
 import * as dateutils from "../../../common/dateutils"
 
@@ -51,10 +52,13 @@ export function getImpactInfo(root: TaskNode, dataProvider: IDataProvider): Prom
         // Compute impact infos
         let returned = new Array<ImpactInfo>()
         Array.from(map.values(), (node: TaskNode) => {
+            if (node.startDate == null || node.duration == null) {
+                throw new NotComputed(node)
+            }
             const estimatedEndDate = dateutils.addDays(node.estimatedStartDate, node.estimatedDuration)
             const endDate = dateutils.addDays(node.startDate, node.duration)
             
-            Array.from(delayMaps.get(node.identifier), (delay: Delay) => {
+            Array.from(maputils.get(delayMaps, node.identifier), (delay: Delay) => {
                 const oldMargin = dateutils.getDateDiff(estimatedEndDate, delay.date)
                 const newMargin = dateutils.getDateDiff(endDate, delay.date)
 

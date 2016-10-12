@@ -2,7 +2,7 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task, Modifier, TaskResults } from "../../common/types"
-import { TaskNotFoundError, TransactionError } from "../../server/core/data/idataprovider"
+import { CorruptedError, TaskNotFoundError, TransactionError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -86,14 +86,13 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should get task results", (done) => {
+        it("Should get an exception on corrupted task results", (done) => {
             db.getTaskResults("task").then((result: TaskResults) => {
-                chai.expect(result.taskIdentifier).to.equals("task")
-                chai.expect(result.startDate).to.null
-                chai.expect(result.duration).to.null
+                done(new Error("getTaskResults should not be a success"))
                 done()
             }).catch((error: Error) => {
-                done(error)
+                chai.expect(error).to.instanceOf(CorruptedError)
+                done()
             })
         })
         it("Should delete task results properties", (done) => {
@@ -107,14 +106,13 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should get task results", (done) => {
+        it("Should get an exception on corrupted task results", (done) => {
             db.getTaskResults("task").then((result: TaskResults) => {
-                chai.expect(result.taskIdentifier).to.equals("task")
-                chai.expect(result.startDate).to.null
-                chai.expect(result.duration).to.null
+                done(new Error("getTaskResults should not be a success"))
                 done()
             }).catch((error: Error) => {
-                done(error)
+                chai.expect(error).to.instanceOf(CorruptedError)
+                done()
             })
         })
         after(() => {

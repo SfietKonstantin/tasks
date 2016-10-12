@@ -40,7 +40,7 @@ function filterTasks(tasks: Array<ApiTask>, filters: [boolean, boolean, boolean]
         return false
     })
     return filtered.sort((first: ApiTask, second: ApiTask) => {
-        return new Date(first.estimatedStartDate).valueOf() - new Date(second.estimatedStartDate).valueOf()
+        return new Date(first.estimatedStartDate).getTime() - new Date(second.estimatedStartDate).getTime()
     })
 }
 
