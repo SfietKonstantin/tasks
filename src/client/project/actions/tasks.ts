@@ -1,5 +1,5 @@
 import { Action, Dispatch } from "redux"
-import { State } from "../types"
+import { State, TasksFilter } from "../types"
 import { ApiTask } from "../../../common/apitypes"
 
 export const TASKS_REQUEST = "TASKS_REQUEST"
@@ -39,15 +39,14 @@ export const fetchTasks = (identifier: string) => {
 
 export interface TasksFilterAction extends Action {
     type: string,
-    filters: [boolean, boolean, boolean]
+    filters: TasksFilter
     today: Date
 }
 
-export const displayTaskFilter = (notStarted: boolean, inProgress: boolean,
-                                  done: boolean): TasksFilterAction => {
+export const displayTaskFilter = (filters: TasksFilter): TasksFilterAction => {
     return {
         type: TASKS_FILTER_DISPLAY,
-        filters: [notStarted, inProgress, done],
+        filters,
         today: new Date()
     }
 }

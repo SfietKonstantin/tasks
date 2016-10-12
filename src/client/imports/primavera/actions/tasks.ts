@@ -85,8 +85,8 @@ const parseTasks = (reader: FileReader, dispatch: Dispatch<State>, resolve: () =
         if (tasks.has(identifier)) {
             warnings.push("Task identifier \"" + identifier + "\" is duplicated")
             return
-        } 
-        
+        }
+
         tasks.set(identifier, {
             identifier,
             name,

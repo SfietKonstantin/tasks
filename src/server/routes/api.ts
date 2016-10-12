@@ -60,7 +60,6 @@ export class Api {
                 res.json(apitypes.createApiTasks(tasks, tasksResults))
             })
         }).catch((error) => {
-            console.log(error)
             if (error instanceof NotFoundError) {
                 res.status(404).json(error)
             } else {
@@ -80,7 +79,6 @@ export class Api {
         }).then(() => {
             res.sendStatus(301)
         }).catch((error: Error) => {
-            console.log(error)
             if (error instanceof NotFoundError) {
                 res.status(404).json(error)
             } else if (error instanceof ExistsError) {

@@ -31,7 +31,12 @@ export const render = (identifier: string) => {
         tasks: {
             isFetching: false,
             tasks: new Array<ApiTask>(),
-            filters: [true, true, false],
+            filter: {
+                notStartedChecked: true,
+                inProgressChecked: true,
+                doneChecked: false,
+                milestonesOnlyChecked: false
+            },
             today: new Date(),
             filteredTasks: new Array<ApiTask>()
         }

@@ -86,13 +86,13 @@ const parseRelations = (reader: FileReader, dispatch: Dispatch<State>, resolve: 
         }
 
         if (relation.lag > 0) {
-            warnings.push("Relation \"" + relation.previous + "\" to \"" 
+            warnings.push("Relation \"" + relation.previous + "\" to \""
                                         + relation.next + "\" have lag and is not supported")
             return
         }
 
-        if (relation.type != "FS") {
-            warnings.push("Relation \"" + relation.previous + "\" to \"" 
+        if (relation.type !== "FS") {
+            warnings.push("Relation \"" + relation.previous + "\" to \""
                                         + relation.next + "\" have type " + type + " and is not supported")
             return
         }

@@ -12,10 +12,17 @@ export interface ProjectState {
     project: Project | null
 }
 
+export interface TasksFilter {
+    notStartedChecked: boolean
+    inProgressChecked: boolean
+    doneChecked: boolean
+    milestonesOnlyChecked: boolean
+}
+
 export interface TasksState {
     isFetching: boolean
     tasks: Array<ApiTask>
-    filters: [boolean, boolean, boolean]
+    filter: TasksFilter
     today: Date | null
     filteredTasks: Array<ApiTask>
 }

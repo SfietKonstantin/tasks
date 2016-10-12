@@ -68,6 +68,11 @@
     margin-top: 30px;
 }
 
+/* Project */
+.project-all-tasks-filter {
+    float: right;
+}
+
 /* Task */
 .task-header-tools {
     float: right;
@@ -103,11 +108,6 @@
     font-size: 20px;
 }
 
-.task-details-milestone {
-    position: relative;
-    display: block;
-    padding: 10px 15px;
-}
 .task-details-duration {
     position: relative;
     display: block;

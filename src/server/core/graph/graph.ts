@@ -1,4 +1,5 @@
 import { Task, TaskResults, Modifier } from "../../../common/types"
+import * as dateutils from "../../../common/dateutils"
 import * as maputils from "../../../common/maputils"
 import { CyclicDependencyError } from "./igraph"
 import { TaskNode } from "./types"
@@ -33,6 +34,15 @@ const defineStartDate = (node: TaskNode): void => {
     }
 }
 
+const processMilestones = (node: TaskNode): void => {
+    if (node.estimatedDuration === 0) {
+        const initialDate = node.startDate as Date
+        const initialDuration = node.duration as number
+        node.startDate = dateutils.addDays(initialDate, initialDuration)
+        node.duration = 0
+    }
+}
+
 export const compute = (root: TaskNode): void => {
     let map = new Map<string, TaskNode>()
     buildGraphIndex(root, map)
@@ -40,6 +50,7 @@ export const compute = (root: TaskNode): void => {
     // Compute durations and define start dates
     Array.from(map.values(), computeDuration)
     Array.from(map.values(), defineStartDate)
+    Array.from(map.values(), processMilestones)
 
     // Compute start time
     let toBeComputed = new Set<string>(map.keys())
@@ -65,9 +76,8 @@ export const compute = (root: TaskNode): void => {
         } else {
             let endDates = node.parents.map((parent: TaskNode) => {
                 const parentStartDate = parent.startDate as Date // Never null
-                let returned = new Date(parentStartDate)
-                returned.setDate(returned.getDate() + parent.duration)
-                return returned
+                const parentDuration = parent.duration as number // Never null
+                return dateutils.addDays(parentStartDate, parentDuration)
             })
             if (node.startDate != null) {
                 endDates.push(node.startDate)

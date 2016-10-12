@@ -55,19 +55,24 @@ export class Status extends React.Component<StatusProperties, {}> {
         const startState = this.getStartState()
         const startDateLabel = this.getStartDateLabel(started)
         const startTodayDiff = this.getStartTodayDiff()
-        const endState = this.getEndState(endDate)
-        const endDateLabel = this.getEndDateLabel(done, endDate)
-        const endTodayDiff = this.getEndTodayDiff(endDate)
 
+        let endStatusTime: JSX.Element | null = null
+        if (this.props.task.estimatedDuration > 0) {
+            const endState = this.getEndState(endDate)
+            const endDateLabel = this.getEndDateLabel(done, endDate)
+            const endTodayDiff = this.getEndTodayDiff(endDate)
+
+            endStatusTime = <StatusTime className="task-overview-end" color={endState[0]} state={endState[1]}
+                                    date={endDateLabel} todayDiff={endTodayDiff} />
+        }
 
         return <Panel className="task-overview">
             <StatusIndicator icon={stateInfo[0]} text={stateInfo[1]} />
             <ProgressBar className="task-overview-progress" now={progressInfo} />
             <Row>
                 <StatusTime className="task-overview-start" color={startState[0]} state={startState[1]}
-                                    date={startDateLabel} todayDiff={startTodayDiff[3]} />
-                <StatusTime className="task-overview-end" color={endState[0]} state={endState[1]}
-                                    date={endDateLabel} todayDiff={endTodayDiff} />
+                                    date={startDateLabel} todayDiff={startTodayDiff} />
+                {endStatusTime}
             </Row>
         </Panel>
     }
@@ -136,7 +141,7 @@ export class Status extends React.Component<StatusProperties, {}> {
         if (diff > 0) {
             return "In " + diff + " days"
         } else if (diff < 0) {
-            return +(-diff) + " days ago"
+            return "" + (-diff) + " days ago"
         } else {
             return "Today"
         }

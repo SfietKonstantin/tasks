@@ -170,14 +170,14 @@ class UnconnectedMain extends React.Component<MainProperties, {}> {
 const mapStateToProps = (state: State) => {
     let warnings = new Array<string>()
     warnings = warnings.concat(state.tasks.warnings, state.relations.warnings)
-    
+
     const tasks = state.tasks.tasks
     const relations = state.relations.relations.filter((relation: PrimaveraTaskRelation) => {
         if (tasks.has(relation.previous) && tasks.has(relation.next)) {
-            return true;
+            return true
         }
-            
-        
+
+
         if (tasks.has(relation.previous)) {
             const previousTask = tasks.get(relation.previous) as PrimaveraTask
             // Check if previous is a start milestone (not yet supported)
@@ -190,19 +190,19 @@ const mapStateToProps = (state: State) => {
                 if (tasks.has(relation.next)) {
                     const nextTask = tasks.get(relation.next) as PrimaveraTask
                     if (nextTask.startDate) {
-                        if (nextTask.startDate.getTime() == previousTask.endDate.getTime()) {
+                        if (nextTask.startDate.getTime() === previousTask.endDate.getTime()) {
                             warnings.push("\"" + relation.previous + "\" is an end milestone and is not yet supported")
                             return false
                         } else {
-                            warnings.push("\"" + relation.previous + "\" is an end milestone and \"" + relation.next 
+                            warnings.push("\"" + relation.previous + "\" is an end milestone and \"" + relation.next
                                             + "\" is a task with a different starting time and this is not yet supported")
                         }
                     }
                 }
             }
-        }       
+        }
 
-        warnings.push("Relation \"" + relation.previous + "\" to \"" 
+        warnings.push("Relation \"" + relation.previous + "\" to \""
                                     + relation.next + "\" do not have corresponding task")
         return false
     })
