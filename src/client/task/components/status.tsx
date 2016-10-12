@@ -22,7 +22,7 @@ interface StatusTimeProperties {
     color: string
     state: string
     date: string
-    days: string
+    todayDiff: string
 }
 
 class StatusTime extends React.Component<StatusTimeProperties, {}> {
@@ -32,7 +32,7 @@ class StatusTime extends React.Component<StatusTimeProperties, {}> {
                 <Label bsStyle={this.props.color}>{this.props.state}</Label>
             </div>
             <div className="task-overview-time">{this.props.date}</div>
-            <div>{this.props.days}</div>
+            <div>{this.props.todayDiff}</div>
         </Col>
     }
 }
@@ -48,20 +48,26 @@ export class Status extends React.Component<StatusProperties, {}> {
         const daysBeforeEnd = this.getDaysBeforeEnd()
         const started = daysBeforeStart < 0
         const done = daysBeforeEnd < 0
+        const endDate = this.getEndDate()
 
         const stateInfo = this.getStateInfo(started, done)
         const progressInfo = this.getProgressInfo(started, done)
-        const startInfo = this.getStartInfo(started)
-        const endInfo = this.getEndInfo(done)
+        const startState = this.getStartState()
+        const startDateLabel = this.getStartDateLabel(started)
+        const startTodayDiff = this.getStartTodayDiff()
+        const endState = this.getEndState(endDate)
+        const endDateLabel = this.getEndDateLabel(done, endDate)
+        const endTodayDiff = this.getEndTodayDiff(endDate)
+
 
         return <Panel className="task-overview">
             <StatusIndicator icon={stateInfo[0]} text={stateInfo[1]} />
-            <ProgressBar className="task-overview-progress" now={progressInfo[0]} />
+            <ProgressBar className="task-overview-progress" now={progressInfo} />
             <Row>
-                <StatusTime className="task-overview-start" color={startInfo[0]} state={startInfo[1]}
-                                    date={startInfo[2]} days={startInfo[3]} />
-                <StatusTime className="task-overview-end" color={endInfo[0]} state={endInfo[1]}
-                                    date={endInfo[2]} days={endInfo[3]} />
+                <StatusTime className="task-overview-start" color={startState[0]} state={startState[1]}
+                                    date={startDateLabel} todayDiff={startTodayDiff[3]} />
+                <StatusTime className="task-overview-end" color={endState[0]} state={endState[1]}
+                                    date={endDateLabel} todayDiff={endTodayDiff} />
             </Row>
         </Panel>
     }
@@ -92,9 +98,9 @@ export class Status extends React.Component<StatusProperties, {}> {
             return ["remove", "Unknown state :()"]
         }
     }
-    private getProgressInfo(started: boolean, done: boolean): [number] {
+    private getProgressInfo(started: boolean, done: boolean): number {
         if (!started) {
-            return [0]
+            return 0
         } else if (started && !done) {
             const startTime = this.props.taskResults.startDate.getTime()
             const endTime = this.getEndDate().getTime()
@@ -102,76 +108,64 @@ export class Status extends React.Component<StatusProperties, {}> {
 
             const ratio = Math.round(100 * (currentTime - startTime) / (endTime - startTime))
 
-            return [ratio]
+            return ratio
         } else if (done) {
-            return [100]
+            return 100
         } else {
-            return null
+            return 0
         }
     }
-    private getStartInfo(started: boolean) : [string, string, string, string] {
-        let color: string = null
-        let state: string = null
-        let date: string = null
-        let days: string = null
-
-        const startDateLabel = dateutils.getDateLabel(this.props.taskResults.startDate)
+    private getStartState(): [string, string] {
         const diff = dateutils.getDateDiff(this.props.task.estimatedStartDate, this.props.taskResults.startDate)
-        const todayDiff = dateutils.getDateDiff(new Date(), this.props.taskResults.startDate)
-        
         if (diff <= 0) {
-            color = "success"
-            state = "On time"
+            return ["success", "On time"]
         } else {
-            color = "warning"
-            state = "Late " + diff + " days"
+            return ["warning", "Late " + diff + " days"]
         }
-
-        if (started) {
-            date = "Started the " + startDateLabel
-        } else {
-            date = "Starting the " + startDateLabel
-        }
-
-        if (todayDiff > 0) {
-            days = "In " + todayDiff + " days"
-        } else if (todayDiff < 0) {
-            days = +(-todayDiff) + " days ago"
-        }
-        
-        return [color, state, date, days]
     }
-    private getEndInfo(done: boolean) : [string, string, string, string] {
-        let color: string = null
-        let state: string = null
-        let date: string = null
-        let days: string = null
-
-        const endDate = this.getEndDate()
-        const endDateLabel = dateutils.getDateLabel(endDate)
+    private getStartDateLabel(started: boolean): string {
+        const startDateLabel = dateutils.getDateLabel(this.props.taskResults.startDate)
+        if (started) {
+            return "Started the " + startDateLabel
+        } else {
+            return "Starting the " + startDateLabel
+        }
+    }
+    private getStartTodayDiff(): string {
+        const diff = dateutils.getDateDiff(new Date(), this.props.taskResults.startDate)
+        if (diff > 0) {
+            return "In " + diff + " days"
+        } else if (diff < 0) {
+            return +(-diff) + " days ago"
+        } else {
+            return "Today"
+        }
+    }
+    private getEndState(endDate: Date): [string, string] {
         const diff = dateutils.getDateDiff(this.getEstimatedEndDate(), endDate)
-        const todayDiff = dateutils.getDateDiff(new Date(), endDate)
-        
         if (diff <= 0) {
-            color = "success"
-            state = "On time"
+            return ["success", "On time"]
         } else {
-            color = "warning"
-            state = "Late " + diff + " days"
+            return ["warning", "Late " + diff + " days"]
         }
-
+    }
+    private getEndDateLabel(done: boolean, endDate: Date): string {
+        const endDateLabel = dateutils.getDateLabel(endDate)
         if (done) {
-            date = "Done the " + endDateLabel
+            return "Done the " + endDateLabel
         } else {
-            date = "Ending the " + endDateLabel
+            return "Ending the " + endDateLabel
         }
-
-        if (todayDiff > 0) {
-            days = "In " + todayDiff + " days"
-        } else if (todayDiff < 0) {
-            days = +(-todayDiff) + " days ago"
+    }
+    private getEndTodayDiff(endDate: Date): string {
+        const todayDiff = dateutils.getDateDiff(new Date(), endDate)
+        const diff = dateutils.getDateDiff(new Date(), this.props.taskResults.startDate)
+        if (diff > 0) {
+            return "In " + diff + " days"
+        } else if (diff < 0) {
+            return +(-diff) + " days ago"
+        } else {
+            return "Today"
         }
-        
-        return [color, state, date, days]
     }
 }

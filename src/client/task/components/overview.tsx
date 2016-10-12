@@ -22,4 +22,4 @@ export class Overview extends React.Component<OverviewProperties, {}> {
             </Col>
         </Grid>
     }
-} 
+}

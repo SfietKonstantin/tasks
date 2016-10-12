@@ -7,7 +7,7 @@ import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
 
-declare module 'redis' {
+declare module "redis" {
     export interface RedisClient extends NodeJS.EventEmitter {
         setAsync(...args: any[]): Promise<any>
         delAsync(...args: any[]): Promise<any>
@@ -42,7 +42,7 @@ describe("Redis", () => {
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
-                
+
                 return db.addTask(task).then(() => {
                     let taskResults: Array<TaskResults> = [
                         {taskIdentifier: "task", startDate: new Date(2016, 9, 15), duration: 40}
@@ -144,7 +144,7 @@ describe("Redis", () => {
                     estimatedStartDate: new Date(2016, 9, 15),
                     estimatedDuration: 15
                 }
-                
+
                 return db.addTask(task1).then(() => {
                     return db.addTask(task2)
                 }).then(() => {
@@ -201,7 +201,6 @@ describe("Redis", () => {
 
             db.watchTasksModifiers(["task1"]).then(() => {
                 let modifier: Modifier = {
-                    id: null,
                     name: "Transactional modifier",
                     description: "Transactional modifier description",
                     duration: 10
@@ -224,7 +223,7 @@ describe("Redis", () => {
             })
         })
         xit("Should get an exception on transactional error (caused by updating modifiers)", (done) => {
-            
+
         })
         it("Should get an exception on transactional error (caused by modifying node)", (done) => {
             let otherClient = redis.createClient()
@@ -233,7 +232,6 @@ describe("Redis", () => {
 
             db.watchTasksModifiers(["task1"]).then(() => {
                 const modifier: Modifier = {
-                    id: null,
                     name: "Transactional modifier",
                     description: "Transactional modifier description",
                     duration: 10

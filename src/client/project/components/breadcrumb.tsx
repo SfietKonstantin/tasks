@@ -12,4 +12,4 @@ export class Breadcrumb extends React.Component<BreadcrumbProperties, {}> {
             <li class="active">{this.props.project.name}</li>
         </ol>
     }
-} 
+}

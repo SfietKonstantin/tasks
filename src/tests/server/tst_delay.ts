@@ -62,8 +62,12 @@ describe("Delay", () => {
                     return db.addTask(task)
                 }))
             }).then(() => {
-                return Promise.all([db.setTaskRelation("1root", "2short"), db.setTaskRelation("1root", "3long"),
-                                    db.setTaskRelation("2short", "4reducing"), db.setTaskRelation("3long", "4reducing")])
+                return Promise.all([
+                    db.setTaskRelation("1root", "2short"),
+                    db.setTaskRelation("1root", "3long"),
+                    db.setTaskRelation("2short", "4reducing"),
+                    db.setTaskRelation("3long", "4reducing")
+                ])
             }).then(() => {
                 let taskResults: Array<TaskResults> = [
                     {taskIdentifier: "1root", startDate: new Date(2016, 9, 2), duration: 16},

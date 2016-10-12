@@ -107,20 +107,20 @@ describe("Graph persistence", () => {
             chai.expect(node4.estimatedDuration).to.equals(15)
             chai.expect(node4.startDate).to.null
             chai.expect(node4.duration).to.null
-            
+
             chai.expect(node1.children).to.length(2)
             chai.expect(node1.children[0]).to.equals(node2)
             chai.expect(node1.children[1]).to.equals(node3)
-            
+
             chai.expect(node2.children).to.length(1)
             chai.expect(node2.children[0]).to.equals(node4)
 
             chai.expect(node3.children).to.length(1)
             chai.expect(node3.children[0]).to.equals(node4)
-            
+
             chai.expect(node4.children).to.empty
-            
-            
+
+
             chai.expect(node1.parents).to.empty
 
             chai.expect(node2.parents).to.length(1)
@@ -140,39 +140,35 @@ describe("Graph persistence", () => {
     })
     it("Should add some testing data", (done) => {
         const modifier1: Modifier = {
-            id: null,
             name: "Modifier 1",
             description: "Description 1",
             duration: 8
         }
 
         const modifier2_1: Modifier = {
-            id: null,
             name: "Modifier 2, 1",
             description: "Description 2, 1",
             duration: 10
         }
 
         const modifier2_2: Modifier = {
-            id: null,
             name: "Modifier 2, 2",
             description: "Description 2, 2",
             duration: 12
         }
 
         const modifier4: Modifier = {
-            id: null,
             name: "Modifier 4",
             description: "Description 4",
             duration: 15
         }
 
         const modifiers = [modifier1, modifier2_1, modifier2_2, modifier4]
-        Promise.all(modifiers.map(db.addModifier.bind(db))).then(() => {
-            chai.expect(modifier1.id).to.equals(1)
-            chai.expect(modifier2_1.id).to.equals(2)
-            chai.expect(modifier2_2.id).to.equals(3)
-            chai.expect(modifier4.id).to.equals(4)
+        Promise.all(modifiers.map(db.addModifier.bind(db))).then((ids: [number, number, number, number]) => {
+            chai.expect(ids[0]).to.equals(1)
+            chai.expect(ids[1]).to.equals(2)
+            chai.expect(ids[2]).to.equals(3)
+            chai.expect(ids[3]).to.equals(4)
         }).then(() => {
             return db.setModifierForTask(1, "1root")
         }).then(() => {
@@ -228,7 +224,7 @@ describe("Graph persistence", () => {
         chai.expect(node3.duration).to.equals(30)
         chai.expect(node4.startDate.getTime()).to.equals(new Date(2016, 9, 2 + 23 + 37).getTime())
         chai.expect(node4.duration).to.equals(30)
-        
+
         done()
     })
     it("Should save the graph", (done) => {
@@ -247,7 +243,7 @@ describe("Graph persistence", () => {
             const node2 = graph.nodes.get("2short")
             const node3 = graph.nodes.get("3long")
             const node4 = graph.nodes.get("4reducing")
-            
+
             chai.expect(node1.startDate.getTime()).to.equals(new Date(2016, 9, 2).getTime())
             chai.expect(node1.duration).to.equals(23)
             chai.expect(node2.startDate.getTime()).to.equals(new Date(2016, 9, 2 + 23).getTime())
@@ -256,14 +252,14 @@ describe("Graph persistence", () => {
             chai.expect(node3.duration).to.equals(30)
             chai.expect(node4.startDate.getTime()).to.equals(new Date(2016, 9, 2 + 23 + 37).getTime())
             chai.expect(node4.duration).to.equals(30)
-            
+
             done()
         }).catch((error: Error) => {
             done(error)
         })
     })
     xit("Should check that the graph is not saved in case of transaction error", (done) => {
-        
+
     })
     after(() => {
         client.flushdb()

@@ -103,7 +103,7 @@ describe("Graph", () => {
             node2.addChild(node1)
 
             try {
-                graph.compute(node0)   
+                graph.compute(node0)
             } catch (err) {
                 chai.expect(err).to.instanceof(Error)
                 done()

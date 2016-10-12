@@ -2,7 +2,7 @@ import * as chai from "chai"
 import * as apitypes from "../../common/apitypes"
 import { Project, Task} from "../../common/types"
 
-function compareTasks(first: Task, second: Task) {
+const compareTasks = (first: Task, second: Task) => {
     chai.expect(first.identifier).to.equals(second.identifier)
     chai.expect(first.projectIdentifier).to.equals(second.projectIdentifier)
     chai.expect(first.name).to.equals(second.name)
@@ -14,7 +14,7 @@ function compareTasks(first: Task, second: Task) {
 describe("API types", () => {
     describe("createTaskFromApiImportTask", () => {
         it("Should create a Task", () => {
-            const apiTask: apitypes.ApiImportTask = {
+            const apiTask: apitypes.ApiInputTask = {
                 identifier: "identifier",
                 projectIdentifier: "project",
                 name: "Name",
@@ -33,7 +33,7 @@ describe("API types", () => {
             compareTasks(apitypes.createTaskFromApiImportTask(apiTask), task)
         })
         it("Should create a Task with null identifier", () => {
-            const apiTask: apitypes.ApiImportTask = {
+            const apiTask: apitypes.ApiInputTask = {
                 identifier: null,
                 projectIdentifier: "project",
                 name: "Name",
@@ -52,7 +52,7 @@ describe("API types", () => {
             compareTasks(apitypes.createTaskFromApiImportTask(apiTask), task)
         })
         it("Should create a Task with null projectIdentifier", () => {
-            const apiTask: apitypes.ApiImportTask = {
+            const apiTask: apitypes.ApiInputTask = {
                 identifier: "identifier",
                 projectIdentifier: null,
                 name: "Name",
@@ -71,7 +71,7 @@ describe("API types", () => {
             compareTasks(apitypes.createTaskFromApiImportTask(apiTask), task)
         })
         it("Should create a Task with null name", () => {
-            const apiTask: apitypes.ApiImportTask = {
+            const apiTask: apitypes.ApiInputTask = {
                 identifier: "identifier",
                 projectIdentifier: "project",
                 name: null,
@@ -90,7 +90,7 @@ describe("API types", () => {
             compareTasks(apitypes.createTaskFromApiImportTask(apiTask), task)
         })
         it("Should create a Task with null description", () => {
-            const apiTask: apitypes.ApiImportTask = {
+            const apiTask: apitypes.ApiInputTask = {
                 identifier: "identifier",
                 projectIdentifier: "project",
                 name: "Name",
@@ -109,7 +109,7 @@ describe("API types", () => {
             compareTasks(apitypes.createTaskFromApiImportTask(apiTask), task)
         })
         it("Should create a Task with null estimatedDuration", () => {
-            const apiTask: apitypes.ApiImportTask = {
+            const apiTask: apitypes.ApiInputTask = {
                 identifier: "identifier",
                 projectIdentifier: "project",
                 name: "Name",

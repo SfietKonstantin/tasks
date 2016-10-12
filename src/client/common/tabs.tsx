@@ -22,7 +22,7 @@ export class TabBar extends React.Component<TabBarProperties, TabBarState> {
             tabs.push(<NavItem eventKey={i}>{this.props.tabs[i]}</NavItem>)
         }
         return <Col id="page-header-tabs" xs={12} md={8}>
-            <Nav bsStyle="tabs" activeKey={this.state.currentTab} 
+            <Nav bsStyle="tabs" activeKey={this.state.currentTab}
                  className="page-header-nav" onSelect={this.handleClick.bind(this)}>
                 {tabs}
             </Nav>

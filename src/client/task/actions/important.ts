@@ -12,14 +12,14 @@ export interface ImportantAction extends Action {
     important?: boolean
 }
 
-function requestImportant(identifier: string) : ImportantAction {
+const requestImportant = (identifier: string): ImportantAction => {
     return {
         type: TASK_IMPORTANT_REQUEST,
         identifier
     }
 }
 
-function receiveImportant(identifier: string, important: boolean) : ImportantAction {
+const receiveImportant = (identifier: string, important: boolean): ImportantAction => {
     return {
         type: TASK_IMPORTANT_RECEIVE,
         identifier,
@@ -32,7 +32,7 @@ interface ImportantResult {
 }
 
 export const fetchImportant = (identifier: string) => {
-    return function(dispatch: Dispatch<State>) {
+    return (dispatch: Dispatch<State>) => {
         dispatch(requestImportant(identifier))
         return fetch("/api/task/" + identifier + "/important").then((response: Response) => {
             return response.json()
@@ -42,7 +42,7 @@ export const fetchImportant = (identifier: string) => {
     }
 }
 
-function requestUpdateImportant(identifier: string, important: boolean) : ImportantAction {
+const requestUpdateImportant = (identifier: string, important: boolean): ImportantAction => {
     return {
         type: TASK_IMPORTANT_REQUEST_UPDATE,
         identifier,
@@ -51,7 +51,7 @@ function requestUpdateImportant(identifier: string, important: boolean) : Import
 }
 
 export const updateImportant = (identifier: string, important: boolean) => {
-    return function(dispatch: Dispatch<State>) {
+    return (dispatch: Dispatch<State>) => {
         dispatch(requestUpdateImportant(identifier, important))
         const method = important ? "PUT" : "DELETE"
         return fetch("/api/task/" + identifier + "/important", {method}).then((response: Response) => {

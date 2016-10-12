@@ -8,9 +8,9 @@ export class NotComputed extends Error implements Error {
     constructor(node: TaskNode) {
         super("StartDate or duration is computed for node " + node.identifier)
     }
-} 
+}
 
-export function buildGraphIndex(root: TaskNode, map: Map<string, TaskNode>): void {
+export const buildGraphIndex = (root: TaskNode, map: Map<string, TaskNode>): void => {
     if (map.has(root.identifier)) {
         return
     }
@@ -20,23 +20,23 @@ export function buildGraphIndex(root: TaskNode, map: Map<string, TaskNode>): voi
     }
 }
 
-function computeDuration(node: TaskNode) : void {
+const computeDuration = (node: TaskNode): void => {
     node.duration = node.estimatedDuration
     node.duration += Math.max(node.modifiers.reduce((previous: number, current: number) => {
         return previous + current
     }, 0), 0)
 }
 
-function defineStartDate(node: TaskNode) : void {
+const defineStartDate = (node: TaskNode): void => {
     if (!node.startDate) {
         node.startDate = new Date(node.estimatedStartDate.getTime())
     }
 }
 
-export function compute(root: TaskNode): void {
+export const compute = (root: TaskNode): void => {
     let map = new Map<string, TaskNode>()
     buildGraphIndex(root, map)
-    
+
     // Compute durations and define start dates
     Array.from(map.values(), computeDuration)
     Array.from(map.values(), defineStartDate)
@@ -50,8 +50,8 @@ export function compute(root: TaskNode): void {
 
     let lastDeferredLength = queue.length
     while (queue.length > 0 || deferred.length > 0) {
-        if (queue.length == 0) {
-            if (lastDeferredLength == deferred.length) {
+        if (queue.length === 0) {
+            if (lastDeferredLength === deferred.length) {
                 throw new CyclicDependencyError("Cyclic dependency found in graph")
             }
             lastDeferredLength = deferred.length
@@ -85,7 +85,7 @@ export class GraphPersistence {
     constructor(dataProvider: IDataProvider) {
         this.dataProvider = dataProvider
     }
-    loadGraph(identifier: string) : Promise<void> {
+    loadGraph(identifier: string): Promise<void> {
         let nodes = new Map<string, TaskNode>()
         return this.loadNode(identifier, nodes).then(() => {
             let node = maputils.get(nodes, identifier)
@@ -93,7 +93,7 @@ export class GraphPersistence {
             this.nodes = nodes
         })
     }
-    loadData() : Promise<void> {
+    loadData(): Promise<void> {
         let modifierMap = new Map<number, Array<string>>() // Map modifier id to tasks
         return Promise.all(Array.from(this.nodes.values(), (node: TaskNode) => {
             return this.dataProvider.getTaskModifierIds(node.identifier).then((ids: Array<number>) => {
@@ -110,7 +110,7 @@ export class GraphPersistence {
             return this.dataProvider.getModifiersValues(keys).then((values: Array<number>) => {
                 for (let i in keys) {
                     let modifierId = keys[i]
-                    const taskIds = maputils.get(modifierMap, modifierId) 
+                    const taskIds = maputils.get(modifierMap, modifierId)
 
                     taskIds.forEach((taskIdentifier: string) => {
                         let taskNode = maputils.get(this.nodes, taskIdentifier)
@@ -127,7 +127,7 @@ export class GraphPersistence {
             }))
         }).then(() => {})
     }
-    save() : Promise<void> {
+    save(): Promise<void> {
         let taskResults = Array.from(this.nodes.values(), (task: TaskNode) => {
             if (task.startDate == null || task.duration == null) {
                 throw new NotComputed(task)
@@ -141,7 +141,7 @@ export class GraphPersistence {
         })
         return this.dataProvider.setTasksResults(taskResults)
     }
-    private loadNode(identifier: string, nodes: Map<string, TaskNode>) : Promise<void> {
+    private loadNode(identifier: string, nodes: Map<string, TaskNode>): Promise<void> {
         return this.dataProvider.getTask(identifier).then((task: Task) => {
             let node = new TaskNode(identifier, task.estimatedStartDate, task.estimatedDuration)
             nodes.set(identifier, node)

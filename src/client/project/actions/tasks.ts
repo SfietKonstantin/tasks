@@ -9,17 +9,16 @@ export const TASKS_FILTER_DISPLAY = "TASKS_FILTER_DISPLAY"
 export interface TasksAction extends Action {
     type: string,
     identifier: string
-    tasks?: Array<ApiTask> 
+    tasks: Array<ApiTask>
 }
 
-function requestTasks(identifier: string) : TasksAction {
+const requestTasks = (identifier: string): Action => {
     return {
-        type: TASKS_REQUEST,
-        identifier
+        type: TASKS_REQUEST
     }
 }
 
-function receiveTasks(identifier: string, tasks: Array<ApiTask>) : TasksAction {
+const receiveTasks = (identifier: string, tasks: Array<ApiTask>): TasksAction => {
     return {
         type: TASKS_RECEIVE,
         identifier,
@@ -28,7 +27,7 @@ function receiveTasks(identifier: string, tasks: Array<ApiTask>) : TasksAction {
 }
 
 export const fetchTasks = (identifier: string) => {
-    return function(dispatch: Dispatch<State>) {
+    return (dispatch: Dispatch<State>) => {
         dispatch(requestTasks(identifier))
         return fetch("/api/project/" + identifier + "/tasks").then((response: Response) => {
             return response.json()
@@ -44,7 +43,8 @@ export interface TasksFilterAction extends Action {
     today: Date
 }
 
-export function displayTaskFilter(notStarted: boolean, inProgress: boolean, done: boolean) : TasksFilterAction {
+export const displayTaskFilter = (notStarted: boolean, inProgress: boolean,
+                                  done: boolean): TasksFilterAction => {
     return {
         type: TASKS_FILTER_DISPLAY,
         filters: [notStarted, inProgress, done],

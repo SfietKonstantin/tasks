@@ -1,7 +1,7 @@
-import { 
-    CorruptedError, NullIdentifierError, ExistsError, 
-    ProjectNotFoundError, TaskNotFoundError, ModifierNotFoundError, 
-    DelayNotFoundError, TransactionError 
+import {
+    CorruptedError, NullIdentifierError, ExistsError,
+    ProjectNotFoundError, TaskNotFoundError, ModifierNotFoundError,
+    DelayNotFoundError, TransactionError
 } from "./idataprovider"
 import { IRedisDataProvider } from "./iredisdataprovider"
 import { Identifiable, Project, Task, TaskResults, Modifier, Delay } from "../../../common/types"
@@ -10,7 +10,7 @@ import * as bluebird from "bluebird"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
 
-declare module 'redis' {
+declare module "redis" {
     export interface RedisClient extends NodeJS.EventEmitter {
         setAsync(...args: any[]): Promise<any>
         getAsync(...args: any[]): Promise<any>
@@ -42,7 +42,7 @@ class RedisProject {
         this.description = project.description
     }
 
-    static save(project: Project, client: redis.RedisClient) : Promise<void> {
+    static save(project: Project, client: redis.RedisClient): Promise<void> {
         const redisProject = new RedisProject(project)
         const identifier = project.identifier
         return client.multi().hmset("project:" + identifier, redisProject)
@@ -50,7 +50,7 @@ class RedisProject {
                              .execAsync().then((result: any) => {})
     }
 
-    static load(identifier: string, client: redis.RedisClient) : Promise<Project> {
+    static load(identifier: string, client: redis.RedisClient): Promise<Project> {
 
         return client.hgetallAsync("project:" + identifier).then((result: any) => {
             if (!result.hasOwnProperty("name")) {
@@ -81,7 +81,7 @@ class RedisTask {
         this.name = task.name
         this.description = task.description
     }
-    static save(task: Task, client: redis.RedisClient) : Promise<void> {
+    static save(task: Task, client: redis.RedisClient): Promise<void> {
         const redisTask = new RedisTask(task)
         const identifier = task.identifier
         return client.multi().hmset("task:" + identifier, redisTask)
@@ -90,7 +90,7 @@ class RedisTask {
                              .sadd("project:" + task.projectIdentifier + ":tasks", identifier)
                              .execAsync().then((result: any) => {})
     }
-    static load(identifier: string, client: redis.RedisClient) : Promise<Task> {
+    static load(identifier: string, client: redis.RedisClient): Promise<Task> {
         return client.hgetallAsync("task:" + identifier).then((result: any) => {
             if (!result.hasOwnProperty("name")) {
                 throw new CorruptedError("Task " + identifier + " do not have property projectIdentifier")
@@ -104,7 +104,7 @@ class RedisTask {
             const projectIdentifier: string = result["projectIdentifier"]
             const name: string = result["name"]
             const description: string = result["description"]
-            return client.mgetAsync("task:" + identifier + ":estimatedStartDate", 
+            return client.mgetAsync("task:" + identifier + ":estimatedStartDate",
                                     "task:" + identifier + ":estimatedDuration")
                          .then((result: Array<string>) => {
                 if (!result[0]) {
@@ -129,24 +129,20 @@ class RedisTask {
 }
 
 class RedisModifier {
-    id: number
-    taskIdentifier: string
     name: string
     description: string
 
     constructor(modifier: Modifier) {
-        this.id = modifier.id
         this.name = modifier.name
         this.description = modifier.description
     }
-    static save(modifier: Modifier, client: redis.RedisClient) : Promise<number> {
+    static save(id: number, modifier: Modifier, client: redis.RedisClient): Promise<number> {
         const redisModifier = new RedisModifier(modifier)
-        const id = modifier.id
         return client.multi().hmset("modifier:" + id, redisModifier)
                              .set("modifier:" + id + ":duration", modifier.duration)
                              .execAsync().then((result: any) => { return id })
     }
-    static load(id: number, client: redis.RedisClient) : Promise<Modifier> {
+    static load(id: number, client: redis.RedisClient): Promise<Modifier> {
         return client.hgetallAsync("modifier:" + id).then((result: any) => {
             if (!result.hasOwnProperty("name")) {
                 throw new CorruptedError("Modifier " + id + " do not have property name")
@@ -156,12 +152,11 @@ class RedisModifier {
             }
             const name: string = result["name"]
             const description: string = result["description"]
-            return client.getAsync("modifier:" + id + ":duration").then((result: string) => { 
+            return client.getAsync("modifier:" + id + ":duration").then((result: string) => {
                 if (!result) {
                     throw new CorruptedError("Modifier " + id + " do not have property duration")
                 }
                 const modifier: Modifier = {
-                    id,
                     name,
                     description,
                     duration: +result
@@ -186,14 +181,14 @@ class RedisDelay {
         this.description = delay.description
         this.date = delay.date.getTime()
     }
-    static save(delay: Delay, client: redis.RedisClient) : Promise<void> {
+    static save(delay: Delay, client: redis.RedisClient): Promise<void> {
         const redisDelay = new RedisDelay(delay)
         const identifier = delay.identifier
         return client.multi().hmset("delay:" + identifier, redisDelay)
                              .sadd("project:" + delay.projectIdentifier + ":delays", identifier)
                              .execAsync().then((result: any) => {})
     }
-    static load(identifier: string, client: redis.RedisClient) : Promise<Delay> {
+    static load(identifier: string, client: redis.RedisClient): Promise<Delay> {
         return client.hgetallAsync("delay:" + identifier).then((result: any) => {
             if (!result.hasOwnProperty("projectIdentifier")) {
                 throw new CorruptedError("Delay " + identifier + " do not have property projectIdentifier")
@@ -212,11 +207,11 @@ class RedisDelay {
             const description: string = result["description"]
 
             const delay: Delay = {
-                identifier: identifier, 
+                identifier: identifier,
                 projectIdentifier,
-                name, 
-                description, 
-                date: new Date(+result["date"]), 
+                name,
+                description,
+                date: new Date(+result["date"]),
             }
             return delay
         })
@@ -225,13 +220,13 @@ class RedisDelay {
 
 export class RedisDataProvider implements IRedisDataProvider {
     client: redis.RedisClient
-    static getDefaultClient() : redis.RedisClient {
+    static getDefaultClient(): redis.RedisClient {
         return redis.createClient()
     }
     constructor(client: redis.RedisClient) {
         this.client = client
     }
-    getAllProjects() : Promise<Array<Project>> {
+    getAllProjects(): Promise<Array<Project>> {
         return this.client.smembersAsync("project:ids").then((ids: Array<String>) => {
             const sortedIds = ids.sort()
             const promises = sortedIds.map(this.getMappedProject.bind(this))
@@ -242,41 +237,41 @@ export class RedisDataProvider implements IRedisDataProvider {
             return []
         })
     }
-    getProject(identifier: string) : Promise<Project> {
+    getProject(identifier: string): Promise<Project> {
         return this.hasProject(identifier).then(() => {
             return RedisProject.load(identifier, this.client)
         })
     }
-    addProject(project: Project) : Promise<void> {
+    addProject(project: Project): Promise<void> {
         return RedisDataProvider.checkIdentifier(project).then(() => {
             return this.notHasProject(project.identifier)
         }).then(() => {
             return RedisProject.save(project, this.client)
         })
     }
-    hasTask(identifier: string) : Promise<void> {
+    hasTask(identifier: string): Promise<void> {
         return this.client.existsAsync("task:" + identifier).then((result: number) => {
-            if (result != 1) {
+            if (result !== 1) {
                 throw new TaskNotFoundError("Task " + identifier + " not found")
             }
         })
     }
-    getTasks(identifiers: Array<string>) : Promise<Array<Task>> {
+    getTasks(identifiers: Array<string>): Promise<Array<Task>> {
         return Promise.all(identifiers.map(this.getMappedTask.bind(this)))
     }
-    getTask(identifier: string) : Promise<Task> {
+    getTask(identifier: string): Promise<Task> {
         return this.hasTask(identifier).then(() => {
             return RedisTask.load(identifier, this.client)
         })
     }
-    getProjectTasks(identifier: string) : Promise<Array<Task>> {
+    getProjectTasks(identifier: string): Promise<Array<Task>> {
         return this.hasProject(identifier).then(() => {
             return this.client.smembersAsync("project:" + identifier + ":tasks")
         }).then((identifiers: Array<string>) => {
             return this.getTasks(identifiers.sort())
         })
     }
-    addTask(task: Task) : Promise<void> {
+    addTask(task: Task): Promise<void> {
         return RedisDataProvider.checkIdentifier(task).then(() => {
             return RedisDataProvider.checkNullIdentifier(task.projectIdentifier)
         }).then(() => {
@@ -287,7 +282,7 @@ export class RedisDataProvider implements IRedisDataProvider {
             return RedisTask.save(task, this.client)
         })
     }
-    setTaskRelation(parentTaskIdentifier: string, childTaskIdentifier: string) : Promise<void> {
+    setTaskRelation(parentTaskIdentifier: string, childTaskIdentifier: string): Promise<void> {
         return this.hasTask(parentTaskIdentifier).then(() => {
             return this.hasTask(childTaskIdentifier)
         }).then(() => {
@@ -296,28 +291,28 @@ export class RedisDataProvider implements IRedisDataProvider {
                                       .execAsync()
         })
     }
-    getParentTaskIdentifiers(identifier: string) : Promise<Array<string>> {
+    getParentTaskIdentifiers(identifier: string): Promise<Array<string>> {
         return this.hasTask(identifier).then(() => {
             return this.client.smembersAsync("task:" + identifier + ":parents")
         }).then((identifiers: Array<string>) => {
             return identifiers.sort()
         })
     }
-    getChildrenTaskIdentifiers(identifier: string) : Promise<Array<string>> {
+    getChildrenTaskIdentifiers(identifier: string): Promise<Array<string>> {
         return this.hasTask(identifier).then(() => {
             return this.client.smembersAsync("task:" + identifier + ":children")
         }).then((ids: Array<string>) => {
             return ids.sort()
         })
     }
-    isTaskImportant(identifier: string) : Promise<boolean> {
+    isTaskImportant(identifier: string): Promise<boolean> {
         return this.hasTask(identifier).then(() => {
             return this.client.sismemberAsync("task:important", identifier)
         }).then((result: number) => {
-            return (result != 0)
+            return (result !== 0)
         })
     }
-    setTaskImportant(identifier: string, important: boolean) : Promise<void> {
+    setTaskImportant(identifier: string, important: boolean): Promise<void> {
         return this.hasTask(identifier).then(() => {
             if (important) {
                 return this.client.saddAsync("task:important", identifier)
@@ -326,10 +321,10 @@ export class RedisDataProvider implements IRedisDataProvider {
             }
         })
     }
-    getTasksResults(identifiers: Array<string>) : Promise<Array<TaskResults>> {
+    getTasksResults(identifiers: Array<string>): Promise<Array<TaskResults>> {
         return Promise.all(identifiers.map(this.getMappedTaskResults.bind(this)))
     }
-    getTaskResults(identifier: string) : Promise<TaskResults> {
+    getTaskResults(identifier: string): Promise<TaskResults> {
         return this.hasTask(identifier).then(() => {
             return this.client.mgetAsync("task:" + identifier + ":startDate", "task:" + identifier + ":duration")
         }).then((results: Array<string>) => {
@@ -347,7 +342,7 @@ export class RedisDataProvider implements IRedisDataProvider {
             return taskResults
         })
     }
-    setTasksResults(results: Array<TaskResults>) : Promise<void> {
+    setTasksResults(results: Array<TaskResults>): Promise<void> {
         return Promise.all(results.map((results: TaskResults) => {
             return this.hasTask(results.taskIdentifier)
         })).then(() => {
@@ -366,7 +361,7 @@ export class RedisDataProvider implements IRedisDataProvider {
             }
         })
     }
-    getModifiers(ids: Array<number>) : Promise<Array<Modifier>> {
+    getModifiers(ids: Array<number>): Promise<Array<Modifier>> {
         return Promise.all(ids.map(this.getMappedModifier.bind(this)))
     }
     getModifier(id: number): Promise<Modifier> {
@@ -374,27 +369,26 @@ export class RedisDataProvider implements IRedisDataProvider {
             return RedisModifier.load(id, this.client)
         })
     }
-    getTaskModifierIds(identifier: string) : Promise<Array<number>> {
+    getTaskModifierIds(identifier: string): Promise<Array<number>> {
         return this.hasTask(identifier).then(() => {
             return this.client.smembersAsync("task:" + identifier + ":modifiers")
         }).then((ids: Array<string>) => {
             return ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
         })
     }
-    getModifieredTaskIds(id: number) : Promise<Array<string>> {
+    getModifieredTaskIds(id: number): Promise<Array<string>> {
         return this.hasModifier(id).then(() => {
             return this.client.smembersAsync("modifier:" + id + ":tasks")
         }).then((ids: Array<string>) => {
             return ids.sort()
         })
     }
-    addModifier(modifier: Modifier) : Promise<number> {
+    addModifier(modifier: Modifier): Promise<number> {
         return this.getNextId("modifier").then((id: number) => {
-            modifier.id = id
-            return RedisModifier.save(modifier, this.client)
+            return RedisModifier.save(id, modifier, this.client)
         })
     }
-    setModifierForTask(id: number, taskIdentifier: string) : Promise<void> {
+    setModifierForTask(id: number, taskIdentifier: string): Promise<void> {
         return this.hasModifier(id).then(() => {
             return this.hasTask(taskIdentifier)
         }).then(() => {
@@ -403,28 +397,28 @@ export class RedisDataProvider implements IRedisDataProvider {
                                       .execAsync()
         })
     }
-    getModifiersValues(ids: Array<number>) : Promise<Array<number>> {
-        if (ids.length == 0) {
+    getModifiersValues(ids: Array<number>): Promise<Array<number>> {
+        if (ids.length === 0) {
             return new Promise<Array<number>>((resolve, reject) => {
                 resolve([])
             })
         } else {
-            return this.client.mgetAsync(ids.map((id: number) => { 
+            return this.client.mgetAsync(ids.map((id: number) => {
                 return "modifier:" + id + ":duration"
             })).then((results: Array<any>) => {
                 return results.map((result) => { return result ? +result : null })
             })
         }
     }
-    getDelays(identifiers: Array<string>) : Promise<Array<Delay>> {
+    getDelays(identifiers: Array<string>): Promise<Array<Delay>> {
         return Promise.all(identifiers.map(this.getMappedDelays.bind(this)))
     }
-    getDelay(identifier: string) : Promise<Delay> {
+    getDelay(identifier: string): Promise<Delay> {
         return this.hasDelay(identifier).then(() => {
             return RedisDelay.load(identifier, this.client)
         })
     }
-    addDelay(delay: Delay) : Promise<void> {
+    addDelay(delay: Delay): Promise<void> {
         return RedisDataProvider.checkIdentifier(delay).then(() => {
             return RedisDataProvider.checkNullIdentifier(delay.projectIdentifier)
         }).then(() => {
@@ -435,14 +429,14 @@ export class RedisDataProvider implements IRedisDataProvider {
             return RedisDelay.save(delay, this.client)
         })
     }
-    getProjectDelays(identifier: string) : Promise<Array<Delay>> {
+    getProjectDelays(identifier: string): Promise<Array<Delay>> {
         return this.hasProject(identifier).then(() => {
             return this.client.smembersAsync("project:" + identifier + ":delays")
         }).then((identifiers: Array<string>) => {
             return this.getDelays(identifiers.sort())
         })
     }
-    setDelayTaskRelation(delayIdentifier: string, taskIdentifier: string) : Promise<void> {
+    setDelayTaskRelation(delayIdentifier: string, taskIdentifier: string): Promise<void> {
         return this.hasDelay(delayIdentifier).then(() => {
             return this.hasTask(taskIdentifier)
         }).then(() => {
@@ -451,47 +445,47 @@ export class RedisDataProvider implements IRedisDataProvider {
                                       .execAsync()
         })
     }
-    getTaskDelayIds(identifier: string) : Promise<Array<string>> {
+    getTaskDelayIds(identifier: string): Promise<Array<string>> {
         return this.hasTask(identifier).then(() => {
             return this.client.smembersAsync("task:" + identifier + ":delays")
         }).then((identifiers: Array<string>) => {
             return identifiers.sort()
         })
     }
-    getDelayTaskIds(identifier: string) : Promise<Array<string>> {
+    getDelayTaskIds(identifier: string): Promise<Array<string>> {
         return this.hasDelay(identifier).then(() => {
             return this.client.smembersAsync("delay:" + identifier + ":tasks")
         }).then((identifiers: Array<string>) => {
             return identifiers.sort()
         })
     }
-    watchTasksModifiers(identifiers: Array<string>) : Promise<void> {
+    watchTasksModifiers(identifiers: Array<string>): Promise<void> {
         return this.client.watchAsync(identifiers.map((identifier: string) => {
-            return "task:" + identifier + ":modifiers" 
+            return "task:" + identifier + ":modifiers"
         })).then((result) => {})
     }
-    watchModifiersDurations(identifiers: Array<string>) : Promise<void> {
+    watchModifiersDurations(identifiers: Array<string>): Promise<void> {
         return this.client.watchAsync(identifiers.map((identifier: string) => {
-            return "modifier:" + identifier + ":duration" 
+            return "modifier:" + identifier + ":duration"
         })).then((result) => {})
     }
-    private static indexFromString(id: string) : number {
+    private static indexFromString(id: string): number {
         return +id
     }
-    private static compareNumbers(first: number, second: number) : number {
+    private static compareNumbers(first: number, second: number): number {
         return first - second
     }
-    private getMappedProject(identifier: string) : Promise<Project> {
+    private getMappedProject(identifier: string): Promise<Project> {
         return this.getProject(identifier).then((project: Project) => {
             return project
         }).catch((error: Error) => {
             return null
         })
     }
-    private static checkIdentifier<T extends Identifiable>(type: T) : Promise<void> {
+    private static checkIdentifier<T extends Identifiable>(type: T): Promise<void> {
         return RedisDataProvider.checkNullIdentifier(type.identifier)
     }
-    private static checkNullIdentifier(identifier: string) : Promise<void> {
+    private static checkNullIdentifier(identifier: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             if (identifier == null) {
                 reject(new NullIdentifierError("Null identifier"))
@@ -500,77 +494,77 @@ export class RedisDataProvider implements IRedisDataProvider {
             }
         })
     }
-    private getNextId(type: string) : Promise<number> {
+    private getNextId(type: string): Promise<number> {
         return this.client.incrAsync(type + ":lastId").then((id: string) => {
             return this.client.saddAsync(type + ":ids", id).then((result: number) => {
                 return +id
             })
         })
     }
-    private notHasProject(identifier: string) : Promise<void> {
+    private notHasProject(identifier: string): Promise<void> {
         return this.client.existsAsync("project:" + identifier).then((result: number) => {
-            if (result == 1) {
+            if (result === 1) {
                 throw new ExistsError("Project " + identifier + " already exists")
             }
         })
     }
-    private hasProject(identifier: string) : Promise<void> {
+    private hasProject(identifier: string): Promise<void> {
         return this.client.existsAsync("project:" + identifier).then((result: number) => {
-            if (result != 1) {
+            if (result !== 1) {
                 throw new ProjectNotFoundError("Project " + identifier + " not found")
             }
         })
     }
-    private notHasTask(identifier: string) : Promise<void> {
+    private notHasTask(identifier: string): Promise<void> {
         return this.client.existsAsync("task:" + identifier).then((result: number) => {
-            if (result == 1) {
+            if (result === 1) {
                 throw new ExistsError("Task " + identifier + " already exists")
             }
         })
     }
-    private notHasDelay(identifier: string) : Promise<void> {
+    private notHasDelay(identifier: string): Promise<void> {
         return this.client.existsAsync("delay:" + identifier).then((result: number) => {
-            if (result == 1) {
+            if (result === 1) {
                 throw new ExistsError("Delay " + identifier + " already exists")
             }
         })
     }
-    private hasModifier(id: number) : Promise<void> {
+    private hasModifier(id: number): Promise<void> {
         return this.client.existsAsync("modifier:" + id).then((result: number) => {
-            if (result != 1) {
+            if (result !== 1) {
                 throw new ModifierNotFoundError("Modifier " + id + " not found")
             }
         })
     }
-    private hasDelay(identifier: string) : Promise<void> {
+    private hasDelay(identifier: string): Promise<void> {
         return this.client.existsAsync("delay:" + identifier).then((result: number) => {
-            if (result != 1) {
+            if (result !== 1) {
                 throw new DelayNotFoundError("Delay " + identifier + " not found")
             }
         })
     }
-    private getMappedTask(identifier: string) : Promise<Task> {
+    private getMappedTask(identifier: string): Promise<Task> {
         return this.getTask(identifier).then((task: Task) => {
             return task
         }).catch((error: Error) => {
             return null
         })
     }
-    private getMappedTaskResults(identifier: string) : Promise<TaskResults> {
+    private getMappedTaskResults(identifier: string): Promise<TaskResults> {
         return this.getTaskResults(identifier).then((taskResults: TaskResults) => {
             return taskResults
         }).catch((error: Error) => {
             return null
         })
     }
-    private getMappedModifier(id: number) : Promise<Modifier> {
+    private getMappedModifier(id: number): Promise<Modifier> {
         return this.getModifier(id).then((modifier: Modifier) => {
             return modifier
         }).catch((error: Error) => {
             return null
         })
     }
-    private getMappedDelays(identifier: string) : Promise<Delay> {
+    private getMappedDelays(identifier: string): Promise<Delay> {
         return this.getDelay(identifier).then((delay: Delay) => {
             return delay
         }).catch((error: Error) => {

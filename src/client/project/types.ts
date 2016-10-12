@@ -9,13 +9,13 @@ export interface State {
 
 export interface ProjectState {
     isFetching: boolean
-    project: Project
+    project: Project | null
 }
 
 export interface TasksState {
     isFetching: boolean
     tasks: Array<ApiTask>
     filters: [boolean, boolean, boolean]
-    today: Date
+    today: Date | null
     filteredTasks: Array<ApiTask>
 }

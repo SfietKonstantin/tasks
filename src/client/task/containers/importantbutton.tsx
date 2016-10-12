@@ -16,7 +16,7 @@ interface ImportantButtonProperties {
 
 class UnconnectedImportantButton extends React.Component<ImportantButtonProperties, {}> {
     render() {
-        return <Button bsStyle={this.getImportantStyle()} onClick={this.handleImportant.bind(this)} 
+        return <Button bsStyle={this.getImportantStyle()} onClick={this.handleImportant.bind(this)}
                 disabled={!this.props.importantEnabled} >
             <span className="glyphicon glyphicon-star" aria-hidden="true"></span>
             <span className="visible-md-inline visible-lg-inline"> {this.getLabel()}</span>
@@ -25,10 +25,10 @@ class UnconnectedImportantButton extends React.Component<ImportantButtonProperti
     componentDidMount() {
         this.props.dispatch(fetchImportant(this.props.identifier))
     }
-    private getImportantStyle() : string {
+    private getImportantStyle(): string {
         return this.props.important ? "danger" : "default"
     }
-    private getLabel() : string {
+    private getLabel(): string {
         return this.props.important ? "Important" : "Set as important"
     }
     private handleImportant(e: React.MouseEvent) {
@@ -37,7 +37,7 @@ class UnconnectedImportantButton extends React.Component<ImportantButtonProperti
     }
 }
 
-function mapStateToProps(state: State) {
+const mapStateToProps = (state: State) => {
     return {
         identifier: state.identifier,
         importantEnabled: !state.important.isFetching,
@@ -45,7 +45,7 @@ function mapStateToProps(state: State) {
     }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<State>) {
+const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
         onImportantChanged: (identifier: string, important: boolean) => {
             dispatch(updateImportant(identifier, important))

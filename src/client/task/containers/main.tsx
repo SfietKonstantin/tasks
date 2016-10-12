@@ -26,17 +26,17 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
         this.state = { tabIndex: 0 }
     }
     render() {
-        let taskHeader: JSX.Element = null
-        let tab0: JSX.Element = null
-        let tab1: JSX.Element = null
+        let taskHeader: JSX.Element | null = null
+        let tab0: JSX.Element | null = null
+        let tab1: JSX.Element | null = null
         if (this.props.project) {
             taskHeader = <Header project={this.props.project} task={this.props.task}
                                  tabChangedCallback={this.handleTabChange.bind(this)} />
-            tab0 = <Overview visible={this.state.tabIndex==0} task={this.props.task} 
+            tab0 = <Overview visible={this.state.tabIndex === 0} task={this.props.task}
                              taskResults={this.props.taskResults} />
-            //tab1 = <AllTasks visible={this.state.tabIndex==1} />
+            // tab1 = <AllTasks visible={this.state.tabIndex==1} />
         }
-        return <div> 
+        return <div>
             {taskHeader}
             {tab0}
             {tab1}
@@ -46,15 +46,17 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
         this.props.dispatch(fetchTask(this.props.identifier))
     }
     private handleTabChange(index: number) {
-        if (this.state.tabIndex != index) {
+        if (this.state.tabIndex !== index) {
             this.setState({ tabIndex: index })
         }
     }
 }
 
-function mapStateToProps(state: State) {
-    const task = state.task.project && state.task.task ? apitypes.createTaskFromApiTask(state.task.project, state.task.task) : null
-    const taskResults = state.task.task ? apitypes.createTaskResultsFromApiTask(state.task.task) : null
+const mapStateToProps = (state: State) => {
+    const project = state.task.project
+    const apiTask = state.task.task
+    const task = project && apiTask ? apitypes.createTaskFromApiTask(project, apiTask) : null
+    const taskResults = apiTask ? apitypes.createTaskResultsFromApiTask(apiTask) : null
     return {
         identifier: state.identifier,
         project: state.task.project,

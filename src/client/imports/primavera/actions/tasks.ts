@@ -1,6 +1,6 @@
 import { Action, Dispatch } from "redux"
-import { State } from "../types"
-import { ApiImportTask } from "../../../../common/apitypes"
+import { State, PrimaveraTask, PrimaveraDelay } from "../types"
+import { ApiInputTask } from "../../../../common/apitypes"
 import * as dateutils from "../../../../common/dateutils"
 
 export const TASKS_IMPORT_BEGIN = "TASKS_IMPORT_BEGIN"
@@ -12,89 +12,99 @@ export const TASKS_RECEIVE_ADD = "TASKS_RECEIVE_ADD"
 
 export interface TasksAction extends Action {
     type: string,
-    tasks: Map<string, ApiImportTask>
+    tasks: Map<string, PrimaveraTask>
+    delays: Map<string, PrimaveraDelay>
     warnings: Array<string>
 }
 
-function beginTasksImport() : Action {
+const beginTasksImport = (): Action => {
     return {
         type: TASKS_IMPORT_BEGIN
     }
 }
 
-function endTasksImport(tasks: Map<string, ApiImportTask>, warnings: Array<string>) : TasksAction {
+const endTasksImport = (tasks: Map<string, PrimaveraTask>, delays: Map<string, PrimaveraDelay>,
+                        warnings: Array<string>): TasksAction => {
     return {
         type: TASKS_IMPORT_END,
         tasks,
+        delays,
         warnings
     }
 }
 
-function tasksImportInvalidFormat() : Action {
+const tasksImportInvalidFormat = (): Action => {
     return {
         type: TASKS_IMPORT_INVALID_FORMAT
     }
 }
 
-function convertDate(date: string) : Date {
-    const convertedDate = date.replace(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+):(\d+)/,"$2/$1/$3")
+const convertDate = (date: string): Date | null => {
+    const convertedDate = date.replace(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+):(\d+)/, "$2/$1/$3")
     const returned = new Date(convertedDate)
     return Number.isNaN(returned.getTime()) ? null : returned
 }
 
-function parseTasks(reader: FileReader, dispatch: Dispatch<State>, resolve: () => void) {
+const parseTasks = (reader: FileReader, dispatch: Dispatch<State>, resolve: () => void) => {
     const content: string = reader.result
     const splitted = content.split("\n")
     if (splitted.length < 2) {
         dispatch(tasksImportInvalidFormat())
         return
     }
-        
+
     splitted.shift()
     splitted.shift()
 
-    let tasks = new Map<string, ApiImportTask>()
+    let tasks = new Map<string, PrimaveraTask>()
+    let delays = new Map<string, PrimaveraDelay>()
     let warnings = new Array<string>()
     splitted.forEach((line: string) =>  {
         const splittedLine = line.split("\t")
-        if (splittedLine.length >= 9) {
-            const identifier = splittedLine[0]
-            const name = splittedLine[4]
-            const duration = +splittedLine[5]
-            const startDate = convertDate(splittedLine[7])
-            const endDate = convertDate(splittedLine[8])
+        if (splittedLine.length < 9) {
+            return
+        }
 
-            if (duration > 0 && startDate && endDate) {
-                const computedDuration = dateutils.getDateDiff(startDate, endDate)
-                if (duration != computedDuration) {
-                    warnings.push("Task \"" + identifier + "\"'s duration do not match with the computed duration")
-                }
-                    
-                if (tasks.has(identifier)) {
-                    warnings.push("Task identifier \"" + identifier + "\" is duplicated")
-                } else {
-                    tasks.set(identifier, {
-                        projectIdentifier: null,
-                        identifier,
-                        name,
-                        description: "",
-                        estimatedStartDate: startDate.toISOString(),
-                        estimatedDuration: duration        
-                    })
-                }
+        const identifier = splittedLine[0]
+        const name = splittedLine[4]
+        const duration = +splittedLine[5]
+        const startDate = convertDate(splittedLine[7])
+        const endDate = convertDate(splittedLine[8])
+
+        if (identifier.length === 0) {
+            return
+        }
+
+        if (duration > 0 && startDate && endDate) {
+            const computedDuration = dateutils.getDateDiff(startDate, endDate)
+            if (duration !== computedDuration) {
+                warnings.push("Task \"" + identifier + "\"'s duration do not match with the computed duration")
             }
         }
+
+        if (tasks.has(identifier)) {
+            warnings.push("Task identifier \"" + identifier + "\" is duplicated")
+            return
+        } 
+        
+        tasks.set(identifier, {
+            identifier,
+            name,
+            startDate,
+            endDate,
+            duration
+        })
     })
 
-    dispatch(endTasksImport(tasks, warnings))
+    dispatch(endTasksImport(tasks, delays, warnings))
     resolve()
 }
 
 export const importTasks = (file: File) => {
-    return function(dispatch: Dispatch<State>) {
+    return (dispatch: Dispatch<State>) => {
         dispatch(beginTasksImport())
         return new Promise<void>((resolve, reject) => {
-            if (file.type == "text/csv") {
+            if (file.type === "text/csv") {
                 const reader = new FileReader()
                 reader.onload = parseTasks.bind(reader, reader, dispatch, resolve)
                 reader.readAsText(file)
@@ -106,28 +116,40 @@ export const importTasks = (file: File) => {
     }
 }
 
-export function dismissInvalidFormat () : Action {
+export const dismissInvalidTasksFormat = (): Action => {
     return {
         type: TASKS_DISMISS_INVALID_FORMAT
     }
 }
 
-function requestAddTasks() : Action {
+const requestAddTasks = (): Action => {
     return {
         type: TASKS_REQUEST_ADD
     }
 }
 
-function receiveAddTasks() : Action {
+const receiveAddTasks = (): Action => {
     return {
         type: TASKS_RECEIVE_ADD
     }
 }
 
-export const addTasks = (projectIdentifier: string, tasks: Map<string, ApiImportTask>) => {
-    return function(dispatch: Dispatch<State>) {
+export const addTasks = (projectIdentifier: string, tasks: Map<string, PrimaveraTask>) => {
+    return (dispatch: Dispatch<State>) => {
         dispatch(requestAddTasks())
-        return Promise.all(Array.from(tasks.values(), ((task: ApiImportTask) => {
+        const filteredTasks = Array.from(tasks.values()).filter((task: PrimaveraTask) => {
+            return !!task.startDate
+        })
+        return Promise.all(filteredTasks.map(((task: PrimaveraTask) => {
+            const startDate = task.startDate as Date
+            let inputTask: ApiInputTask = {
+                identifier: task.identifier,
+                projectIdentifier,
+                name: task.name,
+                description: "",
+                estimatedStartDate: startDate.toISOString(),
+                estimatedDuration: task.duration
+            }
             const requestInit: RequestInit = {
                 method: "PUT",
                 headers: {
@@ -135,7 +157,7 @@ export const addTasks = (projectIdentifier: string, tasks: Map<string, ApiImport
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    task: Object.assign(task, { projectIdentifier })
+                    task: inputTask
                 })
             }
             return fetch("/api/task", requestInit)

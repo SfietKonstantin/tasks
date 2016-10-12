@@ -13,7 +13,7 @@ export interface ProjectAction extends Action {
     description: string
 }
 
-export function defineProject(identifier: string, name: string, description: string) : ProjectAction {
+export const defineProject = (identifier: string, name: string, description: string): ProjectAction => {
     return {
         type: PROJECT_DEFINE,
         identifier,
@@ -22,20 +22,20 @@ export function defineProject(identifier: string, name: string, description: str
     }
 }
 
-function requestAddProject() : Action {
+const requestAddProject = (): Action => {
     return {
         type: PROJECT_REQUEST_ADD
     }
 }
 
-function receiveAddProject() : Action {
+const receiveAddProject = (): Action => {
     return {
         type: PROJECT_RECEIVE_ADD
     }
 }
 
 export const addProject = (project: Project) => {
-    return function(dispatch: Dispatch<State>) {
+    return (dispatch: Dispatch<State>) => {
         dispatch(requestAddProject())
         const requestInit: RequestInit = {
             method: "PUT",

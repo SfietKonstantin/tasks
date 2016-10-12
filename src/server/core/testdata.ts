@@ -2,7 +2,7 @@ import { IDataProvider } from "./data/idataprovider"
 import { Project, Task } from "./../../common/types"
 import * as graph from "./graph/graph"
 
-function fillProjectsData(dataProvider: IDataProvider) : Promise<void> {
+const fillProjectsData = (dataProvider: IDataProvider): Promise<void> => {
     const project: Project = {
         identifier: "project",
         name: "Test project",
@@ -11,7 +11,7 @@ function fillProjectsData(dataProvider: IDataProvider) : Promise<void> {
     return dataProvider.addProject(project)
 }
 
-function fillTasksData(dataProvider: IDataProvider) : Promise<void> {
+const fillTasksData = (dataProvider: IDataProvider): Promise<void> => {
     let tasks: Array<Task> = [
         {
             identifier: "root",
@@ -51,7 +51,7 @@ function fillTasksData(dataProvider: IDataProvider) : Promise<void> {
     return Promise.all(mappedTasks).then((ids) => {})
 }
 
-function fillTaskRelations(dataProvider: IDataProvider) : Promise<void> {
+const fillTaskRelations = (dataProvider: IDataProvider): Promise<void> => {
     return dataProvider.setTaskRelation("root", "long").then(() => {
         return dataProvider.setTaskRelation("root", "short")
     }).then(() => {
@@ -61,9 +61,9 @@ function fillTaskRelations(dataProvider: IDataProvider) : Promise<void> {
     })
 }
 
-export function fillTestData(dataProvider: IDataProvider) {
+export const fillTestData = (dataProvider: IDataProvider) => {
     dataProvider.getAllProjects().then((projects: Array<Project>) => {
-        if (projects.length == 0) {
+        if (projects.length === 0) {
             return fillProjectsData(dataProvider).then(() => {
                 return fillTasksData(dataProvider)
             }).then(() => {

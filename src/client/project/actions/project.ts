@@ -9,17 +9,16 @@ export const PROJECT_RECEIVE = "PROJECT_RECEIVE"
 export interface ProjectAction extends Action {
     type: string,
     identifier: string
-    project?: Project 
+    project: Project
 }
 
-function requestProject(identifier: string) : ProjectAction {
+const requestProject = (identifier: string): Action => {
     return {
-        type: PROJECT_REQUEST,
-        identifier
+        type: PROJECT_REQUEST
     }
 }
 
-function receiveProject(identifier: string, project: Project) : ProjectAction {
+const receiveProject = (identifier: string, project: Project): ProjectAction => {
     return {
         type: PROJECT_RECEIVE,
         identifier,
@@ -28,7 +27,7 @@ function receiveProject(identifier: string, project: Project) : ProjectAction {
 }
 
 export const fetchProject = (identifier: string) => {
-    return function(dispatch: Dispatch<State>) {
+    return (dispatch: Dispatch<State>) => {
         dispatch(requestProject(identifier))
         return fetch("/api/project/" + identifier).then((response: Response) => {
             return response.json()

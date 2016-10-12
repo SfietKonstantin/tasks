@@ -22,10 +22,13 @@ export interface TaskResults {
 }
 
 export interface Modifier {
-    id: number
     name: string
     description: string
     duration: number
+}
+
+export interface IdentifiableModifier extends Modifier {
+    id: number
 }
 
 export interface Delay {

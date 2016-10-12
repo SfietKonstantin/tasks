@@ -24,4 +24,4 @@ export class Breadcrumb extends React.Component<BreadcrumbProperties, {}> {
             return name.slice(0, 50) + " ..."
         }
     }
-} 
+}

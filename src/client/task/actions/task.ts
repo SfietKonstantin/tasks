@@ -14,14 +14,14 @@ export interface TaskAction extends Action {
     task?: ApiTask
 }
 
-function requestTask(identifier: string) : TaskAction {
+const requestTask = (identifier: string): TaskAction => {
     return {
         type: TASK_REQUEST,
         identifier
     }
 }
 
-function receiveTask(identifier: string, project: Project, task: ApiTask) : TaskAction {
+const receiveTask = (identifier: string, project: Project, task: ApiTask): TaskAction => {
     return {
         type: TASK_RECEIVE,
         identifier,
@@ -31,7 +31,7 @@ function receiveTask(identifier: string, project: Project, task: ApiTask) : Task
 }
 
 export const fetchTask = (identifier: string) => {
-    return function(dispatch: Dispatch<State>) {
+    return (dispatch: Dispatch<State>) => {
         dispatch(requestTask(identifier))
         return fetch("/api/task/" + identifier).then((response: Response) => {
             return response.json()
@@ -47,7 +47,7 @@ export interface ModifierAddAction extends Action {
     modifier: Modifier
 }
 
-function requestAddModifier(identifier: string, modifier: Modifier) : ModifierAddAction {
+const requestAddModifier = (identifier: string, modifier: Modifier): ModifierAddAction => {
     return {
         type: MODIFIER_REQUEST_ADD,
         identifier,
@@ -56,7 +56,7 @@ function requestAddModifier(identifier: string, modifier: Modifier) : ModifierAd
 }
 
 export const addModifier = (identifier: string, modifier: Modifier) => {
-    return function(dispatch: Dispatch<State>) {
+    return (dispatch: Dispatch<State>) => {
         dispatch(requestAddModifier(identifier, modifier))
         const requestInit: RequestInit = {
             method: "PUT",

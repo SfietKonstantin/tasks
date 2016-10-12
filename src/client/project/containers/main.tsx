@@ -24,16 +24,16 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
         this.state = { tabIndex: 0 }
     }
     render() {
-        let taskHeader: JSX.Element = null
-        let tab0: JSX.Element = null
-        let tab1: JSX.Element = null
+        let taskHeader: JSX.Element | null = null
+        let tab0: JSX.Element | null = null
+        let tab1: JSX.Element | null = null
         if (this.props.project) {
             taskHeader = <Header project={this.props.project}
                                         tabChangedCallback={this.handleTabChange.bind(this)} />
-            tab0 = <Overview visible={this.state.tabIndex==0} project={this.props.project} />
-            tab1 = <AllTasks visible={this.state.tabIndex==1} />
+            tab0 = <Overview visible={this.state.tabIndex === 0} project={this.props.project} />
+            tab1 = <AllTasks visible={this.state.tabIndex === 1} />
         }
-        return <div> 
+        return <div>
             {taskHeader}
             {tab0}
             {tab1}
@@ -43,13 +43,13 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
         this.props.dispatch(fetchProject(this.props.identifier))
     }
     private handleTabChange(index: number) {
-        if (this.state.tabIndex != index) {
+        if (this.state.tabIndex !== index) {
             this.setState({ tabIndex: index })
         }
     }
 }
 
-function mapStateToProps(state: State) {
+const mapStateToProps = (state: State) => {
     return {
         identifier: state.identifier,
         project: state.project.project

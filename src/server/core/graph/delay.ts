@@ -18,28 +18,28 @@ export interface ImpactInfo {
     newMargin: number
 }
 
-function compareImpactInfo(first: ImpactInfo, second: ImpactInfo) : number {
-    if (first.type == ImpactInfoType.Warning && second.type == ImpactInfoType.Error) {
+const compareImpactInfo = (first: ImpactInfo, second: ImpactInfo): number => {
+    if (first.type === ImpactInfoType.Warning && second.type === ImpactInfoType.Error) {
         return 1
-    } else if (first.type == ImpactInfoType.Error && second.type == ImpactInfoType.Warning) {
+    } else if (first.type === ImpactInfoType.Error && second.type === ImpactInfoType.Warning) {
         return -1
     }
 
-    if (first.taskIdentifier != second.taskIdentifier) {
+    if (first.taskIdentifier !== second.taskIdentifier) {
         return first.taskIdentifier < second.taskIdentifier ? -1 : 1
     }
 
-    if (first.newMargin != second.newMargin) {
+    if (first.newMargin !== second.newMargin) {
         return first.newMargin - second.newMargin
     }
 
     return 0
 }
 
-export function getImpactInfo(root: TaskNode, dataProvider: IDataProvider): Promise<Array<ImpactInfo>> {
+export const getImpactInfo = (root: TaskNode, dataProvider: IDataProvider): Promise<Array<ImpactInfo>> => {
     let map = new Map<string, TaskNode>()
     buildGraphIndex(root, map)
-    
+
     // Load delays
     let delayMaps = new Map<string, Array<Delay>>()
     return Promise.all(Array.from(map.keys(), (identifier: string) => {
@@ -57,7 +57,7 @@ export function getImpactInfo(root: TaskNode, dataProvider: IDataProvider): Prom
             }
             const estimatedEndDate = dateutils.addDays(node.estimatedStartDate, node.estimatedDuration)
             const endDate = dateutils.addDays(node.startDate, node.duration)
-            
+
             Array.from(maputils.get(delayMaps, node.identifier), (delay: Delay) => {
                 const oldMargin = dateutils.getDateDiff(estimatedEndDate, delay.date)
                 const newMargin = dateutils.getDateDiff(endDate, delay.date)

@@ -1,6 +1,6 @@
 import { Identifiable, Project, Task, TaskResults, Modifier } from "./types"
 
-export interface ApiImportTask extends Identifiable {
+export interface ApiInputTask extends Identifiable {
     projectIdentifier: string,
     name: string
     description: string
@@ -23,7 +23,7 @@ export interface ApiProjectTaskModifiers {
     modifiers: Array<Modifier>
 }
 
-export const createTaskFromApiImportTask = (apiImportTask: ApiImportTask) : Task => {
+export const createTaskFromApiImportTask = (apiImportTask: ApiInputTask): Task => {
     return {
         identifier: apiImportTask.identifier,
         projectIdentifier: apiImportTask.projectIdentifier,
@@ -34,7 +34,7 @@ export const createTaskFromApiImportTask = (apiImportTask: ApiImportTask) : Task
     }
 }
 
-export const createApiTask = (task: Task, taskResults: TaskResults) : ApiTask => {
+export const createApiTask = (task: Task, taskResults: TaskResults): ApiTask => {
     return {
         identifier: task.identifier,
         name: task.name,
@@ -46,7 +46,7 @@ export const createApiTask = (task: Task, taskResults: TaskResults) : ApiTask =>
     }
 }
 
-export const createTaskFromApiTask = (project: Project, apiTask: ApiTask) : Task => {
+export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task => {
     return {
         identifier: apiTask.identifier,
         projectIdentifier: project.identifier,
@@ -57,7 +57,7 @@ export const createTaskFromApiTask = (project: Project, apiTask: ApiTask) : Task
     }
 }
 
-export const createTaskResultsFromApiTask = (apiTask: ApiTask) : TaskResults => {
+export const createTaskResultsFromApiTask = (apiTask: ApiTask): TaskResults => {
     return {
         taskIdentifier: apiTask.identifier,
         startDate: new Date(apiTask.startDate),
@@ -65,7 +65,7 @@ export const createTaskResultsFromApiTask = (apiTask: ApiTask) : TaskResults => 
     }
 }
 
-export const createApiTasks = (tasks: Array<Task>, tasksResults: Array<TaskResults>) : Array<ApiTask> | null => {
+export const createApiTasks = (tasks: Array<Task>, tasksResults: Array<TaskResults>): Array<ApiTask> | null => {
     if (tasks.length === tasksResults.length) {
         let returned = new Array<ApiTask>()
         for (let i = 0; i < tasks.length; ++i) {

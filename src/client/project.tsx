@@ -40,5 +40,5 @@ export const render = (identifier: string) => {
         mainReducer, initialState,
         Redux.applyMiddleware(ReduxThunk.default)
     )
-    ReactDOM.render(<Root store={store} identifier={identifier} />, document.getElementById("content"))
+    ReactDOM.render(<Root store={store} identifier={identifier} />, document.getElementById("content") as Element)
 }

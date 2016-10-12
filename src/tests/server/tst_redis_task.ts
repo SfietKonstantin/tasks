@@ -9,7 +9,7 @@ import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
 
-declare module 'redis' {
+declare module "redis" {
     export interface RedisClient extends NodeJS.EventEmitter {
         setAsync(...args: any[]): Promise<any>
         delAsync(...args: any[]): Promise<any>

@@ -7,7 +7,7 @@ import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
 
-declare module 'redis' {
+declare module "redis" {
     export interface RedisClient extends NodeJS.EventEmitter {
         setAsync(...args: any[]): Promise<any>
         delAsync(...args: any[]): Promise<any>
@@ -42,17 +42,15 @@ describe("Redis", () => {
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
-                
+
                 return db.addTask(task).then(() => {
                     const modifier1: Modifier = {
-                        id: null,
                         name: "Modifier 1",
                         description: "Description 1",
                         duration: 40
                     }
 
                     const modifier2: Modifier = {
-                        id: null,
                         name: "Modifier 2",
                         description: "Description 2",
                         duration: 10
@@ -77,11 +75,9 @@ describe("Redis", () => {
         it("Should get modifiers", (done) => {
             db.getModifiers([2, 1]).then((modifiers: Array<Modifier>) => {
                 chai.expect(modifiers).to.length(2)
-                chai.expect(modifiers[0].id).to.equals(2)
                 chai.expect(modifiers[0].name).to.equals("Modifier 2")
                 chai.expect(modifiers[0].description).to.equals("Description 2")
                 chai.expect(modifiers[0].duration).to.equals(10)
-                chai.expect(modifiers[1].id).to.equals(1)
                 chai.expect(modifiers[1].name).to.equals("Modifier 1")
                 chai.expect(modifiers[1].description).to.equals("Description 1")
                 chai.expect(modifiers[1].duration).to.equals(40)
@@ -98,7 +94,6 @@ describe("Redis", () => {
         it("Should get valid modifiers", (done) => {
             db.getModifiers([2, 1]).then((modifiers: Array<Modifier>) => {
                 chai.expect(modifiers).to.length(2)
-                chai.expect(modifiers[0].id).to.equals(2)
                 chai.expect(modifiers[0].name).to.equals("Modifier 2")
                 chai.expect(modifiers[0].description).to.equals("Description 2")
                 chai.expect(modifiers[0].duration).to.equals(10)
@@ -118,7 +113,6 @@ describe("Redis", () => {
         it("Should get valid modifiers", (done) => {
             db.getModifiers([2, 1]).then((modifiers: Array<Modifier>) => {
                 chai.expect(modifiers).to.length(2)
-                chai.expect(modifiers[0].id).to.equals(2)
                 chai.expect(modifiers[0].name).to.equals("Modifier 2")
                 chai.expect(modifiers[0].description).to.equals("Description 2")
                 chai.expect(modifiers[0].duration).to.equals(10)

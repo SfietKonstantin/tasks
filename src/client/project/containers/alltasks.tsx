@@ -50,7 +50,7 @@ export class UnconnectedAllTasksContent extends React.Component<AllTasksContentP
     componentDidMount() {
         this.props.dispatch(fetchTasks(this.props.identifier))
     }
-    private static getButtonStyle(checked: boolean) : string {
+    private static getButtonStyle(checked: boolean): string {
         return checked ? "primary" : "default"
     }
     private handleNotStartedClicked(e: React.MouseEvent) {
@@ -67,7 +67,7 @@ export class UnconnectedAllTasksContent extends React.Component<AllTasksContentP
     }
 }
 
-function mapStateToProps(state: State) {
+const mapStateToProps = (state: State) => {
     return {
         identifier: state.identifier,
         tasks: state.tasks.filteredTasks,
@@ -77,7 +77,7 @@ function mapStateToProps(state: State) {
     }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<State>) {
+const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
         onFilterChanged: (notStarted: boolean, inProgress: boolean, done: boolean) => {
             dispatch(displayTaskFilter(notStarted, inProgress, done))

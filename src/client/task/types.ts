@@ -9,11 +9,11 @@ export interface State {
 
 export interface TaskState {
     isFetching: boolean
-    project: Project
-    task: ApiTask
+    project: Project | null
+    task: ApiTask | null
 }
 
 export interface ImportantState {
     isFetching: boolean
-    important: boolean    
+    important: boolean
 }

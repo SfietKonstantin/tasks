@@ -14,9 +14,8 @@ class RequestError {
 }
 
 export class Api {
-    private dataProvider : IDataProvider
-    constructor(dataProvider: IDataProvider)
-    {
+    private dataProvider: IDataProvider
+    constructor(dataProvider: IDataProvider) {
         this.dataProvider = dataProvider
     }
     getProjects(req: express.Request, res: express.Response) {
@@ -55,7 +54,9 @@ export class Api {
         const identifier = String(req.params.identifier)
         this.dataProvider.getProjectTasks(identifier).then((tasks: Array<Task>) => {
             tasks.filter((value: Task) => { return !!value })
-            return this.dataProvider.getTasksResults(tasks.map((task: Task) => { return task.identifier })).then((tasksResults: Array<TaskResults>) => {
+            return this.dataProvider.getTasksResults(tasks.map((task: Task) => {
+                return task.identifier
+            })).then((tasksResults: Array<TaskResults>) => {
                 res.json(apitypes.createApiTasks(tasks, tasksResults))
             })
         }).catch((error) => {
@@ -68,7 +69,7 @@ export class Api {
         })
     }
     putTask(req: express.Request, res: express.Response) {
-        const apiTask = req.body.task as apitypes.ApiImportTask
+        const apiTask = req.body.task as apitypes.ApiInputTask
         const task = apitypes.createTaskFromApiImportTask(apiTask)
         this.dataProvider.addTask(task).then(() => {
             return this.dataProvider.setTasksResults([{
@@ -112,10 +113,10 @@ export class Api {
         })
     }
     putTaskImportant(req: express.Request, res: express.Response) {
-       this.setTaskImportant(req, res, true) 
+       this.setTaskImportant(req, res, true)
     }
     deleteTaskImportant(req: express.Request, res: express.Response) {
-       this.setTaskImportant(req, res, false) 
+       this.setTaskImportant(req, res, false)
     }
     putModifier(req: express.Request, res: express.Response) {
         const modifier = req.body.modifier as Modifier
@@ -159,7 +160,7 @@ export class Api {
             }
         })
     }
-    private sendTask(identifier: string, res: express.Response) : Promise<void> {
+    private sendTask(identifier: string, res: express.Response): Promise<void> {
         return this.dataProvider.getTask(identifier).then((task: Task) => {
             return this.dataProvider.getProject(task.projectIdentifier).then((project: Project) => {
                 return this.dataProvider.getTaskResults(task.identifier).then((taskResults: TaskResults) => {

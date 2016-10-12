@@ -42,7 +42,8 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
                                 Title
                             </Col>
                             <Col xd={12} md={10}>
-                                <FormControl type="text" placeholder="Title" onInput={this.handleNameInput.bind(this)} />
+                                <FormControl type="text" placeholder="Title"
+                                             onInput={this.handleNameInput.bind(this)} />
                             </Col>
                         </FormGroup>
                         <FormGroup validationState={this.getDurationValidationState()}>
@@ -51,7 +52,8 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
                             </Col>
                             <Col xd={12} md={10}>
                                 <InputGroup>
-                                    <FormControl type="number" placeholder="Duration" onInput={this.handleDurationInput.bind(this)}/>
+                                    <FormControl type="number" placeholder="Duration"
+                                                 onInput={this.handleDurationInput.bind(this)}/>
                                     <InputGroup.Addon>days</InputGroup.Addon>
                                 </InputGroup>
                             </Col>
@@ -61,13 +63,15 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
                                 Description
                             </Col>
                             <Col xd={12} md={10}>
-                                <FormControl type="text" componentClass="textarea" placeholder="Description" onInput={this.handleDescriptionInput.bind(this)} />
+                                <FormControl type="text" componentClass="textarea" placeholder="Description"
+                                             onInput={this.handleDescriptionInput.bind(this)} />
                             </Col>
                         </FormGroup>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button bsStyle="primary" disabled={!this.isButtonEnabled()} onClick={this.handleSave.bind(this)}>Save</Button>
+                    <Button bsStyle="primary" disabled={!this.isButtonEnabled()}
+                            onClick={this.handleSave.bind(this)}>Save</Button>
                 </Modal.Footer>
             </Modal>
             {this.props.children}
@@ -90,13 +94,13 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
         })
     }
     private isButtonEnabled() {
-        return this.state.name.length > 0 && this.state.duration != Number.NaN && this.state.duration != 0
+        return this.state.name.length > 0 && this.state.duration !== Number.NaN && this.state.duration !== 0
     }
-    private getNameValidationState() : "success" | "error" {
+    private getNameValidationState(): "success" | "error" {
         return this.state.name.length > 0 ? "success" : "error"
     }
-    private getDurationValidationState() : "success" | "error" {
-        return this.state.duration != Number.NaN && this.state.duration != 0 ? "success" : "error"
+    private getDurationValidationState(): "success" | "error" {
+        return this.state.duration !== Number.NaN && this.state.duration !== 0 ? "success" : "error"
     }
     private handleNameInput(e: React.FormEvent) {
         const input = e.target as HTMLInputElement
@@ -130,7 +134,6 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
     private handleSave(e: React.MouseEvent) {
         e.preventDefault()
         const modifier: Modifier = {
-            id: null,
             name: this.state.name,
             description: this.state.description,
             duration: this.state.duration
@@ -140,13 +143,13 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
     }
 }
 
-function mapStateToProps(state: State) {
+const mapStateToProps = (state: State) => {
     return {
         identifier: state.identifier
     }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<State>) {
+const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
         onAddModifier: (identifier: string, modifier: Modifier) => {
             dispatch(addModifier(identifier, modifier))

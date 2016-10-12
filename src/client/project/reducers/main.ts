@@ -3,7 +3,9 @@ import { projectReducer } from "./project"
 import { tasksReducer } from "./tasks"
 import { State } from "../types"
 
-function identifierReducer (state: string = null, action: Action) : string {
+const initialState: string = ""
+
+const identifierReducer = (state: string = initialState, action: Action): string => {
     return state
 }
 

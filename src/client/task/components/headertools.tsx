@@ -5,8 +5,8 @@ import { ModifierButton } from "../containers/modifierbutton"
 
 export class HeaderTools extends React.Component<{}, {}> {
     render() {
-        return <Col xs={4} md={4}> 
-            <div className="task-header-tools"> 
+        return <Col xs={4} md={4}>
+            <div className="task-header-tools">
                 <ButtonGroup>
                     <ModifierButton>
                         <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
