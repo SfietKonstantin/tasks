@@ -163,8 +163,7 @@ export class Status extends React.Component<StatusProperties, {}> {
         }
     }
     private getEndTodayDiff(endDate: Date): string {
-        const todayDiff = dateutils.getDateDiff(new Date(), endDate)
-        const diff = dateutils.getDateDiff(new Date(), this.props.taskResults.startDate)
+        const diff = dateutils.getDateDiff(new Date(), endDate)
         if (diff > 0) {
             return "In " + diff + " days"
         } else if (diff < 0) {
