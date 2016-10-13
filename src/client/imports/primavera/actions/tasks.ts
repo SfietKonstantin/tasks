@@ -79,6 +79,7 @@ const parseTasks = (reader: FileReader, dispatch: Dispatch<State>, resolve: () =
             const computedDuration = dateutils.getDateDiff(startDate, endDate)
             if (duration !== computedDuration) {
                 warnings.push("Task \"" + identifier + "\"'s duration do not match with the computed duration")
+                console.log(identifier, duration, computedDuration)
             }
         }
 

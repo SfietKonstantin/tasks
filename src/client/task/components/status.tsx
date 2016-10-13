@@ -50,14 +50,15 @@ export class Status extends React.Component<StatusProperties, {}> {
         const done = daysBeforeEnd < 0
         const endDate = this.getEndDate()
 
+        const milestone = this.props.task.estimatedDuration == 0
         const stateInfo = this.getStateInfo(started, done)
         const progressInfo = this.getProgressInfo(started, done)
         const startState = this.getStartState()
-        const startDateLabel = this.getStartDateLabel(started)
+        const startDateLabel = this.getStartDateLabel(started, milestone)
         const startTodayDiff = this.getStartTodayDiff()
 
         let endStatusTime: JSX.Element | null = null
-        if (this.props.task.estimatedDuration > 0) {
+        if (!milestone) {
             const endState = this.getEndState(endDate)
             const endDateLabel = this.getEndDateLabel(done, endDate)
             const endTodayDiff = this.getEndTodayDiff(endDate)
@@ -128,12 +129,12 @@ export class Status extends React.Component<StatusProperties, {}> {
             return ["warning", "Late " + diff + " days"]
         }
     }
-    private getStartDateLabel(started: boolean): string {
+    private getStartDateLabel(started: boolean, milestone: boolean): string {
         const startDateLabel = dateutils.getDateLabel(this.props.taskResults.startDate)
         if (started) {
-            return "Started the " + startDateLabel
+            return milestone ? "Reached the " + startDateLabel : "Started the " + startDateLabel
         } else {
-            return "Starting the " + startDateLabel
+            return milestone ? "Will be reached the " + startDateLabel : "Starting the " + startDateLabel
         }
     }
     private getStartTodayDiff(): string {
