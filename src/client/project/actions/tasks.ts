@@ -43,7 +43,7 @@ export interface TasksFilterAction extends Action {
     today: Date
 }
 
-export const displayTaskFilter = (filters: TasksFilter): TasksFilterAction => {
+export const filterTasks = (filters: TasksFilter): TasksFilterAction => {
     return {
         type: TASKS_FILTER_DISPLAY,
         filters,

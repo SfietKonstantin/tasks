@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom"
 import * as Redux from "redux"
 import * as ReduxThunk from "redux-thunk"
 import { Provider } from "react-redux"
-import { State } from "./project/types"
+import { State, TasksFilter } from "./project/types"
 import { mainReducer } from "./project/reducers/main"
 import { Main } from "./project/containers/main"
 import { ApiTask } from "../common/apitypes"
@@ -22,6 +22,20 @@ class Root extends React.Component<RootProperties, {}> {
 }
 
 export const render = (identifier: string) => {
+    // TODO: typesafety
+    let filter: TasksFilter = {
+        notStartedChecked: true,
+        inProgressChecked: true,
+        doneChecked: false,
+        milestonesOnlyChecked: false
+    }
+
+    const filterJson = localStorage.getItem(identifier)
+    if (filterJson) {
+        filter = JSON.parse(filterJson)
+    }
+    filter.milestonesOnlyChecked = false
+
     const initialState: State = {
         identifier,
         project: {
@@ -31,12 +45,7 @@ export const render = (identifier: string) => {
         tasks: {
             isFetching: false,
             tasks: new Array<ApiTask>(),
-            filter: {
-                notStartedChecked: true,
-                inProgressChecked: true,
-                doneChecked: false,
-                milestonesOnlyChecked: false
-            },
+            filter,
             today: new Date(),
             filteredTasks: new Array<ApiTask>()
         }

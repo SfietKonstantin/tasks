@@ -58,10 +58,15 @@ export const tasksReducer = (state: TasksState = initialState, action: Action): 
             return Object.assign({}, state, { isFetching: true })
         case TASKS_RECEIVE:
             const tasksAction = action as TasksAction
+            const tasks = tasksAction.tasks.sort((first: ApiTask, second: ApiTask): number => {
+                const firstDate = new Date(first.estimatedStartDate).getTime() 
+                const secondDate = new Date(second.estimatedStartDate).getTime()
+                return firstDate - secondDate
+            })
             return Object.assign({}, state, {
                 isFetching: false,
-                tasks: tasksAction.tasks,
-                filteredTasks: filterTasks(tasksAction.tasks, state.filter, state.today)
+                tasks,
+                filteredTasks: filterTasks(tasks, state.filter, state.today)
             })
         case TASKS_FILTER_DISPLAY:
             const tasksFilterAction = action as TasksFilterAction
