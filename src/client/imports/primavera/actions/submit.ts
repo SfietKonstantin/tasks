@@ -2,17 +2,13 @@ import { Action, Dispatch } from "redux"
 import { State, PrimaveraTask, PrimaveraTaskRelation } from "../types"
 import { ErrorAction, processError } from "../../../common/actions/error"
 import { Project } from "../../../../common/types"
+import { ApiInputTask } from "../../../../common/apitypes"
+import { InputError } from "../../../../common/errors"
+import { getDateDiff } from "../../../../common/dateutils"
 
 export const SUBMIT_REQUEST = "SUBMIT_REQUEST"
 export const SUBMIT_RECEIVE = "SUBMIT_RECEIVE"
 export const SUBMIT_RECEIVE_FAILURE = "SUBMIT_RECEIVE_FAILURE"
-
-export interface ProjectAction extends Action {
-    type: string,
-    identifier: string,
-    name: string,
-    description: string
-}
 
 const requestSubmit = (): Action => {
     return {
@@ -33,10 +29,42 @@ const receiveSubmitFailure = (message: string): ErrorAction => {
     }
 }
 
+const getDates = (task: PrimaveraTask): [Date, number] => {
+    if (task.startDate) {
+        const date = task.startDate
+        if (task.endDate) {
+            return [date, getDateDiff(task.endDate, date)]
+        } else {
+            return [date, 0]
+        }
+    }
+    if (!task.startDate && task.endDate) {
+        return [task.endDate, 0]
+    }
+    throw new InputError("Invalid duration")
+}
+
 export const submit = (project: Project, tasks: Array<PrimaveraTask>,
                        relations: Array<PrimaveraTaskRelation>) => {
     return (dispatch: Dispatch<State>) => {
         dispatch(requestSubmit())
+        const inputTasks = tasks.map((task: PrimaveraTask) => {
+            try {
+                const dates = getDates(task)
+                const returned: ApiInputTask = {
+                    identifier: task.identifier,
+                    name: task.name,
+                    description: "",
+                    estimatedStartDate: dates[0].toISOString(),
+                    estimatedDuration: dates[1]
+                }
+                return returned
+            } catch (error) {
+                return null
+            }
+        }).filter((task: ApiInputTask | null) => {
+            return task != null
+        }) as Array<ApiInputTask>
         const requestInit: RequestInit = {
             method: "PUT",
             headers: {
@@ -45,7 +73,7 @@ export const submit = (project: Project, tasks: Array<PrimaveraTask>,
             },
             body: JSON.stringify({
                 project,
-                tasks,
+                tasks: inputTasks,
                 relations
             })
         }

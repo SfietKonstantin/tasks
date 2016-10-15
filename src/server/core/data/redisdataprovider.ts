@@ -1,10 +1,9 @@
+import { CorruptedError, IDataProvider } from "./idataprovider"
 import {
-    CorruptedError, ExistsError,
-    IDataProvider,
-    ProjectNotFoundError, TaskNotFoundError, ModifierNotFoundError,
-    DelayNotFoundError
-} from "./idataprovider"
-import { Identifiable, Project, Task, TaskRelation, TaskResults, Modifier, TaskLocation, Delay } from "../../../common/types"
+    Identifiable, Project, Task, TaskRelation, TaskResults,
+    Modifier, TaskLocation, Delay
+} from "../../../common/types"
+import { ExistsError, NotFoundError } from "../../../common/errors"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 
@@ -73,13 +72,15 @@ const fromTaskLocation = (location: TaskLocation): string => {
             return "Beginning"
         case TaskLocation.End:
             return "End"
+        default:
+            return ""
     }
 }
 
 const toTaskLocation = (location: string): TaskLocation | null => {
-    if (location == "Beginning") {
+    if (location === "Beginning") {
         return TaskLocation.Beginning
-    } else if (location == "End") {
+    } else if (location === "End") {
         return TaskLocation.End
     } else {
         return null
@@ -191,15 +192,19 @@ class RedisTaskRelation {
     static save(relation: TaskRelation, client: redis.RedisClient): Promise<void> {
         const redisTaskRelation = new RedisTaskRelation(relation)
         const projectIdentifier = relation.projectIdentifier
-        return client.hmsetAsync(taskRelationKey(projectIdentifier, relation.previous, relation.next), redisTaskRelation).then(() => {
+        return client.hmsetAsync(taskRelationKey(projectIdentifier, relation.previous, relation.next),
+                                 redisTaskRelation).then(() => {
             return client.saddAsync(taskKey(projectIdentifier, relation.previous, "relations"), relation.next)
         })
     }
 
-    static load(projectIdentifier: string, previous: string, next: string, client: redis.RedisClient): Promise<TaskRelation> {
-        return client.hgetallAsync(taskRelationKey(projectIdentifier, previous, next)).then((result: any) => {
+    static load(projectIdentifier: string, previous: string, next: string,
+                client: redis.RedisClient): Promise<TaskRelation> {
+        return client.hgetallAsync(taskRelationKey(projectIdentifier, previous, next))
+                     .then((result: any) => {
             if (!result.hasOwnProperty("previousLocation")) {
-                throw new CorruptedError("TaskRelation " + previous + "-" + next + " do not have property previousLocation")
+                throw new CorruptedError("TaskRelation " + previous + "-" + next
+                                                         + " do not have property previousLocation")
             }
             if (!result.hasOwnProperty("nextLocation")) {
                 throw new CorruptedError("TaskRelation " + previous + "-" + next + " do not have property nextLocation")
@@ -336,7 +341,7 @@ export class RedisDataProvider implements IDataProvider {
             return Promise.all(promises)
         }).then((projects: Array<Project>) => {
             return projects.filter((project: Project) => { return !!project })
-        }).catch((error: Error) => {
+        }).catch((error) => {
             return []
         })
     }
@@ -530,7 +535,7 @@ export class RedisDataProvider implements IDataProvider {
     private getMappedProject(identifier: string): Promise<Project> {
         return this.getProject(identifier).then((project: Project) => {
             return project
-        }).catch((error: Error) => {
+        }).catch((error) => {
             return null
         })
     }
@@ -551,7 +556,7 @@ export class RedisDataProvider implements IDataProvider {
     private hasProject(projectIdentifier: string): Promise<void> {
         return this.client.existsAsync(projectRootKey(projectIdentifier)).then((result: number) => {
             if (result !== 1) {
-                throw new ProjectNotFoundError("Project " + projectIdentifier + " not found")
+                throw new NotFoundError("Project " + projectIdentifier + " not found")
             }
         })
     }
@@ -566,7 +571,7 @@ export class RedisDataProvider implements IDataProvider {
         return this.hasProject(projectIdentifier).then(() => {
             return this.client.existsAsync(taskRootKey(projectIdentifier, taskIdentifier)).then((result: number) => {
                 if (result !== 1) {
-                    throw new TaskNotFoundError("Task " + taskIdentifier + " not found")
+                    throw new NotFoundError("Task " + taskIdentifier + " not found")
                 }
             })
         })
@@ -582,7 +587,7 @@ export class RedisDataProvider implements IDataProvider {
         return this.hasProject(projectIdentifier).then(() => {
             return this.client.existsAsync(modifierRootKey(projectIdentifier, modifierId)).then((result: number) => {
                 if (result !== 1) {
-                    throw new ModifierNotFoundError("Modifier " + modifierId + " not found")
+                    throw new NotFoundError("Modifier " + modifierId + " not found")
                 }
             })
         })
@@ -591,7 +596,7 @@ export class RedisDataProvider implements IDataProvider {
         return this.hasProject(projectIdentifier).then(() => {
             return this.client.existsAsync(delayRootKey(projectIdentifier, delayIdentifier)).then((result: number) => {
                 if (result !== 1) {
-                    throw new DelayNotFoundError("Delay " + delayIdentifier + " not found")
+                    throw new NotFoundError("Delay " + delayIdentifier + " not found")
                 }
             })
         })
@@ -599,28 +604,28 @@ export class RedisDataProvider implements IDataProvider {
     private getMappedTask(projectIdentifier: string, taskIdentifier: string): Promise<Task> {
         return this.getTask(projectIdentifier, taskIdentifier).then((task: Task) => {
             return task
-        }).catch((error: Error) => {
+        }).catch((error) => {
             return null
         })
     }
     private getMappedTaskResults(projectIdentifier: string, taskIdentifier: string): Promise<TaskResults> {
         return this.getTaskResults(projectIdentifier, taskIdentifier).then((taskResults: TaskResults) => {
             return taskResults
-        }).catch((error: Error) => {
+        }).catch((error) => {
             return null
         })
     }
     private getMappedModifier(projectIdentifier: string, modifierId: number): Promise<Modifier> {
         return this.getModifier(projectIdentifier, modifierId).then((modifier: Modifier) => {
             return modifier
-        }).catch((error: Error) => {
+        }).catch((error) => {
             return null
         })
     }
     private getMappedDelays(projectIdentifier: string, delayIdentifier: string): Promise<Delay> {
         return this.getDelay(projectIdentifier, delayIdentifier).then((delay: Delay) => {
             return delay
-        }).catch((error: Error) => {
+        }).catch((error) => {
             return null
         })
     }

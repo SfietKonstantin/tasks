@@ -1,167 +1,100 @@
 import * as express from "express"
-import { Project, Task, TaskResults, Modifier } from "../../common/types"
-import * as apitypes from "../../common//apitypes"
-import { IDataProvider, NotFoundError, ExistsError } from "../core/data/idataprovider"
-import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"
-import * as testdata from "../core/testdata"
-import * as maputils from "../../common/maputils"
+import { Api, RequestError } from "../core/api"
+import { Project, Modifier } from "../../common/types"
+import { ApiTask, ApiProjectTaskModifiers } from "../../common/apitypes"
+import { IDataProvider } from "../core/data/idataprovider"
+import { IGraph } from "../core/graph/types"
+import * as testdata from "../core/tests/testdata"
 
-class RequestError {
-    message: string
-    constructor(message: string) {
-        this.message = message
-    }
-}
-
-export class Api {
+export class ApiRoutes {
     private dataProvider: IDataProvider
     private graph: IGraph
-    constructor(dataProvider: IDataProvider, graph: IGraph) {
+    private api: Api
+    constructor(dataProvider: IDataProvider, graph: IGraph, api: Api) {
         this.dataProvider = dataProvider
         this.graph = graph
+        this.api = api
     }
     getProjects(req: express.Request, res: express.Response) {
-        this.dataProvider.getAllProjects().then((projects: Array<Project>) => {
+        this.api.getProjects().then((projects: Array<Project>) => {
             res.json({projects: projects})
-        }).catch((error) => {
-            res.status(500).json(error)
-        })
-    }
-    putProject(req: express.Request, res: express.Response) {
-        const project = req.body.project as Project
-        this.graph.addProject(project).then(() => {
-            res.sendStatus(301)
-        }).catch((error: Error) => {
-            if (error instanceof GraphError) {
-                res.status(400).json(error)
-            } else {
-                res.status(500).json(error)
-            }
+        }).catch((error: RequestError) => {
+            res.status(error.status).json(error.json)
         })
     }
     getProject(req: express.Request, res: express.Response) {
-        const projectIdentifier = String(req.params.projectIdentifier)
-        this.dataProvider.getProject(projectIdentifier).then((project: Project) => {
+        this.api.getProject(req.params.projectIdentifier).then((project: Project) => {
             res.json(project)
-        }).catch((error) => {
-            if (error instanceof NotFoundError) {
-                res.status(404).json(error)
-            } else {
-                res.status(500).json(error)
-            }
+        }).catch((error: RequestError) => {
+            res.status(error.status).json(error.json)
         })
     }
     getProjectTasks(req: express.Request, res: express.Response) {
-        const projectIdentifier = String(req.params.projectIdentifier)
-        this.dataProvider.getProjectTasks(projectIdentifier).then((tasks: Array<Task>) => {
-            tasks.filter((value: Task) => { return !!value })
-            Promise.all(tasks.map((task: Task) => {
-                return this.dataProvider.getTaskResults(task.projectIdentifier, task.identifier)
-            })).then((tasksResults: Array<TaskResults>) => {
-                res.json(apitypes.createApiTasks(tasks, tasksResults))
-            })
-        }).catch((error) => {
-            if (error instanceof NotFoundError) {
-                res.status(404).json(error)
-            } else {
-                res.status(500).json(error)
-            }
-        })
-    }
-    putTask(req: express.Request, res: express.Response) {
-        const apiTask = req.body.task as apitypes.ApiInputTask
-        const task = apitypes.createTaskFromApiImportTask(apiTask)
-        maputils.get(this.graph.nodes, task.projectIdentifier).addTask(task).then(() => {
-            res.sendStatus(301)
-        }).catch((error: Error) => {
-            if (error instanceof GraphError) {
-                res.status(400).json(error)
-            } else {
-                res.status(500).json(error)
-            }
+        this.api.getProjectTasks(req.params.projectIdentifier).then((tasks: Array<ApiTask>) => {
+            res.json(tasks)
+        }).catch((error: RequestError) => {
+            res.status(error.status).json(error.json)
         })
     }
     getTask(req: express.Request, res: express.Response) {
-        const projectIdentifier = String(req.params.projectIdentifier)
-        const taskIdentifier = String(req.params.taskIdentifier)
-        this.sendTask(projectIdentifier, taskIdentifier, res).catch((error: Error) => {
-            if (error instanceof NotFoundError) {
-                res.status(404).json(error)
-            } else {
-                res.status(500).json(error)
-            }
+        const projectIdentifier = req.params.projectIdentifier
+        const taskIdentifier = req.params.taskIdentifier
+        this.api.getTask(projectIdentifier, taskIdentifier).then((task: ApiProjectTaskModifiers) => {
+            res.json(task)
+        }).catch((error: RequestError) => {
+            res.status(error.status).json(error.json)
         })
     }
     isTaskImportant(req: express.Request, res: express.Response) {
-        const projectIdentifier = String(req.params.projectIdentifier)
-        const taskIdentifier = String(req.params.taskIdentifier)
-        this.dataProvider.isTaskImportant(projectIdentifier, taskIdentifier).then((result: boolean) => {
-            res.json({important: result})
-        }).catch((error: Error) => {
-            if (error instanceof NotFoundError) {
-                res.status(404).json(error)
-            } else {
-                res.status(500).json(error)
-            }
+        const projectIdentifier = req.params.projectIdentifier
+        const taskIdentifier = req.params.taskIdentifier
+        this.api.isTaskImportant(projectIdentifier, taskIdentifier).then((important: boolean) => {
+            res.json({important})
+        }).catch((error: RequestError) => {
+            res.status(error.status).json(error.json)
         })
     }
     putTaskImportant(req: express.Request, res: express.Response) {
-       this.setTaskImportant(req, res, true)
+        const projectIdentifier = req.params.projectIdentifier
+        const taskIdentifier = req.params.taskIdentifier
+        this.api.setTaskImportant(projectIdentifier, taskIdentifier, true).then((important: boolean) => {
+            res.json({important})
+        }).catch((error: RequestError) => {
+            res.status(error.status).json(error.json)
+        })
     }
     deleteTaskImportant(req: express.Request, res: express.Response) {
-       this.setTaskImportant(req, res, false)
+        const projectIdentifier = req.params.projectIdentifier
+        const taskIdentifier = req.params.taskIdentifier
+        this.api.setTaskImportant(projectIdentifier, taskIdentifier, false).then((important: boolean) => {
+            res.json({important})
+        }).catch((error: RequestError) => {
+            res.status(error.status).json(error.json)
+        })
     }
     putModifier(req: express.Request, res: express.Response) {
-        const modifier = req.body.modifier as Modifier
-        const taskIdentifier = String(req.body.taskIdentifier)
-
-        const projectNode = maputils.get(this.graph.nodes, modifier.projectIdentifier)
-        let taskNode = maputils.get(projectNode.nodes, taskIdentifier)
-        taskNode.addModifier(modifier).then(() => {
-            return this.sendTask(modifier.projectIdentifier, taskIdentifier, res)
-        }).catch((error: Error) => {
-            if (error instanceof GraphError) {
-                res.status(400).json(error)
-            } else {
-                res.status(500).json(error)
-            }
+        const modifier = req.body.modifier
+        const taskIdentifier = req.body.taskIdentifier
+        this.api.addModifier(modifier, taskIdentifier).then((task: ApiProjectTaskModifiers) => {
+            res.json(task)
+        }).catch((error: RequestError) => {
+            res.status(error.status).json(error.json)
+        })
+    }
+    putImport(req: express.Request, res: express.Response) {
+        const project = req.body.project
+        const tasks = req.body.tasks
+        this.api.import(project, tasks).then(() => {
+            res.sendStatus(301)
+        }).catch((error: RequestError) => {
+            res.status(error.status).json(error.json)
         })
     }
     getDemoData(req: express.Request, res: express.Response) {
-        testdata.fillTestData(this.dataProvider, this.graph)
-        res.sendStatus(200)
-    }
-    private setTaskImportant(req: express.Request, res: express.Response, important: boolean) {
-        const projectIdentifier = String(req.params.projectIdentifier)
-        const taskIdentifier = String(req.params.taskIdentifier)
-        this.dataProvider.setTaskImportant(projectIdentifier, taskIdentifier, important).then(() => {
-            res.json({important: important})
-        }).catch((error: Error) => {
-            if (error instanceof NotFoundError) {
-                res.status(404).json(error)
-            } else {
-                res.status(500).json(error)
-            }
-        })
-    }
-    private sendTask(projectIdentifier: string, taskIdentifier: string, res: express.Response): Promise<void> {
-        return this.dataProvider.getTask(projectIdentifier, taskIdentifier).then((task: Task) => {
-            return this.dataProvider.getProject(task.projectIdentifier).then((project: Project) => {
-                const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
-                let taskNode = maputils.get(projectNode.nodes, taskIdentifier)
-
-                const apiTask: apitypes.ApiProjectTaskModifiers = {
-                    project: project,
-                    task: apitypes.createApiTask(task, {
-                        projectIdentifier,
-                        taskIdentifier,
-                        startDate: taskNode.startDate,
-                        duration: taskNode.duration
-                    }),
-                    modifiers: taskNode.modifiers
-                }
-                res.json(apiTask)
-            })
+        testdata.fillTestData(this.dataProvider, this.graph).then(() => {
+            res.sendStatus(200)
+        }).catch((error) => {
+            res.sendStatus(500)
         })
     }
 }

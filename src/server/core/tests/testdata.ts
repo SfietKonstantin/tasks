@@ -1,6 +1,6 @@
-import { IDataProvider } from "./data/idataprovider"
-import { Project, Task, TaskRelation, TaskLocation } from "./../../common/types"
-import { IGraph, IProjectNode, ITaskNode } from "../core/graph/types"
+import { IDataProvider } from "../data/idataprovider"
+import { Project, Task, TaskRelation, TaskLocation } from "../../../common/types"
+import { IGraph, IProjectNode, ITaskNode } from "../graph/types"
 
 const fillProjectsData = (graph: IGraph): Promise<IProjectNode> => {
     const project: Project = {

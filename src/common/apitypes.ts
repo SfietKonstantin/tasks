@@ -2,8 +2,9 @@ import {
     Identifiable, ProjectBased,
     Project, Task, TaskResults, Modifier
 } from "./types"
+import { InputError } from "./errors"
 
-export interface ApiInputTask extends Identifiable, ProjectBased {
+export interface ApiInputTask extends Identifiable {
     name: string
     description: string
     estimatedStartDate: string
@@ -25,18 +26,7 @@ export interface ApiProjectTaskModifiers {
     modifiers: Array<Modifier>
 }
 
-export const createTaskFromApiImportTask = (apiImportTask: ApiInputTask): Task => {
-    return {
-        identifier: apiImportTask.identifier,
-        projectIdentifier: apiImportTask.projectIdentifier,
-        name: apiImportTask.name,
-        description: apiImportTask.description,
-        estimatedStartDate: new Date(apiImportTask.estimatedStartDate),
-        estimatedDuration: apiImportTask.estimatedDuration
-    }
-}
-
-export const createApiTask = (task: Task, taskResults: TaskResults): ApiTask => {
+export const createApiTask = (task: Task, startDate: Date, duration: number): ApiTask => {
     return {
         projectIdentifier: task.projectIdentifier,
         identifier: task.identifier,
@@ -44,8 +34,8 @@ export const createApiTask = (task: Task, taskResults: TaskResults): ApiTask => 
         description: task.description,
         estimatedStartDate: task.estimatedStartDate.toISOString(),
         estimatedDuration: task.estimatedDuration,
-        startDate: taskResults.startDate.toISOString(),
-        duration: taskResults.duration
+        startDate: startDate.toISOString(),
+        duration
     }
 }
 
@@ -69,14 +59,79 @@ export const createTaskResultsFromApiTask = (apiTask: ApiTask): TaskResults => {
     }
 }
 
-export const createApiTasks = (tasks: Array<Task>, tasksResults: Array<TaskResults>): Array<ApiTask> | null => {
-    if (tasks.length === tasksResults.length) {
-        let returned = new Array<ApiTask>()
-        for (let i = 0; i < tasks.length; ++i) {
-            returned.push(createApiTask(tasks[i], tasksResults[i]))
-        }
-        return returned
-    } else {
-        return null
+export const createProject = (input: any): Project => {
+    if (!input.hasOwnProperty("identifier")) {
+        throw new InputError("Property \"identifier\" cannot be found")
+    }
+    if (!input.hasOwnProperty("name")) {
+        throw new InputError("Property \"name\" cannot be found")
+    }
+    if (!input.hasOwnProperty("description")) {
+        throw new InputError("Property \"description\" cannot be found")
+    }
+    const identifier = input["identifier"]
+    if (typeof identifier !== "string") {
+        throw new InputError("Property \"identifier\" should be a string")
+    }
+    const name = input["name"]
+    if (typeof name !== "string") {
+        throw new InputError("Property \"name\" should be a string")
+    }
+    const description = input["description"]
+    if (typeof description !== "string") {
+        throw new InputError("Property \"description\" should be a string")
+    }
+
+    return {
+        identifier,
+        name,
+        description
+    }
+}
+
+export const createTask = (input: any, projectIdentifier: string): Task => {
+    if (!input.hasOwnProperty("identifier")) {
+        throw new InputError("Property \"identifier\" cannot be found")
+    }
+    if (!input.hasOwnProperty("name")) {
+        throw new InputError("Property \"name\" cannot be found")
+    }
+    if (!input.hasOwnProperty("description")) {
+        throw new InputError("Property \"description\" cannot be found")
+    }
+    if (!input.hasOwnProperty("estimatedStartDate")) {
+        throw new InputError("Property \"estimatedStartDate\" cannot be found")
+    }
+    if (!input.hasOwnProperty("estimatedDuration")) {
+        throw new InputError("Property \"estimatedDuration\" cannot be found")
+    }
+    const identifier = input["identifier"]
+    if (typeof identifier !== "string") {
+        throw new InputError("Property \"identifier\" should be a string")
+    }
+    const name = input["name"]
+    if (typeof name !== "string") {
+        throw new InputError("Property \"name\" should be a string")
+    }
+    const description = input["description"]
+    if (typeof description !== "string") {
+        throw new InputError("Property \"description\" should be a string")
+    }
+    const estimatedStartDate = input["estimatedStartDate"]
+    if (typeof estimatedStartDate !== "string") {
+        throw new InputError("Property \"estimatedStartDate\" should be a string")
+    }
+    const estimatedDuration = input["estimatedDuration"]
+    if (typeof estimatedDuration !== "number") {
+        throw new InputError("Property \"estimatedDuration\" should be a number")
+    }
+
+    return {
+        projectIdentifier,
+        identifier,
+        name,
+        description,
+        estimatedStartDate: new Date(estimatedStartDate),
+        estimatedDuration
     }
 }

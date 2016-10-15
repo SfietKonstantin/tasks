@@ -2,9 +2,8 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task, TaskRelation, TaskLocation } from "../../common/types"
-import {
-    CorruptedError, ExistsError, ProjectNotFoundError, TaskNotFoundError
-} from "../../server/core/data/idataprovider"
+import { NotFoundError, ExistsError } from "../../common/errors"
+import { CorruptedError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -58,7 +57,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -90,7 +89,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(tasks).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -114,7 +113,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(tasks).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -140,7 +139,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(tasks).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -180,7 +179,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -206,15 +205,15 @@ describe("Redis", () => {
                 ]
                 chai.expect(tasks).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid project", (done) => {
             db.getProjectTasks("project2").then(() => {
                 done(new Error("getProjectTasks should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(ProjectNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
@@ -254,7 +253,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -270,22 +269,22 @@ describe("Redis", () => {
                 }
                 chai.expect(task).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid task", (done) => {
             db.getTask("project", "task3").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TaskNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
         it("Should remove task name", (done) => {
             client.hdelAsync("task:project:task1", "name").then((result: number) => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -293,7 +292,7 @@ describe("Redis", () => {
             db.getTask("project", "task1").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
             })
@@ -303,14 +302,14 @@ describe("Redis", () => {
                 return client.hdelAsync("task:project:task1", "description")
             }).then((result: number) => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted task", (done) => {
             db.getTask("project", "task1").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
             })
@@ -320,14 +319,14 @@ describe("Redis", () => {
                 return client.delAsync("task:project:task1:estimatedStartDate")
             }).then((result: number) => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted task", (done) => {
             db.getTask("project", "task1").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
             })
@@ -337,14 +336,14 @@ describe("Redis", () => {
                 return client.delAsync("task:project:task1:estimatedDuration")
             }).then((result: number) => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted task", (done) => {
             db.getTask("project", "task1").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
             })
@@ -359,7 +358,7 @@ describe("Redis", () => {
         it("Should get an exception on corrupted task", (done) => {
             db.getTask("project", "task3").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.not.null
                 done()
             })
@@ -378,7 +377,7 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -394,7 +393,7 @@ describe("Redis", () => {
 
             db.addTask(task1).then(() => {
                done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -410,8 +409,8 @@ describe("Redis", () => {
 
             db.addTask(task2).then(() => {
                 done(new Error("addTask should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(ProjectNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
@@ -427,7 +426,7 @@ describe("Redis", () => {
 
             db.addTask(task1_2).then(() => {
                 done(new Error("addTask should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
                 done()
             })
@@ -467,7 +466,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -481,7 +480,7 @@ describe("Redis", () => {
                 lag: 0
             }).then(() => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -495,8 +494,8 @@ describe("Redis", () => {
                 lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TaskNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
@@ -510,8 +509,8 @@ describe("Redis", () => {
                 lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TaskNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
@@ -532,7 +531,7 @@ describe("Redis", () => {
                 lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.not.null
                 done()
             })
@@ -554,7 +553,7 @@ describe("Redis", () => {
                 lag: 0
             }).then(() => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -621,7 +620,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -647,15 +646,15 @@ describe("Redis", () => {
                 ]
                 chai.expect(taskRelations).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid task", (done) => {
             db.getTaskRelations("project", "task4").then((taskRelations: Array<TaskRelation>) => {
                 done(new Error("getTaskRelations should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TaskNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
@@ -669,7 +668,7 @@ describe("Redis", () => {
         it("Should get an exception on corrupted task", (done) => {
             db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
                 done(new Error("getTaskRelations should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.not.null
                 done()
             })

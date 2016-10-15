@@ -2,7 +2,6 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task, Modifier, TaskLocation } from "../../common/types"
-import { TaskNotFoundError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -64,7 +63,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -94,7 +93,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(modifiers).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -117,7 +116,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(modifiers).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -142,7 +141,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(modifiers).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })

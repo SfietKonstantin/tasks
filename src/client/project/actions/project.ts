@@ -3,7 +3,7 @@ import "whatwg-fetch"
 import { State } from "../types"
 import { ErrorAction, processError } from "../../common/actions/error"
 import { Project } from "../../../common/types"
-import { buildProject } from "../../../common/builders"
+import { createProject } from "../../../common/apitypes"
 
 export const PROJECT_REQUEST = "PROJECT_REQUEST"
 export const PROJECT_RECEIVE = "PROJECT_RECEIVE"
@@ -42,8 +42,8 @@ export const fetchProject = (projectIdentifier: string) => {
             return processError(response).then(() => {
                 return response.json()
             }).then((result: any) => {
-                dispatch(receiveProject(projectIdentifier, buildProject(result)))
-            }).catch((error: Error) => {
+                dispatch(receiveProject(projectIdentifier, createProject(result)))
+            }).catch((error) => {
                 dispatch(receiveFailureProject())
             })
         })

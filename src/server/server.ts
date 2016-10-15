@@ -4,8 +4,10 @@ import * as path from "path"
 import * as logger from "morgan"
 import * as http from "http"
 import * as redis from "redis"
+import * as winston from "winston"
 import { Graph } from "./core/graph/graph"
-import { Api } from "./routes/api"
+import { Api } from "./core/api"
+import { ApiRoutes } from "./routes/api"
 import { Routes } from "./routes/routes"
 import { IDataProvider } from "./core/data/idataprovider"
 import { RedisDataProvider } from "./core/data/redisdataprovider"
@@ -23,14 +25,16 @@ export class Server {
     private server: http.Server
     private dataProvider: IDataProvider
     private graph: Graph
-    private api: Api
+    private api: ApiRoutes
     private routes: Routes
 
     public constructor() {
+        this.initLog()
+
         this.dataProvider = new RedisDataProvider(redis.createClient())
         this.graph = new Graph(this.dataProvider)
 
-        this.api = new Api(this.dataProvider, this.graph)
+        this.api = new ApiRoutes(this.dataProvider, this.graph, new Api(this.dataProvider, this.graph))
         this.routes = new Routes(this.dataProvider)
         this.app = express()
         this.app.set("view engine", "ejs")
@@ -39,7 +43,7 @@ export class Server {
         // uncomment after placing your favicon in /public
         // this.app.use(favicon(path.join(__dirname, "public", "favicon.ico")))
         this.app.use(logger("dev"))
-        this.app.use(bodyParser.json())
+        this.app.use(bodyParser.json({limit: "10mb"}))
         this.app.use(bodyParser.urlencoded({extended: false}))
         this.app.use(express.static(path.join(__dirname, "..", "public")))
 
@@ -49,7 +53,6 @@ export class Server {
         this.app.get("/import/:source", this.routes.getImport.bind(this.routes))
 
         // API
-        this.app.put("/api/project", this.api.putProject.bind(this.api))
         this.app.get("/api/project/list", this.api.getProjects.bind(this.api))
         this.app.get("/api/project/:projectIdentifier", this.api.getProject.bind(this.api))
         this.app.get("/api/project/:projectIdentifier/tasks", this.api.getProjectTasks.bind(this.api))
@@ -60,8 +63,8 @@ export class Server {
                      this.api.putTaskImportant.bind(this.api))
         this.app.delete("/api/project/:projectIdentifier/task/:taskIdentifier/important",
                      this.api.deleteTaskImportant.bind(this.api))
-        this.app.put("/api/task", this.api.putTask.bind(this.api))
         this.app.put("/api/modifier", this.api.putModifier.bind(this.api))
+        this.app.put("/api/import", this.api.putImport.bind(this.api))
 
         // Demo
         this.app.get("/demo/data", this.api.getDemoData.bind(this.api))
@@ -77,6 +80,15 @@ export class Server {
             this.server.listen(port)
             this.server.on("error", this.onServerError.bind(this))
             this.server.on("listening", this.onServerListening.bind(this))
+        })
+    }
+
+    private initLog() {
+        winston.remove(winston.transports.Console)
+        winston.add(winston.transports.Console, {
+            timestamp: true,
+            level: "debug",
+            colorize: true
         })
     }
 
@@ -115,6 +127,6 @@ export class Server {
     }
 
     private onServerListening() {
-        console.log("Listening on " + this.server.address().port)
+        winston.info("Server started on " + this.server.address().port)
     }
 }

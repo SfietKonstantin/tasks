@@ -1,4 +1,5 @@
 import { Project, Task, TaskRelation, TaskResults, TaskLocation, Modifier } from "../../../common/types"
+import { ExistsError, NotFoundError, InputError } from "../../../common/errors"
 import { GraphError, ITaskNode, IProjectNode, IGraph } from "./types"
 import { IDataProvider } from "../data/idataprovider"
 import * as dateutils from "../../../common/dateutils"
@@ -39,7 +40,7 @@ export class TaskNode implements ITaskNode {
     }
     addModifier(modifier: Modifier): Promise<Modifier> {
         if (modifier.projectIdentifier !== this.projectIdentifier) {
-            return Promise.reject(new GraphError("Invalid project for modifier"))
+            return Promise.reject(new InputError("Invalid project for modifier"))
         }
         return this.dataProvider.addModifier(modifier).then((id: number) => {
             return this.dataProvider.setModifierForTask(this.projectIdentifier, id, this.taskIdentifier)
@@ -63,7 +64,7 @@ export class TaskNode implements ITaskNode {
     private markAndCompute(markedNodes: Set<ITaskNode>) {
         return Promise.resolve().then(() => {
             if (markedNodes.has(this)) {
-                throw new GraphError("Cyclic dependency found")
+                throw new GraphError("Cyclic dependency found involving task \"" + this.taskIdentifier + "\"")
             }
             markedNodes.add(this)
             const currentEndDate = this.getEndDate()
@@ -93,7 +94,7 @@ export class TaskNode implements ITaskNode {
             })
 
             if (parentEndDates.length === 0) {
-                throw new GraphError("Invalid input")
+                throw new GraphError("Task \"" + this.taskIdentifier + "\" contains invalid parent dates")
             }
             this.startDate = dateutils.addDays(new Date(Math.max.apply(null, parentEndDates)),
                                                Math.max(beginningSum, 0))
@@ -178,10 +179,10 @@ export class ProjectNode implements IProjectNode {
     }
     addTask(task: Task): Promise<ITaskNode> {
         if (task.projectIdentifier !== this.projectIdentifier) {
-            return Promise.reject(new GraphError("Invalid project for task"))
+            return Promise.reject(new InputError("Invalid project for task"))
         }
         if (this.nodes.has(task.identifier)) {
-            return Promise.reject(new GraphError("Task is already present in project"))
+            return Promise.reject(new ExistsError("Task \"" + task.identifier + "\" is already present in project"))
         }
         return this.dataProvider.addTask(task).then(() => {
             const taskResults: TaskResults = {
@@ -193,20 +194,28 @@ export class ProjectNode implements IProjectNode {
             return this.dataProvider.setTaskResults(taskResults)
         }).then(() => {
             const node = new TaskNode(this.dataProvider, task.projectIdentifier, task.identifier,
-                                        task.estimatedStartDate, task.estimatedDuration,
-                                        task.estimatedStartDate, task.estimatedDuration)
+                                      task.estimatedStartDate, task.estimatedDuration,
+                                      task.estimatedStartDate, task.estimatedDuration)
             this.nodes.set(task.identifier, node)
             return node
         })
     }
     addRelation(relation: TaskRelation): Promise<void> {
+        if (relation.projectIdentifier !== this.projectIdentifier) {
+            return Promise.reject(new InputError("Invalid project for relation"))
+        }
         if (!this.nodes.has(relation.previous)) {
-            return Promise.reject(new GraphError("Task is not present in project"))
+            return Promise.reject(new NotFoundError("Task \"" + relation.previous + "\" is not present in project"))
         }
         if (!this.nodes.has(relation.next)) {
-            return Promise.reject(new GraphError("Task is not present in project"))
+            return Promise.reject(new NotFoundError("Task \"" + relation.next + "\" is not present in project"))
         }
-        return this.dataProvider.addTaskRelation(relation)
+
+        return this.dataProvider.addTaskRelation(relation).then(() => {
+            const child = maputils.get(this.nodes, relation.next) as TaskNode
+            let taskNode = maputils.get(this.nodes, relation.previous) as TaskNode
+            return taskNode.addChild(child, relation)
+        })
     }
 }
 
@@ -229,7 +238,7 @@ export class Graph implements IGraph {
     }
     addProject(project: Project): Promise<IProjectNode> {
         if (this.nodes.has(project.identifier)) {
-            return Promise.reject(new GraphError("Project is already present in graph"))
+            return Promise.reject(new ExistsError("Project \"" + project.identifier + "\" is already present"))
         }
         return this.dataProvider.addProject(project).then(() => {
             const node = new ProjectNode(this.dataProvider, project.identifier)

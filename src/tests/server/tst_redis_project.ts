@@ -2,9 +2,8 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task } from "../../common/types"
-import {
-    CorruptedError, ExistsError, ProjectNotFoundError
-} from "../../server/core/data/idataprovider"
+import { NotFoundError, ExistsError } from "../../common/errors"
+import { CorruptedError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -33,7 +32,7 @@ describe("Redis", () => {
             db.getAllProjects().then((projects: Array<Project>) => {
                 chai.expect(projects).to.empty
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -54,7 +53,7 @@ describe("Redis", () => {
                 return db.addProject(project2)
             }).then(() => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -74,7 +73,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(projects).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -94,7 +93,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(projects).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -116,7 +115,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(projects).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -133,7 +132,7 @@ describe("Redis", () => {
             db.getAllProjects().then((projects: Array<Project>) => {
                 chai.expect(projects).to.empty
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -160,7 +159,7 @@ describe("Redis", () => {
                 return db.addProject(project2)
             }).then(() => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -173,29 +172,29 @@ describe("Redis", () => {
                 }
                 chai.expect(project).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid project", (done) => {
             db.getProject("project3").then((project: Project) => {
                 done(new Error("getProject should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(ProjectNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
         it("Should remove project name", (done) => {
             client.hdelAsync("project:project1", "name").then((result: number) => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted project", (done) => {
             db.getProject("project1").then((project: Project) => {
                 done(new Error("getProject should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
             })
@@ -205,14 +204,14 @@ describe("Redis", () => {
                 return client.hdelAsync("project:project1", "description")
             }).then((result: number) => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted project", (done) => {
             db.getProject("project1").then((project: Project) => {
                 done(new Error("getProject should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
             })
@@ -227,7 +226,7 @@ describe("Redis", () => {
         it("Should get an exception on corrupted project", (done) => {
             db.getProject("project3").then((project: Project) => {
                 done(new Error("getProject should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.not.null
                 done()
             })
@@ -246,7 +245,7 @@ describe("Redis", () => {
 
             db.addProject(project1).then(() => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -259,7 +258,7 @@ describe("Redis", () => {
 
             db.addProject(project1_2).then(() => {
                 done(new Error("addProject should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
                 done()
             })

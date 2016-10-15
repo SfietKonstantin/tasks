@@ -65,7 +65,7 @@ gulp.task("build:common", function() {
 })
 
 gulp.task("watch:common", ["build:common"], function() {
-     gulp.watch("src/common/**/*.ts", ["build:common"]);
+    gulp.watch("src/common/**/*.ts", ["build:common"]);
 })
 
 gulp.task("build:server", function() {
@@ -75,7 +75,7 @@ gulp.task("build:server", function() {
 })
 
 gulp.task("watch:server", ["build:server"], function() {
-     gulp.watch("src/server/**/*.ts", ["build:server"]);
+    gulp.watch("src/server/**/*.ts", ["build:server"]);
 })
 
 gulp.task("build:server:tests", function() {
@@ -122,7 +122,7 @@ gulp.task("build:client:tests", function() {
 })
 
 gulp.task("watch:client:tests", ["build:client:tests"], function() {
-     gulp.watch("src/tests/client/**/*.ts*", ["build:client:tests"]);
+    gulp.watch("src/tests/client/**/*.ts*", ["build:client:tests"]);
 })
 
 gulp.task("test:pre", function () {
@@ -130,7 +130,7 @@ gulp.task("test:pre", function () {
     var f = filter([
         "**",
         "!tests/server/server.js",
-        "!tests/server/core/testdata.js",
+        "!tests/server/core/tests/testdata.js",
         "!tests/server/routes/**/*.js",
         "!tests/client/project.js",
         "!tests/client/task.js",

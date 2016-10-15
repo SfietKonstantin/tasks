@@ -5,10 +5,9 @@ import {
     TASKS_IMPORT_BEGIN,
     TASKS_IMPORT_END,
     TASKS_IMPORT_INVALID_FORMAT,
-    TASKS_DISMISS_INVALID_FORMAT,
-    TASKS_REQUEST_ADD,
-    TASKS_RECEIVE_ADD
+    TASKS_DISMISS_INVALID_FORMAT
 } from "../actions/tasks"
+import { SUBMIT_REQUEST, SUBMIT_RECEIVE } from "../actions/submit"
 
 const initialState: TasksState = {
     tasks: new Map<string, PrimaveraTask>(),
@@ -46,16 +45,16 @@ export const tasksReducer = (state: TasksState = initialState, action: Action): 
             return Object.assign({}, state, {
                 invalidFormat: false
             })
-        case TASKS_REQUEST_ADD:
+        case SUBMIT_REQUEST:
             return Object.assign({}, state, {
                 isImporting: true
             })
-        case TASKS_RECEIVE_ADD:
+        case SUBMIT_RECEIVE:
             return Object.assign({}, state, {
                 tasks: new Map<string, PrimaveraTask>(),
                 warnings: new Array<string>(),
                 isImporting: false,
-                invalidFormat: true
+                invalidFormat: false
             })
         default:
             return state

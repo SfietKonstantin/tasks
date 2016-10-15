@@ -6,42 +6,6 @@ export class CorruptedError extends Error implements Error {
     }
 }
 
-export class ExistsError extends Error implements Error {
-    constructor(message: string) {
-        super(message)
-    }
-}
-
-export class NotFoundError extends Error implements Error {
-    constructor(message: string) {
-        super(message)
-    }
-}
-
-export class ProjectNotFoundError extends NotFoundError {
-    constructor(message: string) {
-        super(message)
-    }
-}
-
-export class TaskNotFoundError extends NotFoundError {
-    constructor(message: string) {
-        super(message)
-    }
-}
-
-export class ModifierNotFoundError extends NotFoundError {
-    constructor(message: string) {
-        super(message)
-    }
-}
-
-export class DelayNotFoundError extends NotFoundError {
-    constructor(message: string) {
-        super(message)
-    }
-}
-
 export interface IDataProvider {
     getAllProjects(): Promise<Array<Project>>
     getProject(projectIdentifier: string): Promise<Project>

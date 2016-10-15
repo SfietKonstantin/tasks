@@ -5,8 +5,9 @@ import * as ReactRedux from "react-redux"
 import { Grid, Col, ButtonGroup, Button, Alert, Form, FormGroup, FormControl, ControlLabel } from "react-bootstrap"
 import { State, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "../types"
 import { defineProject, addProject } from "../actions/project"
-import { importTasks, dismissInvalidTasksFormat, addTasks } from "../actions/tasks"
+import { importTasks, dismissInvalidTasksFormat } from "../actions/tasks"
 import { importRelations, dismissInvalidRelationsFormat } from "../actions/relations"
+import { submit } from "../actions/submit"
 import { Project } from "../../../../common/types"
 
 interface MainProperties {
@@ -219,14 +220,6 @@ const mapStateToProps = (state: State) => {
     }
 }
 
-const addProjectAndTasks = (project: Project, tasks: Map<string, PrimaveraTask>) => {
-    return (dispatch: Dispatch<State>) => {
-        return addProject(project)(dispatch).then(() => {
-            return addTasks(project.identifier, tasks)(dispatch)
-        })
-    }
-}
-
 const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
         onProjectChanged: (projectIdentifier: string, name: string, description: string) => {
@@ -245,7 +238,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>) => {
             dispatch(dismissInvalidRelationsFormat())
         },
         onSubmit: (project: Project, tasks: Map<string, PrimaveraTask>) => {
-            dispatch(addProjectAndTasks(project, tasks))
+            dispatch(submit(project, Array.from(tasks.values()), []))
         },
         dispatch
     }

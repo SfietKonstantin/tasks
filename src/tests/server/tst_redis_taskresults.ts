@@ -2,7 +2,8 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task, Modifier, TaskResults } from "../../common/types"
-import { CorruptedError, TaskNotFoundError } from "../../server/core/data/idataprovider"
+import { NotFoundError } from "../../common/errors"
+import { CorruptedError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -54,7 +55,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -68,15 +69,15 @@ describe("Redis", () => {
                 }
                 chai.expect(result).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid task", (done) => {
             db.getTaskResults("project", "task2").then((result: TaskResults) => {
                 done(new Error("getTaskResults should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TaskNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
@@ -97,7 +98,7 @@ describe("Redis", () => {
             db.getTaskResults("project", "task").then((result: TaskResults) => {
                 done(new Error("getTaskResults should not be a success"))
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
             })
@@ -117,7 +118,7 @@ describe("Redis", () => {
             db.getTaskResults("project", "task").then((result: TaskResults) => {
                 done(new Error("getTaskResults should not be a success"))
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
             })
@@ -157,7 +158,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -178,7 +179,7 @@ describe("Redis", () => {
                 return db.setTaskResults(taskResults2).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -203,7 +204,7 @@ describe("Redis", () => {
                 chai.expect(result).to.deep.equal(expected)
             }).then(() => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -216,8 +217,8 @@ describe("Redis", () => {
             }
             db.setTaskResults(taskResults).then(() => {
                 done(new Error("setTaskResults should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TaskNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })

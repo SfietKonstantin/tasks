@@ -2,9 +2,8 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Delay } from "../../common/types"
-import {
-    CorruptedError, ExistsError, ProjectNotFoundError, DelayNotFoundError
-} from "../../server/core/data/idataprovider"
+import { NotFoundError, ExistsError } from "../../common/errors"
+import { CorruptedError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -56,7 +55,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -86,7 +85,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(delays).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -109,7 +108,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(delays).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -134,7 +133,7 @@ describe("Redis", () => {
                 ]
                 chai.expect(delays).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -172,7 +171,7 @@ describe("Redis", () => {
                 }).then(() => {
                     done()
                 })
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -187,22 +186,22 @@ describe("Redis", () => {
                 }
                 chai.expect(delay).to.deep.equal(expected)
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid delay", (done) => {
             db.getDelay("project", "delay3").then((delay: Delay) => {
                 done(new Error("getDelay should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(DelayNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
         it("Should remove delay properties", (done) => {
             client.hdelAsync("delay:project:delay1", "name").then((result: number) => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -210,7 +209,7 @@ describe("Redis", () => {
             db.getDelay("project", "delay1").then((delay: Delay) => {
                 done(new Error("getDelay should not be a success"))
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
             })
@@ -225,7 +224,7 @@ describe("Redis", () => {
         it("Should get an exception on corrupted delay", (done) => {
             db.getDelay("project", "delay3").then((delay: Delay) => {
                 done(new Error("getDelay should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.not.null
                 done()
             })
@@ -244,7 +243,7 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -259,7 +258,7 @@ describe("Redis", () => {
 
             db.addDelay(delay1).then(() => {
                done()
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 done(error)
             })
         })
@@ -274,8 +273,8 @@ describe("Redis", () => {
 
             db.addDelay(delay2).then(() => {
                 done(new Error("addDelay should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(ProjectNotFoundError)
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
                 done()
             })
         })
@@ -290,7 +289,7 @@ describe("Redis", () => {
 
             db.addDelay(delay1_2).then(() => {
                 done(new Error("addDelay should not be a success"))
-            }).catch((error: Error) => {
+            }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
                 done()
             })
