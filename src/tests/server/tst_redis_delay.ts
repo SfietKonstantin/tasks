@@ -61,13 +61,13 @@ describe("Redis", () => {
             })
         })
         it("Should get an empty list", (done) => {
-            db.getDelays([]).then((delays: Array<Delay>) => {
+            db.getDelays("project", []).then((delays: Array<Delay>) => {
                 chai.expect(delays).to.length(0)
                 done()
             })
         })
         it("Should get delays", (done) => {
-            db.getDelays(["delay2", "delay1"]).then((delays: Array<Delay>) => {
+            db.getDelays("project", ["delay2", "delay1"]).then((delays: Array<Delay>) => {
                 chai.expect(delays).to.length(2)
                 chai.expect(delays[0].identifier).to.equals("delay2")
                 chai.expect(delays[0].name).to.equals("Delay 2")
@@ -83,12 +83,12 @@ describe("Redis", () => {
             })
         })
         it("Should remove delay", (done) => {
-            client.delAsync("delay:delay1").then((result) => {
+            client.delAsync("delay:project:delay1").then((result) => {
                 done()
             })
         })
         it("Should get valid delays", (done) => {
-            db.getDelays(["delay2", "delay1"]).then((delays: Array<Delay>) => {
+            db.getDelays("project", ["delay2", "delay1"]).then((delays: Array<Delay>) => {
                 chai.expect(delays).to.length(2)
                 chai.expect(delays[0].identifier).to.equals("delay2")
                 chai.expect(delays[0].name).to.equals("Delay 2")
@@ -101,14 +101,14 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt delay properties", (done) => {
-            client.setAsync("delay:delay1", "test").then((result) => {
+            client.setAsync("delay:project:delay1", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should get valid delays", (done) => {
-            db.getDelays(["delay2", "delay1"]).then((delays: Array<Delay>) => {
+            db.getDelays("project", ["delay2", "delay1"]).then((delays: Array<Delay>) => {
                 chai.expect(delays).to.length(2)
                 chai.expect(delays[0].identifier).to.equals("delay2")
                 chai.expect(delays[0].name).to.equals("Delay 2")
@@ -159,7 +159,7 @@ describe("Redis", () => {
             })
         })
         it("Should get delay", (done) => {
-            db.getDelay("delay1").then((delay: Delay) => {
+            db.getDelay("project", "delay1").then((delay: Delay) => {
                 chai.expect(delay.identifier).to.equals("delay1")
                 chai.expect(delay.name).to.equals("Delay 1")
                 chai.expect(delay.description).to.equals("Description 1")
@@ -170,7 +170,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid delay", (done) => {
-            db.getDelay("delay3").then((delay: Delay) => {
+            db.getDelay("project", "delay3").then((delay: Delay) => {
                 done(new Error("getDelay should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(DelayNotFoundError)
@@ -178,14 +178,14 @@ describe("Redis", () => {
             })
         })
         it("Should remove delay properties", (done) => {
-            client.hdelAsync("delay:delay1", "name").then((result: number) => {
+            client.hdelAsync("delay:project:delay1", "name").then((result: number) => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted delay", (done) => {
-            db.getDelay("delay1").then((delay: Delay) => {
+            db.getDelay("project", "delay1").then((delay: Delay) => {
                 done(new Error("getDelay should not be a success"))
                 done()
             }).catch((error: Error) => {
@@ -194,14 +194,14 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt delay properties", (done) => {
-            client.setAsync("delay:delay3", "test").then((result) => {
+            client.setAsync("delay:project:delay3", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted delay", (done) => {
-            db.getDelay("delay3").then((delay: Delay) => {
+            db.getDelay("project", "delay3").then((delay: Delay) => {
                 done(new Error("getDelay should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null

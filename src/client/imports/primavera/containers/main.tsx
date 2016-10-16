@@ -21,7 +21,7 @@ interface MainProperties {
     invalidRelationsFormat: boolean
     onTasksFileSelected: (file: File) => void
     onRelationsFileSelected: (file: File) => void
-    onProjectChanged: (identifier: string, name: string, description: string) => void
+    onProjectChanged: (projectIdentifier: string, name: string, description: string) => void
     onDismissInvalidTasksFormat: () => void
     onDismissInvalidRelationsFormat: () => void
     onSubmit: (project: Project, tasks: Map<string, PrimaveraTask>) => void
@@ -42,14 +42,14 @@ class UnconnectedMain extends React.Component<MainProperties, {}> {
                 Invalid format for relations. Please check that you are trying to import a CSV file.
             </Alert>
         }
-        const identifierLength = this.props.project.identifier.length
+        const projectIdentifierLength = this.props.project.identifier.length
         const tasksLength = this.props.tasks.size + this.props.delays.size
         const relationsLength = this.props.relations.length
 
-        const identifierValidation: "success" | "error" = identifierLength > 0 ? "success" : "error"
+        const identifierValidation: "success" | "error" = projectIdentifierLength > 0 ? "success" : "error"
         const tasksColor = tasksLength > 0 ? "success" : "default"
         const relationsColor = relationsLength > 0 ? "success" : "default"
-        const canImport = identifierLength > 0
+        const canImport = projectIdentifierLength > 0
                           && this.props.project.name.length > 0
                           && tasksLength > 0 && relationsLength > 0
         const tasksButtonText = tasksLength > 0 ? "Imported " + tasksLength + " tasks" : "Import tasks"
@@ -195,7 +195,7 @@ const mapStateToProps = (state: State) => {
                             return false
                         } else {
                             warnings.push("\"" + relation.previous + "\" is an end milestone and \"" + relation.next
-                                            + "\" is a task with a different starting time and this is not yet supported")
+                                          + "\" is a task with a different starting time and this is not yet supported")
                         }
                     }
                 }
@@ -229,8 +229,8 @@ const addProjectAndTasks = (project: Project, tasks: Map<string, PrimaveraTask>)
 
 const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
-        onProjectChanged: (identifier: string, name: string, description: string) => {
-            dispatch(defineProject(identifier, name, description))
+        onProjectChanged: (projectIdentifier: string, name: string, description: string) => {
+            dispatch(defineProject(projectIdentifier, name, description))
         },
         onTasksFileSelected: (file: File) => {
             dispatch(importTasks(file))

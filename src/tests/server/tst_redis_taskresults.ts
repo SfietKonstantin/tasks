@@ -2,7 +2,7 @@ import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task, Modifier, TaskResults } from "../../common/types"
-import { CorruptedError, TaskNotFoundError, TransactionError } from "../../server/core/data/idataprovider"
+import { CorruptedError, TaskNotFoundError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -44,10 +44,13 @@ describe("Redis", () => {
                 }
 
                 return db.addTask(task).then(() => {
-                    let taskResults: Array<TaskResults> = [
-                        {taskIdentifier: "task", startDate: new Date(2016, 9, 15), duration: 40}
-                    ]
-                    return db.setTasksResults(taskResults)
+                    let taskResults: TaskResults = {
+                        projectIdentifier: "project",
+                        taskIdentifier: "task",
+                        startDate: new Date(2016, 9, 15),
+                        duration: 40
+                    }
+                    return db.setTaskResults(taskResults)
                 }).then(() => {
                     done()
                 })
@@ -56,7 +59,7 @@ describe("Redis", () => {
             })
         })
         it("Should get task results", (done) => {
-            db.getTaskResults("task").then((result: TaskResults) => {
+            db.getTaskResults("project", "task").then((result: TaskResults) => {
                 chai.expect(result.taskIdentifier).to.equals("task")
                 chai.expect(result.startDate.getTime()).to.equals(new Date(2016, 9, 15).getTime())
                 chai.expect(result.duration).to.equals(40)
@@ -66,7 +69,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.getTaskResults("task2").then((result: TaskResults) => {
+            db.getTaskResults("project", "task2").then((result: TaskResults) => {
                 done(new Error("getTaskResults should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
@@ -74,12 +77,12 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt task results properties", (done) => {
-            client.delAsync("task:task:startDate").then((result) => {
-                return client.hmsetAsync("task:task:startDate", {"test": "test"})
+            client.delAsync("task:project:task:startDate").then((result) => {
+                return client.hmsetAsync("task:project:task:startDate", {"test": "test"})
             }).then((result) => {
-                return client.delAsync("task:task:duration")
+                return client.delAsync("task:project:task:duration")
             }).then((result) => {
-                return client.hmsetAsync("task:task:duration", {"test": "test"})
+                return client.hmsetAsync("task:project:task:duration", {"test": "test"})
             }).then((result) => {
                 done()
             }).catch((error) => {
@@ -87,7 +90,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task results", (done) => {
-            db.getTaskResults("task").then((result: TaskResults) => {
+            db.getTaskResults("project", "task").then((result: TaskResults) => {
                 done(new Error("getTaskResults should not be a success"))
                 done()
             }).catch((error: Error) => {
@@ -96,10 +99,10 @@ describe("Redis", () => {
             })
         })
         it("Should delete task results properties", (done) => {
-            client.delAsync("task:1:startDate").then((result) => {
-                return client.hmsetAsync("task:task:startDate", {"test": "test"})
+            client.delAsync("task:project:task:startDate").then((result) => {
+                return client.hmsetAsync("task:project:task:startDate", {"test": "test"})
             }).then((result) => {
-                return client.delAsync("task:task:duration")
+                return client.delAsync("task:project:task:duration")
             }).then((result) => {
                 done()
             }).catch((error) => {
@@ -107,7 +110,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task results", (done) => {
-            db.getTaskResults("task").then((result: TaskResults) => {
+            db.getTaskResults("project", "task").then((result: TaskResults) => {
                 done(new Error("getTaskResults should not be a success"))
                 done()
             }).catch((error: Error) => {
@@ -119,7 +122,7 @@ describe("Redis", () => {
             client.flushdb()
         })
     })
-    describe("setTasksResults", () => {
+    describe("setTaskResults", () => {
         it("Should add some testing data", (done) => {
             const project: Project = {
                 identifier: "project",
@@ -155,23 +158,33 @@ describe("Redis", () => {
             })
         })
         it("Should set task results", (done) => {
-            let taskResults: Array<TaskResults> = [
-                {taskIdentifier: "task2", startDate: new Date(2016, 10, 2), duration: 61},
-                {taskIdentifier: "task1", startDate: new Date(2016, 9, 16), duration: 45}
-            ]
-            db.setTasksResults(taskResults).then(() => {
-                done()
+            const taskResults1: TaskResults = {
+                projectIdentifier: "project",
+                taskIdentifier: "task2",
+                startDate: new Date(2016, 10, 2),
+                duration: 61
+            }
+            const taskResults2: TaskResults = {
+                projectIdentifier: "project",
+                taskIdentifier: "task1",
+                startDate: new Date(2016, 9, 16),
+                duration: 45
+            }
+            db.setTaskResults(taskResults1).then(() => {
+                return db.setTaskResults(taskResults2).then(() => {
+                    done()
+                })
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get task results", (done) => {
-            db.getTaskResults("task1").then((result: TaskResults) => {
+            db.getTaskResults("project", "task1").then((result: TaskResults) => {
                 chai.expect(result.taskIdentifier).to.equals("task1")
                 chai.expect(result.startDate.getTime()).to.equals(new Date(2016, 9, 16).getTime())
                 chai.expect(result.duration).to.equals(45)
             }).then(() => {
-                return db.getTaskResults("task2")
+                return db.getTaskResults("project", "task2")
             }).then((result: TaskResults) => {
                 chai.expect(result.taskIdentifier).to.equals("task2")
                 chai.expect(result.startDate.getTime()).to.equals(new Date(2016, 10, 2).getTime())
@@ -183,73 +196,16 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            let taskResults: Array<TaskResults> = [
-                {taskIdentifier: "task2", startDate: new Date(2016, 10, 1), duration: 60},
-                {taskIdentifier: "task3", startDate: new Date(2016, 9, 15), duration: 40}
-            ]
-            db.setTasksResults(taskResults).then(() => {
-                done(new Error("setTasksResults should not be a success"))
+            let taskResults: TaskResults = {
+                projectIdentifier: "project",
+                taskIdentifier: "task3",
+                startDate: new Date(2016, 9, 15),
+                duration: 40
+            }
+            db.setTaskResults(taskResults).then(() => {
+                done(new Error("setTaskResults should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
-                done()
-            })
-        })
-        it("Should get an exception on transactional error (caused by adding modifiers)", (done) => {
-            let otherClient = redis.createClient()
-            otherClient.select(3)
-            let otherDb = new RedisDataProvider(otherClient)
-
-            db.watchTasksModifiers(["task1"]).then(() => {
-                let modifier: Modifier = {
-                    name: "Transactional modifier",
-                    description: "Transactional modifier description",
-                    duration: 10
-                }
-                return otherDb.addModifier(modifier)
-            }).then((id: number) => {
-                return otherDb.setModifierForTask(id, "task1")
-            }).then(() => {
-                let taskResults: Array<TaskResults> = [
-                    {taskIdentifier: "task1", startDate: new Date(2016, 9, 16), duration: 45},
-                    {taskIdentifier: "task2", startDate: new Date(2016, 10, 2), duration: 61}
-                ]
-                return db.setTasksResults(taskResults)
-            }).then(() => {
-                done(new Error("setTasksResults should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TransactionError)
-                otherClient.quit()
-                done()
-            })
-        })
-        xit("Should get an exception on transactional error (caused by updating modifiers)", (done) => {
-
-        })
-        it("Should get an exception on transactional error (caused by modifying node)", (done) => {
-            let otherClient = redis.createClient()
-            otherClient.select(3)
-            let otherDb = new RedisDataProvider(otherClient)
-
-            db.watchTasksModifiers(["task1"]).then(() => {
-                const modifier: Modifier = {
-                    name: "Transactional modifier",
-                    description: "Transactional modifier description",
-                    duration: 10
-                }
-                return otherDb.addModifier(modifier)
-            }).then((id: number) => {
-                return otherDb.setModifierForTask(id, "task1")
-            }).then(() => {
-                let taskResults: Array<TaskResults> = [
-                    {taskIdentifier: "task1", startDate: new Date(2016, 9, 16), duration: 45},
-                    {taskIdentifier: "task2", startDate: new Date(2016, 10, 2), duration: 61}
-                ]
-                return db.setTasksResults(taskResults)
-            }).then(() => {
-                done(new Error("setTasksResults should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TransactionError)
-                otherClient.quit()
                 done()
             })
         })

@@ -63,19 +63,37 @@ describe("Delay", () => {
                 }))
             }).then(() => {
                 return Promise.all([
-                    db.setTaskRelation("1root", "2short"),
-                    db.setTaskRelation("1root", "3long"),
-                    db.setTaskRelation("2short", "4reducing"),
-                    db.setTaskRelation("3long", "4reducing")
+                    db.setTaskRelation("project", "1root", "2short"),
+                    db.setTaskRelation("project", "1root", "3long"),
+                    db.setTaskRelation("project", "2short", "4reducing"),
+                    db.setTaskRelation("project", "3long", "4reducing")
                 ])
             }).then(() => {
                 let taskResults: Array<TaskResults> = [
-                    {taskIdentifier: "1root", startDate: new Date(2016, 9, 2), duration: 16},
-                    {taskIdentifier: "2short", startDate: new Date(2016, 9, 16), duration: 15},
-                    {taskIdentifier: "3long", startDate: new Date(2016, 9, 18), duration: 30},
-                    {taskIdentifier: "4reducing", startDate: new Date(2016, 10, 17), duration: 16}
+                    {
+                        projectIdentifier: "project",
+                        taskIdentifier: "1root",
+                        startDate: new Date(2016, 9, 2),
+                        duration: 16
+                    },
+                    {
+                        projectIdentifier: "project",
+                        taskIdentifier: "2short",
+                        startDate: new Date(2016, 9, 16),
+                        duration: 15},
+                    {
+                        projectIdentifier: "project",
+                        taskIdentifier: "3long",
+                        startDate: new Date(2016, 9, 18),
+                        duration: 30},
+                    {
+                        projectIdentifier: "project",
+                        taskIdentifier: "4reducing",
+                        startDate: new Date(2016, 10, 17),
+                        duration: 16
+                    }
                 ]
-                return db.setTasksResults(taskResults)
+                return Promise.all(taskResults.map(db.setTaskResults.bind(db)))
             }).then(() => {
                 const delay1: Delay = {
                     projectIdentifier: "project",
@@ -103,9 +121,9 @@ describe("Delay", () => {
                     return db.addDelay(delay)
                 }))
             }).then(() => {
-                return Promise.all([db.setDelayTaskRelation("delay1", "1root"),
-                                    db.setDelayTaskRelation("delay2", "2short"),
-                                    db.setDelayTaskRelation("delay4", "4reducing")])
+                return Promise.all([db.setDelayTaskRelation("project", "delay1", "1root"),
+                                    db.setDelayTaskRelation("project", "delay2", "2short"),
+                                    db.setDelayTaskRelation("project", "delay4", "4reducing")])
             }).then(() => {
                 done()
             }).catch((error: Error) => {
@@ -113,11 +131,11 @@ describe("Delay", () => {
             })
         })
         it("Should get delay info", (done) => {
-            let graph = new GraphPersistence(db)
+            let graph = new GraphPersistence("project", db)
             graph.loadGraph("1root").then(() => {
                 return graph.loadData()
             }).then(() => {
-                return delay.getImpactInfo(graph.root, db)
+                return delay.getImpactInfo("project", graph.root, db)
             }).then((impacts: Array<delay.ImpactInfo>) => {
                 chai.expect(impacts).to.length(2)
                 chai.expect(impacts[0].type).to.equals(delay.ImpactInfoType.Error)

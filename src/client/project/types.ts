@@ -2,7 +2,7 @@ import { Project } from "../../common/types"
 import { ApiTask } from "../../common/apitypes"
 
 export interface State {
-    identifier: string
+    projectIdentifier: string
     project: ProjectState
     tasks: TasksState
 }

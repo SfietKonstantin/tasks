@@ -10,7 +10,7 @@ const identifierReducer = (state: string = initialState, action: Action): string
 }
 
 export const mainReducer = combineReducers<State>({
-    identifier: identifierReducer,
+    projectIdentifier: identifierReducer,
     project: projectReducer,
     tasks: tasksReducer
 })

@@ -7,7 +7,7 @@ import { FilterButton } from "../components/filterbutton"
 import { ApiTask } from "../../../common/apitypes"
 
 interface AllTasksContentProperties {
-    identifier: string
+    projectIdentifier: string
     tasks: Array<ApiTask>
     filter: TasksFilter
     onFilterChanged: (filter: TasksFilter) => void
@@ -19,10 +19,10 @@ export class UnconnectedAllTasks extends React.Component<AllTasksContentProperti
         const notStartedChecked = UnconnectedAllTasks.getButtonStyle(this.props.filter.notStartedChecked)
         const inProgressChecked = UnconnectedAllTasks.getButtonStyle(this.props.filter.inProgressChecked)
         const doneChecked = UnconnectedAllTasks.getButtonStyle(this.props.filter.doneChecked)
-        const content = this.props.tasks.map((value: ApiTask) => {
-            const taskLink = "/task/" + value.identifier
+        const content = this.props.tasks.map((task: ApiTask) => {
+            const taskLink = "/project/" + this.props.projectIdentifier + "/task/" + task.identifier
             return <ListGroupItem href={taskLink}>
-                {value.name}
+                {task.name}
             </ListGroupItem>
         })
         return <Col id="main" xs={12} md={12}>
@@ -39,7 +39,7 @@ export class UnconnectedAllTasks extends React.Component<AllTasksContentProperti
                             <span className="glyphicon glyphicon-ok" aria-hidden="true"></span> Done
                         </Button>
                     </ButtonGroup>
-                    <FilterButton milestonesOnly={this.props.filter.milestonesOnlyChecked} 
+                    <FilterButton milestonesOnly={this.props.filter.milestonesOnlyChecked}
                                   onToggleMilestonesOnly={this.handleToggleMilestonesOnly.bind(this)} />
                 </div>
                 <ListGroup fill hover>
@@ -49,7 +49,7 @@ export class UnconnectedAllTasks extends React.Component<AllTasksContentProperti
         </Col>
     }
     componentDidMount() {
-        this.props.dispatch(fetchTasks(this.props.identifier))
+        this.props.dispatch(fetchTasks(this.props.projectIdentifier))
     }
     private static getButtonStyle(checked: boolean): string {
         return checked ? "primary" : "default"
@@ -74,14 +74,14 @@ export class UnconnectedAllTasks extends React.Component<AllTasksContentProperti
         this.handleFilterTasks(Object.assign({}, this.props.filter, {milestonesOnlyChecked}))
     }
     private handleFilterTasks(filter: TasksFilter) {
-        localStorage.setItem(this.props.identifier, JSON.stringify(filter))
+        localStorage.setItem(this.props.projectIdentifier, JSON.stringify(filter))
         this.props.onFilterChanged(filter)
     }
 }
 
 const mapStateToProps = (state: State) => {
     return {
-        identifier: state.identifier,
+        projectIdentifier: state.projectIdentifier,
         tasks: state.tasks.filteredTasks,
         filter: state.tasks.filter
     }

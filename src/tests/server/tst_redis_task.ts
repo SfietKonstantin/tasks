@@ -63,14 +63,14 @@ describe("Redis", () => {
             })
         })
         it("Should have task", (done) => {
-            db.hasTask("task1").then(() => {
+            db.hasTask("project", "task1").then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.hasTask("task3").then(() => {
+            db.hasTask("project", "task3").then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
@@ -118,13 +118,13 @@ describe("Redis", () => {
             })
         })
         it("Should get an empty list", (done) => {
-            db.getTasks([]).then((tasks: Array<Task>) => {
+            db.getTasks("project", []).then((tasks: Array<Task>) => {
                 chai.expect(tasks).to.length(0)
                 done()
             })
         })
         it("Should get tasks", (done) => {
-            db.getTasks(["task2", "task1"]).then((tasks: Array<Task>) => {
+            db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
                 chai.expect(tasks).to.length(2)
                 chai.expect(tasks[0].identifier).to.equals("task2")
                 chai.expect(tasks[0].name).to.equals("Task 2")
@@ -142,12 +142,12 @@ describe("Redis", () => {
             })
         })
         it("Should remove task", (done) => {
-            client.delAsync("task:task1").then((result) => {
+            client.delAsync("task:project:task1").then((result) => {
                 done()
             })
         })
         it("Should get valid tasks", (done) => {
-            db.getTasks(["task2", "task1"]).then((tasks: Array<Task>) => {
+            db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
                 chai.expect(tasks).to.length(2)
                 chai.expect(tasks[0].identifier).to.equals("task2")
                 chai.expect(tasks[0].name).to.equals("Task 2")
@@ -161,14 +161,14 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("task:task1", "test").then((result) => {
+            client.setAsync("task:project:task1", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should get valid tasks", (done) => {
-            db.getTasks(["task2", "task1"]).then((tasks: Array<Task>) => {
+            db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
                 chai.expect(tasks).to.length(2)
                 chai.expect(tasks[0].identifier).to.equals("task2")
                 chai.expect(tasks[0].name).to.equals("Task 2")
@@ -222,7 +222,7 @@ describe("Redis", () => {
             })
         })
         it("Should get task", (done) => {
-            db.getTask("task1").then((task: Task) => {
+            db.getTask("project", "task1").then((task: Task) => {
                 chai.expect(task.identifier).to.equals("task1")
                 chai.expect(task.name).to.equals("Task 1")
                 chai.expect(task.description).to.equals("Description 1")
@@ -234,7 +234,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.getTask("task3").then((task: Task) => {
+            db.getTask("project", "task3").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
@@ -242,14 +242,14 @@ describe("Redis", () => {
             })
         })
         it("Should remove task properties", (done) => {
-            client.hdelAsync("task:task1", "name").then((result: number) => {
+            client.hdelAsync("task:project:task1", "name").then((result: number) => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getTask("task1").then((task: Task) => {
+            db.getTask("project", "task1").then((task: Task) => {
                 done(new Error("getDelay should not be a success"))
                 done()
             }).catch((error: Error) => {
@@ -258,14 +258,14 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("task:task3", "test").then((result) => {
+            client.setAsync("task:project:task3", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getTask("task3").then((task: Task) => {
+            db.getTask("project", "task3").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null
@@ -397,14 +397,14 @@ describe("Redis", () => {
             })
         })
         it("Should set task relation", (done) => {
-            db.setTaskRelation("task1", "task2").then(() => {
+            db.setTaskRelation("project", "task1", "task2").then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid parent task", (done) => {
-            db.setTaskRelation("task3", "task2").then(() => {
+            db.setTaskRelation("project", "task3", "task2").then(() => {
                 done(new Error("setTaskRelation should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
@@ -412,7 +412,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid child task", (done) => {
-            db.setTaskRelation("task1", "task3").then(() => {
+            db.setTaskRelation("project", "task1", "task3").then(() => {
                 done(new Error("setTaskRelation should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
@@ -420,14 +420,14 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("task:task1:children", "test").then((result) => {
+            client.setAsync("task:project:task1:children", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         xit("Should get an exception on corrupted parent task", (done) => {
-            db.setTaskRelation("task1", "task2").then(() => {
+            db.setTaskRelation("project", "task1", "task2").then(() => {
                 done(new Error("setTaskRelation should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null
@@ -435,28 +435,28 @@ describe("Redis", () => {
             })
         })
         it("Should revert task properties corruption", (done) => {
-            client.delAsync("task:task1:children").then((result) => {
+            client.delAsync("task:project:task1:children").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should set task relation", (done) => {
-            db.setTaskRelation("task1", "task2").then(() => {
+            db.setTaskRelation("project", "task1", "task2").then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("task:task2:parents", "test").then((result) => {
+            client.setAsync("task:project:task2:parents", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         xit("Should get an exception on corrupted children task", (done) => {
-            db.setTaskRelation("task1", "task2").then(() => {
+            db.setTaskRelation("project", "task1", "task2").then(() => {
                 done(new Error("setTaskRelation should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null
@@ -506,9 +506,9 @@ describe("Redis", () => {
                 }).then(() => {
                     return db.addTask(task3)
                 }).then(() => {
-                    return db.setTaskRelation("task2", "task1")
+                    return db.setTaskRelation("project", "task2", "task1")
                 }).then(() => {
-                    return db.setTaskRelation("task3", "task1")
+                    return db.setTaskRelation("project", "task3", "task1")
                 }).then(() => {
                     done()
                 })
@@ -517,7 +517,7 @@ describe("Redis", () => {
             })
         })
         it("Should get parent task ids", (done) => {
-            db.getParentTaskIdentifiers("task1").then((ids: Array<string>) => {
+            db.getParentTaskIdentifiers("project", "task1").then((ids: Array<string>) => {
                 chai.expect(ids).to.length(2)
                 chai.expect(ids[0]).to.equals("task2")
                 chai.expect(ids[1]).to.equals("task3")
@@ -527,7 +527,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.getParentTaskIdentifiers("task4").then((ids: Array<string>) => {
+            db.getParentTaskIdentifiers("project", "task4").then((ids: Array<string>) => {
                 done(new Error("getParentTaskIds should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
@@ -535,14 +535,14 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("task:task1:parents", "test").then((result) => {
+            client.setAsync("task:project:task1:parents", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getParentTaskIdentifiers("task1").then((ids: Array<string>) => {
+            db.getParentTaskIdentifiers("project", "task1").then((ids: Array<string>) => {
                 done(new Error("getParentTaskIds should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null
@@ -592,9 +592,9 @@ describe("Redis", () => {
                 }).then(() => {
                     return db.addTask(task3)
                 }).then(() => {
-                    return db.setTaskRelation("task1", "task2")
+                    return db.setTaskRelation("project", "task1", "task2")
                 }).then(() => {
-                    return db.setTaskRelation("task1", "task3")
+                    return db.setTaskRelation("project", "task1", "task3")
                 }).then(() => {
                     done()
                 })
@@ -603,7 +603,7 @@ describe("Redis", () => {
             })
         })
         it("Should get children task ids", (done) => {
-            db.getChildrenTaskIdentifiers("task1").then((ids: Array<string>) => {
+            db.getChildrenTaskIdentifiers("project", "task1").then((ids: Array<string>) => {
                 chai.expect(ids).to.length(2)
                 chai.expect(ids[0]).to.equals("task2")
                 chai.expect(ids[1]).to.equals("task3")
@@ -613,7 +613,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.getChildrenTaskIdentifiers("task4").then((ids: Array<string>) => {
+            db.getChildrenTaskIdentifiers("project", "task4").then((ids: Array<string>) => {
                 done(new Error("getChildrenTaskIds should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
@@ -621,14 +621,14 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("task:task1:children", "test").then((result) => {
+            client.setAsync("task:project:task1:children", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getChildrenTaskIdentifiers("task1").then((ids: Array<string>) => {
+            db.getChildrenTaskIdentifiers("project", "task1").then((ids: Array<string>) => {
                 done(new Error("getChildrenTaskIds should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null

@@ -7,10 +7,11 @@ import { fetchImportant, updateImportant } from "../actions/important"
 import * as apitypes from "../../../common/apitypes"
 
 interface ImportantButtonProperties {
-    identifier: string
+    projectIdentifier: string
+    taskIdentifier: string
     importantEnabled: boolean
     important: boolean
-    onImportantChanged: (identifier: string, important: boolean) => void
+    onImportantChanged: (projectIdentifier: string, taskIdentifier: string, important: boolean) => void
     dispatch: Dispatch<State>
 }
 
@@ -23,7 +24,7 @@ class UnconnectedImportantButton extends React.Component<ImportantButtonProperti
         </Button>
     }
     componentDidMount() {
-        this.props.dispatch(fetchImportant(this.props.identifier))
+        this.props.dispatch(fetchImportant(this.props.projectIdentifier, this.props.taskIdentifier))
     }
     private getImportantStyle(): string {
         return this.props.important ? "danger" : "default"
@@ -33,13 +34,14 @@ class UnconnectedImportantButton extends React.Component<ImportantButtonProperti
     }
     private handleImportant(e: React.MouseEvent) {
         e.preventDefault()
-        this.props.onImportantChanged(this.props.identifier, !this.props.important)
+        this.props.onImportantChanged(this.props.projectIdentifier, this.props.taskIdentifier, !this.props.important)
     }
 }
 
 const mapStateToProps = (state: State) => {
     return {
-        identifier: state.identifier,
+        projectIdentifier: state.projectIdentifier,
+        taskIdentifier: state.taskIdentifier,
         importantEnabled: !state.important.isFetching,
         important: state.important.important
     }
@@ -47,8 +49,8 @@ const mapStateToProps = (state: State) => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
-        onImportantChanged: (identifier: string, important: boolean) => {
-            dispatch(updateImportant(identifier, important))
+        onImportantChanged: (projectIdentifier: string, taskIdentifier: string, important: boolean) => {
+            dispatch(updateImportant(projectIdentifier, taskIdentifier, important))
         },
         dispatch
     }

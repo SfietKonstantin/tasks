@@ -36,17 +36,18 @@ const compareImpactInfo = (first: ImpactInfo, second: ImpactInfo): number => {
     return 0
 }
 
-export const getImpactInfo = (root: TaskNode, dataProvider: IDataProvider): Promise<Array<ImpactInfo>> => {
+export const getImpactInfo = (projectIdentifier: string, root: TaskNode, dataProvider: IDataProvider): Promise<Array<ImpactInfo>> => {
     let map = new Map<string, TaskNode>()
     buildGraphIndex(root, map)
 
     // Load delays
     let delayMaps = new Map<string, Array<Delay>>()
-    return Promise.all(Array.from(map.keys(), (identifier: string) => {
-        return dataProvider.getTaskDelayIds(identifier).then((identifiers: Array<string>) => {
-            return dataProvider.getDelays(identifiers)
+    return Promise.all(Array.from(map.keys(), (taskIdentifier: string) => {
+        return dataProvider.getTaskDelayIds(projectIdentifier, taskIdentifier)
+                           .then((delayIdentifiers: Array<string>) => {
+            return dataProvider.getDelays(projectIdentifier, delayIdentifiers)
         }).then((delays: Array<Delay>) => {
-            delayMaps.set(identifier, delays)
+            delayMaps.set(taskIdentifier, delays)
         })
     })).then(() => {
         // Compute impact infos
@@ -58,14 +59,14 @@ export const getImpactInfo = (root: TaskNode, dataProvider: IDataProvider): Prom
             const estimatedEndDate = dateutils.addDays(node.estimatedStartDate, node.estimatedDuration)
             const endDate = dateutils.addDays(node.startDate, node.duration)
 
-            Array.from(maputils.get(delayMaps, node.identifier), (delay: Delay) => {
+            Array.from(maputils.get(delayMaps, node.taskIdentifier), (delay: Delay) => {
                 const oldMargin = dateutils.getDateDiff(estimatedEndDate, delay.date)
                 const newMargin = dateutils.getDateDiff(endDate, delay.date)
 
                 if (delay.date < endDate) {
                     returned.push({
                         type: ImpactInfoType.Error,
-                        taskIdentifier: node.identifier,
+                        taskIdentifier: node.taskIdentifier,
                         delayIdentifier: delay.identifier,
                         oldMargin: oldMargin,
                         newMargin: newMargin,
@@ -73,7 +74,7 @@ export const getImpactInfo = (root: TaskNode, dataProvider: IDataProvider): Prom
                 } else if (endDate > estimatedEndDate) {
                     returned.push({
                         type: ImpactInfoType.Warning,
-                        taskIdentifier: node.identifier,
+                        taskIdentifier: node.taskIdentifier,
                         delayIdentifier: delay.identifier,
                         oldMargin: oldMargin,
                         newMargin: newMargin,

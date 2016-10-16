@@ -59,7 +59,7 @@ export const tasksReducer = (state: TasksState = initialState, action: Action): 
         case TASKS_RECEIVE:
             const tasksAction = action as TasksAction
             const tasks = tasksAction.tasks.sort((first: ApiTask, second: ApiTask): number => {
-                const firstDate = new Date(first.estimatedStartDate).getTime() 
+                const firstDate = new Date(first.estimatedStartDate).getTime()
                 const secondDate = new Date(second.estimatedStartDate).getTime()
                 return firstDate - secondDate
             })

@@ -48,45 +48,40 @@ export class DelayNotFoundError extends NotFoundError {
     }
 }
 
-export class TransactionError extends Error implements Error {
-    constructor(message: string) {
-        super(message)
-    }
-}
-
 export interface IDataProvider {
     getAllProjects(): Promise<Array<Project>>
-    getProject(identifier: string): Promise<Project>
+    getProject(projectIdentifier: string): Promise<Project>
     addProject(project: Project): Promise<void>
 
-    hasTask(identifier: string): Promise<void>
-    getTasks(identifiers: Array<string>): Promise<Array<Task>>
-    getTask(identifier: string): Promise<Task>
-    getProjectTasks(identifier: string): Promise<Array<Task>>
+    hasTask(projectIdentifier: string, taskIdentifier: string): Promise<void>
+    getTasks(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<Task>>
+    getTask(projectIdentifier: string, taskIdentifier: string): Promise<Task>
+    getProjectTasks(projectIdentifier: string): Promise<Array<Task>>
     addTask(task: Task): Promise<void>
-    setTaskRelation(parentTaskIdentifier: string, childTaskIdentifier: string): Promise<void>
-    getParentTaskIdentifiers(identifier: string): Promise<Array<string>>
-    getChildrenTaskIdentifiers(identifier: string): Promise<Array<string>>
-    isTaskImportant(identifier: string): Promise<boolean>
-    setTaskImportant(identifier: string, important: boolean): Promise<void>
+    setTaskRelation(projectIdentifier: string, parentTaskIdentifier: string,
+                    childTaskIdentifier: string): Promise<void>
+    getParentTaskIdentifiers(projectIdentifier: string, taskIdentifier: string): Promise<Array<string>>
+    getChildrenTaskIdentifiers(projectIdentifier: string, taskIdentifier: string): Promise<Array<string>>
+    isTaskImportant(projectIdentifier: string, taskIdentifier: string): Promise<boolean>
+    setTaskImportant(projectIdentifier: string, taskIdentifier: string, important: boolean): Promise<void>
 
-    getTasksResults(identifiers: Array<string>): Promise<Array<TaskResults>>
-    getTaskResults(identifier: string): Promise<TaskResults>
-    setTasksResults(results: Array<TaskResults>): Promise<void>
+    getTasksResults(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<TaskResults>>
+    getTaskResults(projectIdentifier: string, taskIdentifier: string): Promise<TaskResults>
+    setTaskResults(taskResults: TaskResults): Promise<void>
 
-    getModifiers(ids: Array<number>): Promise<Array<Modifier>>
-    getModifier(id: number): Promise<Modifier>
-    getTaskModifierIds(identifier: string): Promise<Array<number>>
-    getModifieredTaskIds(id: number): Promise<Array<string>>
+    getModifiers(projectIdentifier: string, modifierIds: Array<number>): Promise<Array<Modifier>>
+    getModifier(projectIdentifier: string, modifierId: number): Promise<Modifier>
+    getTaskModifierIds(projectIdentifier: string, taskIdentifier: string): Promise<Array<number>>
+    getModifieredTaskIds(projectIdentifier: string, modifierId: number): Promise<Array<string>>
     addModifier(modifier: Modifier): Promise<number>
-    setModifierForTask(id: number, taskIdentifier: string): Promise<void>
-    getModifiersValues(ids: Array<number>): Promise<Array<number>>
+    setModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void>
+    getModifiersValues(projectIdentifier: string, modifierIds: Array<number>): Promise<Array<number>>
 
-    getDelays(identifiers: Array<string>): Promise<Array<Delay>>
-    getDelay(identifier: string): Promise<Delay>
+    getDelays(projectIdentifier: string, delayIdentifiers: Array<string>): Promise<Array<Delay>>
+    getDelay(projectIdentifier: string, delayIdentifier: string): Promise<Delay>
     addDelay(delay: Delay): Promise<void>
-    getProjectDelays(identifier: string): Promise<Array<Delay>>
-    setDelayTaskRelation(delayIdentifier: string, taskIdentifier: string): Promise<void>
-    getTaskDelayIds(identifier: string): Promise<Array<string>>
-    getDelayTaskIds(identifier: string): Promise<Array<string>>
+    getProjectDelays(projectIdentifier: string): Promise<Array<Delay>>
+    setDelayTaskRelation(projectIdentifier: string, delayIdentifier: string, taskIdentifier: string): Promise<void>
+    getTaskDelayIds(projectIdentifier: string, taskIdentifier: string): Promise<Array<string>>
+    getDelayTaskIds(projectIdentifier: string, delayIdentifier: string): Promise<Array<string>>
 }

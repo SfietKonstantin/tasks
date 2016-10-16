@@ -8,15 +8,15 @@ export const PROJECT_RECEIVE_ADD = "PROJECT_RECEIVE_ADD"
 
 export interface ProjectAction extends Action {
     type: string,
-    identifier: string,
+    projectIdentifier: string,
     name: string,
     description: string
 }
 
-export const defineProject = (identifier: string, name: string, description: string): ProjectAction => {
+export const defineProject = (projectIdentifier: string, name: string, description: string): ProjectAction => {
     return {
         type: PROJECT_DEFINE,
-        identifier,
+        projectIdentifier,
         name,
         description
     }

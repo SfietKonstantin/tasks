@@ -8,21 +8,24 @@ export const TASK_IMPORTANT_REQUEST_UPDATE = "TASK_IMPORTANT_REQUEST_UPDATE"
 
 export interface ImportantAction extends Action {
     type: string,
-    identifier: string
+    projectIdentifier: string,
+    taskIdentifier: string
     important?: boolean
 }
 
-const requestImportant = (identifier: string): ImportantAction => {
+const requestImportant = (projectIdentifier: string, taskIdentifier: string): ImportantAction => {
     return {
         type: TASK_IMPORTANT_REQUEST,
-        identifier
+        projectIdentifier,
+        taskIdentifier
     }
 }
 
-const receiveImportant = (identifier: string, important: boolean): ImportantAction => {
+const receiveImportant = (projectIdentifier: string, taskIdentifier: string, important: boolean): ImportantAction => {
     return {
         type: TASK_IMPORTANT_RECEIVE,
-        identifier,
+        projectIdentifier,
+        taskIdentifier,
         important
     }
 }
@@ -31,33 +34,37 @@ interface ImportantResult {
     important: boolean
 }
 
-export const fetchImportant = (identifier: string) => {
+export const fetchImportant = (projectIdentifier: string, taskIdentifier: string) => {
     return (dispatch: Dispatch<State>) => {
-        dispatch(requestImportant(identifier))
-        return fetch("/api/task/" + identifier + "/important").then((response: Response) => {
+        dispatch(requestImportant(projectIdentifier, taskIdentifier))
+        const url = "/api/project/" + projectIdentifier + "/task/" + taskIdentifier + "/important"
+        return fetch(url).then((response: Response) => {
             return response.json()
         }).then((result: ImportantResult) => {
-            dispatch(receiveImportant(identifier, result.important))
+            dispatch(receiveImportant(projectIdentifier, taskIdentifier, result.important))
         })
     }
 }
 
-const requestUpdateImportant = (identifier: string, important: boolean): ImportantAction => {
+const requestUpdateImportant = (projectIdentifier: string, taskIdentifier: string,
+                                important: boolean): ImportantAction => {
     return {
         type: TASK_IMPORTANT_REQUEST_UPDATE,
-        identifier,
+        projectIdentifier,
+        taskIdentifier,
         important
     }
 }
 
-export const updateImportant = (identifier: string, important: boolean) => {
+export const updateImportant = (projectIdentifier: string, taskIdentifier: string, important: boolean) => {
     return (dispatch: Dispatch<State>) => {
-        dispatch(requestUpdateImportant(identifier, important))
+        dispatch(requestUpdateImportant(projectIdentifier, taskIdentifier, important))
+        const url = "/api/project/" + projectIdentifier + "/task/" + taskIdentifier + "/important"
         const method = important ? "PUT" : "DELETE"
-        return fetch("/api/task/" + identifier + "/important", {method}).then((response: Response) => {
+        return fetch(url, {method}).then((response: Response) => {
             return response.json()
         }).then((result: ImportantResult) => {
-            dispatch(receiveImportant(identifier, result.important))
+            dispatch(receiveImportant(projectIdentifier, taskIdentifier, result.important))
         })
     }
 }

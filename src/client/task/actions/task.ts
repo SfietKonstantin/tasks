@@ -9,55 +9,62 @@ export const MODIFIER_REQUEST_ADD = "MODIFIER_REQUEST_ADD"
 
 export interface TaskAction extends Action {
     type: string,
-    identifier: string
+    projectIdentifier: string
+    taskIdentifier: string
     project?: Project
     task?: ApiTask
 }
 
-const requestTask = (identifier: string): TaskAction => {
+const requestTask = (projectIdentifier: string, taskIdentifier: string): TaskAction => {
     return {
         type: TASK_REQUEST,
-        identifier
+        projectIdentifier,
+        taskIdentifier
     }
 }
 
-const receiveTask = (identifier: string, project: Project, task: ApiTask): TaskAction => {
+const receiveTask = (projectIdentifier: string, taskIdentifier: string,
+                     project: Project, task: ApiTask): TaskAction => {
     return {
         type: TASK_RECEIVE,
-        identifier,
+        projectIdentifier,
+        taskIdentifier,
         project,
         task
     }
 }
 
-export const fetchTask = (identifier: string) => {
+export const fetchTask = (projectIdentifier: string, taskIdentifier: string) => {
     return (dispatch: Dispatch<State>) => {
-        dispatch(requestTask(identifier))
-        return fetch("/api/task/" + identifier).then((response: Response) => {
+        dispatch(requestTask(projectIdentifier, taskIdentifier))
+        return fetch("/api/project/" + projectIdentifier +  "/task/" + taskIdentifier).then((response: Response) => {
             return response.json()
         }).then((result: ApiProjectTaskModifiers) => {
-            dispatch(receiveTask(identifier, result.project, result.task))
+            dispatch(receiveTask(projectIdentifier, taskIdentifier, result.project, result.task))
         })
     }
 }
 
 export interface ModifierAddAction extends Action {
     type: string,
-    identifier: string
+    projectIdentifier: string
+    taskIdentifier: string
     modifier: Modifier
 }
 
-const requestAddModifier = (identifier: string, modifier: Modifier): ModifierAddAction => {
+const requestAddModifier = (projectIdentifier: string, taskIdentifier: string,
+                            modifier: Modifier): ModifierAddAction => {
     return {
         type: MODIFIER_REQUEST_ADD,
-        identifier,
+        projectIdentifier,
+        taskIdentifier,
         modifier
     }
 }
 
-export const addModifier = (identifier: string, modifier: Modifier) => {
+export const addModifier = (projectIdentifier: string, taskIdentifier: string, modifier: Modifier) => {
     return (dispatch: Dispatch<State>) => {
-        dispatch(requestAddModifier(identifier, modifier))
+        dispatch(requestAddModifier(projectIdentifier, taskIdentifier, modifier))
         const requestInit: RequestInit = {
             method: "PUT",
             headers: {
@@ -65,14 +72,15 @@ export const addModifier = (identifier: string, modifier: Modifier) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                identifier: identifier,
+                projectIdentifier,
+                taskIdentifier,
                 modifier
             })
         }
         return fetch("/api/modifier", requestInit).then((response: Response) => {
             return response.json()
         }).then((result: ApiProjectTaskModifiers) => {
-            dispatch(receiveTask(identifier, result.project, result.task))
+            dispatch(receiveTask(projectIdentifier, taskIdentifier, result.project, result.task))
         })
     }
 }

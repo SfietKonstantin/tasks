@@ -1,14 +1,16 @@
-import { Identifiable, Project, Task, TaskResults, Modifier } from "./types"
+import {
+    Identifiable, ProjectBased,
+    Project, Task, TaskResults, Modifier
+} from "./types"
 
-export interface ApiInputTask extends Identifiable {
-    projectIdentifier: string,
+export interface ApiInputTask extends Identifiable, ProjectBased {
     name: string
     description: string
     estimatedStartDate: string
     estimatedDuration: number
 }
 
-export interface ApiTask extends Identifiable {
+export interface ApiTask extends Identifiable, ProjectBased {
     name: string
     description: string
     estimatedStartDate: string
@@ -36,6 +38,7 @@ export const createTaskFromApiImportTask = (apiImportTask: ApiInputTask): Task =
 
 export const createApiTask = (task: Task, taskResults: TaskResults): ApiTask => {
     return {
+        projectIdentifier: task.projectIdentifier,
         identifier: task.identifier,
         name: task.name,
         description: task.description,
@@ -48,8 +51,8 @@ export const createApiTask = (task: Task, taskResults: TaskResults): ApiTask => 
 
 export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task => {
     return {
-        identifier: apiTask.identifier,
         projectIdentifier: project.identifier,
+        identifier: apiTask.identifier,
         name: apiTask.name,
         description: apiTask.description,
         estimatedStartDate: new Date(apiTask.estimatedStartDate),
@@ -59,6 +62,7 @@ export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task 
 
 export const createTaskResultsFromApiTask = (apiTask: ApiTask): TaskResults => {
     return {
+        projectIdentifier: apiTask.projectIdentifier,
         taskIdentifier: apiTask.identifier,
         startDate: new Date(apiTask.startDate),
         duration: apiTask.duration

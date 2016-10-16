@@ -9,7 +9,7 @@ import { Overview } from "../components/overview"
 import { Project } from "../../../common/types"
 
 interface MainProperties {
-    identifier: string
+    projectIdentifier: string
     project: Project
     dispatch: Dispatch<State>
 }
@@ -40,7 +40,7 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
         </div>
     }
     componentDidMount() {
-        this.props.dispatch(fetchProject(this.props.identifier))
+        this.props.dispatch(fetchProject(this.props.projectIdentifier))
     }
     private handleTabChange(index: number) {
         if (this.state.tabIndex !== index) {
@@ -51,7 +51,7 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
 
 const mapStateToProps = (state: State) => {
     return {
-        identifier: state.identifier,
+        projectIdentifier: state.projectIdentifier,
         project: state.project.project
     }
 }

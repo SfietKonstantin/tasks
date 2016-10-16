@@ -1,5 +1,7 @@
-export class TaskNode {
-    identifier: string
+import { TaskBased } from "../../../common/types"
+
+export class TaskNode implements TaskBased {
+    taskIdentifier: string
     estimatedStartDate: Date
     estimatedDuration: number
     startDate: Date | null
@@ -8,8 +10,8 @@ export class TaskNode {
     children: Array<TaskNode>
     modifiers: Array<number>
 
-    constructor(identifier: string, estimatedStartDate: Date, estimatedDuration: number) {
-        this.identifier = identifier
+    constructor(taskIdentifier: string, estimatedStartDate: Date, estimatedDuration: number) {
+        this.taskIdentifier = taskIdentifier
         this.estimatedStartDate = estimatedStartDate
         this.estimatedDuration = estimatedDuration
         this.startDate = null

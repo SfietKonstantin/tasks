@@ -13,7 +13,7 @@ export const projectReducer = (state: Project = initialState, action: Action): P
         case PROJECT_DEFINE:
             const projectAction = action as ProjectAction
             return {
-                identifier: projectAction.identifier,
+                identifier: projectAction.projectIdentifier,
                 name: projectAction.name,
                 description: projectAction.description
             }

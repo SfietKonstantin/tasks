@@ -15,7 +15,7 @@ interface HeaderProperties {
 export class Header extends React.Component<HeaderProperties, {}> {
     render() {
         let tabs = ["Overview", "Duration details"]
-        return <CommonHeader.Header identifier={this.props.task.identifier} name={this.props.task.name}>
+        return <CommonHeader.Header projectIdentifier={this.props.task.projectIdentifier} name={this.props.task.name}>
             <HeaderTools />
             <Col xs={12} md={8}>
                 <Breadcrumb project={this.props.project} task={this.props.task} />

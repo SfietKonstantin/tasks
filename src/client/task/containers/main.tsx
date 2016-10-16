@@ -9,7 +9,8 @@ import { Project, Task, TaskResults, Modifier } from "../../../common/types"
 import * as apitypes from "../../../common/apitypes"
 
 interface MainProperties {
-    identifier: string
+    projectIdentifier: string
+    taskIdentifier: string
     project: Project
     task: Task,
     taskResults: TaskResults
@@ -43,7 +44,7 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
         </div>
     }
     componentDidMount() {
-        this.props.dispatch(fetchTask(this.props.identifier))
+        this.props.dispatch(fetchTask(this.props.projectIdentifier, this.props.taskIdentifier))
     }
     private handleTabChange(index: number) {
         if (this.state.tabIndex !== index) {
@@ -58,7 +59,8 @@ const mapStateToProps = (state: State) => {
     const task = project && apiTask ? apitypes.createTaskFromApiTask(project, apiTask) : null
     const taskResults = apiTask ? apitypes.createTaskResultsFromApiTask(apiTask) : null
     return {
-        identifier: state.identifier,
+        projectIdentifier: state.projectIdentifier,
+        taskIdentifier: state.taskIdentifier,
         project: state.task.project,
         task: task,
         taskResults: taskResults

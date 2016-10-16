@@ -8,31 +8,31 @@ export const TASKS_FILTER_DISPLAY = "TASKS_FILTER_DISPLAY"
 
 export interface TasksAction extends Action {
     type: string,
-    identifier: string
+    projectIdentifier: string
     tasks: Array<ApiTask>
 }
 
-const requestTasks = (identifier: string): Action => {
+const requestTasks = (): Action => {
     return {
         type: TASKS_REQUEST
     }
 }
 
-const receiveTasks = (identifier: string, tasks: Array<ApiTask>): TasksAction => {
+const receiveTasks = (projectIdentifier: string, tasks: Array<ApiTask>): TasksAction => {
     return {
         type: TASKS_RECEIVE,
-        identifier,
+        projectIdentifier,
         tasks
     }
 }
 
-export const fetchTasks = (identifier: string) => {
+export const fetchTasks = (projectIdentifier: string) => {
     return (dispatch: Dispatch<State>) => {
-        dispatch(requestTasks(identifier))
-        return fetch("/api/project/" + identifier + "/tasks").then((response: Response) => {
+        dispatch(requestTasks())
+        return fetch("/api/project/" + projectIdentifier + "/tasks").then((response: Response) => {
             return response.json()
         }).then((tasks: Array<ApiTask>) => {
-            dispatch(receiveTasks(identifier, tasks))
+            dispatch(receiveTasks(projectIdentifier, tasks))
         })
     }
 }

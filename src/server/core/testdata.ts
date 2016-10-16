@@ -52,12 +52,12 @@ const fillTasksData = (dataProvider: IDataProvider): Promise<void> => {
 }
 
 const fillTaskRelations = (dataProvider: IDataProvider): Promise<void> => {
-    return dataProvider.setTaskRelation("root", "long").then(() => {
-        return dataProvider.setTaskRelation("root", "short")
+    return dataProvider.setTaskRelation("project", "root", "long").then(() => {
+        return dataProvider.setTaskRelation("project", "root", "short")
     }).then(() => {
-        return dataProvider.setTaskRelation("long", "reduce")
+        return dataProvider.setTaskRelation("project", "long", "reduce")
     }).then(() => {
-        return dataProvider.setTaskRelation("long", "reduce")
+        return dataProvider.setTaskRelation("project", "long", "reduce")
     })
 }
 
@@ -69,7 +69,7 @@ export const fillTestData = (dataProvider: IDataProvider) => {
             }).then(() => {
                 return fillTaskRelations(dataProvider)
             }).then(() => {
-                const persistance = new graph.GraphPersistence(dataProvider)
+                const persistance = new graph.GraphPersistence("project", dataProvider)
                 return persistance.loadGraph("root").then(() => {
                     return persistance.loadData()
                 }).then(() => {

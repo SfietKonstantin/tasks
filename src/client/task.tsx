@@ -10,7 +10,6 @@ import { ApiTask } from "../common/apitypes"
 
 interface RootProperties {
     store: Redux.Store<State>
-    identifier: string
 }
 
 class Root extends React.Component<RootProperties, {}> {
@@ -21,9 +20,10 @@ class Root extends React.Component<RootProperties, {}> {
     }
 }
 
-export const render = (identifier: string) => {
+export const render = (projectIdentifier: string, taskIdentifier: string) => {
     const initialState: State = {
-        identifier,
+        projectIdentifier,
+        taskIdentifier,
         task: {
             isFetching: false,
             project: null,
@@ -38,5 +38,5 @@ export const render = (identifier: string) => {
         mainReducer, initialState,
         Redux.applyMiddleware(ReduxThunk.default)
     )
-    ReactDOM.render(<Root store={store} identifier={identifier} />, document.getElementById("content") as Element)
+    ReactDOM.render(<Root store={store} />, document.getElementById("content") as Element)
 }

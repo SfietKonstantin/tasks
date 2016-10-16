@@ -2,7 +2,8 @@ import { Project, Modifier } from "../../common/types"
 import { ApiTask } from "../../common/apitypes"
 
 export interface State {
-    identifier: string
+    projectIdentifier: string
+    taskIdentifier: string
     task: TaskState
     important: ImportantState
 }

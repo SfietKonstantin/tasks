@@ -7,8 +7,9 @@ import { addModifier } from "../actions/task"
 import { Modifier } from "../../../common/types"
 
 interface ModifierButtonProperties {
-    identifier: string
-    onAddModifier: (identifier: string, modifier: Modifier) => void
+    projectIdentifier: string
+    taskIdentifier: string
+    onAddModifier: (projectIdentifier: string, taskIdentifier: string, modifier: Modifier) => void
     dispatch: Dispatch<State>
 }
 
@@ -134,25 +135,27 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
     private handleSave(e: React.MouseEvent) {
         e.preventDefault()
         const modifier: Modifier = {
+            projectIdentifier: this.props.projectIdentifier,
             name: this.state.name,
             description: this.state.description,
             duration: this.state.duration
         }
-        this.props.onAddModifier(this.props.identifier, modifier)
+        this.props.onAddModifier(this.props.projectIdentifier, this.props.taskIdentifier, modifier)
         this.close()
     }
 }
 
 const mapStateToProps = (state: State) => {
     return {
-        identifier: state.identifier
+        projectIdentifier: state.projectIdentifier,
+        taskIdentifier: state.taskIdentifier
     }
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
-        onAddModifier: (identifier: string, modifier: Modifier) => {
-            dispatch(addModifier(identifier, modifier))
+        onAddModifier: (projectIdnetifir: string, taskIdentifier: string, modifier: Modifier) => {
+            dispatch(addModifier(projectIdnetifir, taskIdentifier, modifier))
         },
         dispatch
     }

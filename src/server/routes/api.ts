@@ -39,8 +39,8 @@ export class Api {
         })
     }
     getProject(req: express.Request, res: express.Response) {
-        const identifier = String(req.params.identifier)
-        this.dataProvider.getProject(identifier).then((project: Project) => {
+        const projectIdentifier = String(req.params.projectIdentifier)
+        this.dataProvider.getProject(projectIdentifier).then((project: Project) => {
             res.json(project)
         }).catch((error) => {
             if (error instanceof NotFoundError) {
@@ -51,10 +51,10 @@ export class Api {
         })
     }
     getProjectTasks(req: express.Request, res: express.Response) {
-        const identifier = String(req.params.identifier)
-        this.dataProvider.getProjectTasks(identifier).then((tasks: Array<Task>) => {
+        const projectIdentifier = String(req.params.projectIdentifier)
+        this.dataProvider.getProjectTasks(projectIdentifier).then((tasks: Array<Task>) => {
             tasks.filter((value: Task) => { return !!value })
-            return this.dataProvider.getTasksResults(tasks.map((task: Task) => {
+            return this.dataProvider.getTasksResults(projectIdentifier, tasks.map((task: Task) => {
                 return task.identifier
             })).then((tasksResults: Array<TaskResults>) => {
                 res.json(apitypes.createApiTasks(tasks, tasksResults))
@@ -71,11 +71,12 @@ export class Api {
         const apiTask = req.body.task as apitypes.ApiInputTask
         const task = apitypes.createTaskFromApiImportTask(apiTask)
         this.dataProvider.addTask(task).then(() => {
-            return this.dataProvider.setTasksResults([{
+            return this.dataProvider.setTaskResults({
+                projectIdentifier: task.projectIdentifier,
                 taskIdentifier: task.identifier,
                 startDate: task.estimatedStartDate,
                 duration: task.estimatedDuration
-            }])
+            })
         }).then(() => {
             res.sendStatus(301)
         }).catch((error: Error) => {
@@ -89,8 +90,9 @@ export class Api {
         })
     }
     getTask(req: express.Request, res: express.Response) {
-        const identifier = String(req.params.identifier)
-        this.sendTask(identifier, res).catch((error: Error) => {
+        const projectIdentifier = String(req.params.projectIdentifier)
+        const taskIdentifier = String(req.params.taskIdentifier)
+        this.sendTask(projectIdentifier, taskIdentifier, res).catch((error: Error) => {
             if (error instanceof NotFoundError) {
                 res.status(404).json(error)
             } else {
@@ -99,8 +101,9 @@ export class Api {
         })
     }
     isTaskImportant(req: express.Request, res: express.Response) {
-        const identifier = String(req.params.identifier)
-        this.dataProvider.isTaskImportant(identifier).then((result: boolean) => {
+        const projectIdentifier = String(req.params.projectIdentifier)
+        const taskIdentifier = String(req.params.taskIdentifier)
+        this.dataProvider.isTaskImportant(projectIdentifier, taskIdentifier).then((result: boolean) => {
             res.json({important: result})
         }).catch((error: Error) => {
             if (error instanceof NotFoundError) {
@@ -118,13 +121,14 @@ export class Api {
     }
     putModifier(req: express.Request, res: express.Response) {
         const modifier = req.body.modifier as Modifier
-        const taskIdentifier = String(req.body.identifier)
+        const projectIdentifier = String(req.body.projectIdentifier)
+        const taskIdentifier = String(req.body.taskIdentifier)
 
-        let graph: GraphPersistence = new GraphPersistence(this.dataProvider)
-        this.dataProvider.hasTask(taskIdentifier).then(() => {
+        let graph: GraphPersistence = new GraphPersistence(projectIdentifier, this.dataProvider)
+        this.dataProvider.hasTask(projectIdentifier, taskIdentifier).then(() => {
             return this.dataProvider.addModifier(modifier)
-        }).then((id: number) => {
-            return this.dataProvider.setModifierForTask(id, taskIdentifier)
+        }).then((modifierId: number) => {
+            return this.dataProvider.setModifierForTask(projectIdentifier, modifierId, taskIdentifier)
         }).then(() => {
             return graph.loadGraph(taskIdentifier)
         }).then(() => {
@@ -133,7 +137,7 @@ export class Api {
             compute(graph.root)
             return graph.save()
         }).then(() => {
-            return this.sendTask(taskIdentifier, res)
+            return this.sendTask(projectIdentifier, taskIdentifier, res)
         }).catch((error: Error) => {
             if (error instanceof NotFoundError) {
                 res.status(404).json(error)
@@ -147,8 +151,9 @@ export class Api {
         res.sendStatus(200)
     }
     private setTaskImportant(req: express.Request, res: express.Response, important: boolean) {
-        const identifier = String(req.params.identifier)
-        this.dataProvider.setTaskImportant(identifier, important).then(() => {
+        const projectIdentifier = String(req.params.projectIdentifier)
+        const taskIdentifier = String(req.params.taskIdentifier)
+        this.dataProvider.setTaskImportant(projectIdentifier, taskIdentifier, important).then(() => {
             res.json({important: important})
         }).catch((error: Error) => {
             if (error instanceof NotFoundError) {
@@ -158,12 +163,15 @@ export class Api {
             }
         })
     }
-    private sendTask(identifier: string, res: express.Response): Promise<void> {
-        return this.dataProvider.getTask(identifier).then((task: Task) => {
+    private sendTask(projectIdentifier: string, taskIdentifier: string, res: express.Response): Promise<void> {
+        return this.dataProvider.getTask(projectIdentifier, taskIdentifier).then((task: Task) => {
             return this.dataProvider.getProject(task.projectIdentifier).then((project: Project) => {
-                return this.dataProvider.getTaskResults(task.identifier).then((taskResults: TaskResults) => {
-                    return this.dataProvider.getTaskModifierIds(identifier).then((ids: Array<number>) => {
-                        return this.dataProvider.getModifiers(ids).then((modifiers: Array<Modifier>) => {
+                return this.dataProvider.getTaskResults(projectIdentifier, task.identifier)
+                                        .then((taskResults: TaskResults) => {
+                    return this.dataProvider.getTaskModifierIds(projectIdentifier, taskIdentifier)
+                                            .then((modifierIds: Array<number>) => {
+                        return this.dataProvider.getModifiers(projectIdentifier, modifierIds)
+                                                .then((modifiers: Array<Modifier>) => {
                             const apiTask: apitypes.ApiProjectTaskModifiers = {
                                 project: project,
                                 task: apitypes.createApiTask(task, taskResults),

@@ -10,7 +10,6 @@ import { ApiTask } from "../common/apitypes"
 
 interface RootProperties {
     store: Redux.Store<State>
-    identifier: string
 }
 
 class Root extends React.Component<RootProperties, {}> {
@@ -21,8 +20,7 @@ class Root extends React.Component<RootProperties, {}> {
     }
 }
 
-export const render = (identifier: string) => {
-    // TODO: typesafety
+export const render = (projectIdentifier: string) => {
     let filter: TasksFilter = {
         notStartedChecked: true,
         inProgressChecked: true,
@@ -30,14 +28,14 @@ export const render = (identifier: string) => {
         milestonesOnlyChecked: false
     }
 
-    const filterJson = localStorage.getItem(identifier)
+    const filterJson = localStorage.getItem(projectIdentifier)
     if (filterJson) {
         filter = JSON.parse(filterJson)
     }
     filter.milestonesOnlyChecked = false
 
     const initialState: State = {
-        identifier,
+        projectIdentifier,
         project: {
             isFetching: false,
             project: null
@@ -54,5 +52,6 @@ export const render = (identifier: string) => {
         mainReducer, initialState,
         Redux.applyMiddleware(ReduxThunk.default)
     )
-    ReactDOM.render(<Root store={store} identifier={identifier} />, document.getElementById("content") as Element)
+    ReactDOM.render(<Root store={store} />,
+                    document.getElementById("content") as Element)
 }

@@ -40,20 +40,23 @@ export class Server {
         this.app.use(express.static(path.join(__dirname, "..", "public")))
 
         this.app.get("/", this.routes.index.bind(this.routes))
-        this.app.get("/project/:identifier", this.routes.getProject.bind(this.routes))
-        this.app.get("/task/:identifier", this.routes.getTask.bind(this.routes))
+        this.app.get("/project/:projectIdentifier", this.routes.getProject.bind(this.routes))
+        this.app.get("/project/:projectIdentifier/task/:taskIdentifier", this.routes.getTask.bind(this.routes))
         this.app.get("/import/:source", this.routes.getImport.bind(this.routes))
 
         // API
         this.app.put("/api/project", this.api.putProject.bind(this.api))
         this.app.get("/api/project/list", this.api.getProjects.bind(this.api))
-        this.app.get("/api/project/:identifier", this.api.getProject.bind(this.api))
-        this.app.get("/api/project/:identifier/tasks", this.api.getProjectTasks.bind(this.api))
+        this.app.get("/api/project/:projectIdentifier", this.api.getProject.bind(this.api))
+        this.app.get("/api/project/:projectIdentifier/tasks", this.api.getProjectTasks.bind(this.api))
+        this.app.get("/api/project/:projectIdentifier/task/:taskIdentifier", this.api.getTask.bind(this.api))
+        this.app.get("/api/project/:projectIdentifier/task/:taskIdentifier/important",
+                     this.api.isTaskImportant.bind(this.api))
+        this.app.put("/api/project/:projectIdentifier/task/:taskIdentifier/important",
+                     this.api.putTaskImportant.bind(this.api))
+        this.app.delete("/api/project/:projectIdentifier/task/:taskIdentifier/important",
+                     this.api.deleteTaskImportant.bind(this.api))
         this.app.put("/api/task", this.api.putTask.bind(this.api))
-        this.app.get("/api/task/:identifier", this.api.getTask.bind(this.api))
-        this.app.get("/api/task/:identifier/important", this.api.isTaskImportant.bind(this.api))
-        this.app.put("/api/task/:identifier/important", this.api.putTaskImportant.bind(this.api))
-        this.app.delete("/api/task/:identifier/important", this.api.deleteTaskImportant.bind(this.api))
         this.app.put("/api/modifier", this.api.putModifier.bind(this.api))
 
         // Demo

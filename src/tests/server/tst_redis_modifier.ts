@@ -45,12 +45,14 @@ describe("Redis", () => {
 
                 return db.addTask(task).then(() => {
                     const modifier1: Modifier = {
+                        projectIdentifier: "project",
                         name: "Modifier 1",
                         description: "Description 1",
                         duration: 40
                     }
 
                     const modifier2: Modifier = {
+                        projectIdentifier: "project",
                         name: "Modifier 2",
                         description: "Description 2",
                         duration: 10
@@ -67,13 +69,13 @@ describe("Redis", () => {
             })
         })
         it("Should get an empty list", (done) => {
-            db.getModifiers([]).then((modifiers: Array<Modifier>) => {
+            db.getModifiers("project", []).then((modifiers: Array<Modifier>) => {
                 chai.expect(modifiers).to.length(0)
                 done()
             })
         })
         it("Should get modifiers", (done) => {
-            db.getModifiers([2, 1]).then((modifiers: Array<Modifier>) => {
+            db.getModifiers("project", [2, 1]).then((modifiers: Array<Modifier>) => {
                 chai.expect(modifiers).to.length(2)
                 chai.expect(modifiers[0].name).to.equals("Modifier 2")
                 chai.expect(modifiers[0].description).to.equals("Description 2")
@@ -87,12 +89,12 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt modifier", (done) => {
-            client.delAsync("modifier:1").then((result) => {
+            client.delAsync("modifier:project:1").then((result) => {
                 done()
             })
         })
         it("Should get valid modifiers", (done) => {
-            db.getModifiers([2, 1]).then((modifiers: Array<Modifier>) => {
+            db.getModifiers("project", [2, 1]).then((modifiers: Array<Modifier>) => {
                 chai.expect(modifiers).to.length(2)
                 chai.expect(modifiers[0].name).to.equals("Modifier 2")
                 chai.expect(modifiers[0].description).to.equals("Description 2")
@@ -104,14 +106,14 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("modifier:1", "test").then((result) => {
+            client.setAsync("modifier:project:1", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should get valid modifiers", (done) => {
-            db.getModifiers([2, 1]).then((modifiers: Array<Modifier>) => {
+            db.getModifiers("project", [2, 1]).then((modifiers: Array<Modifier>) => {
                 chai.expect(modifiers).to.length(2)
                 chai.expect(modifiers[0].name).to.equals("Modifier 2")
                 chai.expect(modifiers[0].description).to.equals("Description 2")

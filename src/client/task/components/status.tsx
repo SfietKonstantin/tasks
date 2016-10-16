@@ -50,7 +50,7 @@ export class Status extends React.Component<StatusProperties, {}> {
         const done = daysBeforeEnd < 0
         const endDate = this.getEndDate()
 
-        const milestone = this.props.task.estimatedDuration == 0
+        const milestone = this.props.task.estimatedDuration === 0
         const stateInfo = this.getStateInfo(started, done)
         const progressInfo = this.getProgressInfo(started, done)
         const startState = this.getStartState()

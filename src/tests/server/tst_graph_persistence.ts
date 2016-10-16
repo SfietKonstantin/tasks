@@ -14,7 +14,7 @@ describe("Graph persistence", () => {
         client.select(3)
 
         db = new RedisDataProvider(client)
-        graph = new GraphPersistence(db)
+        graph = new GraphPersistence("project", db)
     })
     it("Should add some testing data", (done) => {
         const project: Project = {
@@ -62,16 +62,40 @@ describe("Graph persistence", () => {
                 return db.addTask(task)
             }))
         }).then(() => {
-            return Promise.all([db.setTaskRelation("1root", "2short"), db.setTaskRelation("1root", "3long"),
-                                db.setTaskRelation("2short", "4reducing"), db.setTaskRelation("3long", "4reducing")])
+            return Promise.all([
+                db.setTaskRelation("project", "1root", "2short"),
+                db.setTaskRelation("project", "1root", "3long"),
+                db.setTaskRelation("project", "2short", "4reducing"),
+                db.setTaskRelation("project", "3long", "4reducing")
+            ])
         }).then(() => {
             let taskResults: Array<TaskResults> = [
-                {taskIdentifier: "1root", startDate: new Date(2016, 9, 2), duration: 16},
-                {taskIdentifier: "2short", startDate: new Date(2016, 9, 18), duration: 15},
-                {taskIdentifier: "3long", startDate: new Date(2016, 9, 18), duration: 30},
-                {taskIdentifier: "4reducing", startDate: new Date(2016, 10, 17), duration: 16}
+                {
+                    projectIdentifier: "project",
+                    taskIdentifier: "1root",
+                    startDate: new Date(2016, 9, 2),
+                    duration: 16
+                },
+                {
+                    projectIdentifier: "project",
+                    taskIdentifier: "2short",
+                    startDate: new Date(2016, 9, 18),
+                    duration: 15
+                },
+                {
+                    projectIdentifier: "project",
+                    taskIdentifier: "3long",
+                    startDate: new Date(2016, 9, 18),
+                    duration: 30
+                },
+                {
+                    projectIdentifier: "project",
+                    taskIdentifier: "4reducing",
+                    startDate: new Date(2016, 10, 17),
+                    duration: 16
+                }
             ]
-            return db.setTasksResults(taskResults)
+            return Promise.all(taskResults.map(db.setTaskResults.bind(db)))
         }).then(() => {
             done()
         }).catch((error: Error) => {
@@ -81,28 +105,28 @@ describe("Graph persistence", () => {
     it("Should load the whole graph", (done) => {
         graph.loadGraph("1root").then(() => {
             const node1 = graph.nodes.get("1root")
-            chai.expect(node1.identifier).to.equals("1root")
+            chai.expect(node1.taskIdentifier).to.equals("1root")
             chai.expect(node1.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 1).getTime())
             chai.expect(node1.estimatedDuration).to.equals(15)
             chai.expect(node1.startDate).to.null
             chai.expect(node1.duration).to.null
 
             const node2 = graph.nodes.get("2short")
-            chai.expect(node2.identifier).to.equals("2short")
+            chai.expect(node2.taskIdentifier).to.equals("2short")
             chai.expect(node2.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 16).getTime())
             chai.expect(node2.estimatedDuration).to.equals(15)
             chai.expect(node2.startDate).to.null
             chai.expect(node2.duration).to.null
 
             const node3 = graph.nodes.get("3long")
-            chai.expect(node3.identifier).to.equals("3long")
+            chai.expect(node3.taskIdentifier).to.equals("3long")
             chai.expect(node3.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 16).getTime())
             chai.expect(node3.estimatedDuration).to.equals(30)
             chai.expect(node3.startDate).to.null
             chai.expect(node3.duration).to.null
 
             const node4 = graph.nodes.get("4reducing")
-            chai.expect(node4.identifier).to.equals("4reducing")
+            chai.expect(node4.taskIdentifier).to.equals("4reducing")
             chai.expect(node4.estimatedStartDate.getTime()).to.equals(new Date(2016, 10, 15).getTime())
             chai.expect(node4.estimatedDuration).to.equals(15)
             chai.expect(node4.startDate).to.null
@@ -140,24 +164,28 @@ describe("Graph persistence", () => {
     })
     it("Should add some testing data", (done) => {
         const modifier1: Modifier = {
+            projectIdentifier: "project",
             name: "Modifier 1",
             description: "Description 1",
             duration: 8
         }
 
         const modifier2_1: Modifier = {
+            projectIdentifier: "project",
             name: "Modifier 2, 1",
             description: "Description 2, 1",
             duration: 10
         }
 
         const modifier2_2: Modifier = {
+            projectIdentifier: "project",
             name: "Modifier 2, 2",
             description: "Description 2, 2",
             duration: 12
         }
 
         const modifier4: Modifier = {
+            projectIdentifier: "project",
             name: "Modifier 4",
             description: "Description 4",
             duration: 15
@@ -170,13 +198,13 @@ describe("Graph persistence", () => {
             chai.expect(ids[2]).to.equals(3)
             chai.expect(ids[3]).to.equals(4)
         }).then(() => {
-            return db.setModifierForTask(1, "1root")
+            return db.setModifierForTask("project", 1, "1root")
         }).then(() => {
-            return db.setModifierForTask(2, "2short")
+            return db.setModifierForTask("project", 2, "2short")
         }).then(() => {
-            return db.setModifierForTask(3, "2short")
+            return db.setModifierForTask("project", 3, "2short")
         }).then(() => {
-            return db.setModifierForTask(4, "4reducing")
+            return db.setModifierForTask("project", 4, "4reducing")
         }).then(() => {
             done()
         }).catch((error: Error) => {
@@ -235,7 +263,7 @@ describe("Graph persistence", () => {
         })
     })
     it("Should check that data has been save", (done) => {
-        let newGraph = new GraphPersistence(db)
+        let newGraph = new GraphPersistence("project", db)
         newGraph.loadGraph("1root").then(() => {
             return newGraph.loadData()
         }).then(() => {
