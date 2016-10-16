@@ -40,9 +40,9 @@ describe("Primavera actions", () => {
                     chai.expect(dispatch.calledWith({type: PROJECT_RECEIVE_ADD})).to.true
                     chai.expect(fetch.args).to.length(1)
                     chai.expect(fetch.args[0]).to.length(2)
-                    chai.expect(fetch.args[0][0]).to.equals("/api/project")
+                    chai.expect(fetch.args[0][0]).to.equal("/api/project")
                     const requestInit = fetch.args[0][1] as RequestInit
-                    chai.expect(requestInit.method).to.equals("PUT")
+                    chai.expect(requestInit.method).to.equal("PUT")
                     const body = JSON.parse(requestInit.body as string)
                     chai.expect(body).to.haveOwnProperty("project")
                     chai.expect(body.project).to.deep.equal(project)

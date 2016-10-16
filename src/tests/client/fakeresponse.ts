@@ -8,12 +8,10 @@ export class FakeResponse {
         this.shouldThrow = shouldThrow
     }
     json(): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            if (!this.shouldThrow) {
-                resolve(this.body)
-            } else {
-                reject(new Error("Some error"))
-            }
-        })
+        if (this.shouldThrow) {
+            return Promise.reject(new Error("Some error"))
+        } else {
+            return Promise.resolve(this.body)
+        }
     }
 }

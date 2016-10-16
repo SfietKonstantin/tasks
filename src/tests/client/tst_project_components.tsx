@@ -7,8 +7,8 @@ import { Breadcrumb } from "../../client/project/components/breadcrumb"
 import { FilterButton } from "../../client/project/components/filterbutton"
 import { Project } from "../../common/types"
 
-let document = jsdom.jsdom("<!doctype html><html><body></body></html>")
-let window = document.defaultView
+const document = jsdom.jsdom("<!doctype html><html><body></body></html>")
+const window = document.defaultView
 
 global.document = document
 global.window = window
@@ -27,11 +27,11 @@ describe("Project components", () => {
             const ol = testutils.findRenderedDOMComponentWithTag(component, "ol")
             const olLi = ol.getElementsByTagName("li")
             chai.expect(olLi).to.length(2)
-            chai.expect(olLi[1].textContent).to.equals("Project")
+            chai.expect(olLi[1].textContent).to.equal("Project")
 
             const li1a = olLi[0].getElementsByTagName("a")
             chai.expect(li1a).to.length(1)
-            chai.expect(li1a[0].href).to.equals("/")
+            chai.expect(li1a[0].href).to.equal("/")
         })
     })
     describe("FilterButton", () => {

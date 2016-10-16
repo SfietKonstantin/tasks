@@ -6,6 +6,7 @@
     "chai": "registry:dt/chai#3.4.0+20160601211834",
     "mocha": "registry:dt/mocha#2.2.5+20160720003353",
     "node": "registry:env/node#0.10.0+20160825160117",
-    "redis": "registry:dt/redis#0.12.1+20160818110030"
+    "redis": "registry:dt/redis#0.12.1+20160818110030",
+    "sinon": "registry:dt/sinon#1.16.0+20160924120326"
   }
 }

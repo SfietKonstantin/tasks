@@ -68,15 +68,23 @@ describe("Redis", () => {
         })
         it("Should get delays", (done) => {
             db.getDelays("project", ["delay2", "delay1"]).then((delays: Array<Delay>) => {
-                chai.expect(delays).to.length(2)
-                chai.expect(delays[0].identifier).to.equals("delay2")
-                chai.expect(delays[0].name).to.equals("Delay 2")
-                chai.expect(delays[0].description).to.equals("Description 2")
-                chai.expect(delays[0].date.getTime()).to.equals(new Date(2016, 9, 15).getTime())
-                chai.expect(delays[1].identifier).to.equals("delay1")
-                chai.expect(delays[1].name).to.equals("Delay 1")
-                chai.expect(delays[1].description).to.equals("Description 1")
-                chai.expect(delays[1].date.getTime()).to.equals(new Date(2016, 9, 1).getTime())
+                const expected: Array<Delay> = [
+                    {
+                        projectIdentifier: "project",
+                        identifier: "delay2",
+                        name: "Delay 2",
+                        description: "Description 2",
+                        date: new Date(2016, 9, 15)
+                    },
+                    {
+                        projectIdentifier: "project",
+                        identifier: "delay1",
+                        name: "Delay 1",
+                        description: "Description 1",
+                        date: new Date(2016, 9, 1)
+                    }
+                ]
+                chai.expect(delays).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -89,12 +97,17 @@ describe("Redis", () => {
         })
         it("Should get valid delays", (done) => {
             db.getDelays("project", ["delay2", "delay1"]).then((delays: Array<Delay>) => {
-                chai.expect(delays).to.length(2)
-                chai.expect(delays[0].identifier).to.equals("delay2")
-                chai.expect(delays[0].name).to.equals("Delay 2")
-                chai.expect(delays[0].description).to.equals("Description 2")
-                chai.expect(delays[0].date.getTime()).to.equals(new Date(2016, 9, 15).getTime())
-                chai.expect(delays[1]).to.null
+                const expected: Array<Delay | null> = [
+                    {
+                        projectIdentifier: "project",
+                        identifier: "delay2",
+                        name: "Delay 2",
+                        description: "Description 2",
+                        date: new Date(2016, 9, 15)
+                    },
+                    null
+                ]
+                chai.expect(delays).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -109,12 +122,17 @@ describe("Redis", () => {
         })
         it("Should get valid delays", (done) => {
             db.getDelays("project", ["delay2", "delay1"]).then((delays: Array<Delay>) => {
-                chai.expect(delays).to.length(2)
-                chai.expect(delays[0].identifier).to.equals("delay2")
-                chai.expect(delays[0].name).to.equals("Delay 2")
-                chai.expect(delays[0].description).to.equals("Description 2")
-                chai.expect(delays[0].date.getTime()).to.equals(new Date(2016, 9, 15).getTime())
-                chai.expect(delays[1]).to.null
+                const expected: Array<Delay | null> = [
+                    {
+                        projectIdentifier: "project",
+                        identifier: "delay2",
+                        name: "Delay 2",
+                        description: "Description 2",
+                        date: new Date(2016, 9, 15)
+                    },
+                    null
+                ]
+                chai.expect(delays).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -160,10 +178,14 @@ describe("Redis", () => {
         })
         it("Should get delay", (done) => {
             db.getDelay("project", "delay1").then((delay: Delay) => {
-                chai.expect(delay.identifier).to.equals("delay1")
-                chai.expect(delay.name).to.equals("Delay 1")
-                chai.expect(delay.description).to.equals("Description 1")
-                chai.expect(delay.date.getTime()).to.equals(new Date(2016, 9, 1).getTime())
+                const expected: Delay = {
+                    projectIdentifier: "project",
+                    identifier: "delay1",
+                    name: "Delay 1",
+                    description: "Description 1",
+                    date: new Date(2016, 9, 1)
+                }
+                chai.expect(delay).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)

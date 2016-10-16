@@ -62,7 +62,7 @@ export const importTasks = (file: File) => {
         return new Promise<void>((resolve, reject) => {
             if (file.type === "text/csv") {
                 const reader = new FileReader()
-                reader.onload = parseTasks.bind(reader, reader, dispatch, resolve, reject)
+                reader.onload = doParseTasks.bind(reader, reader, dispatch, resolve, reject)
                 reader.readAsText(file)
             } else {
                 dispatch(tasksImportInvalidFormat())
@@ -98,7 +98,7 @@ export const addTasks = (projectIdentifier: string, tasks: Map<string, Primavera
         })
         return Promise.all(filteredTasks.map(((task: PrimaveraTask) => {
             const startDate = task.startDate as Date
-            let inputTask: ApiInputTask = {
+            const inputTask: ApiInputTask = {
                 identifier: task.identifier,
                 projectIdentifier,
                 name: task.name,

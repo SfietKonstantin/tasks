@@ -32,9 +32,12 @@ export const parseTasks = (content: string): TaskParseResults => {
     let delays = new Map<string, PrimaveraDelay>()
     let warnings = new Array<string>()
     splitted.forEach((line: string) =>  {
+        if (line.length === 0) {
+            return
+        }
         const splittedLine = line.split("\t")
         if (splittedLine.length < 9) {
-            throw new InvalidFormatError("Task file should have at least 9 columns")
+            throw new InvalidFormatError("Task file should have at least 9 columns. Line content: \"" + line + "\"")
         }
 
         const identifier = splittedLine[0]
@@ -51,7 +54,6 @@ export const parseTasks = (content: string): TaskParseResults => {
             const computedDuration = dateutils.getDateDiff(startDate, endDate)
             if (duration !== computedDuration) {
                 warnings.push("Task \"" + identifier + "\"'s duration do not match with the computed duration")
-                console.log(identifier, duration, computedDuration)
             }
         }
         if (startDate == null || endDate == null) {

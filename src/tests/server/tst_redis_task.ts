@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Task } from "../../common/types"
+import { Project, Task, TaskRelation } from "../../common/types"
 import {
     CorruptedError, ExistsError, ProjectNotFoundError, TaskNotFoundError
 } from "../../server/core/data/idataprovider"
@@ -25,61 +25,6 @@ describe("Redis", () => {
         client.select(3)
 
         db = new RedisDataProvider(client)
-    })
-    describe("hasTask", () => {
-        it("Should add some testing data", (done) => {
-            const project: Project = {
-                identifier: "project",
-                name: "Project",
-                description: "Description"
-            }
-
-            db.addProject(project).then(() => {
-                const task1: Task = {
-                    projectIdentifier: "project",
-                    identifier: "task1",
-                    name: "Task 1",
-                    description: "Description 1",
-                    estimatedStartDate: new Date(2016, 9, 1),
-                    estimatedDuration: 30
-                }
-                const task2: Task = {
-                    projectIdentifier: "project",
-                    identifier: "task2",
-                    name: "Task 2",
-                    description: "Description 2",
-                    estimatedStartDate: new Date(2016, 9, 15),
-                    estimatedDuration: 15
-                }
-
-                return db.addTask(task1).then(() => {
-                }).then(() => {
-                    return db.addTask(task2)
-                }).then(() => {
-                    done()
-                })
-            }).catch((error: Error) => {
-                done(error)
-            })
-        })
-        it("Should have task", (done) => {
-            db.hasTask("project", "task1").then(() => {
-                done()
-            }).catch((error: Error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception on invalid task", (done) => {
-            db.hasTask("project", "task3").then(() => {
-                done(new Error("getTask should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TaskNotFoundError)
-                done()
-            })
-        })
-        after(() => {
-            client.flushdb()
-        })
     })
     describe("getTasks", () => {
         it("Should add some testing data", (done) => {
@@ -125,17 +70,25 @@ describe("Redis", () => {
         })
         it("Should get tasks", (done) => {
             db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
-                chai.expect(tasks).to.length(2)
-                chai.expect(tasks[0].identifier).to.equals("task2")
-                chai.expect(tasks[0].name).to.equals("Task 2")
-                chai.expect(tasks[0].description).to.equals("Description 2")
-                chai.expect(tasks[0].estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 15).getTime())
-                chai.expect(tasks[0].estimatedDuration).to.equals(15)
-                chai.expect(tasks[1].identifier).to.equals("task1")
-                chai.expect(tasks[1].name).to.equals("Task 1")
-                chai.expect(tasks[1].description).to.equals("Description 1")
-                chai.expect(tasks[1].estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 1).getTime())
-                chai.expect(tasks[1].estimatedDuration).to.equals(30)
+                const expected: Array<Task> = [
+                    {
+                        projectIdentifier: "project",
+                        identifier: "task2",
+                        name: "Task 2",
+                        description: "Description 2",
+                        estimatedStartDate: new Date(2016, 9, 15),
+                        estimatedDuration: 15
+                    },
+                    {
+                        projectIdentifier: "project",
+                        identifier: "task1",
+                        name: "Task 1",
+                        description: "Description 1",
+                        estimatedStartDate: new Date(2016, 9, 1),
+                        estimatedDuration: 30
+                    }
+                ]
+                chai.expect(tasks).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -148,13 +101,18 @@ describe("Redis", () => {
         })
         it("Should get valid tasks", (done) => {
             db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
-                chai.expect(tasks).to.length(2)
-                chai.expect(tasks[0].identifier).to.equals("task2")
-                chai.expect(tasks[0].name).to.equals("Task 2")
-                chai.expect(tasks[0].description).to.equals("Description 2")
-                chai.expect(tasks[0].estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 15).getTime())
-                chai.expect(tasks[0].estimatedDuration).to.equals(15)
-                chai.expect(tasks[1]).to.null
+                const expected: Array<Task | null> = [
+                    {
+                        projectIdentifier: "project",
+                        identifier: "task2",
+                        name: "Task 2",
+                        description: "Description 2",
+                        estimatedStartDate: new Date(2016, 9, 15),
+                        estimatedDuration: 15
+                    },
+                    null
+                ]
+                chai.expect(tasks).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -169,13 +127,18 @@ describe("Redis", () => {
         })
         it("Should get valid tasks", (done) => {
             db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
-                chai.expect(tasks).to.length(2)
-                chai.expect(tasks[0].identifier).to.equals("task2")
-                chai.expect(tasks[0].name).to.equals("Task 2")
-                chai.expect(tasks[0].description).to.equals("Description 2")
-                chai.expect(tasks[0].estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 15).getTime())
-                chai.expect(tasks[0].estimatedDuration).to.equals(15)
-                chai.expect(tasks[1]).to.null
+                const expected: Array<Task | null> = [
+                    {
+                        projectIdentifier: "project",
+                        identifier: "task2",
+                        name: "Task 2",
+                        description: "Description 2",
+                        estimatedStartDate: new Date(2016, 9, 15),
+                        estimatedDuration: 15
+                    },
+                    null
+                ]
+                chai.expect(tasks).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -223,11 +186,15 @@ describe("Redis", () => {
         })
         it("Should get task", (done) => {
             db.getTask("project", "task1").then((task: Task) => {
-                chai.expect(task.identifier).to.equals("task1")
-                chai.expect(task.name).to.equals("Task 1")
-                chai.expect(task.description).to.equals("Description 1")
-                chai.expect(task.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 1).getTime())
-                chai.expect(task.estimatedDuration).to.equals(30)
+                const expected: Task = {
+                    projectIdentifier: "project",
+                    identifier: "task1",
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                chai.expect(task).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -362,7 +329,7 @@ describe("Redis", () => {
             client.flushdb()
         })
     })
-    describe("setTaskRelation", () => {
+    describe("addTaskRelation", () => {
         it("Should add some testing data", (done) => {
             const project: Project = {
                 identifier: "project",
@@ -397,24 +364,36 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should set task relation", (done) => {
-            db.setTaskRelation("project", "task1", "task2").then(() => {
+        it("Should add task relation", (done) => {
+            db.addTaskRelation({
+                projectIdentifier: "project",
+                previous: "task1",
+                next: "task2"
+            }).then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid parent task", (done) => {
-            db.setTaskRelation("project", "task3", "task2").then(() => {
-                done(new Error("setTaskRelation should not be a success"))
+            db.addTaskRelation({
+                projectIdentifier: "project",
+                previous: "task3",
+                next: "task2"
+            }).then(() => {
+                done(new Error("addTaskRelation should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
                 done()
             })
         })
         it("Should get an exception on invalid child task", (done) => {
-            db.setTaskRelation("project", "task1", "task3").then(() => {
-                done(new Error("setTaskRelation should not be a success"))
+            db.addTaskRelation({
+                projectIdentifier: "project",
+                previous: "task1",
+                next: "task3"
+            }).then(() => {
+                done(new Error("addTaskRelation should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
                 done()
@@ -427,9 +406,13 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        xit("Should get an exception on corrupted parent task", (done) => {
-            db.setTaskRelation("project", "task1", "task2").then(() => {
-                done(new Error("setTaskRelation should not be a success"))
+        it("Should get an exception on corrupted parent task", (done) => {
+            db.addTaskRelation({
+                projectIdentifier: "project",
+                previous: "task1",
+                next: "task2"
+            }).then(() => {
+                done(new Error("addTaskRelation should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null
                 done()
@@ -443,32 +426,21 @@ describe("Redis", () => {
             })
         })
         it("Should set task relation", (done) => {
-            db.setTaskRelation("project", "task1", "task2").then(() => {
+            db.addTaskRelation({
+                projectIdentifier: "project",
+                previous: "task1",
+                next: "task2"
+            }).then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
-            })
-        })
-        it("Should corrupt task properties", (done) => {
-            client.setAsync("task:project:task2:parents", "test").then((result) => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        xit("Should get an exception on corrupted children task", (done) => {
-            db.setTaskRelation("project", "task1", "task2").then(() => {
-                done(new Error("setTaskRelation should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.not.null
-                done()
             })
         })
         after(() => {
             client.flushdb()
         })
     })
-    describe("getParentTaskIds", () => {
+    describe("getTaskRelations", () => {
         it("Should add some testing data", (done) => {
             const project: Project = {
                 identifier: "project",
@@ -507,95 +479,17 @@ describe("Redis", () => {
                 }).then(() => {
                     return db.addTask(task3)
                 }).then(() => {
-                    return db.setTaskRelation("project", "task2", "task1")
+                    return db.addTaskRelation({
+                        projectIdentifier: "project",
+                        previous: "task1",
+                        next: "task2"
+                    })
                 }).then(() => {
-                    return db.setTaskRelation("project", "task3", "task1")
-                }).then(() => {
-                    done()
-                })
-            }).catch((error: Error) => {
-                done(error)
-            })
-        })
-        it("Should get parent task ids", (done) => {
-            db.getParentTaskIdentifiers("project", "task1").then((ids: Array<string>) => {
-                chai.expect(ids).to.length(2)
-                chai.expect(ids[0]).to.equals("task2")
-                chai.expect(ids[1]).to.equals("task3")
-                done()
-            }).catch((error: Error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception on invalid task", (done) => {
-            db.getParentTaskIdentifiers("project", "task4").then((ids: Array<string>) => {
-                done(new Error("getParentTaskIds should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(TaskNotFoundError)
-                done()
-            })
-        })
-        it("Should corrupt task properties", (done) => {
-            client.setAsync("task:project:task1:parents", "test").then((result) => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception on corrupted task", (done) => {
-            db.getParentTaskIdentifiers("project", "task1").then((ids: Array<string>) => {
-                done(new Error("getParentTaskIds should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.not.null
-                done()
-            })
-        })
-        after(() => {
-            client.flushdb()
-        })
-    })
-    describe("getChildrenTaskIds", () => {
-        it("Should add some testing data", (done) => {
-            const project: Project = {
-                identifier: "project",
-                name: "Project",
-                description: "Description"
-            }
-
-            db.addProject(project).then(() => {
-                const task1: Task = {
-                    projectIdentifier: "project",
-                    identifier: "task1",
-                    name: "Task 1",
-                    description: "Description 1",
-                    estimatedStartDate: new Date(2016, 9, 1),
-                    estimatedDuration: 30
-                }
-                const task2: Task = {
-                    projectIdentifier: "project",
-                    identifier: "task2",
-                    name: "Task 2",
-                    description: "Description 2",
-                    estimatedStartDate: new Date(2016, 9, 15),
-                    estimatedDuration: 15
-                }
-                const task3: Task = {
-                    projectIdentifier: "project",
-                    identifier: "task3",
-                    name: "Task 3",
-                    description: "Description 3",
-                    estimatedStartDate: new Date(2016, 10, 1),
-                    estimatedDuration: 10
-                }
-
-                return db.addTask(task1).then(() => {
-                    return db.addTask(task2)
-                }).then(() => {
-                    return db.addTask(task3)
-                }).then(() => {
-                    return db.setTaskRelation("project", "task1", "task2")
-                }).then(() => {
-                    return db.setTaskRelation("project", "task1", "task3")
+                    return db.addTaskRelation({
+                        projectIdentifier: "project",
+                        previous: "task1",
+                        next: "task3"
+                    })
                 }).then(() => {
                     done()
                 })
@@ -603,19 +497,29 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should get children task ids", (done) => {
-            db.getChildrenTaskIdentifiers("project", "task1").then((ids: Array<string>) => {
-                chai.expect(ids).to.length(2)
-                chai.expect(ids[0]).to.equals("task2")
-                chai.expect(ids[1]).to.equals("task3")
+        it("Should get task relations", (done) => {
+            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+                const expected: Array<TaskRelation> = [
+                    {
+                        projectIdentifier: "project",
+                        previous: "task1",
+                        next: "task2"
+                    },
+                    {
+                        projectIdentifier: "project",
+                        previous: "task1",
+                        next: "task3"
+                    }
+                ]
+                chai.expect(taskRelations).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.getChildrenTaskIdentifiers("project", "task4").then((ids: Array<string>) => {
-                done(new Error("getChildrenTaskIds should not be a success"))
+            db.getTaskRelations("project", "task4").then((taskRelations: Array<TaskRelation>) => {
+                done(new Error("getTaskRelations should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(TaskNotFoundError)
                 done()
@@ -629,8 +533,8 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getChildrenTaskIdentifiers("project", "task1").then((ids: Array<string>) => {
-                done(new Error("getChildrenTaskIds should not be a success"))
+            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+                done(new Error("getTaskRelations should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.not.null
                 done()

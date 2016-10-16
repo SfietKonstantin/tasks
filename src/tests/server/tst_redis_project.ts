@@ -60,13 +60,19 @@ describe("Redis", () => {
         })
         it("Should get all projects", (done) => {
             db.getAllProjects().then((projects: Array<Project>) => {
-                chai.expect(projects).to.length(2)
-                chai.expect(projects[0].identifier).to.equals("project1")
-                chai.expect(projects[0].name).to.equals("Project 1")
-                chai.expect(projects[0].description).to.equals("Description 1")
-                chai.expect(projects[1].identifier).to.equals("project2")
-                chai.expect(projects[1].name).to.equals("Project 2")
-                chai.expect(projects[1].description).to.equals("Description 2")
+                const expected: Array<Project> = [
+                    {
+                        identifier: "project1",
+                        name: "Project 1",
+                        description: "Description 1"
+                    },
+                    {
+                        identifier: "project2",
+                        name: "Project 2",
+                        description: "Description 2"
+                    }
+                ]
+                chai.expect(projects).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -79,10 +85,14 @@ describe("Redis", () => {
         })
         it("Should get all valid projects", (done) => {
             db.getAllProjects().then((projects: Array<Project>) => {
-                chai.expect(projects).to.length(1)
-                chai.expect(projects[0].identifier).to.equals("project2")
-                chai.expect(projects[0].name).to.equals("Project 2")
-                chai.expect(projects[0].description).to.equals("Description 2")
+                const expected: Array<Project> = [
+                    {
+                        identifier: "project2",
+                        name: "Project 2",
+                        description: "Description 2"
+                    }
+                ]
+                chai.expect(projects).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -97,10 +107,14 @@ describe("Redis", () => {
         })
         it("Should get all non-corrupted projects", (done) => {
             db.getAllProjects().then((projects: Array<Project>) => {
-                chai.expect(projects).to.length(1)
-                chai.expect(projects[0].identifier).to.equals("project2")
-                chai.expect(projects[0].name).to.equals("Project 2")
-                chai.expect(projects[0].description).to.equals("Description 2")
+                    const expected: Array<Project> = [
+                    {
+                        identifier: "project2",
+                        name: "Project 2",
+                        description: "Description 2"
+                    }
+                ]
+                chai.expect(projects).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -152,9 +166,12 @@ describe("Redis", () => {
         })
         it("Should get project", (done) => {
             db.getProject("project1").then((project: Project) => {
-                chai.expect(project.identifier).to.equals("project1")
-                chai.expect(project.name).to.equals("Project 1")
-                chai.expect(project.description).to.equals("Description 1")
+                const expected: Project = {
+                    identifier: "project1",
+                    name: "Project 1",
+                    description: "Description 1"
+                }
+                chai.expect(project).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)

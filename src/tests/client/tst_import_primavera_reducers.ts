@@ -117,7 +117,7 @@ describe("Primavera reducers", () => {
                 const action = dispatch.args[1][0]
                 const state = main.mainReducer(initialState, action)
                 chai.expect(state.project.project).to.deep.equal(initialState.project.project)
-                chai.expect(state.project.error).to.equals("Error message")
+                chai.expect(state.project.error).to.equal("Error message")
                 done()
             }).catch((error) => {
                 done(error)

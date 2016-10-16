@@ -76,13 +76,21 @@ describe("Redis", () => {
         })
         it("Should get modifiers", (done) => {
             db.getModifiers("project", [2, 1]).then((modifiers: Array<Modifier>) => {
-                chai.expect(modifiers).to.length(2)
-                chai.expect(modifiers[0].name).to.equals("Modifier 2")
-                chai.expect(modifiers[0].description).to.equals("Description 2")
-                chai.expect(modifiers[0].duration).to.equals(10)
-                chai.expect(modifiers[1].name).to.equals("Modifier 1")
-                chai.expect(modifiers[1].description).to.equals("Description 1")
-                chai.expect(modifiers[1].duration).to.equals(40)
+                const expected: Array<Modifier> = [
+                    {
+                        projectIdentifier: "project",
+                        name: "Modifier 2",
+                        description: "Description 2",
+                        duration: 10
+                    },
+                    {
+                        projectIdentifier: "project",
+                        name: "Modifier 1",
+                        description: "Description 1",
+                        duration: 40
+                    }
+                ]
+                chai.expect(modifiers).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -95,11 +103,16 @@ describe("Redis", () => {
         })
         it("Should get valid modifiers", (done) => {
             db.getModifiers("project", [2, 1]).then((modifiers: Array<Modifier>) => {
-                chai.expect(modifiers).to.length(2)
-                chai.expect(modifiers[0].name).to.equals("Modifier 2")
-                chai.expect(modifiers[0].description).to.equals("Description 2")
-                chai.expect(modifiers[0].duration).to.equals(10)
-                chai.expect(modifiers[1]).to.null
+                const expected: Array<Modifier | null> = [
+                    {
+                        projectIdentifier: "project",
+                        name: "Modifier 2",
+                        description: "Description 2",
+                        duration: 10
+                    },
+                    null
+                ]
+                chai.expect(modifiers).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -114,11 +127,16 @@ describe("Redis", () => {
         })
         it("Should get valid modifiers", (done) => {
             db.getModifiers("project", [2, 1]).then((modifiers: Array<Modifier>) => {
-                chai.expect(modifiers).to.length(2)
-                chai.expect(modifiers[0].name).to.equals("Modifier 2")
-                chai.expect(modifiers[0].description).to.equals("Description 2")
-                chai.expect(modifiers[0].duration).to.equals(10)
-                chai.expect(modifiers[1]).to.null
+                const expected: Array<Modifier | null> = [
+                    {
+                        projectIdentifier: "project",
+                        name: "Modifier 2",
+                        description: "Description 2",
+                        duration: 10
+                    },
+                    null
+                ]
+                chai.expect(modifiers).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)

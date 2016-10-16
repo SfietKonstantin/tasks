@@ -6,8 +6,8 @@ import * as sinon from "sinon"
 import { Header } from "../../client/common/header"
 import { TabBar } from "../../client/common/tabs"
 
-let document = jsdom.jsdom("<!doctype html><html><body></body></html>")
-let window = document.defaultView
+const document = jsdom.jsdom("<!doctype html><html><body></body></html>")
+const window = document.defaultView
 
 global.document = document
 global.window = window
@@ -19,7 +19,7 @@ describe("Common components", () => {
                 <Header identifier="test" name="Test" />
             ) as React.Component<any, any>
             const h1 = testutils.findRenderedDOMComponentWithTag(component, "h1")
-            chai.expect(h1.textContent).to.equals("Test #test")
+            chai.expect(h1.textContent).to.equal("Test #test")
         })
     })
     describe("TabBar", () => {
@@ -37,15 +37,15 @@ describe("Common components", () => {
             const navLi = nav.getElementsByTagName("li")
             chai.expect(navLi).to.length(5)
 
-            chai.expect(navLi[0].textContent).to.equals("Tab 1")
+            chai.expect(navLi[0].textContent).to.equal("Tab 1")
             chai.expect(navLi[0].classList.toString()).to.contains("active")
-            chai.expect(navLi[1].textContent).to.equals("Tab 2")
+            chai.expect(navLi[1].textContent).to.equal("Tab 2")
             chai.expect(navLi[1].classList.toString()).to.not.contains("active")
-            chai.expect(navLi[2].textContent).to.equals("Tab 3")
+            chai.expect(navLi[2].textContent).to.equal("Tab 3")
             chai.expect(navLi[2].classList.toString()).to.not.contains("active")
-            chai.expect(navLi[3].textContent).to.equals("Tab 4")
+            chai.expect(navLi[3].textContent).to.equal("Tab 4")
             chai.expect(navLi[3].classList.toString()).to.not.contains("active")
-            chai.expect(navLi[4].textContent).to.equals("Tab 5")
+            chai.expect(navLi[4].textContent).to.equal("Tab 5")
             chai.expect(navLi[4].classList.toString()).to.not.contains("active")
         })
         it("Should handle change", () => {
@@ -63,11 +63,11 @@ describe("Common components", () => {
             chai.expect(callback.calledTwice)
             chai.expect(callback.calledWith(0))
             chai.expect(callback.calledWith(2))
-            chai.expect(navLi[0].textContent).to.equals("Tab 1")
+            chai.expect(navLi[0].textContent).to.equal("Tab 1")
             chai.expect(navLi[0].classList.toString()).to.not.contains("active")
-            chai.expect(navLi[1].textContent).to.equals("Tab 2")
+            chai.expect(navLi[1].textContent).to.equal("Tab 2")
             chai.expect(navLi[1].classList.toString()).to.not.contains("active")
-            chai.expect(navLi[2].textContent).to.equals("Tab 3")
+            chai.expect(navLi[2].textContent).to.equal("Tab 3")
             chai.expect(navLi[2].classList.toString()).to.contains("active")
         })
     })

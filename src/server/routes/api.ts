@@ -2,9 +2,9 @@ import * as express from "express"
 import { Project, Task, TaskResults, Modifier } from "../../common/types"
 import * as apitypes from "../../common//apitypes"
 import { IDataProvider, NotFoundError, ExistsError } from "../core/data/idataprovider"
-import { TaskNode } from "../core/graph/types"
-import { compute, GraphPersistence } from "../core/graph/graph"
+import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"
 import * as testdata from "../core/testdata"
+import * as maputils from "../../common/maputils"
 
 class RequestError {
     message: string
@@ -15,8 +15,10 @@ class RequestError {
 
 export class Api {
     private dataProvider: IDataProvider
-    constructor(dataProvider: IDataProvider) {
+    private graph: IGraph
+    constructor(dataProvider: IDataProvider, graph: IGraph) {
         this.dataProvider = dataProvider
+        this.graph = graph
     }
     getProjects(req: express.Request, res: express.Response) {
         this.dataProvider.getAllProjects().then((projects: Array<Project>) => {
@@ -27,11 +29,10 @@ export class Api {
     }
     putProject(req: express.Request, res: express.Response) {
         const project = req.body.project as Project
-
-        this.dataProvider.addProject(project).then(() => {
+        this.graph.addProject(project).then(() => {
             res.sendStatus(301)
         }).catch((error: Error) => {
-            if (error instanceof ExistsError) {
+            if (error instanceof GraphError) {
                 res.status(400).json(error)
             } else {
                 res.status(500).json(error)
@@ -54,8 +55,8 @@ export class Api {
         const projectIdentifier = String(req.params.projectIdentifier)
         this.dataProvider.getProjectTasks(projectIdentifier).then((tasks: Array<Task>) => {
             tasks.filter((value: Task) => { return !!value })
-            return this.dataProvider.getTasksResults(projectIdentifier, tasks.map((task: Task) => {
-                return task.identifier
+            Promise.all(tasks.map((task: Task) => {
+                return this.dataProvider.getTaskResults(task.projectIdentifier, task.identifier)
             })).then((tasksResults: Array<TaskResults>) => {
                 res.json(apitypes.createApiTasks(tasks, tasksResults))
             })
@@ -70,19 +71,10 @@ export class Api {
     putTask(req: express.Request, res: express.Response) {
         const apiTask = req.body.task as apitypes.ApiInputTask
         const task = apitypes.createTaskFromApiImportTask(apiTask)
-        this.dataProvider.addTask(task).then(() => {
-            return this.dataProvider.setTaskResults({
-                projectIdentifier: task.projectIdentifier,
-                taskIdentifier: task.identifier,
-                startDate: task.estimatedStartDate,
-                duration: task.estimatedDuration
-            })
-        }).then(() => {
+        maputils.get(this.graph.nodes, task.projectIdentifier).addTask(task).then(() => {
             res.sendStatus(301)
         }).catch((error: Error) => {
-            if (error instanceof NotFoundError) {
-                res.status(404).json(error)
-            } else if (error instanceof ExistsError) {
+            if (error instanceof GraphError) {
                 res.status(400).json(error)
             } else {
                 res.status(500).json(error)
@@ -121,33 +113,22 @@ export class Api {
     }
     putModifier(req: express.Request, res: express.Response) {
         const modifier = req.body.modifier as Modifier
-        const projectIdentifier = String(req.body.projectIdentifier)
         const taskIdentifier = String(req.body.taskIdentifier)
 
-        let graph: GraphPersistence = new GraphPersistence(projectIdentifier, this.dataProvider)
-        this.dataProvider.hasTask(projectIdentifier, taskIdentifier).then(() => {
-            return this.dataProvider.addModifier(modifier)
-        }).then((modifierId: number) => {
-            return this.dataProvider.setModifierForTask(projectIdentifier, modifierId, taskIdentifier)
-        }).then(() => {
-            return graph.loadGraph(taskIdentifier)
-        }).then(() => {
-            return graph.loadData()
-        }).then(() => {
-            compute(graph.root)
-            return graph.save()
-        }).then(() => {
-            return this.sendTask(projectIdentifier, taskIdentifier, res)
+        const projectNode = maputils.get(this.graph.nodes, modifier.projectIdentifier)
+        let taskNode = maputils.get(projectNode.nodes, taskIdentifier)
+        taskNode.addModifier(modifier).then(() => {
+            return this.sendTask(modifier.projectIdentifier, taskIdentifier, res)
         }).catch((error: Error) => {
-            if (error instanceof NotFoundError) {
-                res.status(404).json(error)
+            if (error instanceof GraphError) {
+                res.status(400).json(error)
             } else {
                 res.status(500).json(error)
             }
         })
     }
     getDemoData(req: express.Request, res: express.Response) {
-        testdata.fillTestData(this.dataProvider)
+        testdata.fillTestData(this.dataProvider, this.graph)
         res.sendStatus(200)
     }
     private setTaskImportant(req: express.Request, res: express.Response, important: boolean) {
@@ -166,21 +147,20 @@ export class Api {
     private sendTask(projectIdentifier: string, taskIdentifier: string, res: express.Response): Promise<void> {
         return this.dataProvider.getTask(projectIdentifier, taskIdentifier).then((task: Task) => {
             return this.dataProvider.getProject(task.projectIdentifier).then((project: Project) => {
-                return this.dataProvider.getTaskResults(projectIdentifier, task.identifier)
-                                        .then((taskResults: TaskResults) => {
-                    return this.dataProvider.getTaskModifierIds(projectIdentifier, taskIdentifier)
-                                            .then((modifierIds: Array<number>) => {
-                        return this.dataProvider.getModifiers(projectIdentifier, modifierIds)
-                                                .then((modifiers: Array<Modifier>) => {
-                            const apiTask: apitypes.ApiProjectTaskModifiers = {
-                                project: project,
-                                task: apitypes.createApiTask(task, taskResults),
-                                modifiers: modifiers
-                            }
-                            res.json(apiTask)
-                        })
-                    })
-                })
+                const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
+                let taskNode = maputils.get(projectNode.nodes, taskIdentifier)
+
+                const apiTask: apitypes.ApiProjectTaskModifiers = {
+                    project: project,
+                    task: apitypes.createApiTask(task, {
+                        projectIdentifier,
+                        taskIdentifier,
+                        startDate: taskNode.startDate,
+                        duration: taskNode.duration
+                    }),
+                    modifiers: taskNode.modifiers
+                }
+                res.json(apiTask)
             })
         })
     }

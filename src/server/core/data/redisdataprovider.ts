@@ -1,10 +1,10 @@
 import {
     CorruptedError, ExistsError,
+    IDataProvider,
     ProjectNotFoundError, TaskNotFoundError, ModifierNotFoundError,
     DelayNotFoundError
 } from "./idataprovider"
-import { IDataProvider } from "./idataprovider"
-import { Identifiable, Project, Task, TaskResults, Modifier, Delay } from "../../../common/types"
+import { Identifiable, Project, Task, TaskRelation, TaskResults, Modifier, Delay } from "../../../common/types"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 
@@ -269,16 +269,7 @@ export class RedisDataProvider implements IDataProvider {
             return RedisProject.save(project, this.client)
         })
     }
-    hasTask(projectIdentifier: string, taskIdentifier: string): Promise<void> {
-        return this.hasProject(projectIdentifier).then(() => {
-            return this.client.existsAsync(taskRootKey(projectIdentifier, taskIdentifier)).then((result: number) => {
-                if (result !== 1) {
-                    throw new TaskNotFoundError("Task " + taskIdentifier + " not found")
-                }
-            })
-        })
-    }
-    getTasks(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<Task>> {
+    getTasks(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<Task | null>> {
         return Promise.all(taskIdentifiers.map(this.getMappedTask.bind(this, projectIdentifier)))
     }
     getTask(projectIdentifier: string, taskIdentifier: string): Promise<Task> {
@@ -301,32 +292,6 @@ export class RedisDataProvider implements IDataProvider {
             return RedisTask.save(task, this.client)
         })
     }
-    setTaskRelation(projectIdentifier: string, parentTaskIdentifier: string,
-                    childTaskIdentifier: string): Promise<void> {
-        return this.hasTask(projectIdentifier, parentTaskIdentifier).then(() => {
-            return this.hasTask(projectIdentifier, childTaskIdentifier)
-        }).then(() => {
-            const taskChildren = taskKey(projectIdentifier, parentTaskIdentifier, "children")
-            const taskParents = taskKey(projectIdentifier, childTaskIdentifier, "parents")
-            return this.client.multi().sadd(taskChildren, childTaskIdentifier)
-                                      .sadd(taskParents, parentTaskIdentifier)
-                                      .execAsync()
-        })
-    }
-    getParentTaskIdentifiers(projectIdentifier: string, taskIdentifier: string): Promise<Array<string>> {
-        return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
-            return this.client.smembersAsync(taskKey(projectIdentifier, taskIdentifier, "parents"))
-        }).then((identifiers: Array<string>) => {
-            return identifiers.sort()
-        })
-    }
-    getChildrenTaskIdentifiers(projectIdentifier: string, taskIdentifier: string): Promise<Array<string>> {
-        return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
-            return this.client.smembersAsync(taskKey(projectIdentifier, taskIdentifier, "children"))
-        }).then((identifiers: Array<string>) => {
-            return identifiers.sort()
-        })
-    }
     isTaskImportant(projectIdentifier: string, taskIdentifier: string): Promise<boolean> {
         return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
             return this.client.sismemberAsync("task:important", projectIdentifier + ":" + taskIdentifier)
@@ -344,8 +309,28 @@ export class RedisDataProvider implements IDataProvider {
             }
         })
     }
-    getTasksResults(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<TaskResults>> {
-        return Promise.all(taskIdentifiers.map(this.getMappedTaskResults.bind(this, projectIdentifier)))
+    addTaskRelation(relation: TaskRelation): Promise<void> {
+        return this.hasTask(relation.projectIdentifier, relation.previous).then(() => {
+            return this.hasTask(relation.projectIdentifier, relation.next)
+        }).then(() => {
+            const projectIdentifier = relation.projectIdentifier
+            const previous = relation.previous
+            const next = relation.next
+            return this.client.saddAsync(taskKey(projectIdentifier, previous, "children"), next)
+        })
+    }
+    getTaskRelations(projectIdentifier: string, taskIdentifier: string): Promise<Array<TaskRelation>> {
+        return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
+            return this.client.smembersAsync(taskKey(projectIdentifier, taskIdentifier, "children"))
+        }).then((identifiers: Array<string>) => {
+            return identifiers.sort().map((childIndentifier: string): TaskRelation => {
+                return {
+                    projectIdentifier,
+                    previous: taskIdentifier,
+                    next: childIndentifier
+                }
+            })
+        })
     }
     getTaskResults(projectIdentifier: string, taskIdentifier: string): Promise<TaskResults> {
         return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
@@ -370,7 +355,7 @@ export class RedisDataProvider implements IDataProvider {
     setTaskResults(taskResults: TaskResults): Promise<void> {
         const projectIdentifier = taskResults.projectIdentifier
         return this.hasTask(projectIdentifier, taskResults.taskIdentifier).then(() => {
-            let set = [
+            const set = [
                 taskKey(projectIdentifier, taskResults.taskIdentifier, "duration"),
                 +taskResults.duration,
                 taskKey(projectIdentifier, taskResults.taskIdentifier, "startDate"),
@@ -379,7 +364,7 @@ export class RedisDataProvider implements IDataProvider {
             return this.client.msetAsync(set)
         })
     }
-    getModifiers(projectIdentifier: string, modifierIds: Array<number>): Promise<Array<Modifier>> {
+    getModifiers(projectIdentifier: string, modifierIds: Array<number>): Promise<Array<Modifier | null>> {
         return Promise.all(modifierIds.map(this.getMappedModifier.bind(this, projectIdentifier)))
     }
     getModifier(projectIdentifier: string, modifierId: number): Promise<Modifier> {
@@ -387,11 +372,12 @@ export class RedisDataProvider implements IDataProvider {
             return RedisModifier.load(projectIdentifier, modifierId, this.client)
         })
     }
-    getTaskModifierIds(projectIdentifier: string, taskIdentifier: string): Promise<Array<number>> {
+    getTaskModifiers(projectIdentifier: string, taskIdentifier: string): Promise<Array<Modifier>> {
         return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
             return this.client.smembersAsync(taskKey(projectIdentifier, taskIdentifier, "modifiers"))
         }).then((ids: Array<string>) => {
-            return ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
+            const sorted = ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
+            return this.getModifiers(projectIdentifier, sorted)
         })
     }
     getModifieredTaskIds(projectIdentifier: string, modifierId: number): Promise<Array<string>> {
@@ -415,20 +401,7 @@ export class RedisDataProvider implements IDataProvider {
                                       .execAsync()
         })
     }
-    getModifiersValues(projectIdentifier: string, modifierIds: Array<number>): Promise<Array<number>> {
-        if (modifierIds.length === 0) {
-            return new Promise<Array<number>>((resolve, reject) => {
-                resolve([])
-            })
-        } else {
-            return this.client.mgetAsync(modifierIds.map((id: number) => {
-                return modifierKey(projectIdentifier, id, "duration")
-            })).then((results: Array<any>) => {
-                return results.map((result) => { return result ? +result : null })
-            })
-        }
-    }
-    getDelays(projectIdentifier: string, delayIdentifiers: Array<string>): Promise<Array<Delay>> {
+    getDelays(projectIdentifier: string, delayIdentifiers: Array<string>): Promise<Array<Delay | null>> {
         return Promise.all(delayIdentifiers.map(this.getMappedDelays.bind(this, projectIdentifier)))
     }
     getDelay(projectIdentifier: string, delayIdentifier: string): Promise<Delay> {
@@ -474,16 +447,6 @@ export class RedisDataProvider implements IDataProvider {
             return identifiers.sort()
         })
     }
-    watchTasksModifiers(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<void> {
-        return this.client.watchAsync(taskIdentifiers.map((taskIdentifier: string) => {
-            return taskKey(projectIdentifier, taskIdentifier, "modifiers")
-        })).then((result) => {})
-    }
-    watchModifiersDurations(projectIdentifier: string, modifierIdentifiers: Array<string>): Promise<void> {
-        return this.client.watchAsync(modifierIdentifiers.map((modifierIdentifier: string) => {
-            return modifierKey(projectIdentifier, +modifierIdentifier, "duration")
-        })).then((result) => {})
-    }
     private static indexFromString(id: string): number {
         return +id
     }
@@ -523,6 +486,15 @@ export class RedisDataProvider implements IDataProvider {
             if (result === 1) {
                 throw new ExistsError("Task " + taskIdentifier + " already exists")
             }
+        })
+    }
+    private hasTask(projectIdentifier: string, taskIdentifier: string): Promise<void> {
+        return this.hasProject(projectIdentifier).then(() => {
+            return this.client.existsAsync(taskRootKey(projectIdentifier, taskIdentifier)).then((result: number) => {
+                if (result !== 1) {
+                    throw new TaskNotFoundError("Task " + taskIdentifier + " not found")
+                }
+            })
         })
     }
     private notHasDelay(projectIdentifier: string, delayIdentifier: string): Promise<void> {

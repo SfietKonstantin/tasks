@@ -44,7 +44,7 @@ describe("Redis", () => {
                 }
 
                 return db.addTask(task).then(() => {
-                    let taskResults: TaskResults = {
+                    const taskResults: TaskResults = {
                         projectIdentifier: "project",
                         taskIdentifier: "task",
                         startDate: new Date(2016, 9, 15),
@@ -60,9 +60,13 @@ describe("Redis", () => {
         })
         it("Should get task results", (done) => {
             db.getTaskResults("project", "task").then((result: TaskResults) => {
-                chai.expect(result.taskIdentifier).to.equals("task")
-                chai.expect(result.startDate.getTime()).to.equals(new Date(2016, 9, 15).getTime())
-                chai.expect(result.duration).to.equals(40)
+                const expected: TaskResults = {
+                    projectIdentifier: "project",
+                    taskIdentifier: "task",
+                    startDate: new Date(2016, 9, 15),
+                    duration: 40
+                }
+                chai.expect(result).to.deep.equal(expected)
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -180,15 +184,23 @@ describe("Redis", () => {
         })
         it("Should get task results", (done) => {
             db.getTaskResults("project", "task1").then((result: TaskResults) => {
-                chai.expect(result.taskIdentifier).to.equals("task1")
-                chai.expect(result.startDate.getTime()).to.equals(new Date(2016, 9, 16).getTime())
-                chai.expect(result.duration).to.equals(45)
+                const expected: TaskResults = {
+                    projectIdentifier: "project",
+                    taskIdentifier: "task1",
+                    startDate: new Date(2016, 9, 16),
+                    duration: 45
+                }
+                chai.expect(result).to.deep.equal(expected)
             }).then(() => {
                 return db.getTaskResults("project", "task2")
             }).then((result: TaskResults) => {
-                chai.expect(result.taskIdentifier).to.equals("task2")
-                chai.expect(result.startDate.getTime()).to.equals(new Date(2016, 10, 2).getTime())
-                chai.expect(result.duration).to.equals(61)
+                const expected: TaskResults = {
+                    projectIdentifier: "project",
+                    taskIdentifier: "task2",
+                    startDate: new Date(2016, 10, 2),
+                    duration: 61
+                }
+                chai.expect(result).to.deep.equal(expected)
             }).then(() => {
                 done()
             }).catch((error: Error) => {
@@ -196,7 +208,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            let taskResults: TaskResults = {
+            const taskResults: TaskResults = {
                 projectIdentifier: "project",
                 taskIdentifier: "task3",
                 startDate: new Date(2016, 9, 15),

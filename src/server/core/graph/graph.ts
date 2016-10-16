@@ -1,179 +1,224 @@
-import { Task, TaskResults, Modifier } from "../../../common/types"
+import { Project, Task, TaskRelation, TaskResults, Modifier } from "../../../common/types"
+import { GraphError, ITaskNode, IProjectNode, IGraph } from "./types"
+import { IDataProvider } from "../data/idataprovider"
 import * as dateutils from "../../../common/dateutils"
 import * as maputils from "../../../common/maputils"
-import { CyclicDependencyError } from "./igraph"
-import { TaskNode } from "./types"
-import { IDataProvider, TaskNotFoundError } from "../data/idataprovider"
 
-export class NotComputed extends Error implements Error {
-    constructor(node: TaskNode) {
-        super("StartDate or duration is computed for node " + node.taskIdentifier)
-    }
-}
-
-export const buildGraphIndex = (root: TaskNode, map: Map<string, TaskNode>): void => {
-    if (map.has(root.taskIdentifier)) {
-        return
-    }
-    map.set(root.taskIdentifier, root)
-    for (let child of root.children) {
-        buildGraphIndex(child, map)
-    }
-}
-
-const computeDuration = (node: TaskNode): void => {
-    node.duration = node.estimatedDuration
-    node.duration += Math.max(node.modifiers.reduce((previous: number, current: number) => {
-        return previous + current
-    }, 0), 0)
-}
-
-const defineStartDate = (node: TaskNode): void => {
-    if (!node.startDate) {
-        node.startDate = new Date(node.estimatedStartDate.getTime())
-    }
-}
-
-const processMilestones = (node: TaskNode): void => {
-    if (node.estimatedDuration === 0) {
-        const initialDate = node.startDate as Date
-        const initialDuration = node.duration as number
-        node.startDate = dateutils.addDays(initialDate, initialDuration)
-        node.duration = 0
-    }
-}
-
-export const compute = (root: TaskNode): void => {
-    let map = new Map<string, TaskNode>()
-    buildGraphIndex(root, map)
-
-    // Compute durations and define start dates
-    Array.from(map.values(), computeDuration)
-    Array.from(map.values(), defineStartDate)
-    Array.from(map.values(), processMilestones)
-
-    // Compute start time
-    let toBeComputed = new Set<string>(map.keys())
-    toBeComputed.delete(root.taskIdentifier) // root should not be computed
-
-    let queue = Array.from(toBeComputed)
-    let deferred = new Array<string>()
-
-    let lastDeferredLength = queue.length
-    while (queue.length > 0 || deferred.length > 0) {
-        if (queue.length === 0) {
-            if (lastDeferredLength === deferred.length) {
-                throw new CyclicDependencyError("Cyclic dependency found in graph")
-            }
-            lastDeferredLength = deferred.length
-            queue = queue.concat(deferred)
-            deferred.splice(0)
-        }
-        const identifier = queue.shift() as string
-        let node = maputils.get(map, identifier)
-        if (node.parents.filter((parent: TaskNode) => { return toBeComputed.has(parent.taskIdentifier)}).length > 0) {
-            deferred.push(identifier)
-        } else {
-            let endDates = node.parents.map((parent: TaskNode) => {
-                const parentStartDate = parent.startDate as Date // Never null
-                const parentDuration = parent.duration as number // Never null
-                return dateutils.addDays(parentStartDate, parentDuration)
-            })
-            if (node.startDate != null) {
-                endDates.push(node.startDate)
-            }
-            node.startDate = new Date(Math.max.apply(null, endDates))
-            toBeComputed.delete(identifier)
-        }
-    }
-}
-
-export class GraphPersistence {
+export class TaskNode implements ITaskNode {
     projectIdentifier: string
-    root: TaskNode
-    nodes: Map<string, TaskNode>
+    taskIdentifier: string
+    startDate: Date
+    duration: number
+    children: Array<ITaskNode>
+    parents: Array<ITaskNode>
+    modifiers: Array<Modifier>
     private dataProvider: IDataProvider
-    constructor(projectIdentifier: string, dataProvider: IDataProvider) {
-        this.projectIdentifier = projectIdentifier
+    private estimatedStartDate: Date
+    private estimatedDuration: number
+    private marked: boolean
+    constructor(dataProvider: IDataProvider,
+                projectIdentifier: string, taskIdentifier: string,
+                estimatedStartDate: Date, estimatedDuration: number,
+                startDate: Date, duration: number) {
         this.dataProvider = dataProvider
+        this.projectIdentifier = projectIdentifier
+        this.taskIdentifier = taskIdentifier
+        this.estimatedStartDate = estimatedStartDate
+        this.estimatedDuration = estimatedDuration
+        this.startDate = startDate
+        this.duration = duration
+        this.children = new Array<ITaskNode>()
+        this.parents = new Array<ITaskNode>()
+        this.modifiers = new Array<Modifier>()
+        this.marked = false
     }
-    loadGraph(taskIdentifier: string): Promise<void> {
-        let nodes = new Map<string, TaskNode>()
-        return this.loadNode(taskIdentifier, nodes).then(() => {
-            let node = maputils.get(nodes, taskIdentifier)
-            this.root = node
-            this.nodes = nodes
+    compute(): Promise<void> {
+        return this.markAndCompute(new Set<ITaskNode>())
+    }
+    addModifier(modifier: Modifier): Promise<Modifier> {
+        if (modifier.projectIdentifier !== this.projectIdentifier) {
+            return Promise.reject(new GraphError("Invalid project for modifier"))
+        }
+        return this.dataProvider.addModifier(modifier).then((id: number) => {
+            return this.dataProvider.setModifierForTask(this.projectIdentifier, id, this.taskIdentifier)
+        }).then(() => {
+            this.modifiers.push(modifier)
+            return this.compute()
+        }).then(() => {
+            return modifier
         })
     }
-    loadData(): Promise<void> {
-        let modifierMap = new Map<number, Array<string>>() // Map modifier id to tasks
-        return Promise.all(Array.from(this.nodes.values(), (node: TaskNode) => {
-            return this.dataProvider.getTaskModifierIds(this.projectIdentifier, node.taskIdentifier)
-                                    .then((ids: Array<number>) => {
-                ids.forEach((id: number) => {
-                    if (!modifierMap.has(id)) {
-                        modifierMap.set(id, new Array<string>())
-                    }
-                    let modifier = maputils.get(modifierMap, id)
-                    modifier.push(node.taskIdentifier)
-                })
-            })
-        })).then(() => {
-            let keys = Array.from(modifierMap.keys()).sort()
-            return this.dataProvider.getModifiersValues(this.projectIdentifier, keys).then((values: Array<number>) => {
-                for (let i in keys) {
-                    let modifierId = keys[i]
-                    const taskIds = maputils.get(modifierMap, modifierId)
+    addChild(node: ITaskNode): Promise<void> {
+        this.children.push(node)
+        node.parents.push(this)
+        return this.computeChildren(new Set<ITaskNode>())
+    }
+    getEndDate(): Date {
+        return dateutils.addDays(this.startDate, this.duration)
+    }
+    private markAndCompute(markedNodes: Set<ITaskNode>) {
+        return Promise.resolve().then(() => {
+            if (markedNodes.has(this)) {
+                throw new GraphError("Cyclic dependency found")
+            }
+            markedNodes.add(this)
+            const currentEndDate = this.getEndDate()
 
-                    taskIds.forEach((taskIdentifier: string) => {
-                        let taskNode = maputils.get(this.nodes, taskIdentifier)
-                        taskNode.modifiers.push(values[i])
-                    })
-                }
+            // Compute duration
+            const durations = this.modifiers.map((modifier: Modifier) => { return modifier.duration })
+            this.duration = this.estimatedDuration + Math.max(durations.reduce((first: number, second: number) => {
+                return first + second
+            }, 0), 0)
+
+            // Compute start date
+            let parentEndDates = this.parents.map((node: ITaskNode) => { return (node as TaskNode).getEndDate() })
+            parentEndDates.push(this.startDate)
+            parentEndDates = parentEndDates.filter((value: Date) => {
+                return !Number.isNaN(value.getTime())
+            })
+
+            if (parentEndDates.length === 0) {
+                throw new GraphError("Invalid input")
+            }
+            this.startDate = new Date(Math.max.apply(null, parentEndDates))
+
+            // Take milestones in account
+            if (this.estimatedDuration === 0) {
+                this.startDate = dateutils.addDays(this.startDate, this.duration)
+                this.duration = 0
+            }
+
+            // No need to save / compute children if nothing changed
+            const newEndDate = this.getEndDate()
+            if (newEndDate.getTime() === currentEndDate.getTime()) {
+                return false
+            }
+            return true
+        }).then((shouldCompute: boolean) => {
+            if (!shouldCompute) {
+                return
+            }
+
+            // Try computing children first
+            return this.computeChildren(markedNodes).then(() => {
+                // Then save results
+                return this.dataProvider.setTaskResults({
+                    projectIdentifier: this.projectIdentifier,
+                    taskIdentifier: this.taskIdentifier,
+                    startDate: this.startDate,
+                    duration: this.duration
+                })
             })
         }).then(() => {
-            return Promise.all(Array.from(this.nodes.values(), (node: TaskNode) => {
-                return this.dataProvider.getTaskResults(this.projectIdentifier, node.taskIdentifier)
-                                        .then((result: TaskResults) => {
-                    node.startDate = result.startDate
-                    node.duration = result.duration
+            markedNodes.delete(this)
+        })
+    }
+    private computeChildren(markedNodes: Set<ITaskNode>): Promise<void> {
+        return Promise.all(this.children.map((child: TaskNode) => {
+            return child.markAndCompute(markedNodes)
+        }))
+    }
+}
+
+export class ProjectNode implements IProjectNode {
+    projectIdentifier: string
+    nodes: Map<string, ITaskNode>
+    private dataProvider: IDataProvider
+    constructor(dataProvider: IDataProvider, projectIdentifier: string) {
+        this.dataProvider = dataProvider
+        this.projectIdentifier = projectIdentifier
+        this.nodes = new Map<string, ITaskNode>()
+    }
+    load(): Promise<void> {
+        return this.dataProvider.getProjectTasks(this.projectIdentifier).then((tasks: Array<Task>) => {
+            return Promise.all(tasks.map((task: Task) => {
+                return this.dataProvider.getTaskResults(task.projectIdentifier, task.identifier)
+                           .then((results: TaskResults) => {
+                    const node = new TaskNode(this.dataProvider, task.projectIdentifier, task.identifier,
+                                              task.estimatedStartDate, task.estimatedDuration,
+                                              results.startDate, results.duration)
+                    this.nodes.set(task.identifier, node)
+                })
+            })).then(() => {
+                return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
+                    return this.dataProvider.getTaskModifiers(node.projectIdentifier, node.taskIdentifier)
+                               .then((modifiers: Array<Modifier>) => {
+                        node.modifiers = modifiers
+                    })
+                }))
+            }).then(() => {
+                return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
+                    return this.dataProvider.getTaskRelations(node.projectIdentifier, node.taskIdentifier)
+                               .then((taskRelations: Array<TaskRelation>) => {
+                        taskRelations.forEach((taskRelation: TaskRelation) => {
+                            const child = maputils.get(this.nodes, taskRelation.next)
+                            let taskNode = node as TaskNode
+                            taskNode.addChild(child)
+                        })
+                    })
+                }))
+            })
+        })
+    }
+    addTask(task: Task): Promise<ITaskNode> {
+        if (task.projectIdentifier !== this.projectIdentifier) {
+            return Promise.reject(new GraphError("Invalid project for task"))
+        }
+        if (this.nodes.has(task.identifier)) {
+            return Promise.reject(new GraphError("Task is already present in project"))
+        }
+        return this.dataProvider.addTask(task).then(() => {
+            const taskResults: TaskResults = {
+                projectIdentifier: task.projectIdentifier,
+                taskIdentifier: task.identifier,
+                startDate: task.estimatedStartDate,
+                duration: task.estimatedDuration
+            }
+            return this.dataProvider.setTaskResults(taskResults)
+        }).then(() => {
+            const node = new TaskNode(this.dataProvider, task.projectIdentifier, task.identifier,
+                                        task.estimatedStartDate, task.estimatedDuration,
+                                        task.estimatedStartDate, task.estimatedDuration)
+            this.nodes.set(task.identifier, node)
+            return node
+        })
+    }
+    addRelation(relation: TaskRelation): Promise<void> {
+        if (!this.nodes.has(relation.previous)) {
+            return Promise.reject(new GraphError("Task is not present in project"))
+        }
+        if (!this.nodes.has(relation.next)) {
+            return Promise.reject(new GraphError("Task is not present in project"))
+        }
+        return this.dataProvider.addTaskRelation(relation)
+    }
+}
+
+export class Graph implements IGraph {
+    nodes: Map<string, IProjectNode>
+    private dataProvider: IDataProvider
+    constructor(dataProvider: IDataProvider) {
+        this.dataProvider = dataProvider
+        this.nodes = new Map<string, IProjectNode>()
+    }
+    load(): Promise<void> {
+        return this.dataProvider.getAllProjects().then((projects: Array<Project>) => {
+            return Promise.all(projects.map((project: Project) => {
+                let node = new ProjectNode(this.dataProvider, project.identifier)
+                return node.load().then(() => {
+                    this.nodes.set(project.identifier, node)
                 })
             }))
-        }).then(() => {})
-    }
-    save(): Promise<void> {
-        let taskResults = Array.from(this.nodes.values(), (task: TaskNode) => {
-            if (task.startDate == null || task.duration == null) {
-                throw new NotComputed(task)
-            }
-            let taskResult: TaskResults = {
-                projectIdentifier: this.projectIdentifier,
-                taskIdentifier: task.taskIdentifier,
-                startDate: task.startDate,
-                duration: task.duration
-            }
-            return taskResult
         })
-        return Promise.all(taskResults.map(this.dataProvider.setTaskResults.bind(this.dataProvider)))
     }
-    private loadNode(taskIdentifier: string, nodes: Map<string, TaskNode>): Promise<void> {
-        return this.dataProvider.getTask(this.projectIdentifier, taskIdentifier).then((task: Task) => {
-            let node = new TaskNode(taskIdentifier, task.estimatedStartDate, task.estimatedDuration)
-            nodes.set(taskIdentifier, node)
-
-            return this.dataProvider.getChildrenTaskIdentifiers(this.projectIdentifier, task.identifier)
-                                    .then((ids: Array<string>) => {
-                const sorted = ids.sort().filter((value: string) => {
-                    return !nodes.has(value)
-                })
-                return Promise.all(sorted.map((id: string) => {
-                    return this.loadNode(id, nodes)
-                })).then(() => {
-                    sorted.forEach((id: string) => {
-                        node.addChild(maputils.get(nodes, id))
-                    })
-                })
-            })
+    addProject(project: Project): Promise<IProjectNode> {
+        if (this.nodes.has(project.identifier)) {
+            return Promise.reject(new GraphError("Project is already present in graph"))
+        }
+        return this.dataProvider.addProject(project).then(() => {
+            const node = new ProjectNode(this.dataProvider, project.identifier)
+            this.nodes.set(project.identifier, node)
+            return node
         })
     }
 }

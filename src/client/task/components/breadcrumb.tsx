@@ -9,7 +9,7 @@ interface BreadcrumbProperties {
 export class Breadcrumb extends React.Component<BreadcrumbProperties, {}> {
     render() {
         const name = this.renderName()
-        let projectPath = "/project/" + this.props.project.identifier
+        const projectPath = "/project/" + this.props.project.identifier
         return <ol className="breadcrumb">
             <li><a href="/"><span className="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
             <li><a href={projectPath}>{this.props.project.name}</a></li>
@@ -17,7 +17,7 @@ export class Breadcrumb extends React.Component<BreadcrumbProperties, {}> {
         </ol>
     }
     private renderName() {
-        let name = this.props.task.name
+        const name = this.props.task.name
         if (name.length < 50) {
             return name
         } else {

@@ -27,6 +27,11 @@ export interface TaskResults extends ProjectBased, TaskBased {
     duration: number
 }
 
+export interface TaskRelation extends ProjectBased {
+    previous: string
+    next: string
+}
+
 export interface Modifier extends ProjectBased {
     name: string
     description: string

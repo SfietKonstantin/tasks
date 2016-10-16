@@ -1,28 +1,30 @@
-import { TaskBased } from "../../../common/types"
+import {
+    ProjectBased, TaskBased,
+    Project, Task, TaskRelation, TaskResults, Modifier
+} from "../../../common/types"
 
-export class TaskNode implements TaskBased {
-    taskIdentifier: string
-    estimatedStartDate: Date
-    estimatedDuration: number
-    startDate: Date | null
-    duration: number | null
-    parents: Array<TaskNode>
-    children: Array<TaskNode>
-    modifiers: Array<number>
-
-    constructor(taskIdentifier: string, estimatedStartDate: Date, estimatedDuration: number) {
-        this.taskIdentifier = taskIdentifier
-        this.estimatedStartDate = estimatedStartDate
-        this.estimatedDuration = estimatedDuration
-        this.startDate = null
-        this.duration = null
-        this.parents = new Array<TaskNode>()
-        this.children = new Array<TaskNode>()
-        this.modifiers = new Array<number>()
+export class GraphError extends Error implements Error {
+    constructor(message: string) {
+        super(message)
     }
+}
 
-    addChild(child: TaskNode) {
-        this.children.push(child)
-        child.parents.push(this)
-    }
+export interface ITaskNode extends ProjectBased, TaskBased {
+    startDate: Date
+    duration: number
+    children: Array<ITaskNode>
+    parents: Array<ITaskNode>
+    modifiers: Array<Modifier>
+    addModifier(modifier: Modifier): Promise<Modifier>
+}
+
+export interface IProjectNode extends ProjectBased {
+    nodes: Map<string, ITaskNode>
+    addTask(task: Task): Promise<ITaskNode>
+    addRelation(relation: TaskRelation): Promise<void>
+}
+
+export interface IGraph {
+    nodes: Map<string, IProjectNode>
+    addProject(project: Project): Promise<IProjectNode>
 }

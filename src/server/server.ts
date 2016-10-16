@@ -3,6 +3,7 @@ import * as express from "express"
 import * as path from "path"
 import * as logger from "morgan"
 import * as http from "http"
+import { Graph } from "./core/graph/graph"
 import { Api } from "./routes/api"
 import { Routes } from "./routes/routes"
 import { IDataProvider } from "./core/data/idataprovider"
@@ -20,13 +21,15 @@ export class Server {
     private app: express.Application
     private server: http.Server
     private dataProvider: IDataProvider
+    private graph: Graph
     private api: Api
     private routes: Routes
 
     public constructor() {
         this.dataProvider = new RedisDataProvider(RedisDataProvider.getDefaultClient())
+        this.graph = new Graph(this.dataProvider)
 
-        this.api = new Api(this.dataProvider)
+        this.api = new Api(this.dataProvider, this.graph)
         this.routes = new Routes(this.dataProvider)
         this.app = express()
         this.app.set("view engine", "ejs")
@@ -67,11 +70,13 @@ export class Server {
     }
 
     public start(port: number) {
-        this.app.set("port", port)
-        this.server = http.createServer(this.app)
-        this.server.listen(port)
-        this.server.on("error", this.onServerError.bind(this))
-        this.server.on("listening", this.onServerListening.bind(this))
+        this.graph.load().then(() => {
+            this.app.set("port", port)
+            this.server = http.createServer(this.app)
+            this.server.listen(port)
+            this.server.on("error", this.onServerError.bind(this))
+            this.server.on("listening", this.onServerListening.bind(this))
+        })
     }
 
     private errorHandler(req: express.Request, res: express.Response, next: express.NextFunction) {

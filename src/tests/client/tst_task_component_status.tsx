@@ -6,8 +6,8 @@ import * as sinon from "sinon"
 import { Status } from "../../client/task/components/status"
 import { Task, TaskResults } from "../../common/types"
 
-let document = jsdom.jsdom("<!doctype html><html><body></body></html>")
-let window = document.defaultView
+const document = jsdom.jsdom("<!doctype html><html><body></body></html>")
+const window = document.defaultView
 
 global.document = document
 global.window = window
@@ -21,7 +21,7 @@ describe("Task components", () => {
                        startText: string, startClass: string, startDate: string, startDays: string,
                        endText: string, endClass: string, endDate: string, endDays: string) => {
             const state = testutils.findRenderedDOMComponentWithClass(component, "task-overview-state")
-            chai.expect(state.textContent).to.equals(" " + stateText)
+            chai.expect(state.textContent).to.equal(" " + stateText)
             const progress = testutils.findRenderedDOMComponentWithClass(component, "task-overview-progress")
             const progressDivs = progress.getElementsByTagName("div")
             chai.expect(progressDivs).to.length(1)
@@ -29,21 +29,21 @@ describe("Task components", () => {
             const start = testutils.findRenderedDOMComponentWithClass(component, "task-overview-start")
             const startDivs = start.getElementsByTagName("div")
             chai.expect(startDivs).to.length(3)
-            chai.expect(startDivs[0].textContent).to.equals(startText)
+            chai.expect(startDivs[0].textContent).to.equal(startText)
             const startDivs1Labels = startDivs[0].getElementsByClassName("label")
             chai.expect(startDivs1Labels).to.length(1)
             chai.expect(startDivs1Labels[0].className).to.contains(startClass)
-            chai.expect(startDivs[1].textContent).to.equals(startDate)
-            chai.expect(startDivs[2].textContent).to.equals(startDays)
+            chai.expect(startDivs[1].textContent).to.equal(startDate)
+            chai.expect(startDivs[2].textContent).to.equal(startDays)
             const end = testutils.findRenderedDOMComponentWithClass(component, "task-overview-end")
             const endDivs = end.getElementsByTagName("div")
             chai.expect(endDivs).to.length(3)
-            chai.expect(endDivs[0].textContent).to.equals(endText)
+            chai.expect(endDivs[0].textContent).to.equal(endText)
             const endDivs1Labels = endDivs[0].getElementsByClassName("label")
             chai.expect(endDivs1Labels).to.length(1)
             chai.expect(endDivs1Labels[0].className).to.contains(endClass)
-            chai.expect(endDivs[1].textContent).to.equals(endDate)
-            chai.expect(endDivs[2].textContent).to.equals(endDays)
+            chai.expect(endDivs[1].textContent).to.equal(endDate)
+            chai.expect(endDivs[2].textContent).to.equal(endDays)
         }
         it("Should create Status for not started and on time task", () => {
             const task: Task = {
