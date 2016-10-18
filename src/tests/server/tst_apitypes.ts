@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as apitypes from "../../common/apitypes"
-import { Project, Task} from "../../common/types"
+import { Project, Task } from "../../common/types"
 
 const compareTasks = (first: Task, second: Task) => {
     chai.expect(first.identifier).to.equals(second.identifier)

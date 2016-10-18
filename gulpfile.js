@@ -50,6 +50,16 @@ gulp.task("init:client:typings", function() {
     return stream;
 })
 
+gulp.task("init:server:tests:typings", function() {
+    var stream = gulp.src("src/tests/server/typings.json").pipe(typings());
+    return stream;
+})
+
+gulp.task("init:client:tests:typings", function() {
+    var stream = gulp.src("src/tests/client/typings.json").pipe(typings());
+    return stream;
+})
+
 gulp.task("build:common", function() {
     var tsProject = ts.createProject("src/common/tsconfig.json");
     var result = gulp.src("src/common/**/*.ts").pipe(tsProject())
@@ -90,14 +100,36 @@ gulp.task("build:client", function(callback) {
     })
 })
 
-gulp.task("test:server:pre", function () {
-    return gulp.src(["tests/common/**/*.js", "tests/server/**/*.js"])
+// watch:client
+
+gulp.task("build:client:ts", function() {
+    var tsProject = ts.createProject("src/client/tsconfig.json");
+    var result = gulp.src("src/client/**/*.ts*").pipe(tsProject())
+    return result.js.pipe(gulp.dest("tests/client"));
+})
+
+gulp.task("watch:client:ts", ["build:client:ts"], function() {
+     gulp.watch("src/client/**/*.ts*", ["build:client:ts"]);
+})
+
+gulp.task("build:client:tests", ["build:client:ts"], function() {
+    var tsProject = ts.createProject("src/tests/client/tsconfig.json");
+    var result = gulp.src("src/tests/client/**/*.ts*").pipe(tsProject())
+    return result.js.pipe(gulp.dest("tests/tests/client"));
+})
+
+gulp.task("watch:client:tests", ["build:client:tests"], function() {
+     gulp.watch("src/tests/client/**/*.ts*", ["build:client:tests"]);
+})
+
+gulp.task("test:pre", function () {
+    return gulp.src(["tests/common/**/*.js", "tests/server/**/*.js", "tests/client/**/*.js"])
                .pipe(istanbul({includeUntested: true}))
                .pipe(istanbul.hookRequire());
 });
 
-gulp.task("test:server", ["test:server:pre"], function() {
-    return gulp.src("tests/tests/server/*.js")
+gulp.task("test", ["test:pre"], function() {
+    return gulp.src("tests/tests/**/*.js")
                .pipe(mocha({reporter: "spec"}))
                .pipe(istanbul.writeReports({
                     dir: "./coverage",
@@ -117,7 +149,6 @@ gulp.task('tslint', () => {
     return gulp.src("src/**/*.ts*").pipe(f).pipe(tslint()).pipe(tslint.report({ formatter: 'prose', emitError: false }));
 })
 
-gulp.task("init", ["init:server:typings", "init:client:typings"])
+gulp.task("init", ["init:server:typings", "init:client:typings", "init:server:tests:typings", "init:client:tests:typings"])
 gulp.task("default", ["build:common", "build:server", "build:server:tests", "build:client"])
-gulp.task("test", ["test:server"])
-gulp.task("watch", ["watch:common", "watch:server", "watch:server:tests"])
+gulp.task("watch", ["watch:common", "watch:server", "watch:server:tests", "watch:client:ts", "watch:client:tests"])
