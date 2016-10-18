@@ -128,7 +128,19 @@ gulp.task("watch:client:tests", ["build:client:tests"], function() {
 })
 
 gulp.task("test:pre", function () {
+    // Removing entry points
+    var f = filter([
+        "**",
+        "!tests/server/server.js",
+        "!tests/server/core/testdata.js",
+        "!tests/server/routes/**/*.js",
+        "!tests/client/project.js",
+        "!tests/client/task.js",
+        "!tests/client/imports.js",
+        "!tests/client/imports/primavera.js",
+    ])
     return gulp.src(["tests/common/**/*.js", "tests/server/**/*.js", "tests/client/**/*.js"])
+               .pipe(f)
                .pipe(istanbul({includeUntested: true}))
                .pipe(istanbul.hookRequire());
 });
