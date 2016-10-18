@@ -155,5 +155,5 @@ gulp.task('tslint', () => {
 })
 
 gulp.task("init", ["init:server:typings", "init:client:typings", "init:server:tests:typings", "init:client:tests:typings"])
-gulp.task("default", ["build:common", "build:server", "build:server:tests", "build:client"])
+gulp.task("default", ["build:common", "build:server", "build:server:tests", "build:client", "build:client:ts", "build:client:tests"])
 gulp.task("watch", ["watch:common", "watch:server", "watch:server:tests", "watch:client", "watch:client:ts", "watch:client:tests"])
