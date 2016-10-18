@@ -13,7 +13,7 @@ export class Breadcrumb extends React.Component<BreadcrumbProperties, {}> {
         return <ol className="breadcrumb">
             <li><a href="/"><span className="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
             <li><a href={projectPath}>{this.props.project.name}</a></li>
-            <li class="active">{name}</li>
+            <li className="active">{name}</li>
         </ol>
     }
     private renderName() {

@@ -25,32 +25,32 @@ describe("Delay", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    identifier: "1root",
                     projectIdentifier: "project",
+                    identifier: "1root",
                     name: "Root",
                     description: "Root task",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 15
                 }
                 const task2: Task = {
-                    identifier: "2short",
                     projectIdentifier: "project",
+                    identifier: "2short",
                     name: "Short task",
                     description: "Short task",
                     estimatedStartDate: new Date(2016, 9, 16),
                     estimatedDuration: 15
                 }
                 const task3: Task = {
-                    identifier: "3long",
                     projectIdentifier: "project",
+                    identifier: "3long",
                     name: "Long task",
                     description: "Long task",
                     estimatedStartDate: new Date(2016, 9, 16),
                     estimatedDuration: 30
                 }
                 const task4: Task = {
-                    identifier: "4reducing",
                     projectIdentifier: "project",
+                    identifier: "4reducing",
                     name: "Reducing task",
                     description: "Reducing task",
                     estimatedStartDate: new Date(2016, 10, 15),

@@ -90,8 +90,10 @@ gulp.task("watch:server:tests", ["build:server:tests"], function() {
      gulp.watch("src/tests/server/**/*.ts", ["build:server:tests"]);
 })
 
+var webpackCompiler = webpack(webpackClientConfig);
+
 gulp.task("build:client", function(callback) {
-    webpack(webpackClientConfig, function(err, stats) {
+    webpackCompiler.run(function(err, stats) {
         if (err) {
             throw new gutil.PluginError("webpack", err);
         }
@@ -100,7 +102,10 @@ gulp.task("build:client", function(callback) {
     })
 })
 
-// watch:client
+
+gulp.task("watch:client", ["build:client"], function() {
+    gulp.watch("src/client/**/*.ts*", ["build:client"]);
+})
 
 gulp.task("build:client:ts", function() {
     var tsProject = ts.createProject("src/client/tsconfig.json");
@@ -109,10 +114,10 @@ gulp.task("build:client:ts", function() {
 })
 
 gulp.task("watch:client:ts", ["build:client:ts"], function() {
-     gulp.watch("src/client/**/*.ts*", ["build:client:ts"]);
+    gulp.watch("src/client/**/*.ts*", ["build:client:ts"]);
 })
 
-gulp.task("build:client:tests", ["build:client:ts"], function() {
+gulp.task("build:client:tests", function() {
     var tsProject = ts.createProject("src/tests/client/tsconfig.json");
     var result = gulp.src("src/tests/client/**/*.ts*").pipe(tsProject())
     return result.js.pipe(gulp.dest("tests/tests/client"));
@@ -151,4 +156,4 @@ gulp.task('tslint', () => {
 
 gulp.task("init", ["init:server:typings", "init:client:typings", "init:server:tests:typings", "init:client:tests:typings"])
 gulp.task("default", ["build:common", "build:server", "build:server:tests", "build:client"])
-gulp.task("watch", ["watch:common", "watch:server", "watch:server:tests", "watch:client:ts", "watch:client:tests"])
+gulp.task("watch", ["watch:common", "watch:server", "watch:server:tests", "watch:client", "watch:client:ts", "watch:client:tests"])

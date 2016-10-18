@@ -3,7 +3,7 @@ import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task } from "../../common/types"
 import {
-    NullIdentifierError, CorruptedError, ExistsError, ProjectNotFoundError
+    CorruptedError, ExistsError, ProjectNotFoundError
 } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
@@ -213,20 +213,6 @@ describe("Redis", () => {
                 done()
             }).catch((error: Error) => {
                 done(error)
-            })
-        })
-        it("Should get an exception when adding a project with null identifier", (done) => {
-            const project2: Project = {
-                identifier: null,
-                name: "Project 2",
-                description: "Description 2"
-            }
-
-            db.addProject(project2).then(() => {
-                done(new Error("addProject should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(NullIdentifierError)
-                done()
             })
         })
         it("Should get an exception when adding existing project", (done) => {

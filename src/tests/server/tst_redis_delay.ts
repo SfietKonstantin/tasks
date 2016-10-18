@@ -3,7 +3,7 @@ import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Delay } from "../../common/types"
 import {
-    NullIdentifierError, CorruptedError, ExistsError, ProjectNotFoundError, DelayNotFoundError
+    CorruptedError, ExistsError, ProjectNotFoundError, DelayNotFoundError
 } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
@@ -36,15 +36,15 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const delay1: Delay = {
-                    identifier: "delay1",
                     projectIdentifier: "project",
+                    identifier: "delay1",
                     name: "Delay 1",
                     description: "Description 1",
                     date: new Date(2016, 9, 1)
                 }
                 const delay2: Delay = {
-                    identifier: "delay2",
                     projectIdentifier: "project",
+                    identifier: "delay2",
                     name: "Delay 2",
                     description: "Description 2",
                     date: new Date(2016, 9, 15)
@@ -62,7 +62,7 @@ describe("Redis", () => {
         })
         it("Should get an empty list", (done) => {
             db.getDelays("project", []).then((delays: Array<Delay>) => {
-                chai.expect(delays).to.length(0)
+                chai.expect(delays).to.empty
                 done()
             })
         })
@@ -134,15 +134,15 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const delay1: Delay = {
-                    identifier: "delay1",
                     projectIdentifier: "project",
+                    identifier: "delay1",
                     name: "Delay 1",
                     description: "Description 1",
                     date: new Date(2016, 9, 1)
                 }
                 const delay2: Delay = {
-                    identifier: "delay2",
                     projectIdentifier: "project",
+                    identifier: "delay2",
                     name: "Delay 2",
                     description: "Description 2",
                     date: new Date(2016, 9, 15)
@@ -228,8 +228,8 @@ describe("Redis", () => {
         })
         it("Should add delay", (done) => {
             const delay1: Delay = {
-                identifier: "delay1",
                 projectIdentifier: "project",
+                identifier: "delay1",
                 name: "Delay 1",
                 description: "Description 1",
                 date: new Date(2016, 9, 1)
@@ -241,26 +241,10 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should get an exception when adding a delay with null identifier", (done) => {
-            const delay2: Delay = {
-                identifier: null,
-                projectIdentifier: "project",
-                name: "Delay 2",
-                description: "Description 2",
-                date: new Date(2016, 9, 1)
-            }
-
-            db.addDelay(delay2).then(() => {
-                done(new Error("addDelay should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(NullIdentifierError)
-                done()
-            })
-        })
         it("Should get an exception when adding delay on invalid project", (done) => {
             const delay2: Delay = {
-                identifier: "delay2",
                 projectIdentifier: "project2",
+                identifier: "delay2",
                 name: "Delay 2",
                 description: "Description 2",
                 date: new Date(2016, 9, 1)
@@ -275,8 +259,8 @@ describe("Redis", () => {
         })
         it("Should get an exception when adding an existing delay", (done) => {
             const delay1_2: Delay = {
-                identifier: "delay1",
                 projectIdentifier: "project",
+                identifier: "delay1",
                 name: "Delay 2",
                 description: "Description 2",
                 date: new Date(2016, 9, 1)

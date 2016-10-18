@@ -16,6 +16,7 @@
     "redux": "registry:dt/redux#3.5.2+20160703092728",
     "redux-mock-store": "registry:dt/redux-mock-store#0.0.6+20160907111255",
     "redux-thunk": "registry:dt/redux-thunk#2.1.0+20160703120921",
+    "sinon": "registry:dt/sinon#1.16.0+20160924120326",
     "whatwg-fetch": "registry:dt/whatwg-fetch#0.0.0+20161004182750",
     "whatwg-streams": "registry:dt/whatwg-streams#0.0.0+20160829180742"
   }

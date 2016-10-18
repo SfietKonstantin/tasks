@@ -3,7 +3,7 @@ import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task } from "../../common/types"
 import {
-    NullIdentifierError, CorruptedError, ExistsError, ProjectNotFoundError, TaskNotFoundError
+    CorruptedError, ExistsError, ProjectNotFoundError, TaskNotFoundError
 } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
@@ -36,16 +36,16 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    identifier: "task1",
                     projectIdentifier: "project",
+                    identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    identifier: "task2",
                     projectIdentifier: "project",
+                    identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
                     estimatedStartDate: new Date(2016, 9, 15),
@@ -91,16 +91,16 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    identifier: "task1",
                     projectIdentifier: "project",
+                    identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    identifier: "task2",
                     projectIdentifier: "project",
+                    identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
                     estimatedStartDate: new Date(2016, 9, 15),
@@ -119,7 +119,7 @@ describe("Redis", () => {
         })
         it("Should get an empty list", (done) => {
             db.getTasks("project", []).then((tasks: Array<Task>) => {
-                chai.expect(tasks).to.length(0)
+                chai.expect(tasks).to.empty
                 done()
             })
         })
@@ -195,16 +195,16 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    identifier: "task1",
                     projectIdentifier: "project",
+                    identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    identifier: "task2",
                     projectIdentifier: "project",
+                    identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
                     estimatedStartDate: new Date(2016, 9, 15),
@@ -292,8 +292,8 @@ describe("Redis", () => {
         })
         it("Should add task", (done) => {
             const task1: Task = {
-                identifier: "task1",
                 projectIdentifier: "project",
+                identifier: "task1",
                 name: "Task 1",
                 description: "Description 1",
                 estimatedStartDate: new Date(2016, 9, 1),
@@ -306,27 +306,10 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should get an exception when adding a task with null identifier", (done) => {
-            const task2: Task = {
-                identifier: null,
-                projectIdentifier: "project",
-                name: "Task 2",
-                description: "Description 2",
-                estimatedStartDate: new Date(2016, 9, 1),
-                estimatedDuration: 30
-            }
-
-            db.addTask(task2).then(() => {
-                done(new Error("addTask should not be a success"))
-            }).catch((error: Error) => {
-                chai.expect(error).to.instanceOf(NullIdentifierError)
-                done()
-            })
-        })
         it("Should get an exception when adding task on invalid project", (done) => {
             const task2: Task = {
-                identifier: "task2",
                 projectIdentifier: "project2",
+                identifier: "task2",
                 name: "Task 2",
                 description: "Description 2",
                 estimatedStartDate: new Date(2016, 9, 1),
@@ -342,8 +325,8 @@ describe("Redis", () => {
         })
         it("Should get an exception when adding an existing task", (done) => {
             const task1_2: Task = {
-                identifier: "task1",
                 projectIdentifier: "project",
+                identifier: "task1",
                 name: "Task 2",
                 description: "Description 2",
                 estimatedStartDate: new Date(2016, 9, 1),
@@ -371,16 +354,16 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    identifier: "task1",
                     projectIdentifier: "project",
+                    identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    identifier: "task2",
                     projectIdentifier: "project",
+                    identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
                     estimatedStartDate: new Date(2016, 9, 15),
@@ -477,24 +460,24 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    identifier: "task1",
                     projectIdentifier: "project",
+                    identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    identifier: "task2",
                     projectIdentifier: "project",
+                    identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
                     estimatedStartDate: new Date(2016, 9, 15),
                     estimatedDuration: 15
                 }
                 const task3: Task = {
-                    identifier: "task3",
                     projectIdentifier: "project",
+                    identifier: "task3",
                     name: "Task 3",
                     description: "Description 3",
                     estimatedStartDate: new Date(2016, 10, 1),
@@ -563,24 +546,24 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    identifier: "task1",
                     projectIdentifier: "project",
+                    identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    identifier: "task2",
                     projectIdentifier: "project",
+                    identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
                     estimatedStartDate: new Date(2016, 9, 15),
                     estimatedDuration: 15
                 }
                 const task3: Task = {
-                    identifier: "task3",
                     projectIdentifier: "project",
+                    identifier: "task3",
                     name: "Task 3",
                     description: "Description 3",
                     estimatedStartDate: new Date(2016, 10, 1),

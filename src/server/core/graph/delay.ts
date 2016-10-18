@@ -36,7 +36,8 @@ const compareImpactInfo = (first: ImpactInfo, second: ImpactInfo): number => {
     return 0
 }
 
-export const getImpactInfo = (projectIdentifier: string, root: TaskNode, dataProvider: IDataProvider): Promise<Array<ImpactInfo>> => {
+export const getImpactInfo = (projectIdentifier: string, root: TaskNode,
+                              dataProvider: IDataProvider): Promise<Array<ImpactInfo>> => {
     let map = new Map<string, TaskNode>()
     buildGraphIndex(root, map)
 

@@ -14,32 +14,32 @@ const fillProjectsData = (dataProvider: IDataProvider): Promise<void> => {
 const fillTasksData = (dataProvider: IDataProvider): Promise<void> => {
     let tasks: Array<Task> = [
         {
-            identifier: "root",
             projectIdentifier: "project",
+            identifier: "root",
             name: "Root task",
             description: "Project beginning",
             estimatedStartDate: new Date(2016, 7, 15),
             estimatedDuration: 31
         },
         {
-            identifier: "long",
             projectIdentifier: "project",
+            identifier: "long",
             name: "Long task",
             description: "Some long task",
             estimatedStartDate: new Date(2016, 8, 15),
             estimatedDuration: 60
         },
         {
-            identifier: "short",
             projectIdentifier: "project",
+            identifier: "short",
             name: "Short task",
             description: "Some short task",
             estimatedStartDate: new Date(2016, 8, 15),
             estimatedDuration: 31
         },
         {
-            identifier: "reduce",
             projectIdentifier: "project",
+            identifier: "reduce",
             name: "Reducing task",
             description: "Task depending on two tasks",
             estimatedStartDate: new Date(2016, 10, 16),

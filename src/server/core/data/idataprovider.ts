@@ -1,11 +1,5 @@
 import { Project, Task, TaskResults, Modifier, Delay } from "../../../common/types"
 
-export class NullIdentifierError extends Error implements Error {
-    constructor(message: string) {
-        super(message)
-    }
-}
-
 export class CorruptedError extends Error implements Error {
     constructor(message: string) {
         super(message)

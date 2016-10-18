@@ -35,8 +35,8 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task: Task = {
-                    identifier: "task",
                     projectIdentifier: "project",
+                    identifier: "task",
                     name: "Task",
                     description: "Description",
                     estimatedStartDate: new Date(2016, 9, 1),
@@ -70,7 +70,7 @@ describe("Redis", () => {
         })
         it("Should get an empty list", (done) => {
             db.getModifiers("project", []).then((modifiers: Array<Modifier>) => {
-                chai.expect(modifiers).to.length(0)
+                chai.expect(modifiers).to.empty
                 done()
             })
         })

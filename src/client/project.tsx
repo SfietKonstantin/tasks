@@ -29,7 +29,7 @@ export const render = (projectIdentifier: string) => {
     }
 
     const filterJson = localStorage.getItem(projectIdentifier)
-    if (filterJson) {
+    if (filterJson != null) {
         filter = JSON.parse(filterJson)
     }
     filter.milestonesOnlyChecked = false
@@ -52,6 +52,5 @@ export const render = (projectIdentifier: string) => {
         mainReducer, initialState,
         Redux.applyMiddleware(ReduxThunk.default)
     )
-    ReactDOM.render(<Root store={store} />,
-                    document.getElementById("content") as Element)
+    ReactDOM.render(<Root store={store} />, document.getElementById("content") as Element)
 }

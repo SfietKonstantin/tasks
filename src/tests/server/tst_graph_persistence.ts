@@ -3,6 +3,7 @@ import { Project, Task, TaskResults, Modifier } from "../../common/types"
 import { TaskNode } from "../../server/core/graph/types"
 import { GraphPersistence, compute } from "../../server/core/graph/graph"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
+import * as maputils from "../../common/maputils"
 import * as redis from "redis"
 
 describe("Graph persistence", () => {
@@ -25,32 +26,32 @@ describe("Graph persistence", () => {
 
         db.addProject(project).then(() => {
             const task1: Task = {
-                identifier: "1root",
                 projectIdentifier: "project",
+                identifier: "1root",
                 name: "Root",
                 description: "Root task",
                 estimatedStartDate: new Date(2016, 9, 1),
                 estimatedDuration: 15
             }
             const task2: Task = {
-                identifier: "2short",
                 projectIdentifier: "project",
+                identifier: "2short",
                 name: "Short task",
                 description: "Short task",
                 estimatedStartDate: new Date(2016, 9, 16),
                 estimatedDuration: 15
             }
             const task3: Task = {
-                identifier: "3long",
                 projectIdentifier: "project",
+                identifier: "3long",
                 name: "Long task",
                 description: "Long task",
                 estimatedStartDate: new Date(2016, 9, 16),
                 estimatedDuration: 30
             }
             const task4: Task = {
-                identifier: "4reducing",
                 projectIdentifier: "project",
+                identifier: "4reducing",
                 name: "Reducing task",
                 description: "Reducing task",
                 estimatedStartDate: new Date(2016, 10, 15),
@@ -104,28 +105,28 @@ describe("Graph persistence", () => {
     })
     it("Should load the whole graph", (done) => {
         graph.loadGraph("1root").then(() => {
-            const node1 = graph.nodes.get("1root")
+            const node1 = maputils.get(graph.nodes, "1root")
             chai.expect(node1.taskIdentifier).to.equals("1root")
             chai.expect(node1.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 1).getTime())
             chai.expect(node1.estimatedDuration).to.equals(15)
             chai.expect(node1.startDate).to.null
             chai.expect(node1.duration).to.null
 
-            const node2 = graph.nodes.get("2short")
+            const node2 = maputils.get(graph.nodes, "2short")
             chai.expect(node2.taskIdentifier).to.equals("2short")
             chai.expect(node2.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 16).getTime())
             chai.expect(node2.estimatedDuration).to.equals(15)
             chai.expect(node2.startDate).to.null
             chai.expect(node2.duration).to.null
 
-            const node3 = graph.nodes.get("3long")
+            const node3 = maputils.get(graph.nodes, "3long")
             chai.expect(node3.taskIdentifier).to.equals("3long")
             chai.expect(node3.estimatedStartDate.getTime()).to.equals(new Date(2016, 9, 16).getTime())
             chai.expect(node3.estimatedDuration).to.equals(30)
             chai.expect(node3.startDate).to.null
             chai.expect(node3.duration).to.null
 
-            const node4 = graph.nodes.get("4reducing")
+            const node4 = maputils.get(graph.nodes, "4reducing")
             chai.expect(node4.taskIdentifier).to.equals("4reducing")
             chai.expect(node4.estimatedStartDate.getTime()).to.equals(new Date(2016, 10, 15).getTime())
             chai.expect(node4.estimatedDuration).to.equals(15)
@@ -213,21 +214,21 @@ describe("Graph persistence", () => {
     })
     it("Should load all data (start date and modifiers)", (done) => {
         graph.loadData().then(() => {
-            const node1 = graph.nodes.get("1root")
-            const node2 = graph.nodes.get("2short")
-            const node3 = graph.nodes.get("3long")
-            const node4 = graph.nodes.get("4reducing")
+            const node1 = maputils.get(graph.nodes, "1root")
+            const node2 = maputils.get(graph.nodes, "2short")
+            const node3 = maputils.get(graph.nodes, "3long")
+            const node4 = maputils.get(graph.nodes, "4reducing")
 
-            chai.expect(node1.startDate.getTime()).to.equals(new Date(2016, 9, 2).getTime())
+            chai.expect((node1.startDate as Date).getTime()).to.equals(new Date(2016, 9, 2).getTime())
             chai.expect(node1.modifiers).to.length(1)
             chai.expect(node1.modifiers[0]).to.equals(8)
-            chai.expect(node2.startDate.getTime()).to.equals(new Date(2016, 9, 18).getTime())
+            chai.expect((node2.startDate as Date).getTime()).to.equals(new Date(2016, 9, 18).getTime())
             chai.expect(node2.modifiers).to.length(2)
             chai.expect(node2.modifiers[0]).to.equals(10)
             chai.expect(node2.modifiers[1]).to.equals(12)
-            chai.expect(node3.startDate.getTime()).to.equals(new Date(2016, 9, 18).getTime())
-            chai.expect(node3.modifiers).to.length(0)
-            chai.expect(node4.startDate.getTime()).to.equals(new Date(2016, 10, 17).getTime())
+            chai.expect((node3.startDate as Date).getTime()).to.equals(new Date(2016, 9, 18).getTime())
+            chai.expect(node3.modifiers).to.empty
+            chai.expect((node4.startDate as Date).getTime()).to.equals(new Date(2016, 10, 17).getTime())
             chai.expect(node4.modifiers).to.length(1)
             chai.expect(node4.modifiers[0]).to.equals(15)
 
@@ -239,18 +240,18 @@ describe("Graph persistence", () => {
     it("Should compute the graph", (done) => {
         compute(graph.root)
 
-        const node1 = graph.nodes.get("1root")
-        const node2 = graph.nodes.get("2short")
-        const node3 = graph.nodes.get("3long")
-        const node4 = graph.nodes.get("4reducing")
+        const node1 = maputils.get(graph.nodes, "1root")
+        const node2 = maputils.get(graph.nodes, "2short")
+        const node3 = maputils.get(graph.nodes, "3long")
+        const node4 = maputils.get(graph.nodes, "4reducing")
 
-        chai.expect(node1.startDate.getTime()).to.equals(new Date(2016, 9, 2).getTime())
+        chai.expect((node1.startDate as Date).getTime()).to.equals(new Date(2016, 9, 2).getTime())
         chai.expect(node1.duration).to.equals(23)
-        chai.expect(node2.startDate.getTime()).to.equals(new Date(2016, 9, 2 + 23).getTime())
+        chai.expect((node2.startDate as Date).getTime()).to.equals(new Date(2016, 9, 2 + 23).getTime())
         chai.expect(node2.duration).to.equals(37)
-        chai.expect(node3.startDate.getTime()).to.equals(new Date(2016, 9, 2 + 23).getTime())
+        chai.expect((node3.startDate as Date).getTime()).to.equals(new Date(2016, 9, 2 + 23).getTime())
         chai.expect(node3.duration).to.equals(30)
-        chai.expect(node4.startDate.getTime()).to.equals(new Date(2016, 9, 2 + 23 + 37).getTime())
+        chai.expect((node4.startDate as Date).getTime()).to.equals(new Date(2016, 9, 2 + 23 + 37).getTime())
         chai.expect(node4.duration).to.equals(30)
 
         done()
@@ -267,18 +268,18 @@ describe("Graph persistence", () => {
         newGraph.loadGraph("1root").then(() => {
             return newGraph.loadData()
         }).then(() => {
-            const node1 = graph.nodes.get("1root")
-            const node2 = graph.nodes.get("2short")
-            const node3 = graph.nodes.get("3long")
-            const node4 = graph.nodes.get("4reducing")
+            const node1 = maputils.get(graph.nodes, "1root")
+            const node2 = maputils.get(graph.nodes, "2short")
+            const node3 = maputils.get(graph.nodes, "3long")
+            const node4 = maputils.get(graph.nodes, "4reducing")
 
-            chai.expect(node1.startDate.getTime()).to.equals(new Date(2016, 9, 2).getTime())
+            chai.expect((node1.startDate as Date).getTime()).to.equals(new Date(2016, 9, 2).getTime())
             chai.expect(node1.duration).to.equals(23)
-            chai.expect(node2.startDate.getTime()).to.equals(new Date(2016, 9, 2 + 23).getTime())
+            chai.expect((node2.startDate as Date).getTime()).to.equals(new Date(2016, 9, 2 + 23).getTime())
             chai.expect(node2.duration).to.equals(37)
-            chai.expect(node3.startDate.getTime()).to.equals(new Date(2016, 9, 2 + 23).getTime())
+            chai.expect((node3.startDate as Date).getTime()).to.equals(new Date(2016, 9, 2 + 23).getTime())
             chai.expect(node3.duration).to.equals(30)
-            chai.expect(node4.startDate.getTime()).to.equals(new Date(2016, 9, 2 + 23 + 37).getTime())
+            chai.expect((node4.startDate as Date).getTime()).to.equals(new Date(2016, 9, 2 + 23 + 37).getTime())
             chai.expect(node4.duration).to.equals(30)
 
             done()

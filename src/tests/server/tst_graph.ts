@@ -13,9 +13,9 @@ describe("Graph", () => {
 
             graph.compute(node0)
 
-            chai.expect(node0.startDate.getTime()).to.equals(new Date(2015, 9, 1).getTime())
+            chai.expect((node0.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1).getTime())
             chai.expect(node0.duration).to.equals(15)
-            chai.expect(node1.startDate.getTime()).to.equals(new Date(2015, 9, 1 + 15).getTime())
+            chai.expect((node1.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1 + 15).getTime())
             chai.expect(node1.duration).to.equals(15)
         })
         it("Should compute the correct start time depending on old start time", () => {
@@ -27,7 +27,7 @@ describe("Graph", () => {
 
             graph.compute(node0)
 
-            chai.expect(node0.startDate.getTime()).to.equals(new Date(2015, 9, 1).getTime())
+            chai.expect((node0.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1).getTime())
             chai.expect(node0.duration).to.equals(15)
             chai.expect(node1.startDate.getTime()).to.equals(new Date(2015, 9, 20).getTime())
             chai.expect(node1.duration).to.equals(15)
@@ -49,13 +49,13 @@ describe("Graph", () => {
 
             graph.compute(node0)
 
-            chai.expect(node0.startDate.getTime()).to.equals(new Date(2015, 9, 1).getTime())
+            chai.expect((node0.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1).getTime())
             chai.expect(node0.duration).to.equals(15)
-            chai.expect(node1.startDate.getTime()).to.equals(new Date(2015, 9, 1 + 15).getTime())
+            chai.expect((node1.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1 + 15).getTime())
             chai.expect(node1.duration).to.equals(15)
-            chai.expect(node2.startDate.getTime()).to.equals(new Date(2015, 9, 1 + 15).getTime())
+            chai.expect((node2.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1 + 15).getTime())
             chai.expect(node2.duration).to.equals(30)
-            chai.expect(node3.startDate.getTime()).to.equals(new Date(2015, 9, 1 + 15 + 30).getTime())
+            chai.expect((node3.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1 + 15 + 30).getTime())
             chai.expect(node3.duration).to.equals(15)
         })
         it("Should compute the correct start time with modifier", () => {
@@ -119,7 +119,7 @@ describe("Graph", () => {
 
             graph.compute(milestone)
 
-            chai.expect(milestone.startDate.getTime()).to.equals(new Date(2015, 9, 9).getTime())
+            chai.expect((milestone.startDate as Date).getTime()).to.equals(new Date(2015, 9, 9).getTime())
             chai.expect(milestone.duration).to.equals(0)
         })
         it("End milestone should affect parent tasks", () => {
@@ -129,9 +129,9 @@ describe("Graph", () => {
 
             graph.compute(node)
 
-            chai.expect(node.startDate.getTime()).to.equals(new Date(2015, 9, 1).getTime())
+            chai.expect((node.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1).getTime())
             chai.expect(node.duration).to.equals(15)
-            chai.expect(milestone.startDate.getTime()).to.equals(new Date(2015, 9, 1 + 15).getTime())
+            chai.expect((milestone.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1 + 15).getTime())
             chai.expect(milestone.duration).to.equals(0)
         })
         it("End milestone should affect parent tasks (modifier)", () => {
@@ -142,9 +142,9 @@ describe("Graph", () => {
 
             graph.compute(node)
 
-            chai.expect(node.startDate.getTime()).to.equals(new Date(2015, 9, 1).getTime())
+            chai.expect((node.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1).getTime())
             chai.expect(node.duration).to.equals(15 + 8)
-            chai.expect(milestone.startDate.getTime()).to.equals(new Date(2015, 9, 1 + 8 + 15).getTime())
+            chai.expect((milestone.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1 + 8 + 15).getTime())
             chai.expect(milestone.duration).to.equals(0)
         })
         it("Start milestone should affect children tasks", () => {
@@ -154,9 +154,9 @@ describe("Graph", () => {
 
             graph.compute(milestone)
 
-            chai.expect(milestone.startDate.getTime()).to.equals(new Date(2015, 9, 1).getTime())
+            chai.expect((milestone.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1).getTime())
             chai.expect(milestone.duration).to.equals(0)
-            chai.expect(node.startDate.getTime()).to.equals(new Date(2015, 9, 1).getTime())
+            chai.expect((node.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1).getTime())
             chai.expect(node.duration).to.equals(15)
         })
         it("Start milestone should affect children tasks (modifiers)", () => {
@@ -167,9 +167,9 @@ describe("Graph", () => {
 
             graph.compute(milestone)
 
-            chai.expect(milestone.startDate.getTime()).to.equals(new Date(2015, 9, 1 + 8).getTime())
+            chai.expect((milestone.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1 + 8).getTime())
             chai.expect(milestone.duration).to.equals(0)
-            chai.expect(node.startDate.getTime()).to.equals(new Date(2015, 9, 1 + 8).getTime())
+            chai.expect((node.startDate as Date).getTime()).to.equals(new Date(2015, 9, 1 + 8).getTime())
             chai.expect(node.duration).to.equals(15)
         })
     })

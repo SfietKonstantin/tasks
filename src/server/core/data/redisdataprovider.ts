@@ -1,5 +1,5 @@
 import {
-    CorruptedError, NullIdentifierError, ExistsError,
+    CorruptedError, ExistsError,
     ProjectNotFoundError, TaskNotFoundError, ModifierNotFoundError,
     DelayNotFoundError
 } from "./idataprovider"
@@ -265,9 +265,7 @@ export class RedisDataProvider implements IDataProvider {
         })
     }
     addProject(project: Project): Promise<void> {
-        return RedisDataProvider.checkIdentifier(project).then(() => {
-            return this.notHasProject(project.identifier)
-        }).then(() => {
+        return this.notHasProject(project.identifier).then(() => {
             return RedisProject.save(project, this.client)
         })
     }
@@ -297,11 +295,7 @@ export class RedisDataProvider implements IDataProvider {
     }
     addTask(task: Task): Promise<void> {
         const projectIdentifier = task.projectIdentifier
-        return RedisDataProvider.checkIdentifier(task).then(() => {
-            return RedisDataProvider.checkNullIdentifier(projectIdentifier)
-        }).then(() => {
-            return this.hasProject(projectIdentifier)
-        }).then(() => {
+        return this.hasProject(projectIdentifier).then(() => {
             return this.notHasTask(projectIdentifier, task.identifier)
         }).then(() => {
             return RedisTask.save(task, this.client)
@@ -444,11 +438,7 @@ export class RedisDataProvider implements IDataProvider {
     }
     addDelay(delay: Delay): Promise<void> {
         const projectIdentifier = delay.projectIdentifier
-        return RedisDataProvider.checkIdentifier(delay).then(() => {
-            return RedisDataProvider.checkNullIdentifier(projectIdentifier)
-        }).then(() => {
-            return this.hasProject(projectIdentifier)
-        }).then(() => {
+        return this.hasProject(projectIdentifier).then(() => {
             return this.notHasDelay(projectIdentifier, delay.identifier)
         }).then(() => {
             return RedisDelay.save(delay, this.client)
@@ -505,18 +495,6 @@ export class RedisDataProvider implements IDataProvider {
             return project
         }).catch((error: Error) => {
             return null
-        })
-    }
-    private static checkIdentifier<T extends Identifiable>(type: T): Promise<void> {
-        return RedisDataProvider.checkNullIdentifier(type.identifier)
-    }
-    private static checkNullIdentifier(identifier: string): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            if (identifier == null) {
-                reject(new NullIdentifierError("Null identifier"))
-            } else {
-                resolve()
-            }
         })
     }
     private getNextId(type: string): Promise<number> {

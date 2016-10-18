@@ -3,12 +3,12 @@ import { Row, Col, Panel, ProgressBar, Label } from "react-bootstrap"
 import { Task, TaskResults } from "../../../common/types"
 import * as dateutils from "../../../common/dateutils"
 
-interface StatusIndicatorProperties {
+interface StateIndicatorProperties {
     icon: string
     text: string
 }
 
-class StatusIndicator extends React.Component<StatusIndicatorProperties, {}> {
+class StateIndicator extends React.Component<StateIndicatorProperties, {}> {
     render() {
         const className = "glyphicon glyphicon-" + this.props.icon
         return <div className="task-overview-state">
@@ -68,7 +68,7 @@ export class Status extends React.Component<StatusProperties, {}> {
         }
 
         return <Panel className="task-overview">
-            <StatusIndicator icon={stateInfo[0]} text={stateInfo[1]} />
+            <StateIndicator icon={stateInfo[0]} text={stateInfo[1]} />
             <ProgressBar className="task-overview-progress" now={progressInfo} />
             <Row>
                 <StatusTime className="task-overview-start" color={startState[0]} state={startState[1]}

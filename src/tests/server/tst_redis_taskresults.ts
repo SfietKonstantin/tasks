@@ -35,8 +35,8 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task: Task = {
-                    identifier: "task",
                     projectIdentifier: "project",
+                    identifier: "task",
                     name: "Task",
                     description: "Description",
                     estimatedStartDate: new Date(2016, 9, 1),
@@ -132,16 +132,16 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    identifier: "task1",
                     projectIdentifier: "project",
+                    identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    identifier: "task2",
                     projectIdentifier: "project",
+                    identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
                     estimatedStartDate: new Date(2016, 9, 15),
