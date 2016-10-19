@@ -37,7 +37,6 @@
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
     "redux-logger": "^2.7.0",
-    "redux-mock-store": "^1.2.1",
     "redux-thunk": "^2.1.0",
     "sinon": "^1.17.6",
     "ts-loader": "^0.8.2",

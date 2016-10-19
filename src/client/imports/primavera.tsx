@@ -23,9 +23,12 @@ class Root extends React.Component<RootProperties, {}> {
 export const render = () => {
     const initialState: State = {
         project: {
-            identifier: "",
-            name: "",
-            description: ""
+            project: {
+                identifier: "",
+                name: "",
+                description: ""
+            },
+            error: null
         },
         tasks: {
             tasks: new Map<string, PrimaveraTask>(),

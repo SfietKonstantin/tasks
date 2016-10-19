@@ -34,8 +34,6 @@ var webpackClientConfig = {
         "react-dom": "ReactDOM",
         "react-redux": "ReactRedux",
         "react-bootstrap": "ReactBootstrap",
-        "es6-promise": "es6-promise",
-        "whatwg-fetch": "fetch",
         "redux-thunk": "ReduxThunk"
     }
 }

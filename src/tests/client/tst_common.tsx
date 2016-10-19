@@ -31,8 +31,8 @@ describe("Common components", () => {
             ) as React.Component<any, any>
             const nav = testutils.findRenderedDOMComponentWithClass(component, "nav") as HTMLElement
 
-            chai.expect(callback.calledOnce)
-            chai.expect(callback.calledWith(0))
+            chai.expect(callback.calledOnce).to.true
+            chai.expect(callback.calledWith(0)).to.true
             chai.expect(nav.classList.toString()).to.contains("nav-tabs")
             const navLi = nav.getElementsByTagName("li")
             chai.expect(navLi).to.length(5)

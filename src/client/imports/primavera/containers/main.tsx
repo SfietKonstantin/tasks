@@ -207,7 +207,7 @@ const mapStateToProps = (state: State) => {
         return false
     })
     return {
-        project: state.project,
+        project: state.project.project,
         tasks,
         delays: state.tasks.delays,
         relations,

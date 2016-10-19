@@ -1,22 +1,24 @@
 import { Action, Dispatch } from "redux"
 import { State } from "../types"
+import { ErrorAction } from "../../../common/actions/error"
 import { Project } from "../../../../common/types"
 
 export const PROJECT_DEFINE = "PROJECT_DEFINE"
 export const PROJECT_REQUEST_ADD = "PROJECT_REQUEST_ADD"
 export const PROJECT_RECEIVE_ADD = "PROJECT_RECEIVE_ADD"
+export const PROJECT_RECEIVE_ADD_FAILURE = "PROJECT_RECEIVE_ADD_FAILURE"
 
 export interface ProjectAction extends Action {
     type: string,
-    projectIdentifier: string,
+    identifier: string,
     name: string,
     description: string
 }
 
-export const defineProject = (projectIdentifier: string, name: string, description: string): ProjectAction => {
+export const defineProject = (identifier: string, name: string, description: string): ProjectAction => {
     return {
         type: PROJECT_DEFINE,
-        projectIdentifier,
+        identifier,
         name,
         description
     }
@@ -31,6 +33,13 @@ const requestAddProject = (): Action => {
 const receiveAddProject = (): Action => {
     return {
         type: PROJECT_RECEIVE_ADD
+    }
+}
+
+const receiveAddFailureProject = (message: string): ErrorAction => {
+    return {
+        type: PROJECT_RECEIVE_ADD_FAILURE,
+        message
     }
 }
 
@@ -49,6 +58,8 @@ export const addProject = (project: Project) => {
         }
         return fetch("/api/project", requestInit).then(() => {
             dispatch(receiveAddProject())
+        }).catch((error: Error) => {
+            dispatch(receiveAddFailureProject(error.message))
         })
     }
 }

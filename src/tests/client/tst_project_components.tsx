@@ -40,7 +40,7 @@ describe("Project components", () => {
             const component = testutils.renderIntoDocument(
                 <FilterButton milestonesOnly={true} onToggleMilestonesOnly={callback} />
             ) as React.Component<any, any>
-            chai.expect(callback.notCalled)
+            chai.expect(callback.notCalled).to.true
             const button = testutils.findRenderedDOMComponentWithTag(component, "button")
             chai.expect(button).to.not.null
             const dropdownMenu = testutils.findRenderedDOMComponentWithClass(component, "dropdown-menu") as HTMLElement
@@ -53,7 +53,7 @@ describe("Project components", () => {
             const component = testutils.renderIntoDocument(
                 <FilterButton milestonesOnly={false} onToggleMilestonesOnly={callback} />
             ) as React.Component<any, any>
-            chai.expect(callback.notCalled)
+            chai.expect(callback.notCalled).to.true
             const dropdownMenu = testutils.findRenderedDOMComponentWithClass(component, "dropdown-menu") as HTMLElement
             const dropdownMenuLi = dropdownMenu.getElementsByTagName("li")
             chai.expect(dropdownMenuLi).to.length(1)
@@ -68,9 +68,9 @@ describe("Project components", () => {
             const dropdownMenuLi = dropdownMenu.getElementsByTagName("li")
             const milestonesA = dropdownMenuLi[0].getElementsByTagName("a")
             chai.expect(milestonesA).to.length(1)
-            chai.expect(callback.notCalled)
+            chai.expect(callback.notCalled).to.true
             testutils.Simulate.click(milestonesA[0])
-            chai.expect(callback.calledOnce)
+            chai.expect(callback.calledOnce).to.true
         })
     })
 })

@@ -1,7 +1,7 @@
 import { Project } from "../../../common/types"
 
 export interface State {
-    project: Project
+    project: ProjectState
     tasks: TasksState
     relations: RelationsState
 }
@@ -25,6 +25,11 @@ export interface PrimaveraTaskRelation {
     next: string
     type: "FS" | "SF" | "FF" | "SS"
     lag: number
+}
+
+export interface ProjectState {
+    project: Project
+    error: string | null
 }
 
 export interface TasksState {

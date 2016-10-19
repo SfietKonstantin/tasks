@@ -92,7 +92,7 @@ describe("Graph", () => {
         })
     })
     describe("Cyclic dependency", () => {
-        it("Should detect a cyclic dependency", (done) => {
+        it("Should detect a cyclic dependency", () => {
             let node0 = new TaskNode("task1", new Date(2015, 9, 1), 15)
             let node1 = new TaskNode("task2", new Date(2015, 9, 1), 15)
             let node2 = new TaskNode("task3", new Date(2015, 9, 1), 15)
@@ -102,14 +102,7 @@ describe("Graph", () => {
             node1.addChild(node2)
             node2.addChild(node1)
 
-            try {
-                graph.compute(node0)
-            } catch (err) {
-                chai.expect(err).to.instanceof(Error)
-                done()
-                return
-            }
-            done(new Error("Cyclic dependency should not be a success"))
+            chai.expect(() => {graph.compute(node0)}).to.throw(CyclicDependencyError)
         })
     })
     describe("Milestone", () => {
