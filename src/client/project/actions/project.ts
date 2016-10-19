@@ -1,10 +1,12 @@
 import { Action, Dispatch } from "redux"
 import "whatwg-fetch"
 import { State } from "../types"
+import { ErrorAction, processError } from "../../common/actions/error"
 import { Project } from "../../../common/types"
 
 export const PROJECT_REQUEST = "PROJECT_REQUEST"
 export const PROJECT_RECEIVE = "PROJECT_RECEIVE"
+export const PROJECT_RECEIVE_FAILURE = "PROJECT_RECEIVE_FAILURE"
 
 export interface ProjectAction extends Action {
     type: string,
@@ -26,13 +28,23 @@ const receiveProject = (projectIdentifier: string, project: Project): ProjectAct
     }
 }
 
+const receiveFailureProject = (): Action => {
+    return {
+        type: PROJECT_RECEIVE_FAILURE
+    }
+}
+
 export const fetchProject = (projectIdentifier: string) => {
     return (dispatch: Dispatch<State>) => {
         dispatch(requestProject(projectIdentifier))
         return fetch("/api/project/" + projectIdentifier).then((response: Response) => {
-            return response.json()
-        }).then((project: Project) => {
-            dispatch(receiveProject(projectIdentifier, project))
+            return processError(response).then(() => {
+                return response.json()
+            }).then((project: Project) => {
+                dispatch(receiveProject(projectIdentifier, project))
+            }).catch((error: Error) => {
+                dispatch(receiveFailureProject())
+            })
         })
     }
 }

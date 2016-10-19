@@ -5,6 +5,7 @@ import {
     defineProject, addProject
 } from "../../client/imports/primavera/actions/project"
 import { Project } from "../../common/types"
+import { FakeResponse } from "./fakeresponse"
 
 describe("Primavera actions", () => {
     describe("Project", () => {
@@ -21,7 +22,7 @@ describe("Primavera actions", () => {
         describe("Asynchronous", () => {
             it("Should PUT a project", (done) => {
                 // Mock
-                let promiseResolve: ((response: Response) => void) | null = null
+                let promiseResolve: ((response: any) => void) | null = null
                 const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
                     promiseResolve = resolve
                 }))
@@ -53,15 +54,17 @@ describe("Primavera actions", () => {
                 chai.expect(dispatch.calledOnce).to.true
                 chai.expect(dispatch.calledWith({type: PROJECT_REQUEST_ADD})).to.true
                 chai.expect(promiseResolve).to.not.null
+
+                const response = new FakeResponse(true, {})
                 if (promiseResolve) { // Workaround typescript
-                    promiseResolve()
+                    promiseResolve(response)
                 }
             })
-            it("Should react to PUT failure", (done) => {
+            it("Should react to PUT error from server", (done) => {
                 // Mock
-                let promiseReject: ((reason: any) => void) | null = null
+                let promiseResolve: ((reason: any) => void) | null = null
                 const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
-                    promiseReject = reject
+                    promiseResolve = resolve
                 }))
                 global.fetch = fetch
                 const dispatch = sinon.spy()
@@ -84,9 +87,76 @@ describe("Primavera actions", () => {
 
                 chai.expect(dispatch.calledOnce).to.true
                 chai.expect(dispatch.calledWith({type: PROJECT_REQUEST_ADD})).to.true
-                chai.expect(promiseReject).to.not.null
-                if (promiseReject) { // Workaround typescript
-                    promiseReject(new Error("Error message"))
+                chai.expect(promiseResolve).to.not.null
+                const response = new FakeResponse(false, {error: "Error message"})
+                if (promiseResolve) { // Workaround typescript
+                    promiseResolve(response)
+                }
+            })
+            it("Should react to PUT error from server without cause", (done) => {
+                // Mock
+                let promiseResolve: ((reason: any) => void) | null = null
+                const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
+                    promiseResolve = resolve
+                }))
+                global.fetch = fetch
+                const dispatch = sinon.spy()
+
+                // Test
+                addProject({
+                    identifier: "identifier",
+                    name: "Name",
+                    description: "Description"
+                })(dispatch).then(() => {
+                    chai.expect(dispatch.calledTwice).to.true
+                    chai.expect(dispatch.calledWith({
+                        type: PROJECT_RECEIVE_ADD_FAILURE,
+                        message: "Unknown error"
+                    })).to.true
+                    done()
+                }).catch((error) => {
+                    done(error)
+                })
+
+                chai.expect(dispatch.calledOnce).to.true
+                chai.expect(dispatch.calledWith({type: PROJECT_REQUEST_ADD})).to.true
+                chai.expect(promiseResolve).to.not.null
+                const response = new FakeResponse(false, {})
+                if (promiseResolve) { // Workaround typescript
+                    promiseResolve(response)
+                }
+            })
+            it("Should react to PUT result JSON parsing error", (done) => {
+                // Mock
+                let promiseResolve: ((reason: any) => void) | null = null
+                const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
+                    promiseResolve = resolve
+                }))
+                global.fetch = fetch
+                const dispatch = sinon.spy()
+
+                // Test
+                addProject({
+                    identifier: "identifier",
+                    name: "Name",
+                    description: "Description"
+                })(dispatch).then(() => {
+                    chai.expect(dispatch.calledTwice).to.true
+                    chai.expect(dispatch.calledWith({
+                        type: PROJECT_RECEIVE_ADD_FAILURE,
+                        message: "Unknown error"
+                    })).to.true
+                    done()
+                }).catch((error) => {
+                    done(error)
+                })
+
+                chai.expect(dispatch.calledOnce).to.true
+                chai.expect(dispatch.calledWith({type: PROJECT_REQUEST_ADD})).to.true
+                chai.expect(promiseResolve).to.not.null
+                const response = new FakeResponse(false, {}, true)
+                if (promiseResolve) { // Workaround typescript
+                    promiseResolve(response)
                 }
             })
         })

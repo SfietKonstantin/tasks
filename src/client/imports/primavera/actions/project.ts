@@ -1,6 +1,6 @@
 import { Action, Dispatch } from "redux"
 import { State } from "../types"
-import { ErrorAction } from "../../../common/actions/error"
+import { ErrorAction, processError } from "../../../common/actions/error"
 import { Project } from "../../../../common/types"
 
 export const PROJECT_DEFINE = "PROJECT_DEFINE"
@@ -56,10 +56,12 @@ export const addProject = (project: Project) => {
                 project
             })
         }
-        return fetch("/api/project", requestInit).then(() => {
-            dispatch(receiveAddProject())
-        }).catch((error: Error) => {
-            dispatch(receiveAddFailureProject(error.message))
+        return fetch("/api/project", requestInit).then((response: Response) => {
+            return processError(response).then(() => {
+                dispatch(receiveAddProject())
+            }).catch((error: Error) => {
+                dispatch(receiveAddFailureProject(error.message))
+            })
         })
     }
 }

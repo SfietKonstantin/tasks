@@ -5,6 +5,7 @@ import { defineProject, addProject } from "../../client/imports/primavera/action
 import {
     State, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation
 } from "../../client/imports/primavera/types"
+import { FakeResponse } from "./fakeresponse"
 
 describe("Primavera reducers", () => {
     const initialState: State = {
@@ -74,7 +75,7 @@ describe("Primavera reducers", () => {
         })
         it("Should reduce PROJECT_RECEIVE_ADD", (done) => {
             // Mock
-            let promiseResolve: ((response: Response) => void) | null = null
+            let promiseResolve: ((response: any) => void) | null = null
             const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
                 promiseResolve = resolve
             }))
@@ -94,15 +95,16 @@ describe("Primavera reducers", () => {
                 done(error)
             })
 
+            const response = new FakeResponse(true, {})
             if (promiseResolve) { // Workaround typescript
-                promiseResolve()
+                promiseResolve(response)
             }
         })
         it("Should reduce PROJECT_RECEIVE_ADD_FAILURE", (done) => {
             // Mock
-            let promiseReject: ((reason: any) => void) | null = null
+            let promiseResolve: ((response: any) => void) | null = null
             const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
-                promiseReject = reject
+                promiseResolve = resolve
             }))
             global.fetch = fetch
             const dispatch = sinon.spy()
@@ -121,8 +123,9 @@ describe("Primavera reducers", () => {
                 done(error)
             })
 
-            if (promiseReject) { // Workaround typescript
-                promiseReject(new Error("Error message"))
+            const response = new FakeResponse(false, {error: "Error message"})
+            if (promiseResolve) { // Workaround typescript
+                promiseResolve(response)
             }
         })
     })
