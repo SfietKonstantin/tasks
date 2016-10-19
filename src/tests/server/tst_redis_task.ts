@@ -241,7 +241,7 @@ describe("Redis", () => {
                 done()
             })
         })
-        it("Should remove task properties", (done) => {
+        it("Should remove task name", (done) => {
             client.hdelAsync("task:project:task1", "name").then((result: number) => {
                 done()
             }).catch((error: Error) => {
@@ -250,7 +250,25 @@ describe("Redis", () => {
         })
         it("Should get an exception on corrupted task", (done) => {
             db.getTask("project", "task1").then((task: Task) => {
-                done(new Error("getDelay should not be a success"))
+                done(new Error("getTask should not be a success"))
+                done()
+            }).catch((error: Error) => {
+                chai.expect(error).to.instanceOf(CorruptedError)
+                done()
+            })
+        })
+        it("Should remove task description", (done) => {
+            client.hsetAsync("task:project:task1", "name", "Task 1").then((result: number) => {
+                return client.hdelAsync("task:project:task1", "description")
+            }).then((result: number) => {
+                done()
+            }).catch((error: Error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted task", (done) => {
+            db.getTask("project", "task1").then((task: Task) => {
+                done(new Error("getTask should not be a success"))
                 done()
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)

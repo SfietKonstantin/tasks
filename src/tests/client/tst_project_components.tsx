@@ -24,7 +24,7 @@ describe("Project components", () => {
             const component = testutils.renderIntoDocument(
                 <Breadcrumb project={project} />
             ) as React.Component<any, any>
-            const ol = testutils.findRenderedDOMComponentWithTag(component, "ol") as HTMLElement
+            const ol = testutils.findRenderedDOMComponentWithTag(component, "ol")
             const olLi = ol.getElementsByTagName("li")
             chai.expect(olLi).to.length(2)
             chai.expect(olLi[1].textContent).to.equals("Project")
@@ -43,7 +43,7 @@ describe("Project components", () => {
             chai.expect(callback.notCalled).to.true
             const button = testutils.findRenderedDOMComponentWithTag(component, "button")
             chai.expect(button).to.not.null
-            const dropdownMenu = testutils.findRenderedDOMComponentWithClass(component, "dropdown-menu") as HTMLElement
+            const dropdownMenu = testutils.findRenderedDOMComponentWithClass(component, "dropdown-menu")
             const dropdownMenuLi = dropdownMenu.getElementsByTagName("li")
             chai.expect(dropdownMenuLi).to.length(1)
             chai.expect(dropdownMenuLi[0].classList.toString()).to.contains("active")
@@ -54,7 +54,7 @@ describe("Project components", () => {
                 <FilterButton milestonesOnly={false} onToggleMilestonesOnly={callback} />
             ) as React.Component<any, any>
             chai.expect(callback.notCalled).to.true
-            const dropdownMenu = testutils.findRenderedDOMComponentWithClass(component, "dropdown-menu") as HTMLElement
+            const dropdownMenu = testutils.findRenderedDOMComponentWithClass(component, "dropdown-menu")
             const dropdownMenuLi = dropdownMenu.getElementsByTagName("li")
             chai.expect(dropdownMenuLi).to.length(1)
             chai.expect(dropdownMenuLi[0].classList.toString()).to.not.contains("active")
@@ -64,7 +64,7 @@ describe("Project components", () => {
             const component = testutils.renderIntoDocument(
                 <FilterButton milestonesOnly={false} onToggleMilestonesOnly={callback} />
             ) as React.Component<any, any>
-            const dropdownMenu = testutils.findRenderedDOMComponentWithClass(component, "dropdown-menu") as HTMLElement
+            const dropdownMenu = testutils.findRenderedDOMComponentWithClass(component, "dropdown-menu")
             const dropdownMenuLi = dropdownMenu.getElementsByTagName("li")
             const milestonesA = dropdownMenuLi[0].getElementsByTagName("a")
             chai.expect(milestonesA).to.length(1)

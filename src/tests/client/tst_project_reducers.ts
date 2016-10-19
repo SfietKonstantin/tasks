@@ -5,6 +5,7 @@ import { fetchProject } from "../../client/project/actions/project"
 import {
     State, ProjectState, TasksFilter, TasksState
 } from "../../client/project/types"
+import { Project } from "../../common/types"
 import { ApiTask } from "../../common/apitypes"
 import { FakeResponse } from "./fakeresponse"
 
@@ -51,54 +52,50 @@ describe("Project reducers", () => {
             global.fetch = fetch
             const dispatch = sinon.spy()
 
+            const project: Project = {
+                identifier: "identifier",
+                name: "Name",
+                description: "Description"
+            }
+
             fetchProject("identifier")(dispatch).then(() => {
                 const action = dispatch.args[1][0]
                 const state = main.mainReducer(initialState, action)
                 chai.expect(state.project.isFetching).to.false
-
+                chai.expect(state.project.project).to.deep.equal(project)
                 done()
             }).catch((error) => {
                 done(error)
             })
 
-            const response = new FakeResponse(true, {
-                identifier: "identifier",
-                name: "Name",
-                description: "Description"
-            })
-
+            const response = new FakeResponse(true, project)
             if (promiseResolve) { // Workaround typescript
                 promiseResolve(response)
             }
         })
-        /*
         it("Should reduce PROJECT_RECEIVE_ADD_FAILURE", (done) => {
             // Mock
-            let promiseReject: ((reason: any) => void) | null = null
+            let promiseResolve: ((response: any) => void) | null = null
             const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
-                promiseReject = reject
+                promiseResolve = resolve
             }))
             global.fetch = fetch
             const dispatch = sinon.spy()
 
-            addProject({
-                identifier: "identifier",
-                name: "Name",
-                description: "Description"
-            })(dispatch).then(() => {
+            fetchProject("identifier")(dispatch).then(() => {
                 const action = dispatch.args[1][0]
                 const state = main.mainReducer(initialState, action)
-                chai.expect(state.project.project).to.deep.equal(initialState.project.project)
-                chai.expect(state.project.error).to.equals("Error message")
+                chai.expect(state.project.isFetching).to.false
+            chai.expect(state.project.project).to.null
                 done()
             }).catch((error) => {
                 done(error)
             })
 
-            if (promiseReject) { // Workaround typescript
-                promiseReject(new Error("Error message"))
+            const response = new FakeResponse(false, {error: "Error message"})
+            if (promiseResolve) { // Workaround typescript
+                promiseResolve(response)
             }
         })
-        */
     })
 })

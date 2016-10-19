@@ -18,7 +18,7 @@ describe("Common components", () => {
             const component = testutils.renderIntoDocument(
                 <Header identifier="test" name="Test" />
             ) as React.Component<any, any>
-            const h1 = testutils.findRenderedDOMComponentWithTag(component, "h1") as HTMLElement
+            const h1 = testutils.findRenderedDOMComponentWithTag(component, "h1")
             chai.expect(h1.textContent).to.equals("Test #test")
         })
     })
@@ -29,7 +29,7 @@ describe("Common components", () => {
             const component = testutils.renderIntoDocument(
                 <TabBar tabs={tabs} tabChangedCallback={callback} />
             ) as React.Component<any, any>
-            const nav = testutils.findRenderedDOMComponentWithClass(component, "nav") as HTMLElement
+            const nav = testutils.findRenderedDOMComponentWithClass(component, "nav")
 
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWith(0)).to.true
@@ -54,7 +54,7 @@ describe("Common components", () => {
             const component = testutils.renderIntoDocument(
                 <TabBar tabs={tabs} tabChangedCallback={callback} />
             ) as React.Component<any, any>
-            const nav = testutils.findRenderedDOMComponentWithClass(component, "nav") as HTMLElement
+            const nav = testutils.findRenderedDOMComponentWithClass(component, "nav")
             const navLi = nav.getElementsByTagName("li")
             const tab3a = navLi[2].getElementsByTagName("a")
             chai.expect(tab3a).to.length(1)

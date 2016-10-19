@@ -14,6 +14,7 @@ declare module "redis" {
         setAsync(...args: any[]): Promise<any>
         delAsync(...args: any[]): Promise<any>
         hmsetAsync(...args: any[]): Promise<any>
+        hsetAsync(...args: any[]): Promise<any>
         hdelAsync(...args: any[]): Promise<any>
     }
 }
@@ -167,8 +168,25 @@ describe("Redis", () => {
                 done()
             })
         })
-        it("Should remove project properties", (done) => {
+        it("Should remove project name", (done) => {
             client.hdelAsync("project:project1", "name").then((result: number) => {
+                done()
+            }).catch((error: Error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted project", (done) => {
+            db.getProject("project1").then((project: Project) => {
+                done(new Error("getProject should not be a success"))
+            }).catch((error: Error) => {
+                chai.expect(error).to.instanceOf(CorruptedError)
+                done()
+            })
+        })
+        it("Should remove project description", (done) => {
+            client.hsetAsync("project:project1", "name", "Project 1").then((result: number) => {
+                return client.hdelAsync("project:project1", "description")
+            }).then((result: number) => {
                 done()
             }).catch((error: Error) => {
                 done(error)

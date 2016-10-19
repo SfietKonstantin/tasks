@@ -30,7 +30,7 @@ describe("Task components", () => {
             const component = testutils.renderIntoDocument(
                 <Breadcrumb project={project} task={task} />
             ) as React.Component<any, any>
-            const ol = testutils.findRenderedDOMComponentWithTag(component, "ol") as HTMLElement
+            const ol = testutils.findRenderedDOMComponentWithTag(component, "ol")
             const olLi = ol.getElementsByTagName("li")
             chai.expect(olLi).to.length(3)
             chai.expect(olLi[1].textContent).to.equals("Project")
@@ -60,7 +60,7 @@ describe("Task components", () => {
             const component = testutils.renderIntoDocument(
                 <Breadcrumb project={project} task={task} />
             ) as React.Component<any, any>
-            const ol = testutils.findRenderedDOMComponentWithTag(component, "ol") as HTMLElement
+            const ol = testutils.findRenderedDOMComponentWithTag(component, "ol")
             const olLi = ol.getElementsByTagName("li")
             chai.expect(olLi).to.length(3)
             chai.expect(olLi[1].textContent).to.equals("Project")
