@@ -3,6 +3,7 @@ import * as express from "express"
 import * as path from "path"
 import * as logger from "morgan"
 import * as http from "http"
+import * as redis from "redis"
 import { Graph } from "./core/graph/graph"
 import { Api } from "./routes/api"
 import { Routes } from "./routes/routes"
@@ -26,7 +27,7 @@ export class Server {
     private routes: Routes
 
     public constructor() {
-        this.dataProvider = new RedisDataProvider(RedisDataProvider.getDefaultClient())
+        this.dataProvider = new RedisDataProvider(redis.createClient())
         this.graph = new Graph(this.dataProvider)
 
         this.api = new Api(this.dataProvider, this.graph)

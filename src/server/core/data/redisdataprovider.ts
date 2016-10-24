@@ -242,9 +242,6 @@ class RedisDelay {
 
 export class RedisDataProvider implements IDataProvider {
     client: redis.RedisClient
-    static getDefaultClient(): redis.RedisClient {
-        return redis.createClient()
-    }
     constructor(client: redis.RedisClient) {
         this.client = client
     }

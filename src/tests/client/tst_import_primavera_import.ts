@@ -15,6 +15,13 @@ describe("Primavera import", () => {
         chai.expect(results.delays.size).to.equal(0)
         chai.expect(results.warnings).to.empty
     })
+    it("Should ignore empty lines", () => {
+        const tasks = "header\nsecond_line\n\n\n"
+        const results = parseTasks(tasks)
+        chai.expect(results.tasks.size).to.equal(0)
+        chai.expect(results.delays.size).to.equal(0)
+        chai.expect(results.warnings).to.empty
+    })
     it("Should throw an exception on input < 9 column", () => {
         const tasks = "header\nsecond_line\ntest"
         chai.expect(() => {parseTasks(tasks)}).to.throw(Error)

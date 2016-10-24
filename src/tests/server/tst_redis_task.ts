@@ -148,6 +148,80 @@ describe("Redis", () => {
             client.flushdb()
         })
     })
+    describe("getTasks", () => {
+        it("Should add some testing data", (done) => {
+            const project: Project = {
+                identifier: "project",
+                name: "Project",
+                description: "Description"
+            }
+
+            db.addProject(project).then(() => {
+                const task1: Task = {
+                    projectIdentifier: "project",
+                    identifier: "task1",
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                const task2: Task = {
+                    projectIdentifier: "project",
+                    identifier: "task2",
+                    name: "Task 2",
+                    description: "Description 2",
+                    estimatedStartDate: new Date(2016, 9, 15),
+                    estimatedDuration: 15
+                }
+
+                return db.addTask(task1).then(() => {
+                }).then(() => {
+                    return db.addTask(task2)
+                }).then(() => {
+                    done()
+                })
+            }).catch((error: Error) => {
+                done(error)
+            })
+        })
+        it("Should get project tasks", (done) => {
+            db.getProjectTasks("project").then((tasks: Array<Task>) => {
+                const expected: Array<Task> = [
+                    {
+                        projectIdentifier: "project",
+                        identifier: "task1",
+                        name: "Task 1",
+                        description: "Description 1",
+                        estimatedStartDate: new Date(2016, 9, 1),
+                        estimatedDuration: 30
+                    },
+                    {
+                        projectIdentifier: "project",
+                        identifier: "task2",
+                        name: "Task 2",
+                        description: "Description 2",
+                        estimatedStartDate: new Date(2016, 9, 15),
+                        estimatedDuration: 15
+                    }
+                ]
+                chai.expect(tasks).to.deep.equal(expected)
+                done()
+            }).catch((error: Error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on invalid project", (done) => {
+            db.getProjectTasks("project2").then(() => {
+                done(new Error("getProjectTasks should not be a success"))
+            }).catch((error: Error) => {
+                chai.expect(error).to.instanceOf(ProjectNotFoundError)
+                done()
+            })
+        })
+        after(() => {
+            client.flushdb()
+        })
+    })
     describe("getTask", () => {
         it("Should add some testing data", (done) => {
             const project: Project = {
@@ -236,7 +310,40 @@ describe("Redis", () => {
         it("Should get an exception on corrupted task", (done) => {
             db.getTask("project", "task1").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
+            }).catch((error: Error) => {
+                chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            })
+        })
+        it("Should remove task estimatedStartDate", (done) => {
+            client.hsetAsync("task:project:task1", "description", "Description 1").then((result: number) => {
+                return client.delAsync("task:project:task1:estimatedStartDate")
+            }).then((result: number) => {
+                done()
+            }).catch((error: Error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted task", (done) => {
+            db.getTask("project", "task1").then((task: Task) => {
+                done(new Error("getTask should not be a success"))
+            }).catch((error: Error) => {
+                chai.expect(error).to.instanceOf(CorruptedError)
+                done()
+            })
+        })
+        it("Should remove task estimatedDuration", (done) => {
+            client.setAsync("task:project:task1:estimatedStartDate", "0").then((result: number) => {
+                return client.delAsync("task:project:task1:estimatedDuration")
+            }).then((result: number) => {
+                done()
+            }).catch((error: Error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted task", (done) => {
+            db.getTask("project", "task1").then((task: Task) => {
+                done(new Error("getTask should not be a success"))
             }).catch((error: Error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
