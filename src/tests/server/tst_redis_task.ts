@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Task, TaskRelation } from "../../common/types"
+import { Project, Task, TaskRelation, TaskLocation } from "../../common/types"
 import {
     CorruptedError, ExistsError, ProjectNotFoundError, TaskNotFoundError
 } from "../../server/core/data/idataprovider"
@@ -475,7 +475,10 @@ describe("Redis", () => {
             db.addTaskRelation({
                 projectIdentifier: "project",
                 previous: "task1",
-                next: "task2"
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
             }).then(() => {
                 done()
             }).catch((error: Error) => {
@@ -486,7 +489,10 @@ describe("Redis", () => {
             db.addTaskRelation({
                 projectIdentifier: "project",
                 previous: "task3",
-                next: "task2"
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
             }).catch((error: Error) => {
@@ -498,7 +504,10 @@ describe("Redis", () => {
             db.addTaskRelation({
                 projectIdentifier: "project",
                 previous: "task1",
-                next: "task3"
+                previousLocation: TaskLocation.End,
+                next: "task3",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
             }).catch((error: Error) => {
@@ -507,7 +516,7 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("task:project:task1:children", "test").then((result) => {
+            client.setAsync("task:project:task1:relations", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -517,7 +526,10 @@ describe("Redis", () => {
             db.addTaskRelation({
                 projectIdentifier: "project",
                 previous: "task1",
-                next: "task2"
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
             }).catch((error: Error) => {
@@ -526,7 +538,7 @@ describe("Redis", () => {
             })
         })
         it("Should revert task properties corruption", (done) => {
-            client.delAsync("task:project:task1:children").then((result) => {
+            client.delAsync("task:project:task1:relations").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -536,7 +548,10 @@ describe("Redis", () => {
             db.addTaskRelation({
                 projectIdentifier: "project",
                 previous: "task1",
-                next: "task2"
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
             }).then(() => {
                 done()
             }).catch((error: Error) => {
@@ -589,13 +604,19 @@ describe("Redis", () => {
                     return db.addTaskRelation({
                         projectIdentifier: "project",
                         previous: "task1",
-                        next: "task2"
+                        previousLocation: TaskLocation.End,
+                        next: "task2",
+                        nextLocation: TaskLocation.Beginning,
+                        lag: 12
                     })
                 }).then(() => {
                     return db.addTaskRelation({
                         projectIdentifier: "project",
                         previous: "task1",
-                        next: "task3"
+                        previousLocation: TaskLocation.Beginning,
+                        next: "task3",
+                        nextLocation: TaskLocation.End,
+                        lag: 23
                     })
                 }).then(() => {
                     done()
@@ -610,12 +631,18 @@ describe("Redis", () => {
                     {
                         projectIdentifier: "project",
                         previous: "task1",
-                        next: "task2"
+                        previousLocation: TaskLocation.End,
+                        next: "task2",
+                        nextLocation: TaskLocation.Beginning,
+                        lag: 12
                     },
                     {
                         projectIdentifier: "project",
                         previous: "task1",
-                        next: "task3"
+                        previousLocation: TaskLocation.Beginning,
+                        next: "task3",
+                        nextLocation: TaskLocation.End,
+                        lag: 23
                     }
                 ]
                 chai.expect(taskRelations).to.deep.equal(expected)
@@ -633,7 +660,7 @@ describe("Redis", () => {
             })
         })
         it("Should corrupt task properties", (done) => {
-            client.setAsync("task:project:task1:children", "test").then((result) => {
+            client.setAsync("task:project:task1:relations", "test").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)

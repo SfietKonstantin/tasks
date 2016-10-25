@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Task, Modifier } from "../../common/types"
+import { Project, Task, Modifier, TaskLocation } from "../../common/types"
 import { TaskNotFoundError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
@@ -48,16 +48,16 @@ describe("Redis", () => {
                         projectIdentifier: "project",
                         name: "Modifier 1",
                         description: "Description 1",
-                        duration: 40
+                        duration: 40,
+                        location: TaskLocation.End
                     }
-
                     const modifier2: Modifier = {
                         projectIdentifier: "project",
                         name: "Modifier 2",
                         description: "Description 2",
-                        duration: 10
+                        duration: 10,
+                        location: TaskLocation.Beginning
                     }
-
                     return db.addModifier(modifier1).then(() => {
                         return db.addModifier(modifier2)
                     })
@@ -81,13 +81,15 @@ describe("Redis", () => {
                         projectIdentifier: "project",
                         name: "Modifier 2",
                         description: "Description 2",
-                        duration: 10
+                        duration: 10,
+                        location: TaskLocation.Beginning
                     },
                     {
                         projectIdentifier: "project",
                         name: "Modifier 1",
                         description: "Description 1",
-                        duration: 40
+                        duration: 40,
+                        location: TaskLocation.End
                     }
                 ]
                 chai.expect(modifiers).to.deep.equal(expected)
@@ -108,7 +110,8 @@ describe("Redis", () => {
                         projectIdentifier: "project",
                         name: "Modifier 2",
                         description: "Description 2",
-                        duration: 10
+                        duration: 10,
+                        location: TaskLocation.Beginning
                     },
                     null
                 ]
@@ -132,7 +135,8 @@ describe("Redis", () => {
                         projectIdentifier: "project",
                         name: "Modifier 2",
                         description: "Description 2",
-                        duration: 10
+                        duration: 10,
+                        location: TaskLocation.Beginning
                     },
                     null
                 ]

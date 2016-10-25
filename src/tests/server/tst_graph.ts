@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Task, TaskResults, TaskRelation, Modifier } from "../../common/types"
+import { Task, TaskResults, TaskRelation, Modifier, TaskLocation } from "../../common/types"
 import { FakeDataProvider } from "./fakedataprovider"
 import { GraphError } from "../../server/core/graph/types"
 import { ProjectNode, TaskNode } from "../../server/core/graph/graph"
@@ -25,7 +25,7 @@ describe("Graph", () => {
             const arg: TaskResults = {
                 projectIdentifier: "project",
                 taskIdentifier: "task",
-                startDate: new Date(2015, 2, 5),
+                startDate: new Date(2015, 2, 1),
                 duration: 20
             }
             mock.expects("setTaskResults").once().withArgs(arg).returns(Promise.resolve())
@@ -41,8 +41,8 @@ describe("Graph", () => {
         })
         it("Should get error on invalid input", (done) => {
             const dataprovider = new FakeDataProvider()
-            const node = new TaskNode(dataprovider, "project", "task", new Date(2015, 2, 1), 20,
-                                      new Date(NaN), 20)
+            const node = new TaskNode(dataprovider, "project", "task", new Date(NaN), 20,
+                                      new Date(2015, 2, 1), 20)
             node.compute().then(() => {
                 done(new Error("Input error should be detected"))
             }).catch((error: Error) => {
@@ -50,7 +50,7 @@ describe("Graph", () => {
                 done()
             })
         })
-        it("Should compute the correct results based on modifiers", (done) => {
+        it("Should compute the correct results based on modifiers 1", (done) => {
             // Mock
             const dataprovider = new FakeDataProvider()
             let mock = sinon.mock(dataprovider)
@@ -70,13 +70,53 @@ describe("Graph", () => {
                     projectIdentifier: "project",
                     name: "Modifier 1",
                     description: "Description 1",
-                    duration: 5
+                    duration: 5,
+                    location: TaskLocation.End
                 },
                 {
                     projectIdentifier: "project",
                     name: "Modifier 2",
                     description: "Description 2",
-                    duration: -2
+                    duration: -2,
+                    location: TaskLocation.End
+                }
+            ]
+
+            node.compute().then(() => {
+                done()
+            }).catch((error: Error) => {
+                done(error)
+            })
+        })
+        it("Should compute the correct results based on modifiers 2", (done) => {
+            // Mock
+            const dataprovider = new FakeDataProvider()
+            let mock = sinon.mock(dataprovider)
+            const arg: TaskResults = {
+                projectIdentifier: "project",
+                taskIdentifier: "task",
+                startDate: new Date(2015, 2, 4),
+                duration: 20
+            }
+            mock.expects("setTaskResults").once().withArgs(arg).returns(Promise.resolve())
+
+            // Test
+            const node = new TaskNode(dataprovider, "project", "task", new Date(2015, 2, 1), 20,
+                                      new Date(2015, 2, 1), 20)
+            node.modifiers = [
+                {
+                    projectIdentifier: "project",
+                    name: "Modifier 1",
+                    description: "Description 1",
+                    duration: 5,
+                    location: TaskLocation.Beginning
+                },
+                {
+                    projectIdentifier: "project",
+                    name: "Modifier 2",
+                    description: "Description 2",
+                    duration: -2,
+                    location: TaskLocation.Beginning
                 }
             ]
 
@@ -104,7 +144,14 @@ describe("Graph", () => {
             const node2 = new TaskNode(dataprovider, "project", "task2", new Date(2015, 1, 1), 15,
                                        new Date(2015, 1, 1), 0)
 
-            node1.addChild(node2).then(() => {
+            node1.addChild(node2, {
+                projectIdentifier: "project",
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
+            }).then(() => {
                 done()
             }).catch((error: Error) => {
                 done(error)
@@ -118,7 +165,8 @@ describe("Graph", () => {
                 projectIdentifier: "project",
                 name: "Modifier 1",
                 description: "Description 1",
-                duration: 2
+                duration: 2,
+                location: TaskLocation.End
             }
             const results: Array<TaskResults> = [
                 {
@@ -153,7 +201,14 @@ describe("Graph", () => {
             const node2 = new TaskNode(dataprovider, "project", "task2", new Date(2015, 1, 1), 15,
                                        new Date(2015, 1, 1), 0)
 
-            node1.addChild(node2).then(() => {
+            node1.addChild(node2, {
+                projectIdentifier: "project",
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
+            }).then(() => {
                 chai.expect(expectations[0].called).to.true
                 chai.expect(expectations[1].called).to.false
                 chai.expect(expectations[2].called).to.false
@@ -176,7 +231,8 @@ describe("Graph", () => {
                 projectIdentifier: "project",
                 name: "Modifier 1",
                 description: "Description 1",
-                duration: 2
+                duration: 2,
+                location: TaskLocation.End
             }
             const results: TaskResults = {
                 projectIdentifier: "project",
@@ -209,7 +265,8 @@ describe("Graph", () => {
                 projectIdentifier: "project2",
                 name: "Modifier 1",
                 description: "Description 1",
-                duration: 2
+                duration: 2,
+                location: TaskLocation.End
             }
             const results: Array<TaskResults> = [
                 {
@@ -229,7 +286,14 @@ describe("Graph", () => {
             const node2 = new TaskNode(dataprovider, "project", "task2", new Date(2015, 1, 1), 15,
                                        new Date(2015, 1, 1), 0)
 
-            node1.addChild(node2).then(() => {
+            node1.addChild(node2, {
+                projectIdentifier: "project",
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
+            }).then(() => {
                 return node1.addModifier(modifier)
             }).then(() => {
                 done(new Error("Error should be thrown when adding invalid modifier"))
@@ -256,8 +320,22 @@ describe("Graph", () => {
             const node2 = new TaskNode(dataprovider, "project", "task2", new Date(2015, 1, 1), 15,
                                        new Date(2015, 1, 1), 0)
 
-            node1.addChild(node2).then(() => {
-                return node2.addChild(node1)
+            node1.addChild(node2, {
+                projectIdentifier: "project",
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
+            }).then(() => {
+                return node2.addChild(node1, {
+                projectIdentifier: "project",
+                previous: "task2",
+                previousLocation: TaskLocation.End,
+                next: "task1",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
+            })
             }).then(() => {
                 done(new Error("Cyclic dependency should be detected"))
             }).catch((error: Error) => {
@@ -327,7 +405,7 @@ describe("Graph", () => {
                 {
                     projectIdentifier: "project",
                     taskIdentifier: "reducing",
-                    startDate: new Date(2016, 10, 26),
+                    startDate: new Date(2016, 10, 24),
                     duration: 30
                 }
             ]
@@ -341,7 +419,8 @@ describe("Graph", () => {
                     projectIdentifier: "project",
                     name: "Root modifier",
                     description: "Root modifier description",
-                    duration: 5
+                    duration: 5,
+                    location: TaskLocation.End
                 }
             ]
             mock.expects("getTaskModifiers").once().withArgs("project", "root")
@@ -353,13 +432,15 @@ describe("Graph", () => {
                     projectIdentifier: "project",
                     name: "Short modifier 1",
                     description: "Short modifier 1 description",
-                    duration: 10
+                    duration: 10,
+                    location: TaskLocation.End
                 },
                 {
                     projectIdentifier: "project",
                     name: "Short modifier 2",
                     description: "Short modifier 2 description",
-                    duration: 24
+                    duration: 24,
+                    location: TaskLocation.End
                 }
             ]
             mock.expects("getTaskModifiers").once().withArgs("project", "short")
@@ -370,12 +451,18 @@ describe("Graph", () => {
                 {
                     projectIdentifier: "project",
                     previous: "root",
-                    next: "long"
+                    previousLocation: TaskLocation.End,
+                    next: "long",
+                    nextLocation: TaskLocation.Beginning,
+                    lag: 0
                 },
                 {
                     projectIdentifier: "project",
                     previous: "root",
-                    next: "short"
+                    previousLocation: TaskLocation.End,
+                    next: "short",
+                    nextLocation: TaskLocation.Beginning,
+                    lag: 0
                 }
             ]
             mock.expects("getTaskRelations").once().withArgs("project", "root")
@@ -384,7 +471,10 @@ describe("Graph", () => {
                 {
                     projectIdentifier: "project",
                     previous: "long",
-                    next: "reducing"
+                    previousLocation: TaskLocation.End,
+                    next: "reducing",
+                    nextLocation: TaskLocation.Beginning,
+                    lag: 0
                 }
             ]
             mock.expects("getTaskRelations").once().withArgs("project", "long")
@@ -393,7 +483,11 @@ describe("Graph", () => {
                 {
                     projectIdentifier: "project",
                     previous: "short",
-                    next: "reducing"
+                    previousLocation: TaskLocation.End,
+                    next: "reducing",
+                    nextLocation: TaskLocation.Beginning,
+                    lag: 0
+
                 }
             ]
             mock.expects("getTaskRelations").once().withArgs("project", "short")
@@ -422,7 +516,7 @@ describe("Graph", () => {
                 chai.expect(long.modifiers).to.deep.equal([])
                 const reducing = maputils.get(node.nodes, "reducing")
                 chai.expect(reducing.taskIdentifier).to.equal("reducing")
-                chai.expect(reducing.startDate).to.deep.equal(new Date(2016, 10, 26))
+                chai.expect(reducing.startDate).to.deep.equal(new Date(2016, 10, 24))
                 chai.expect(reducing.duration).to.equal(30)
                 chai.expect(reducing.modifiers).to.deep.equal([])
                 done()

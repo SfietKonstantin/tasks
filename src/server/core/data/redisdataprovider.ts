@@ -4,7 +4,7 @@ import {
     ProjectNotFoundError, TaskNotFoundError, ModifierNotFoundError,
     DelayNotFoundError
 } from "./idataprovider"
-import { Identifiable, Project, Task, TaskRelation, TaskResults, Modifier, Delay } from "../../../common/types"
+import { Identifiable, Project, Task, TaskRelation, TaskResults, Modifier, TaskLocation, Delay } from "../../../common/types"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
 
@@ -47,6 +47,10 @@ const taskKey = (projectIdentifier: string, taskIdentifier: string, property: st
     return "task:" + projectIdentifier + ":" + taskIdentifier + ":" + property
 }
 
+const taskRelationKey = (projectIdentifier: string, previousIdentifier: string, nextIdentifier: string) => {
+    return "task:" + projectIdentifier + ":" + previousIdentifier + ":relation:" + nextIdentifier
+}
+
 const modifierRootKey = (projectIdentifier: string, modifierId: number) => {
     return "modifier:" + projectIdentifier + ":" + modifierId
 }
@@ -61,6 +65,25 @@ const delayRootKey = (projectIdentifier: string, taskIdentifier: string) => {
 
 const delayKey = (projectIdentifier: string, taskIdentifier: string, property: string) => {
     return "delay:" + projectIdentifier + ":" + taskIdentifier + ":" + property
+}
+
+const fromTaskLocation = (location: TaskLocation): string => {
+    switch (location) {
+        case TaskLocation.Beginning:
+            return "Beginning"
+        case TaskLocation.End:
+            return "End"
+    }
+}
+
+const toTaskLocation = (location: string): TaskLocation | null => {
+    if (location == "Beginning") {
+        return TaskLocation.Beginning
+    } else if (location == "End") {
+        return TaskLocation.End
+    } else {
+        return null
+    }
 }
 
 class RedisProject {
@@ -154,13 +177,66 @@ class RedisTask {
     }
 }
 
+class RedisTaskRelation {
+    previousLocation: string
+    nextLocation: string
+    lag: number
+
+    constructor(taskRelation: TaskRelation) {
+        this.previousLocation = fromTaskLocation(taskRelation.previousLocation)
+        this.nextLocation = fromTaskLocation(taskRelation.nextLocation)
+        this.lag = taskRelation.lag
+    }
+
+    static save(relation: TaskRelation, client: redis.RedisClient): Promise<void> {
+        const redisTaskRelation = new RedisTaskRelation(relation)
+        const projectIdentifier = relation.projectIdentifier
+        return client.hmsetAsync(taskRelationKey(projectIdentifier, relation.previous, relation.next), redisTaskRelation).then(() => {
+            return client.saddAsync(taskKey(projectIdentifier, relation.previous, "relations"), relation.next)
+        })
+    }
+
+    static load(projectIdentifier: string, previous: string, next: string, client: redis.RedisClient): Promise<TaskRelation> {
+        return client.hgetallAsync(taskRelationKey(projectIdentifier, previous, next)).then((result: any) => {
+            if (!result.hasOwnProperty("previousLocation")) {
+                throw new CorruptedError("TaskRelation " + previous + "-" + next + " do not have property previousLocation")
+            }
+            if (!result.hasOwnProperty("nextLocation")) {
+                throw new CorruptedError("TaskRelation " + previous + "-" + next + " do not have property nextLocation")
+            }
+            if (!result.hasOwnProperty("lag")) {
+                throw new CorruptedError("TaskRelation " + previous + "-" + next + " do not have property lag")
+            }
+            const previousLocation = toTaskLocation(result["previousLocation"])
+            if (previousLocation == null) {
+                throw new CorruptedError("TaskRelation " + previous + "-" + next + " has an invalid previousLocation")
+            }
+            const nextLocation = toTaskLocation(result["nextLocation"])
+            if (nextLocation == null) {
+                throw new CorruptedError("TaskRelation " + previous + "-" + next + " has an invalid nextLocation")
+            }
+            const relation: TaskRelation = {
+                projectIdentifier,
+                previous,
+                previousLocation,
+                next,
+                nextLocation,
+                lag: +(result["lag"] as string)
+            }
+            return relation
+        })
+    }
+}
+
 class RedisModifier {
     name: string
     description: string
+    location: string
 
     constructor(modifier: Modifier) {
         this.name = modifier.name
         this.description = modifier.description
+        this.location = fromTaskLocation(modifier.location)
     }
     static save(id: number, modifier: Modifier, client: redis.RedisClient): Promise<number> {
         const redisModifier = new RedisModifier(modifier)
@@ -177,8 +253,15 @@ class RedisModifier {
             if (!result.hasOwnProperty("description")) {
                 throw new CorruptedError("Modifier " + modifierId + " do not have property description")
             }
+            if (!result.hasOwnProperty("location")) {
+                throw new CorruptedError("Modifier " + modifierId + " do not have property location")
+            }
             const name: string = result["name"]
             const description: string = result["description"]
+            const location = toTaskLocation(result["location"])
+            if (location == null) {
+                throw new CorruptedError("Modifier " + modifierId + " have an invalid type")
+            }
             const modifierDuration = modifierKey(projectIdentifier, modifierId, "duration")
             return client.getAsync(modifierDuration).then((result: string) => {
                 if (!result) {
@@ -188,7 +271,8 @@ class RedisModifier {
                     projectIdentifier,
                     name,
                     description,
-                    duration: +result
+                    duration: +result,
+                    location
                 }
                 return modifier
             })
@@ -310,23 +394,16 @@ export class RedisDataProvider implements IDataProvider {
         return this.hasTask(relation.projectIdentifier, relation.previous).then(() => {
             return this.hasTask(relation.projectIdentifier, relation.next)
         }).then(() => {
-            const projectIdentifier = relation.projectIdentifier
-            const previous = relation.previous
-            const next = relation.next
-            return this.client.saddAsync(taskKey(projectIdentifier, previous, "children"), next)
+            return RedisTaskRelation.save(relation, this.client)
         })
     }
     getTaskRelations(projectIdentifier: string, taskIdentifier: string): Promise<Array<TaskRelation>> {
         return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
-            return this.client.smembersAsync(taskKey(projectIdentifier, taskIdentifier, "children"))
+            return this.client.smembersAsync(taskKey(projectIdentifier, taskIdentifier, "relations"))
         }).then((identifiers: Array<string>) => {
-            return identifiers.sort().map((childIndentifier: string): TaskRelation => {
-                return {
-                    projectIdentifier,
-                    previous: taskIdentifier,
-                    next: childIndentifier
-                }
-            })
+            return Promise.all(identifiers.sort().map((childIndentifier: string): Promise<TaskRelation> => {
+                return RedisTaskRelation.load(projectIdentifier, taskIdentifier, childIndentifier, this.client)
+            }))
         })
     }
     getTaskResults(projectIdentifier: string, taskIdentifier: string): Promise<TaskResults> {

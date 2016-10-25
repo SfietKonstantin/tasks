@@ -29,13 +29,22 @@ export interface TaskResults extends ProjectBased, TaskBased {
 
 export interface TaskRelation extends ProjectBased {
     previous: string
+    previousLocation: TaskLocation
     next: string
+    nextLocation: TaskLocation
+    lag: number
+}
+
+export enum TaskLocation {
+    Beginning,
+    End
 }
 
 export interface Modifier extends ProjectBased {
     name: string
     description: string
     duration: number
+    location: TaskLocation
 }
 
 export interface Delay extends Identifiable, ProjectBased {

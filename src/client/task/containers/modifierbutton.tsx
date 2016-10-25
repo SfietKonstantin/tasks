@@ -1,10 +1,10 @@
 import * as React from "react"
-import { Col, Button, Modal, Form, FormGroup, FormControl, ControlLabel, InputGroup } from "react-bootstrap"
+import { Col, Button, Modal, Form, FormGroup, FormControl, ControlLabel, InputGroup, Radio } from "react-bootstrap"
 import { Dispatch } from "redux"
 import * as ReactRedux from "react-redux"
 import { State } from "../types"
 import { addModifier } from "../actions/task"
-import { Modifier } from "../../../common/types"
+import { Modifier, TaskLocation } from "../../../common/types"
 
 interface ModifierButtonProperties {
     projectIdentifier: string
@@ -17,7 +17,8 @@ interface ModifierButtonState {
     show: boolean,
     name: string
     description: string,
-    duration: number
+    duration: number,
+    location: TaskLocation
 }
 
 export class UnconnectedModifierButton extends React.Component<ModifierButtonProperties, ModifierButtonState> {
@@ -27,14 +28,15 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
             show: false,
             name: "",
             description: "",
-            duration: 0
+            duration: 0,
+            location: TaskLocation.End
         }
     }
     render() {
         return <Button onClick={this.open.bind(this)}>
             <Modal show={this.state.show} bsSize="large" onHide={this.close.bind(this)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Add task modifier</Modal.Title>
+                    <Modal.Title>Add task duration modifier</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form horizontal>
@@ -56,6 +58,23 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
                                     <FormControl type="number" placeholder="Duration"
                                                  onInput={this.handleDurationInput.bind(this)}/>
                                     <InputGroup.Addon>days</InputGroup.Addon>
+                                </InputGroup>
+                            </Col>
+                        </FormGroup>
+                        <FormGroup>
+                            <Col componentClass={ControlLabel} xd={12} md={2}>
+                                Modifier type
+                            </Col>
+                            <Col xd={12} md={10}>
+                                <InputGroup>
+                                    <Radio checked={this.state.location === TaskLocation.Beginning}
+                                           onClick={this.handleBeginningRadio.bind(this)}>
+                                        At the begining of the task
+                                    </Radio>
+                                    <Radio checked={this.state.location === TaskLocation.End}
+                                           onClick={this.handleEndRadio.bind(this)}>
+                                        At the end of the task
+                                    </Radio>
                                 </InputGroup>
                             </Col>
                         </FormGroup>
@@ -83,16 +102,12 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
             show: true,
             name: "",
             description: "",
-            duration: 0
+            duration: 0,
+            location: TaskLocation.End
         })
     }
     private close() {
-        this.setState({
-            show: false,
-            name: this.state.name,
-            description: this.state.description,
-            duration: this.state.duration
-        })
+        this.setState(Object.assign(this.state, { show: false }))
     }
     private isButtonEnabled() {
         return this.state.name.length > 0 && this.state.duration !== Number.NaN && this.state.duration !== 0
@@ -105,32 +120,24 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
     }
     private handleNameInput(e: React.FormEvent) {
         const input = e.target as HTMLInputElement
-        this.setState({
-            show: this.state.show,
-            name: input.value,
-            duration: this.state.duration,
-            description: this.state.description,
-        })
+        this.setState(Object.assign(this.state, { name: input.value }))
     }
     private handleDurationInput(e: React.FormEvent) {
         const input = e.target as HTMLInputElement
         const duration = +input.value
         this.state.duration = duration
-        this.setState({
-            show: this.state.show,
-            name: this.state.name,
-            duration: duration,
-            description: this.state.description,
-        })
+        this.setState(Object.assign(this.state, { duration }))
+
     }
     private handleDescriptionInput(e: React.FormEvent) {
         const input = e.target as HTMLInputElement
-        this.setState({
-            show: this.state.show,
-            name: this.state.name,
-            duration: this.state.duration,
-            description: input.value,
-        })
+        this.setState(Object.assign(this.state, { description: input.value }))
+    }
+    private handleBeginningRadio(e: React.MouseEvent) {
+        this.setState(Object.assign(this.state, { location: TaskLocation.Beginning }))
+    }
+    private handleEndRadio(e: React.MouseEvent) {
+        this.setState(Object.assign(this.state, { location: TaskLocation.End }))
     }
     private handleSave(e: React.MouseEvent) {
         e.preventDefault()
@@ -138,7 +145,8 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
             projectIdentifier: this.props.projectIdentifier,
             name: this.state.name,
             description: this.state.description,
-            duration: this.state.duration
+            duration: this.state.duration,
+            location: this.state.location
         }
         this.props.onAddModifier(this.props.projectIdentifier, this.props.taskIdentifier, modifier)
         this.close()

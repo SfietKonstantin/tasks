@@ -1,4 +1,4 @@
-import { Project, Task, TaskRelation, TaskResults, Modifier } from "../../../common/types"
+import { Project, Task, TaskRelation, TaskResults, TaskLocation, Modifier } from "../../../common/types"
 import { GraphError, ITaskNode, IProjectNode, IGraph } from "./types"
 import { IDataProvider } from "../data/idataprovider"
 import * as dateutils from "../../../common/dateutils"
@@ -15,7 +15,8 @@ export class TaskNode implements ITaskNode {
     private dataProvider: IDataProvider
     private estimatedStartDate: Date
     private estimatedDuration: number
-    private marked: boolean
+    private childrenRelations: Map<string, TaskRelation>
+    private parentsRelations: Map<string, TaskRelation>
     constructor(dataProvider: IDataProvider,
                 projectIdentifier: string, taskIdentifier: string,
                 estimatedStartDate: Date, estimatedDuration: number,
@@ -30,7 +31,8 @@ export class TaskNode implements ITaskNode {
         this.children = new Array<ITaskNode>()
         this.parents = new Array<ITaskNode>()
         this.modifiers = new Array<Modifier>()
-        this.marked = false
+        this.childrenRelations = new Map<string, TaskRelation>()
+        this.parentsRelations = new Map<string, TaskRelation>()
     }
     compute(): Promise<void> {
         return this.markAndCompute(new Set<ITaskNode>())
@@ -48,9 +50,11 @@ export class TaskNode implements ITaskNode {
             return modifier
         })
     }
-    addChild(node: ITaskNode): Promise<void> {
+    addChild(node: TaskNode, relation: TaskRelation): Promise<void> {
         this.children.push(node)
+        this.childrenRelations.set(node.taskIdentifier, relation)
         node.parents.push(this)
+        node.parentsRelations.set(this.taskIdentifier, relation)
         return this.computeChildren(new Set<ITaskNode>())
     }
     getEndDate(): Date {
@@ -65,14 +69,25 @@ export class TaskNode implements ITaskNode {
             const currentEndDate = this.getEndDate()
 
             // Compute duration
-            const durations = this.modifiers.map((modifier: Modifier) => { return modifier.duration })
-            this.duration = this.estimatedDuration + Math.max(durations.reduce((first: number, second: number) => {
+            const beginningDurations = this.modifiers.map((modifier: Modifier) => {
+                return modifier.location === TaskLocation .Beginning ? modifier.duration : 0
+            })
+            const beginningSum = beginningDurations.reduce((first: number, second: number) => {
                 return first + second
-            }, 0), 0)
+            }, 0)
+
+            const endDurations = this.modifiers.map((modifier: Modifier) => {
+                return modifier.location === TaskLocation .End ? modifier.duration : 0
+            })
+            const endSum = endDurations.reduce((first: number, second: number) => {
+                return first + second
+            }, 0)
+
+            this.duration = this.estimatedDuration + Math.max(endSum, 0)
 
             // Compute start date
             let parentEndDates = this.parents.map((node: ITaskNode) => { return (node as TaskNode).getEndDate() })
-            parentEndDates.push(this.startDate)
+            parentEndDates.push(this.estimatedStartDate)
             parentEndDates = parentEndDates.filter((value: Date) => {
                 return !Number.isNaN(value.getTime())
             })
@@ -80,7 +95,8 @@ export class TaskNode implements ITaskNode {
             if (parentEndDates.length === 0) {
                 throw new GraphError("Invalid input")
             }
-            this.startDate = new Date(Math.max.apply(null, parentEndDates))
+            this.startDate = dateutils.addDays(new Date(Math.max.apply(null, parentEndDates)),
+                                               Math.max(beginningSum, 0))
 
             // Take milestones in account
             if (this.estimatedDuration === 0) {
@@ -151,9 +167,9 @@ export class ProjectNode implements IProjectNode {
                     return this.dataProvider.getTaskRelations(node.projectIdentifier, node.taskIdentifier)
                                .then((taskRelations: Array<TaskRelation>) => {
                         taskRelations.forEach((taskRelation: TaskRelation) => {
-                            const child = maputils.get(this.nodes, taskRelation.next)
+                            const child = maputils.get(this.nodes, taskRelation.next) as TaskNode
                             let taskNode = node as TaskNode
-                            taskNode.addChild(child)
+                            taskNode.addChild(child, taskRelation)
                         })
                     })
                 }))
