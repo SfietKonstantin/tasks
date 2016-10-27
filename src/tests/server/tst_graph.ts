@@ -198,7 +198,8 @@ describe("Graph", () => {
             mock.expects("setModifierForTask").once().withArgs("project", 1, "task1")
                 .returns(Promise.resolve())
             const expectations = results.map((result: [string, TaskResults]) => {
-                return mock.expects("setTaskResults").once().withArgs("project", result[0], result[1]).returns(Promise.resolve())
+                return mock.expects("setTaskResults").once().withArgs("project", result[0], result[1])
+                           .returns(Promise.resolve())
             })
 
             // Test

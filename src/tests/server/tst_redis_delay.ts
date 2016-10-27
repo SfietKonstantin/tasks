@@ -96,7 +96,7 @@ describe("Redis", () => {
             })
         })
         it("Should remove delay description", (done) => {
-            client.hsetAsync("delay:project:delay1", "name", "Delay 1").then((result: number) => {
+            client.hsetAsync("delay:project:delay1", "name", "Delay 1").then((result) => {
                 return client.hdelAsync("delay:project:delay1", "description")
             }).then((result: number) => {
                 done()
@@ -114,7 +114,7 @@ describe("Redis", () => {
             })
         })
         it("Should remove delay date", (done) => {
-            client.hsetAsync("delay:project:delay1", "description", "Description 1").then((result: number) => {
+            client.hsetAsync("delay:project:delay1", "description", "Description 1").then((result) => {
                 return client.hdelAsync("delay:project:delay1", "date")
             }).then((result: number) => {
                 done()
@@ -165,6 +165,95 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.not.null
                 done()
+            })
+        })
+        after(() => {
+            client.flushdb()
+        })
+    })
+    describe("getProjectDelays", () => {
+        it("Should add some testing data", (done) => {
+            const project: Project = {
+                identifier: "project",
+                name: "Project",
+                description: "Description"
+            }
+
+            db.addProject(project).then(() => {
+                const delay1: Delay = {
+                    identifier: "delay1",
+                    name: "Delay 1",
+                    description: "Description 1",
+                    date: new Date(2016, 9, 1)
+                }
+                const delay2: Delay = {
+                    identifier: "delay2",
+                    name: "Delay 2",
+                    description: "Description 2",
+                    date: new Date(2016, 9, 15)
+                }
+
+                return db.addDelay("project", delay1).then(() => {
+                }).then(() => {
+                    return db.addDelay("project", delay2)
+                }).then(() => {
+                    done()
+                })
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get project delays", (done) => {
+            db.getProjectDelays("project").then((delays: Array<Delay>) => {
+                const expected: Array<Delay> = [
+                    {
+                        identifier: "delay1",
+                        name: "Delay 1",
+                        description: "Description 1",
+                        date: new Date(2016, 9, 1)
+                    },
+                    {
+                        identifier: "delay2",
+                        name: "Delay 2",
+                        description: "Description 2",
+                        date: new Date(2016, 9, 15)
+                    }
+                ]
+                chai.expect(delays).to.deep.equal(expected)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on invalid project", (done) => {
+            db.getProjectDelays("project2").then(() => {
+                done(new Error("getProjectDelays should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            })
+        })
+        it("Should corrupt delay properties", (done) => {
+            client.setAsync("delay:project:delay1", "test").then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get non corrupted project delays", (done) => {
+            db.getProjectDelays("project").then((delays: Array<Delay>) => {
+                const expected: Array<Delay> = [
+                    {
+                        identifier: "delay2",
+                        name: "Delay 2",
+                        description: "Description 2",
+                        date: new Date(2016, 9, 15)
+                    }
+                ]
+                chai.expect(delays).to.deep.equal(expected)
+                done()
+            }).catch((error) => {
+                done(error)
             })
         })
         after(() => {

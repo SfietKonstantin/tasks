@@ -91,6 +91,30 @@ describe("Redis", () => {
                 done()
             })
         })
+        it("Should corrupt task properties", (done) => {
+            client.setAsync("task:project:task1", "test").then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get non corrupted project tasks", (done) => {
+            db.getProjectTasks("project").then((tasks: Array<Task>) => {
+                const expected: Array<Task> = [
+                    {
+                        identifier: "task2",
+                        name: "Task 2",
+                        description: "Description 2",
+                        estimatedStartDate: new Date(2016, 9, 15),
+                        estimatedDuration: 15
+                    }
+                ]
+                chai.expect(tasks).to.deep.equal(expected)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
         after(() => {
             client.flushdb()
         })
@@ -144,6 +168,14 @@ describe("Redis", () => {
                 done(error)
             })
         })
+        it("Should get an exception on invalid project", (done) => {
+            db.getTask("project2", "task1").then((task: Task) => {
+                done(new Error("getTask should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            })
+        })
         it("Should get an exception on invalid task", (done) => {
             db.getTask("project", "task3").then((task: Task) => {
                 done(new Error("getTask should not be a success"))
@@ -169,7 +201,7 @@ describe("Redis", () => {
             })
         })
         it("Should remove task description", (done) => {
-            client.hsetAsync("task:project:task1", "name", "Task 1").then((result: number) => {
+            client.hsetAsync("task:project:task1", "name", "Task 1").then((result) => {
                 return client.hdelAsync("task:project:task1", "description")
             }).then((result: number) => {
                 done()
@@ -186,7 +218,7 @@ describe("Redis", () => {
             })
         })
         it("Should remove task estimatedStartDate", (done) => {
-            client.hsetAsync("task:project:task1", "description", "Description 1").then((result: number) => {
+            client.hsetAsync("task:project:task1", "description", "Description 1").then((result) => {
                 return client.delAsync("task:project:task1:estimatedStartDate")
             }).then((result: number) => {
                 done()
@@ -203,7 +235,8 @@ describe("Redis", () => {
             })
         })
         it("Should remove task estimatedDuration", (done) => {
-            client.setAsync("task:project:task1:estimatedStartDate", +((new Date(2016, 9, 1).getTime()))).then((result: number) => {
+            client.setAsync("task:project:task1:estimatedStartDate", +((new Date(2016, 9, 1).getTime())))
+                  .then((result: number) => {
                 return client.delAsync("task:project:task1:estimatedDuration")
             }).then((result: number) => {
                 done()
@@ -740,6 +773,14 @@ describe("Redis", () => {
                 done(error)
             })
         })
+        it("Should get an exception on invalid project", (done) => {
+            db.getTaskRelations("project2", "task1").then((taskRelations: Array<TaskRelation>) => {
+                done(new Error("getTaskRelations should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            })
+        })
         it("Should get an exception on invalid task", (done) => {
             db.getTaskRelations("project", "task4").then((taskRelations: Array<TaskRelation>) => {
                 done(new Error("getTaskRelations should not be a success"))
@@ -764,7 +805,7 @@ describe("Redis", () => {
             })
         })
         it("Should remove task relation nextLocation", (done) => {
-            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result: number) => {
+            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result) => {
                 return client.hdelAsync("task:project:task1:relation:task2", "nextLocation")
             }).then((result: number) => {
                 done()
@@ -781,7 +822,7 @@ describe("Redis", () => {
             })
         })
         it("Should remove task relation lag", (done) => {
-            client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "Beginning").then((result: number) => {
+            client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "Beginning").then((result) => {
                 return client.hdelAsync("task:project:task1:relation:task2", "lag")
             }).then((result: number) => {
                 done()
@@ -798,9 +839,9 @@ describe("Redis", () => {
             })
         })
         it("Should set an invalid task relation previousLocation", (done) => {
-            client.hsetAsync("task:project:task1:relation:task2", "lag", "12").then((result: number) => {
+            client.hsetAsync("task:project:task1:relation:task2", "lag", "12").then((result) => {
                 return client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "")
-            }).then((result: number) => {
+            }).then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -815,9 +856,9 @@ describe("Redis", () => {
             })
         })
         it("Should set an invalid task relation nextLocation", (done) => {
-            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result: number) => {
+            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result) => {
                 return client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "")
-            }).then((result: number) => {
+            }).then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -832,7 +873,7 @@ describe("Redis", () => {
             })
         })
         it("Should revert relation properties corruption", (done) => {
-            client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "Beginning").then((result: number) => {
+            client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "Beginning").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)

@@ -239,7 +239,8 @@ class RedisModifier {
         this.description = modifier.description
         this.location = fromTaskLocation(modifier.location)
     }
-    static save(projectIdentifier: string, modifierId: number, modifier: Modifier, client: redis.RedisClient): Promise<number> {
+    static save(projectIdentifier: string, modifierId: number, modifier: Modifier,
+                client: redis.RedisClient): Promise<number> {
         const redisModifier = new RedisModifier(modifier)
         return client.multi().hmset(modifierRootKey(projectIdentifier, modifierId), redisModifier)
                              .set(modifierKey(projectIdentifier, modifierId, "duration"), modifier.duration)
@@ -357,6 +358,10 @@ export class RedisDataProvider implements IDataProvider {
             return this.client.smembersAsync(projectKey(projectIdentifier, "tasks"))
         }).then((taskIdentifiers: Array<string>) => {
             return this.getTasks(projectIdentifier, taskIdentifiers.sort())
+        }).then((tasks: Array<Task | null>) => {
+            return tasks.filter((value: Task | null) => {
+                return value != null
+            })
         })
     }
     addTask(projectIdentifier: string, task: Task): Promise<void> {
@@ -464,6 +469,10 @@ export class RedisDataProvider implements IDataProvider {
             return this.client.smembersAsync(projectKey(projectIdentifier, "delays"))
         }).then((delayIdentifiers: Array<string>) => {
             return this.getDelays(projectIdentifier, delayIdentifiers.sort())
+        }).then((delays: Array<Delay | null>) => {
+            return delays.filter((value: Delay | null) => {
+                return value != null
+            })
         })
     }
     addDelay(projectIdentifier: string, delay: Delay): Promise<void> {

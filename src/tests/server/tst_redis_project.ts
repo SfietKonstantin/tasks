@@ -200,7 +200,7 @@ describe("Redis", () => {
             })
         })
         it("Should remove project description", (done) => {
-            client.hsetAsync("project:project1", "name", "Project 1").then((result: number) => {
+            client.hsetAsync("project:project1", "name", "Project 1").then((result) => {
                 return client.hdelAsync("project:project1", "description")
             }).then((result: number) => {
                 done()
