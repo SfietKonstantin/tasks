@@ -76,14 +76,8 @@ describe("Redis", () => {
                 done()
             })
         })
-        it("Should corrupt task results properties", (done) => {
+        it("Should remove task results startDate", (done) => {
             client.delAsync("task:project:task:startDate").then((result) => {
-                return client.hmsetAsync("task:project:task:startDate", {"test": "test"})
-            }).then((result) => {
-                return client.delAsync("task:project:task:duration")
-            }).then((result) => {
-                return client.hmsetAsync("task:project:task:duration", {"test": "test"})
-            }).then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -98,12 +92,10 @@ describe("Redis", () => {
                 done()
             })
         })
-        it("Should delete task results properties", (done) => {
-            client.delAsync("task:project:task:startDate").then((result) => {
-                return client.hmsetAsync("task:project:task:startDate", {"test": "test"})
-            }).then((result) => {
+        it("Should remove task results duration", (done) => {
+            client.setAsync("task:project:task:startDate", +((new Date(2016, 9, 15)).getTime())).then((result) => {
                 return client.delAsync("task:project:task:duration")
-            }).then((result) => {
+            }).then(() => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -116,6 +108,25 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            })
+        })
+        it("Should revert task results properties corruption", (done) => {
+            client.setAsync("task:project:task:duration", 40).then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get task results", (done) => {
+            db.getTaskResults("project", "task").then((result: TaskResults) => {
+                const expected: TaskResults = {
+                    startDate: new Date(2016, 9, 15),
+                    duration: 40
+                }
+                chai.expect(result).to.deep.equal(expected)
+                done()
+            }).catch((error) => {
+                done(error)
             })
         })
         after(() => {

@@ -1,6 +1,6 @@
 import * as winston from "winston"
 import { Project, Task, TaskResults, Modifier } from "../../common/types"
-import { IDataProvider, CorruptedError } from "../core/data/idataprovider"
+import { IDataProvider } from "../core/data/idataprovider"
 import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"
 import { findCyclicDependency } from "../core/graph/analyzer"
 import { ApiTask, ApiProjectTaskModifiers, createProject, createTask, createApiTask } from "../../common/apitypes"

@@ -14,9 +14,6 @@ export class FakeDataProvider implements IDataProvider {
     hasTask(projectIdentifier: string, taskIdentifier: string): Promise<void> {
         return Promise.reject(new Error("Not mocked"))
     }
-    getTasks(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<Task>> {
-        return Promise.reject(new Error("Not mocked"))
-    }
     getTask(projectIdentifier: string, taskIdentifier: string): Promise<Task> {
         return Promise.reject(new Error("Not mocked"))
     }
@@ -47,16 +44,10 @@ export class FakeDataProvider implements IDataProvider {
     setTaskResults(projectIdentifier: string, taskIdentifier: string, taskResults: TaskResults): Promise<void> {
         return Promise.reject(new Error("Not mocked"))
     }
-    getModifiers(projectIdentifier: string, modifierIds: Array<number>): Promise<Array<Modifier>> {
-        return Promise.reject(new Error("Not mocked"))
-    }
     getModifier(projectIdentifier: string, modifierId: number): Promise<Modifier> {
         return Promise.reject(new Error("Not mocked"))
     }
     getTaskModifiers(projectIdentifier: string, taskIdentifier: string): Promise<Array<Modifier>> {
-        return Promise.reject(new Error("Not mocked"))
-    }
-    getModifieredTaskIds(projectIdentifier: string, modifierId: number): Promise<Array<string>> {
         return Promise.reject(new Error("Not mocked"))
     }
     addModifier(projectIdentifier: string, modifier: Modifier): Promise<number> {
@@ -65,28 +56,16 @@ export class FakeDataProvider implements IDataProvider {
     setModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void> {
         return Promise.reject(new Error("Not mocked"))
     }
-    getModifiersValues(projectIdentifier: string, modifierIds: Array<number>): Promise<Array<number>> {
-        return Promise.reject(new Error("Not mocked"))
-    }
-    getDelays(projectIdentifier: string, delayIdentifiers: Array<string>): Promise<Array<Delay>> {
-        return Promise.reject(new Error("Not mocked"))
-    }
     getDelay(projectIdentifier: string, delayIdentifier: string): Promise<Delay> {
-        return Promise.reject(new Error("Not mocked"))
-    }
-    addDelay(projectIdentifier: string, delay: Delay): Promise<void> {
         return Promise.reject(new Error("Not mocked"))
     }
     getProjectDelays(projectIdentifier: string): Promise<Array<Delay>> {
         return Promise.reject(new Error("Not mocked"))
     }
-    setDelayTaskRelation(projectIdentifier: string, delayIdentifier: string, taskIdentifier: string): Promise<void> {
+    addDelay(projectIdentifier: string, delay: Delay): Promise<void> {
         return Promise.reject(new Error("Not mocked"))
     }
-    getTaskDelayIds(projectIdentifier: string, taskIdentifier: string): Promise<Array<string>> {
-        return Promise.reject(new Error("Not mocked"))
-    }
-    getDelayTaskIds(projectIdentifier: string, delayIdentifier: string): Promise<Array<string>> {
+    addDelayTaskRelation(projectIdentifier: string, delayIdentifier: string, taskIdentifier: string): Promise<void> {
         return Promise.reject(new Error("Not mocked"))
     }
 }

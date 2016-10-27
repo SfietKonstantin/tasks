@@ -25,123 +25,7 @@ describe("Redis", () => {
 
         db = new RedisDataProvider(client)
     })
-    describe("getTasks", () => {
-        it("Should add some testing data", (done) => {
-            const project: Project = {
-                identifier: "project",
-                name: "Project",
-                description: "Description"
-            }
-
-            db.addProject(project).then(() => {
-                const task1: Task = {
-                    identifier: "task1",
-                    name: "Task 1",
-                    description: "Description 1",
-                    estimatedStartDate: new Date(2016, 9, 1),
-                    estimatedDuration: 30
-                }
-                const task2: Task = {
-                    identifier: "task2",
-                    name: "Task 2",
-                    description: "Description 2",
-                    estimatedStartDate: new Date(2016, 9, 15),
-                    estimatedDuration: 15
-                }
-
-                return db.addTask("project", task1).then(() => {
-                }).then(() => {
-                    return db.addTask("project", task2)
-                }).then(() => {
-                    done()
-                })
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an empty list", (done) => {
-            db.getTasks("project", []).then((tasks: Array<Task>) => {
-                chai.expect(tasks).to.empty
-                done()
-            })
-        })
-        it("Should get tasks", (done) => {
-            db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
-                const expected: Array<Task> = [
-                    {
-                        identifier: "task2",
-                        name: "Task 2",
-                        description: "Description 2",
-                        estimatedStartDate: new Date(2016, 9, 15),
-                        estimatedDuration: 15
-                    },
-                    {
-                        identifier: "task1",
-                        name: "Task 1",
-                        description: "Description 1",
-                        estimatedStartDate: new Date(2016, 9, 1),
-                        estimatedDuration: 30
-                    }
-                ]
-                chai.expect(tasks).to.deep.equal(expected)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should remove task", (done) => {
-            client.delAsync("task:project:task1").then((result) => {
-                done()
-            })
-        })
-        it("Should get valid tasks", (done) => {
-            db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
-                const expected: Array<Task | null> = [
-                    {
-                        identifier: "task2",
-                        name: "Task 2",
-                        description: "Description 2",
-                        estimatedStartDate: new Date(2016, 9, 15),
-                        estimatedDuration: 15
-                    },
-                    null
-                ]
-                chai.expect(tasks).to.deep.equal(expected)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should corrupt task properties", (done) => {
-            client.setAsync("task:project:task1", "test").then((result) => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get valid tasks", (done) => {
-            db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
-                const expected: Array<Task | null> = [
-                    {
-                        identifier: "task2",
-                        name: "Task 2",
-                        description: "Description 2",
-                        estimatedStartDate: new Date(2016, 9, 15),
-                        estimatedDuration: 15
-                    },
-                    null
-                ]
-                chai.expect(tasks).to.deep.equal(expected)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        after(() => {
-            client.flushdb()
-        })
-    })
-    describe("getTasks", () => {
+    describe("getProjectTasks", () => {
         it("Should add some testing data", (done) => {
             const project: Project = {
                 identifier: "project",
@@ -319,7 +203,7 @@ describe("Redis", () => {
             })
         })
         it("Should remove task estimatedDuration", (done) => {
-            client.setAsync("task:project:task1:estimatedStartDate", "0").then((result: number) => {
+            client.setAsync("task:project:task1:estimatedStartDate", +((new Date(2016, 9, 1).getTime()))).then((result: number) => {
                 return client.delAsync("task:project:task1:estimatedDuration")
             }).then((result: number) => {
                 done()
@@ -333,6 +217,28 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            })
+        })
+        it("Should revert task properties corruption", (done) => {
+            client.setAsync("task:project:task1:estimatedDuration", "30").then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get task", (done) => {
+            db.getTask("project", "task1").then((task: Task) => {
+                const expected: Task = {
+                    identifier: "task1",
+                    name: "Task 1",
+                    description: "Description 1",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                chai.expect(task).to.deep.equal(expected)
+                done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should corrupt task properties", (done) => {
@@ -412,6 +318,220 @@ describe("Redis", () => {
                 done(new Error("addTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
+                done()
+            })
+        })
+        after(() => {
+            client.flushdb()
+        })
+    })
+    describe("isTaskImportant", () => {
+        it("Should add some testing data", (done) => {
+            const project: Project = {
+                identifier: "project",
+                name: "Project",
+                description: "Description"
+            }
+
+            db.addProject(project).then(() => {
+                const task: Task = {
+                    identifier: "task",
+                    name: "Task",
+                    description: "Description",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                return db.addTask("project", task).then(() => {
+                    done()
+                })
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should check that task is not important", (done) => {
+            db.isTaskImportant("project", "task").then((important: boolean) => {
+                chai.expect(important).to.false
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should set task as important", (done) => {
+            db.setTaskImportant("project", "task", true).then(() => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should check that task is important", (done) => {
+            db.isTaskImportant("project", "task").then((important: boolean) => {
+                chai.expect(important).to.true
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should set task as not important", (done) => {
+            db.setTaskImportant("project", "task", false).then(() => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should check that task is not important", (done) => {
+            db.isTaskImportant("project", "task").then((important: boolean) => {
+                chai.expect(important).to.false
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when checking task status on invalid project", (done) => {
+            db.isTaskImportant("project2", "task").then((important: boolean) => {
+                done(new Error("isTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            })
+        })
+        it("Should get an exception when checking task status on invalid task", (done) => {
+            db.isTaskImportant("project", "task2").then((important: boolean) => {
+                done(new Error("isTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            })
+        })
+        it("Should corrupt project properties", (done) => {
+            client.setAsync("project:project:task:important", "test").then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted project", (done) => {
+            db.isTaskImportant("project", "task").then((important: boolean) => {
+                done(new Error("isTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.not.null
+                done()
+            })
+        })
+        after(() => {
+            client.flushdb()
+        })
+    })
+    describe("setTaskImportant", () => {
+        it("Should add some testing data", (done) => {
+            const project: Project = {
+                identifier: "project",
+                name: "Project",
+                description: "Description"
+            }
+
+            db.addProject(project).then(() => {
+                const task: Task = {
+                    identifier: "task",
+                    name: "Task",
+                    description: "Description",
+                    estimatedStartDate: new Date(2016, 9, 1),
+                    estimatedDuration: 30
+                }
+                return db.addTask("project", task).then(() => {
+                    done()
+                })
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should set task as important", (done) => {
+            db.setTaskImportant("project", "task", true).then(() => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should check that task is important", (done) => {
+            db.isTaskImportant("project", "task").then((important: boolean) => {
+                chai.expect(important).to.true
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should set task as not important", (done) => {
+            db.setTaskImportant("project", "task", false).then(() => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should check that task is not important", (done) => {
+            db.isTaskImportant("project", "task").then((important: boolean) => {
+                chai.expect(important).to.false
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should set task as important", (done) => {
+            db.setTaskImportant("project", "task", true).then(() => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should check that task is important", (done) => {
+            db.isTaskImportant("project", "task").then((important: boolean) => {
+                chai.expect(important).to.true
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should set task as important", (done) => {
+            db.setTaskImportant("project", "task", true).then(() => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should check that task is still important", (done) => {
+            db.isTaskImportant("project", "task").then((important: boolean) => {
+                chai.expect(important).to.true
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when setting task status on invalid project", (done) => {
+            db.setTaskImportant("project2", "task", true).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            })
+        })
+        it("Should get an exception when setting task status on invalid task", (done) => {
+            db.setTaskImportant("project2", "task2", true).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            })
+        })
+        it("Should corrupt project properties", (done) => {
+            client.setAsync("project:project:task:important", "test").then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted project", (done) => {
+            db.setTaskImportant("project", "task", true).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.not.null
                 done()
             })
         })
@@ -626,6 +746,120 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
                 done()
+            })
+        })
+        it("Should remove task relation previousLocation", (done) => {
+            client.hdelAsync("task:project:task1:relation:task2", "previousLocation").then((result: number) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted task relations", (done) => {
+            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+                done(new Error("getTaskRelations should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.not.null
+                done()
+            })
+        })
+        it("Should remove task relation nextLocation", (done) => {
+            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result: number) => {
+                return client.hdelAsync("task:project:task1:relation:task2", "nextLocation")
+            }).then((result: number) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted task relations", (done) => {
+            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+                done(new Error("getTaskRelations should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.not.null
+                done()
+            })
+        })
+        it("Should remove task relation lag", (done) => {
+            client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "Beginning").then((result: number) => {
+                return client.hdelAsync("task:project:task1:relation:task2", "lag")
+            }).then((result: number) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted task relations", (done) => {
+            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+                done(new Error("getTaskRelations should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.not.null
+                done()
+            })
+        })
+        it("Should set an invalid task relation previousLocation", (done) => {
+            client.hsetAsync("task:project:task1:relation:task2", "lag", "12").then((result: number) => {
+                return client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "")
+            }).then((result: number) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted task relations", (done) => {
+            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+                done(new Error("getTaskRelations should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.not.null
+                done()
+            })
+        })
+        it("Should set an invalid task relation nextLocation", (done) => {
+            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result: number) => {
+                return client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "")
+            }).then((result: number) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted task relations", (done) => {
+            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+                done(new Error("getTaskRelations should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.not.null
+                done()
+            })
+        })
+        it("Should revert relation properties corruption", (done) => {
+            client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "Beginning").then((result: number) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get task relations", (done) => {
+            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+                const expected: Array<TaskRelation> = [
+                    {
+                        previous: "task1",
+                        previousLocation: TaskLocation.End,
+                        next: "task2",
+                        nextLocation: TaskLocation.Beginning,
+                        lag: 12
+                    },
+                    {
+                        previous: "task1",
+                        previousLocation: TaskLocation.Beginning,
+                        next: "task3",
+                        nextLocation: TaskLocation.End,
+                        lag: 23
+                    }
+                ]
+                chai.expect(taskRelations).to.deep.equal(expected)
+                done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should corrupt task properties", (done) => {

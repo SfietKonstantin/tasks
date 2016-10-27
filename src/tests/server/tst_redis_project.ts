@@ -216,6 +216,26 @@ describe("Redis", () => {
                 done()
             })
         })
+        it("Should revert project properties corruption", (done) => {
+            client.hsetAsync("project:project1", "description", "Description 1").then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get project", (done) => {
+            db.getProject("project1").then((project: Project) => {
+                const expected: Project = {
+                    identifier: "project1",
+                    name: "Project 1",
+                    description: "Description 1"
+                }
+                chai.expect(project).to.deep.equal(expected)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
         it("Should corrupt project properties", (done) => {
             client.setAsync("project:project3", "test").then((result) => {
                 done()

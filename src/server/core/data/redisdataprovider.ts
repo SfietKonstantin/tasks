@@ -347,9 +347,6 @@ export class RedisDataProvider implements IDataProvider {
             return RedisProject.save(project, this.client)
         })
     }
-    getTasks(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<Task | null>> {
-        return Promise.all(taskIdentifiers.map(this.getMappedTask.bind(this, projectIdentifier)))
-    }
     getTask(projectIdentifier: string, taskIdentifier: string): Promise<Task> {
         return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
             return RedisTask.load(projectIdentifier, taskIdentifier, this.client)
@@ -371,18 +368,17 @@ export class RedisDataProvider implements IDataProvider {
     }
     isTaskImportant(projectIdentifier: string, taskIdentifier: string): Promise<boolean> {
         return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
-            return this.client.sismemberAsync("task:important", projectIdentifier + ":" + taskIdentifier)
+            return this.client.sismemberAsync(projectKey(projectIdentifier, "task:important"), taskIdentifier)
         }).then((result: number) => {
             return (result !== 0)
         })
     }
     setTaskImportant(projectIdentifier: string, taskIdentifier: string, important: boolean): Promise<void> {
-        const projectAndTaskIdentifier = projectIdentifier + ":" + taskIdentifier
         return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
             if (important) {
-                return this.client.saddAsync("task:important", projectAndTaskIdentifier)
+                return this.client.saddAsync(projectKey(projectIdentifier, "task:important"), taskIdentifier)
             } else {
-                return this.client.sremAsync("task:important", projectAndTaskIdentifier)
+                return this.client.sremAsync(projectKey(projectIdentifier, "task:important"), taskIdentifier)
             }
         })
     }
@@ -431,9 +427,6 @@ export class RedisDataProvider implements IDataProvider {
             return this.client.msetAsync(set)
         })
     }
-    getModifiers(projectIdentifier: string, modifierIds: Array<number>): Promise<Array<Modifier | null>> {
-        return Promise.all(modifierIds.map(this.getMappedModifier.bind(this, projectIdentifier)))
-    }
     getModifier(projectIdentifier: string, modifierId: number): Promise<Modifier> {
         return this.hasModifier(projectIdentifier, modifierId).then(() => {
             return RedisModifier.load(projectIdentifier, modifierId, this.client)
@@ -445,13 +438,6 @@ export class RedisDataProvider implements IDataProvider {
         }).then((ids: Array<string>) => {
             const sorted = ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
             return this.getModifiers(projectIdentifier, sorted)
-        })
-    }
-    getModifieredTaskIds(projectIdentifier: string, modifierId: number): Promise<Array<string>> {
-        return this.hasModifier(projectIdentifier, modifierId).then(() => {
-            return this.client.smembersAsync(modifierKey(projectIdentifier, modifierId, "tasks"))
-        }).then((ids: Array<string>) => {
-            return ids.sort()
         })
     }
     addModifier(projectIdentifier: string, modifier: Modifier): Promise<number> {
@@ -468,19 +454,9 @@ export class RedisDataProvider implements IDataProvider {
                                       .execAsync()
         })
     }
-    getDelays(projectIdentifier: string, delayIdentifiers: Array<string>): Promise<Array<Delay | null>> {
-        return Promise.all(delayIdentifiers.map(this.getMappedDelays.bind(this, projectIdentifier)))
-    }
     getDelay(projectIdentifier: string, delayIdentifier: string): Promise<Delay> {
         return this.hasDelay(projectIdentifier, delayIdentifier).then(() => {
             return RedisDelay.load(projectIdentifier, delayIdentifier, this.client)
-        })
-    }
-    addDelay(projectIdentifier: string, delay: Delay): Promise<void> {
-        return this.hasProject(projectIdentifier).then(() => {
-            return this.notHasDelay(projectIdentifier, delay.identifier)
-        }).then(() => {
-            return RedisDelay.save(projectIdentifier, delay, this.client)
         })
     }
     getProjectDelays(projectIdentifier: string): Promise<Array<Delay>> {
@@ -490,27 +466,20 @@ export class RedisDataProvider implements IDataProvider {
             return this.getDelays(projectIdentifier, delayIdentifiers.sort())
         })
     }
-    setDelayTaskRelation(projectIdentifier: string, delayIdentifier: string, taskIdentifier: string): Promise<void> {
+    addDelay(projectIdentifier: string, delay: Delay): Promise<void> {
+        return this.hasProject(projectIdentifier).then(() => {
+            return this.notHasDelay(projectIdentifier, delay.identifier)
+        }).then(() => {
+            return RedisDelay.save(projectIdentifier, delay, this.client)
+        })
+    }
+    addDelayTaskRelation(projectIdentifier: string, delayIdentifier: string, taskIdentifier: string): Promise<void> {
         return this.hasDelay(projectIdentifier, delayIdentifier).then(() => {
             return this.hasTask(projectIdentifier, taskIdentifier)
         }).then(() => {
             return this.client.multi().sadd(delayKey(projectIdentifier, delayIdentifier, "tasks"), taskIdentifier)
                                       .sadd(taskKey(projectIdentifier, taskIdentifier, "delays"), delayIdentifier)
                                       .execAsync()
-        })
-    }
-    getTaskDelayIds(projectIdentifier: string, taskIdentifier: string): Promise<Array<string>> {
-        return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
-            return this.client.smembersAsync(taskKey(projectIdentifier, taskIdentifier, "delays"))
-        }).then((identifiers: Array<string>) => {
-            return identifiers.sort()
-        })
-    }
-    getDelayTaskIds(projectIdentifier: string, delayIdentifier: string): Promise<Array<string>> {
-        return this.hasDelay(projectIdentifier, delayIdentifier).then(() => {
-            return this.client.smembersAsync(delayKey(projectIdentifier, delayIdentifier, "tasks"))
-        }).then((identifiers: Array<string>) => {
-            return identifiers.sort()
         })
     }
     private static indexFromString(id: string): number {
@@ -588,25 +557,25 @@ export class RedisDataProvider implements IDataProvider {
             })
         })
     }
-    private getMappedTask(projectIdentifier: string, taskIdentifier: string): Promise<Task> {
-        return this.getTask(projectIdentifier, taskIdentifier).then((task: Task) => {
-            return task
-        }).catch((error) => {
-            return null
-        })
+    private getTasks(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<Task | null>> {
+        return Promise.all(taskIdentifiers.map((taskIdentifier: string): Promise<Task | null> => {
+            return this.getTask(projectIdentifier, taskIdentifier).catch((error) => {
+                return null
+            })
+        }))
     }
-    private getMappedModifier(projectIdentifier: string, modifierId: number): Promise<Modifier> {
-        return this.getModifier(projectIdentifier, modifierId).then((modifier: Modifier) => {
-            return modifier
-        }).catch((error) => {
-            return null
-        })
+    private getModifiers(projectIdentifier: string, modifierIds: Array<number>): Promise<Array<Modifier | null>> {
+        return Promise.all(modifierIds.map((modifierId: number): Promise<Modifier | null> => {
+            return this.getModifier(projectIdentifier, modifierId).catch((error) => {
+                return null
+            })
+        }))
     }
-    private getMappedDelays(projectIdentifier: string, delayIdentifier: string): Promise<Delay> {
-        return this.getDelay(projectIdentifier, delayIdentifier).then((delay: Delay) => {
-            return delay
-        }).catch((error) => {
-            return null
-        })
+    private getDelays(projectIdentifier: string, delayIdentifiers: Array<string>): Promise<Array<Delay | null>> {
+        return Promise.all(delayIdentifiers.map((delayIdentifier): Promise<Delay | null> => {
+            return this.getDelay(projectIdentifier, delayIdentifier).catch((error) => {
+                return null
+            })
+        }))
     }
 }
