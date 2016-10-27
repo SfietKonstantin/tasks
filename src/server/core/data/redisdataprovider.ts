@@ -595,13 +595,6 @@ export class RedisDataProvider implements IDataProvider {
             return null
         })
     }
-    private getMappedTaskResults(projectIdentifier: string, taskIdentifier: string): Promise<TaskResults> {
-        return this.getTaskResults(projectIdentifier, taskIdentifier).then((taskResults: TaskResults) => {
-            return taskResults
-        }).catch((error) => {
-            return null
-        })
-    }
     private getMappedModifier(projectIdentifier: string, modifierId: number): Promise<Modifier> {
         return this.getModifier(projectIdentifier, modifierId).then((modifier: Modifier) => {
             return modifier

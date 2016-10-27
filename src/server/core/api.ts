@@ -145,9 +145,9 @@ export class Api {
         const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
         let taskNode = maputils.get(projectNode.nodes, taskIdentifier)
         return taskNode.addModifier(modifier).catch((error) => {
-            if (error instanceof InputError) {
+            if (error instanceof NotFoundError) {
                 winston.debug(error.message)
-                throw new RequestError(400, "Invalid input for modifier")
+                throw new RequestError(404, "Task \"" + taskIdentifier + "\" not found")
             } else {
                 winston.error(error.message)
                 throw new RequestError(500, "Internal error")
