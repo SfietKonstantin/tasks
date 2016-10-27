@@ -14,14 +14,13 @@ describe("API types", () => {
                 estimatedDuration: 123
             }
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "identifier",
                 name: "Name",
                 description: "Description",
                 estimatedStartDate: new Date(2015, 1, 15),
                 estimatedDuration: 123
             }
-            chai.expect(apitypes.createTask(apiTask, "project")).to.deep.equal(task)
+            chai.expect(apitypes.createTask(apiTask)).to.deep.equal(task)
         })
         it("Should not create a task without identifier", () => {
             const apiTask = {
@@ -30,7 +29,7 @@ describe("API types", () => {
                 estimatedStartDate: new Date(2015, 1, 15).toISOString(),
                 estimatedDuration: 123
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
         it("Should not create a task with wrong identifier", () => {
             const apiTask = {
@@ -40,7 +39,7 @@ describe("API types", () => {
                 estimatedStartDate: new Date(2015, 1, 15).toISOString(),
                 estimatedDuration: 123
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
         it("Should not create a task without name", () => {
             const apiTask = {
@@ -49,7 +48,7 @@ describe("API types", () => {
                 estimatedStartDate: new Date(2015, 1, 15).toISOString(),
                 estimatedDuration: 123
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
         it("Should not create a task with wrong name", () => {
             const apiTask = {
@@ -59,7 +58,7 @@ describe("API types", () => {
                 estimatedStartDate: new Date(2015, 1, 15).toISOString(),
                 estimatedDuration: 123
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
         it("Should not create a task without description", () => {
             const apiTask = {
@@ -68,7 +67,7 @@ describe("API types", () => {
                 estimatedStartDate: new Date(2015, 1, 15).toISOString(),
                 estimatedDuration: 123
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
         it("Should not create a task with wrong description", () => {
             const apiTask = {
@@ -78,7 +77,7 @@ describe("API types", () => {
                 estimatedStartDate: new Date(2015, 1, 15).toISOString(),
                 estimatedDuration: 123
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
         it("Should not create a task without estimatedStartDate", () => {
             const apiTask = {
@@ -87,7 +86,7 @@ describe("API types", () => {
                 description: "Description",
                 estimatedDuration: 123
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
         it("Should not create a task with wrong estimatedStartDate", () => {
             const apiTask = {
@@ -97,7 +96,7 @@ describe("API types", () => {
                 estimatedStartDate: { test: "test" },
                 estimatedDuration: 123
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
         it("Should not create a task without estimatedDuration", () => {
             const apiTask = {
@@ -106,7 +105,7 @@ describe("API types", () => {
                 description: "Description",
                 estimatedStartDate: new Date(2015, 1, 15).toISOString()
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
         it("Should not create a task with wrong estimatedDuration", () => {
             const apiTask = {
@@ -116,7 +115,7 @@ describe("API types", () => {
                 estimatedStartDate: new Date(2015, 1, 15).toISOString(),
                 estimatedDuration: { test: "test" }
             }
-            chai.expect(() => { apitypes.createTask(apiTask, "project") }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
     })
     describe("createProject", () => {

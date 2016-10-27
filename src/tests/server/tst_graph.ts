@@ -3,6 +3,7 @@ import * as sinon from "sinon"
 import { Project, Task, TaskResults, TaskRelation, Modifier, TaskLocation } from "../../common/types"
 import { InputError, NotFoundError, ExistsError } from "../../common/errors"
 import { FakeDataProvider } from "./fakedataprovider"
+import { FakeGraph, FakeProjectNode } from "./fakegraph"
 import { GraphError } from "../../server/core/graph/types"
 import { Graph, ProjectNode, TaskNode } from "../../server/core/graph/graph"
 import * as maputils from "../../common/maputils"
@@ -11,7 +12,9 @@ describe("Graph", () => {
     describe("TaskNode", () => {
         it("Should not compute when not needed", (done) => {
             const dataProvider = new FakeDataProvider()
-            const node = new TaskNode(dataProvider, "project", "task", new Date(2015, 2, 1), 20,
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
+            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
                                       new Date(2015, 2, 1), 20)
             node.compute().then(() => {
                 done()
@@ -22,17 +25,17 @@ describe("Graph", () => {
         it("Should compute the correct results", (done) => {
             // Mock
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
             let mock = sinon.mock(dataProvider)
             const arg: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task",
                 startDate: new Date(2015, 2, 1),
                 duration: 20
             }
-            mock.expects("setTaskResults").once().withArgs(arg).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withArgs("project", "task", arg).returns(Promise.resolve())
 
             // Test
-            const node = new TaskNode(dataProvider, "project", "task", new Date(2015, 2, 1), 20,
+            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
                                       new Date(2015, 2, 5), 25)
             node.compute().then(() => {
                 done()
@@ -42,7 +45,9 @@ describe("Graph", () => {
         })
         it("Should get error on invalid input", (done) => {
             const dataProvider = new FakeDataProvider()
-            const node = new TaskNode(dataProvider, "project", "task", new Date(NaN), 20,
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
+            const node = new TaskNode(dataProvider, projectNode, "task", new Date(NaN), 20,
                                       new Date(2015, 2, 1), 20)
             node.compute().then(() => {
                 done(new Error("Input error should be detected"))
@@ -55,27 +60,25 @@ describe("Graph", () => {
             // Mock
             const dataProvider = new FakeDataProvider()
             let mock = sinon.mock(dataProvider)
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
             const arg: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task",
                 startDate: new Date(2015, 2, 1),
                 duration: 23
             }
-            mock.expects("setTaskResults").once().withArgs(arg).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withArgs("project", "task", arg).returns(Promise.resolve())
 
             // Test
-            const node = new TaskNode(dataProvider, "project", "task", new Date(2015, 2, 1), 20,
+            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
                                       new Date(2015, 2, 1), 20)
             node.modifiers = [
                 {
-                    projectIdentifier: "project",
                     name: "Modifier 1",
                     description: "Description 1",
                     duration: 5,
                     location: TaskLocation.End
                 },
                 {
-                    projectIdentifier: "project",
                     name: "Modifier 2",
                     description: "Description 2",
                     duration: -2,
@@ -93,27 +96,25 @@ describe("Graph", () => {
             // Mock
             const dataProvider = new FakeDataProvider()
             let mock = sinon.mock(dataProvider)
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
             const arg: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task",
                 startDate: new Date(2015, 2, 4),
                 duration: 20
             }
-            mock.expects("setTaskResults").once().withArgs(arg).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withArgs("project", "task", arg).returns(Promise.resolve())
 
             // Test
-            const node = new TaskNode(dataProvider, "project", "task", new Date(2015, 2, 1), 20,
+            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
                                       new Date(2015, 2, 1), 20)
             node.modifiers = [
                 {
-                    projectIdentifier: "project",
                     name: "Modifier 1",
                     description: "Description 1",
                     duration: 5,
                     location: TaskLocation.Beginning
                 },
                 {
-                    projectIdentifier: "project",
                     name: "Modifier 2",
                     description: "Description 2",
                     duration: -2,
@@ -130,23 +131,22 @@ describe("Graph", () => {
         it("Should compute children when adding", (done) => {
             // Mock
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
             let mock = sinon.mock(dataProvider)
             const arg: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task2",
                 startDate: new Date(2015, 2, 21),
                 duration: 15
             }
-            mock.expects("setTaskResults").once().withArgs(arg).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withArgs("project", "task2", arg).returns(Promise.resolve())
 
             // Test
-            const node1 = new TaskNode(dataProvider, "project", "task1", new Date(2015, 2, 1), 20,
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 20,
                                        new Date(2015, 2, 1), 20)
-            const node2 = new TaskNode(dataProvider, "project", "task2", new Date(2015, 1, 1), 15,
+            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 1, 1), 15,
                                        new Date(2015, 1, 1), 0)
 
             node1.addChild(node2, {
-                projectIdentifier: "project",
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
@@ -162,48 +162,52 @@ describe("Graph", () => {
             // Mock
             const dataProvider = new FakeDataProvider()
             let mock = sinon.mock(dataProvider)
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
+
             const modifier: Modifier = {
-                projectIdentifier: "project",
                 name: "Modifier 1",
                 description: "Description 1",
                 duration: 2,
                 location: TaskLocation.End
             }
-            const results: Array<TaskResults> = [
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "task2",
-                    startDate: new Date(2015, 2, 21),
-                    duration: 15
-                },
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "task1",
-                    startDate: new Date(2015, 2, 1),
-                    duration: 22
-                },
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "task2",
-                    startDate: new Date(2015, 2, 23),
-                    duration: 15
-                }
+            const results: Array<[string, TaskResults]> = [
+                [
+                    "task2",
+                    {
+                        startDate: new Date(2015, 2, 21),
+                        duration: 15
+                    }
+                ],
+                [
+                    "task1",
+                    {
+                        startDate: new Date(2015, 2, 1),
+                        duration: 22
+                    }
+                ],
+                [
+                    "task2",
+                    {
+                        startDate: new Date(2015, 2, 23),
+                        duration: 15
+                    }
+                ]
             ]
-            mock.expects("addModifier").once().withArgs(modifier).returns(Promise.resolve(1))
+            mock.expects("addModifier").once().withArgs("project", modifier).returns(Promise.resolve(1))
             mock.expects("setModifierForTask").once().withArgs("project", 1, "task1")
                 .returns(Promise.resolve())
-            const expectations = results.map((result: TaskResults) => {
-                return mock.expects("setTaskResults").once().withArgs(result).returns(Promise.resolve())
+            const expectations = results.map((result: [string, TaskResults]) => {
+                return mock.expects("setTaskResults").once().withArgs("project", result[0], result[1]).returns(Promise.resolve())
             })
 
             // Test
-            const node1 = new TaskNode(dataProvider, "project", "task1", new Date(2015, 2, 1), 20,
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 20,
                                        new Date(2015, 2, 1), 20)
-            const node2 = new TaskNode(dataProvider, "project", "task2", new Date(2015, 1, 1), 15,
+            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 1, 1), 15,
                                        new Date(2015, 1, 1), 0)
 
             node1.addChild(node2, {
-                projectIdentifier: "project",
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
@@ -227,27 +231,26 @@ describe("Graph", () => {
         it("Should correctly compute milestones", (done) => {
             // Mock
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
             let mock = sinon.mock(dataProvider)
             const modifier: Modifier = {
-                projectIdentifier: "project",
                 name: "Modifier 1",
                 description: "Description 1",
                 duration: 2,
                 location: TaskLocation.End
             }
             const results: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task1",
                 startDate: new Date(2015, 2, 3),
                 duration: 0
             }
-            mock.expects("addModifier").once().withArgs(modifier).returns(Promise.resolve(1))
+            mock.expects("addModifier").once().withArgs("project", modifier).returns(Promise.resolve(1))
             mock.expects("setModifierForTask").once().withArgs("project", 1, "task1")
                 .returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withArgs(results).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withArgs("project", "task1", results).returns(Promise.resolve())
 
             // Test
-            const node1 = new TaskNode(dataProvider, "project", "task1", new Date(2015, 2, 1), 0,
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 0,
                                        new Date(2015, 2, 1), 0)
 
             node1.addModifier(modifier).then(() => {
@@ -258,71 +261,25 @@ describe("Graph", () => {
                 done(error)
             })
         })
-        it("Should throw error when adding invalid modifier", (done) => {
-            // Mock
-            const dataProvider = new FakeDataProvider()
-            let mock = sinon.mock(dataProvider)
-            const modifier: Modifier = {
-                projectIdentifier: "project2",
-                name: "Modifier 1",
-                description: "Description 1",
-                duration: 2,
-                location: TaskLocation.End
-            }
-            const results: Array<TaskResults> = [
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "task2",
-                    startDate: new Date(2015, 2, 21),
-                    duration: 15
-                }
-            ]
-            const expectations = results.map((result: TaskResults) => {
-                return mock.expects("setTaskResults").once().withArgs(result).returns(Promise.resolve())
-            })
-
-            // Test
-            const node1 = new TaskNode(dataProvider, "project", "task1", new Date(2015, 2, 1), 20,
-                                       new Date(2015, 2, 1), 20)
-            const node2 = new TaskNode(dataProvider, "project", "task2", new Date(2015, 1, 1), 15,
-                                       new Date(2015, 1, 1), 0)
-
-            node1.addChild(node2, {
-                projectIdentifier: "project",
-                previous: "task1",
-                previousLocation: TaskLocation.End,
-                next: "task2",
-                nextLocation: TaskLocation.Beginning,
-                lag: 0
-            }).then(() => {
-                return node1.addModifier(modifier)
-            }).then(() => {
-                done(new Error("Error should be thrown when adding invalid modifier"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(InputError)
-                done()
-            })
-        })
         it("Should detect cyclic dependencies", (done) => {
             // Mock
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
             let mock = sinon.mock(dataProvider)
             const arg: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task2",
                 startDate: new Date(2015, 2, 21),
                 duration: 15
             }
-            mock.expects("setTaskResults").once().withArgs(arg).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withArgs("project", "task2", arg).returns(Promise.resolve())
 
             // Test
-            const node1 = new TaskNode(dataProvider, "project", "task1", new Date(2015, 2, 1), 20,
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 20,
                                        new Date(2015, 2, 1), 20)
-            const node2 = new TaskNode(dataProvider, "project", "task2", new Date(2015, 1, 1), 15,
+            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 1, 1), 15,
                                        new Date(2015, 1, 1), 0)
 
             node1.addChild(node2, {
-                projectIdentifier: "project",
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
@@ -330,7 +287,6 @@ describe("Graph", () => {
                 lag: 0
             }).then(() => {
                 return node2.addChild(node1, {
-                projectIdentifier: "project",
                 previous: "task2",
                 previousLocation: TaskLocation.End,
                 next: "task1",
@@ -349,10 +305,10 @@ describe("Graph", () => {
         it("Should load the node", (done) => {
             // Mock
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
             const tasks: Array<Task> = [
                 {
-                    projectIdentifier: "project",
                     identifier: "root",
                     name: "Root task",
                     description: "Project beginning",
@@ -360,7 +316,6 @@ describe("Graph", () => {
                     estimatedDuration: 31
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "long",
                     name: "Long task",
                     description: "Some long task",
@@ -368,7 +323,6 @@ describe("Graph", () => {
                     estimatedDuration: 60
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "short",
                     name: "Short task",
                     description: "Some short task",
@@ -376,7 +330,6 @@ describe("Graph", () => {
                     estimatedDuration: 31
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "reducing",
                     name: "Reducing task",
                     description: "Task depending on two tasks",
@@ -384,40 +337,43 @@ describe("Graph", () => {
                     estimatedDuration: 30
                 }
             ]
-            const results: Array<TaskResults> = [
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "root",
-                    startDate: new Date(2016, 7, 15),
-                    duration: 36
-                },
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "long",
-                    startDate: new Date(2016, 8, 20),
-                    duration: 60
-                },
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "short",
-                    startDate: new Date(2016, 8, 20),
-                    duration: 65
-                },
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "reducing",
-                    startDate: new Date(2016, 10, 24),
-                    duration: 30
-                }
+            const results: Array<[string, TaskResults]> = [
+                [
+                    "root",
+                    {
+                        startDate: new Date(2016, 7, 15),
+                        duration: 36
+                    },
+                ],
+                [
+                    "long",
+                    {
+                        startDate: new Date(2016, 8, 20),
+                        duration: 60
+                    }
+                ],
+                [
+                    "short",
+                    {
+                        startDate: new Date(2016, 8, 20),
+                        duration: 65
+                    }
+                ],
+                [
+                    "reducing",
+                    {
+                        startDate: new Date(2016, 10, 24),
+                        duration: 30
+                    }
+                ]
             ]
             mock.expects("getProjectTasks").once().returns(Promise.resolve(tasks))
-            results.forEach((result: TaskResults) => {
-                mock.expects("getTaskResults").once().withArgs(result.projectIdentifier, result.taskIdentifier)
-                    .returns(Promise.resolve(result))
+            results.forEach((result: [string, TaskResults]) => {
+                mock.expects("getTaskResults").once().withArgs("project", result[0])
+                    .returns(Promise.resolve(result[1]))
             })
             const rootModifiers: Array<Modifier> = [
                 {
-                    projectIdentifier: "project",
                     name: "Root modifier",
                     description: "Root modifier description",
                     duration: 5,
@@ -430,14 +386,12 @@ describe("Graph", () => {
                 .returns(Promise.resolve([]))
             const shortModifiers: Array<Modifier> = [
                 {
-                    projectIdentifier: "project",
                     name: "Short modifier 1",
                     description: "Short modifier 1 description",
                     duration: 10,
                     location: TaskLocation.End
                 },
                 {
-                    projectIdentifier: "project",
                     name: "Short modifier 2",
                     description: "Short modifier 2 description",
                     duration: 24,
@@ -450,7 +404,6 @@ describe("Graph", () => {
                 .returns(Promise.resolve([]))
             const rootRelations: Array<TaskRelation> = [
                 {
-                    projectIdentifier: "project",
                     previous: "root",
                     previousLocation: TaskLocation.End,
                     next: "long",
@@ -458,7 +411,6 @@ describe("Graph", () => {
                     lag: 0
                 },
                 {
-                    projectIdentifier: "project",
                     previous: "root",
                     previousLocation: TaskLocation.End,
                     next: "short",
@@ -470,7 +422,6 @@ describe("Graph", () => {
                 .returns(Promise.resolve(rootRelations))
             const longRelations: Array<TaskRelation> = [
                 {
-                    projectIdentifier: "project",
                     previous: "long",
                     previousLocation: TaskLocation.End,
                     next: "reducing",
@@ -482,7 +433,6 @@ describe("Graph", () => {
                 .returns(Promise.resolve(longRelations))
             const shortRelations: Array<TaskRelation> = [
                 {
-                    projectIdentifier: "project",
                     previous: "short",
                     previousLocation: TaskLocation.End,
                     next: "reducing",
@@ -498,7 +448,7 @@ describe("Graph", () => {
 
 
             // Test
-            let node = new ProjectNode(dataProvider, "project")
+            let node = new ProjectNode(dataProvider, graph, "project")
             node.load().then(() => {
                 const root = maputils.get(node.nodes, "root")
                 chai.expect(root.taskIdentifier).to.equal("root")
@@ -527,14 +477,14 @@ describe("Graph", () => {
         })
         it("Should add a task", (done) => {
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
 
-            let node = new ProjectNode(dataProvider, "project")
-            const taskNode = new TaskNode(dataProvider, "project", "task1", new Date(2015, 1, 1), 30,
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
                                           new Date(2015, 1, 5), 35)
             node.nodes.set("task1", taskNode)
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task2",
                 name: "Task 2",
                 description: "Description 2",
@@ -542,13 +492,11 @@ describe("Graph", () => {
                 estimatedDuration: 10
             }
             const taskResults: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task2",
                 startDate: new Date(2015, 1, 1),
                 duration: 10
             }
-            mock.expects("addTask").once().withArgs(task).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withArgs(taskResults).returns(Promise.resolve())
+            mock.expects("addTask").once().withArgs("project", task).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withArgs("project", "task2", taskResults).returns(Promise.resolve())
 
             node.addTask(task).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
@@ -563,14 +511,14 @@ describe("Graph", () => {
         })
         it("Should add a task", (done) => {
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
 
-            let node = new ProjectNode(dataProvider, "project")
-            const taskNode = new TaskNode(dataProvider, "project", "task1", new Date(2015, 1, 1), 30,
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
                                           new Date(2015, 1, 5), 35)
             node.nodes.set("task1", taskNode)
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task2",
                 name: "Task 2",
                 description: "Description 2",
@@ -578,13 +526,11 @@ describe("Graph", () => {
                 estimatedDuration: 10
             }
             const taskResults: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task2",
                 startDate: new Date(2015, 1, 1),
                 duration: 10
             }
-            mock.expects("addTask").once().withArgs(task).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withArgs(taskResults).returns(Promise.resolve())
+            mock.expects("addTask").once().withArgs("project", task).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withArgs("project", "task2", taskResults).returns(Promise.resolve())
 
             node.addTask(task).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
@@ -599,14 +545,14 @@ describe("Graph", () => {
         })
         it("Should throw error when adding existing node", (done) => {
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
 
-            let node = new ProjectNode(dataProvider, "project")
-            const taskNode = new TaskNode(dataProvider, "project", "task1", new Date(2015, 1, 1), 30,
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
                                           new Date(2015, 1, 5), 35)
             node.nodes.set("task1", taskNode)
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task1",
                 name: "Task 1",
                 description: "Description 1",
@@ -621,44 +567,20 @@ describe("Graph", () => {
                 done()
             })
         })
-        it("Should throw error when adding invalid node", (done) => {
-            const dataProvider = new FakeDataProvider()
-            let mock = sinon.mock(dataProvider)
-
-            let node = new ProjectNode(dataProvider, "project")
-            const taskNode = new TaskNode(dataProvider, "project", "task1", new Date(2015, 1, 1), 30,
-                                          new Date(2015, 1, 5), 35)
-            node.nodes.set("task1", taskNode)
-            const task: Task = {
-                projectIdentifier: "project2",
-                identifier: "task2",
-                name: "Task 2",
-                description: "Description 2",
-                estimatedStartDate: new Date(2015, 1, 1),
-                estimatedDuration: 10
-            }
-
-            node.addTask(task).then(() => {
-                done(new Error("Input error should be detected"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(InputError)
-                done()
-            })
-        })
         it("Should add a relation", (done) => {
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
 
-            let node = new ProjectNode(dataProvider, "project")
-            const taskNode1 = new TaskNode(dataProvider, "project", "task1", new Date(2015, 1, 1), 30,
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
                                            new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode1)
-            const taskNode2 = new TaskNode(dataProvider, "project", "task2", new Date(2015, 1, 1), 10,
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
                                            new Date(2015, 1, 1), 10)
             node.nodes.set("task2", taskNode2)
 
             const relation: TaskRelation = {
-                projectIdentifier: "project",
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
@@ -666,13 +588,11 @@ describe("Graph", () => {
                 lag: 0
             }
             const taskResults: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task2",
                 startDate: new Date(2015, 2, 3),
                 duration: 10
             }
-            mock.expects("addTaskRelation").once().withArgs(relation).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withArgs(taskResults).returns(Promise.resolve())
+            mock.expects("addTaskRelation").once().withArgs("project", relation).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withArgs("project", "task2", taskResults).returns(Promise.resolve())
 
             node.addRelation(relation).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
@@ -686,18 +606,18 @@ describe("Graph", () => {
         })
         it("Should throw error when adding relation with invalid previous node", (done) => {
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
 
-            let node = new ProjectNode(dataProvider, "project")
-            const taskNode1 = new TaskNode(dataProvider, "project", "task1", new Date(2015, 1, 1), 30,
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
                                            new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode1)
-            const taskNode2 = new TaskNode(dataProvider, "project", "task2", new Date(2015, 1, 1), 10,
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
                                            new Date(2015, 1, 1), 10)
             node.nodes.set("task2", taskNode2)
 
             const relation: TaskRelation = {
-                projectIdentifier: "project",
                 previous: "task3",
                 previousLocation: TaskLocation.End,
                 next: "task2",
@@ -713,18 +633,18 @@ describe("Graph", () => {
         })
         it("Should throw error when adding relation with invalid next node", (done) => {
             const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
 
-            let node = new ProjectNode(dataProvider, "project")
-            const taskNode1 = new TaskNode(dataProvider, "project", "task1", new Date(2015, 1, 1), 30,
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
                                            new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode1)
-            const taskNode2 = new TaskNode(dataProvider, "project", "task2", new Date(2015, 1, 1), 10,
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
                                            new Date(2015, 1, 1), 10)
             node.nodes.set("task2", taskNode2)
 
             const relation: TaskRelation = {
-                projectIdentifier: "project",
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task3",
@@ -735,33 +655,6 @@ describe("Graph", () => {
                 done(new Error("Input error should be detected"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
-                done()
-            })
-        })
-        it("Should throw error when adding invalid relation", (done) => {
-            const dataProvider = new FakeDataProvider()
-            let mock = sinon.mock(dataProvider)
-
-            let node = new ProjectNode(dataProvider, "project")
-            const taskNode1 = new TaskNode(dataProvider, "project", "task1", new Date(2015, 1, 1), 30,
-                                           new Date(2015, 1, 1), 30)
-            node.nodes.set("task1", taskNode1)
-            const taskNode2 = new TaskNode(dataProvider, "project", "task2", new Date(2015, 1, 1), 10,
-                                           new Date(2015, 1, 1), 10)
-            node.nodes.set("task2", taskNode2)
-
-            const relation: TaskRelation = {
-                projectIdentifier: "project2",
-                previous: "task1",
-                previousLocation: TaskLocation.End,
-                next: "task2",
-                nextLocation: TaskLocation.Beginning,
-                lag: 0
-            }
-            node.addRelation(relation).then(() => {
-                done(new Error("Input error should be detected"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(InputError)
                 done()
             })
         })
@@ -785,7 +678,6 @@ describe("Graph", () => {
             ]
             const tasks: Array<Task> = [
                 {
-                    projectIdentifier: "project",
                     identifier: "root",
                     name: "Root task",
                     description: "Project beginning",
@@ -793,7 +685,6 @@ describe("Graph", () => {
                     estimatedDuration: 31
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "long",
                     name: "Long task",
                     description: "Some long task",
@@ -801,7 +692,6 @@ describe("Graph", () => {
                     estimatedDuration: 60
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "short",
                     name: "Short task",
                     description: "Some short task",
@@ -809,7 +699,6 @@ describe("Graph", () => {
                     estimatedDuration: 31
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "reducing",
                     name: "Reducing task",
                     description: "Task depending on two tasks",
@@ -817,9 +706,8 @@ describe("Graph", () => {
                     estimatedDuration: 30
                 }
             ]
-            const otherTasks = [
+            const otherTasks: Array<Task> = [
                 {
-                    projectIdentifier: "other",
                     identifier: "other1",
                     name: "Other task 1",
                     description: "Description 1",
@@ -827,7 +715,6 @@ describe("Graph", () => {
                     estimatedDuration: 31
                 },
                 {
-                    projectIdentifier: "other",
                     identifier: "other2",
                     name: "Other task 2",
                     description: "Description 2",
@@ -835,54 +722,65 @@ describe("Graph", () => {
                     estimatedDuration: 10
                 }
             ]
-            const results: Array<TaskResults> = [
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "root",
-                    startDate: new Date(2016, 7, 15),
-                    duration: 36
-                },
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "long",
-                    startDate: new Date(2016, 8, 20),
-                    duration: 60
-                },
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "short",
-                    startDate: new Date(2016, 8, 20),
-                    duration: 65
-                },
-                {
-                    projectIdentifier: "project",
-                    taskIdentifier: "reducing",
-                    startDate: new Date(2016, 10, 24),
-                    duration: 30
-                },
-                {
-                    projectIdentifier: "other",
-                    taskIdentifier: "other1",
-                    startDate: new Date(2016, 2, 1),
-                    duration: 31
-                },
-                {
-                    projectIdentifier: "other",
-                    taskIdentifier: "other2",
-                    startDate: new Date(2016, 2, 1),
-                    duration: 15
-                }
+            const results: Array<[string, string, TaskResults]> = [
+                [
+                    "project",
+                    "root",
+                    {
+                        startDate: new Date(2016, 7, 15),
+                        duration: 36
+                    }
+                ],
+                [
+                    "project",
+                    "long",
+                    {
+                        startDate: new Date(2016, 8, 20),
+                        duration: 60
+                    }
+                ],
+                [
+                    "project",
+                    "short",
+                    {
+                        startDate: new Date(2016, 8, 20),
+                        duration: 65
+                    }
+                ],
+                [
+                    "project",
+                    "reducing",
+                    {
+                        startDate: new Date(2016, 10, 24),
+                        duration: 30
+                    }
+                ],
+                [
+                    "other",
+                    "other1",
+                    {
+                        startDate: new Date(2016, 2, 1),
+                        duration: 31
+                    }
+                ],
+                [
+                    "other",
+                    "other2",
+                    {
+                        startDate: new Date(2016, 2, 1),
+                        duration: 15
+                    }
+                ]
             ]
             mock.expects("getAllProjects").once().returns(Promise.resolve(projects))
             mock.expects("getProjectTasks").once().withArgs("project").returns(Promise.resolve(tasks))
             mock.expects("getProjectTasks").once().withArgs("other").returns(Promise.resolve(otherTasks))
-            results.forEach((result: TaskResults) => {
-                mock.expects("getTaskResults").once().withArgs(result.projectIdentifier, result.taskIdentifier)
-                    .returns(Promise.resolve(result))
+            results.forEach((result: [string, string, TaskResults]) => {
+                mock.expects("getTaskResults").once().withArgs(result[0], result[1])
+                    .returns(Promise.resolve(result[2]))
             })
             const rootModifiers: Array<Modifier> = [
                 {
-                    projectIdentifier: "project",
                     name: "Root modifier",
                     description: "Root modifier description",
                     duration: 5,
@@ -895,14 +793,12 @@ describe("Graph", () => {
                 .returns(Promise.resolve([]))
             const shortModifiers: Array<Modifier> = [
                 {
-                    projectIdentifier: "project",
                     name: "Short modifier 1",
                     description: "Short modifier 1 description",
                     duration: 10,
                     location: TaskLocation.End
                 },
                 {
-                    projectIdentifier: "project",
                     name: "Short modifier 2",
                     description: "Short modifier 2 description",
                     duration: 24,
@@ -920,7 +816,6 @@ describe("Graph", () => {
 
             const rootRelations: Array<TaskRelation> = [
                 {
-                    projectIdentifier: "project",
                     previous: "root",
                     previousLocation: TaskLocation.End,
                     next: "long",
@@ -928,7 +823,6 @@ describe("Graph", () => {
                     lag: 0
                 },
                 {
-                    projectIdentifier: "project",
                     previous: "root",
                     previousLocation: TaskLocation.End,
                     next: "short",
@@ -940,7 +834,6 @@ describe("Graph", () => {
                 .returns(Promise.resolve(rootRelations))
             const longRelations: Array<TaskRelation> = [
                 {
-                    projectIdentifier: "project",
                     previous: "long",
                     previousLocation: TaskLocation.End,
                     next: "reducing",
@@ -952,7 +845,6 @@ describe("Graph", () => {
                 .returns(Promise.resolve(longRelations))
             const shortRelations: Array<TaskRelation> = [
                 {
-                    projectIdentifier: "project",
                     previous: "short",
                     previousLocation: TaskLocation.End,
                     next: "reducing",
@@ -1016,7 +908,7 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new Graph(dataProvider)
-            const projectNode = new ProjectNode(dataProvider, "project")
+            const projectNode = new ProjectNode(dataProvider, node, "project1")
             node.nodes.set("project1", projectNode)
 
             const project: Project = {
@@ -1039,7 +931,7 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new Graph(dataProvider)
-            const projectNode = new ProjectNode(dataProvider, "project")
+            const projectNode = new ProjectNode(dataProvider, node, "project1")
             node.nodes.set("project1", projectNode)
 
             const project: Project = {

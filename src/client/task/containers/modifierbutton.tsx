@@ -142,7 +142,6 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
     private handleSave(e: React.MouseEvent) {
         e.preventDefault()
         const modifier: Modifier = {
-            projectIdentifier: this.props.projectIdentifier,
             name: this.state.name,
             description: this.state.description,
             duration: this.state.duration,

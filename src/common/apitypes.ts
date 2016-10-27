@@ -1,7 +1,4 @@
-import {
-    Identifiable, ProjectBased,
-    Project, Task, TaskResults, Modifier
-} from "./types"
+import { Identifiable, Project, Task, TaskResults, Modifier } from "./types"
 import { InputError } from "./errors"
 
 export interface ApiInputTask extends Identifiable {
@@ -11,7 +8,7 @@ export interface ApiInputTask extends Identifiable {
     estimatedDuration: number
 }
 
-export interface ApiTask extends Identifiable, ProjectBased {
+export interface ApiTask extends Identifiable {
     name: string
     description: string
     estimatedStartDate: string
@@ -28,7 +25,6 @@ export interface ApiProjectTaskModifiers {
 
 export const createApiTask = (task: Task, startDate: Date, duration: number): ApiTask => {
     return {
-        projectIdentifier: task.projectIdentifier,
         identifier: task.identifier,
         name: task.name,
         description: task.description,
@@ -41,7 +37,6 @@ export const createApiTask = (task: Task, startDate: Date, duration: number): Ap
 
 export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task => {
     return {
-        projectIdentifier: project.identifier,
         identifier: apiTask.identifier,
         name: apiTask.name,
         description: apiTask.description,
@@ -52,8 +47,6 @@ export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task 
 
 export const createTaskResultsFromApiTask = (apiTask: ApiTask): TaskResults => {
     return {
-        projectIdentifier: apiTask.projectIdentifier,
-        taskIdentifier: apiTask.identifier,
         startDate: new Date(apiTask.startDate),
         duration: apiTask.duration
     }
@@ -89,7 +82,7 @@ export const createProject = (input: any): Project => {
     }
 }
 
-export const createTask = (input: any, projectIdentifier: string): Task => {
+export const createTask = (input: any): Task => {
     if (!input.hasOwnProperty("identifier")) {
         throw new InputError("Property \"identifier\" cannot be found")
     }
@@ -127,7 +120,6 @@ export const createTask = (input: any, projectIdentifier: string): Task => {
     }
 
     return {
-        projectIdentifier,
         identifier,
         name,
         description,

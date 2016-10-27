@@ -2,16 +2,16 @@ import { ITaskNode, IProjectNode, IGraph } from "../../server/core/graph/types"
 import { Project, Task, TaskResults, TaskRelation, Modifier, Delay } from "../../common/types"
 
 export class FakeTaskNode implements ITaskNode {
-    projectIdentifier: string
+    parent: IProjectNode
     taskIdentifier: string
     startDate: Date
     duration: number
     children: Array<ITaskNode>
     parents: Array<ITaskNode>
     modifiers: Array<Modifier>
-    constructor(startDate: Date, duration: number) {
-        this.projectIdentifier = ""
-        this.taskIdentifier = ""
+    constructor(parent: IProjectNode, taskIdentifier: string, startDate: Date, duration: number) {
+        this.parent = parent
+        this.taskIdentifier = taskIdentifier
         this.startDate = startDate
         this.duration = duration
         this.children = new Array<ITaskNode>()
@@ -24,10 +24,12 @@ export class FakeTaskNode implements ITaskNode {
 }
 
 export class FakeProjectNode implements IProjectNode {
+    parent: IGraph
     projectIdentifier: string
     nodes: Map<string, ITaskNode>
-    constructor() {
-        this.projectIdentifier = ""
+    constructor(parent: IGraph, projectIdentifier: string) {
+        this.parent = parent
+        this.projectIdentifier = projectIdentifier
         this.nodes = new Map<string, ITaskNode>()
     }
     addTask(task: Task): Promise<ITaskNode> {

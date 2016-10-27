@@ -35,23 +35,21 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const delay1: Delay = {
-                    projectIdentifier: "project",
                     identifier: "delay1",
                     name: "Delay 1",
                     description: "Description 1",
                     date: new Date(2016, 9, 1)
                 }
                 const delay2: Delay = {
-                    projectIdentifier: "project",
                     identifier: "delay2",
                     name: "Delay 2",
                     description: "Description 2",
                     date: new Date(2016, 9, 15)
                 }
 
-                return db.addDelay(delay1).then(() => {
+                return db.addDelay("project", delay1).then(() => {
                 }).then(() => {
-                    return db.addDelay(delay2)
+                    return db.addDelay("project", delay2)
                 }).then(() => {
                     done()
                 })
@@ -69,14 +67,12 @@ describe("Redis", () => {
             db.getDelays("project", ["delay2", "delay1"]).then((delays: Array<Delay>) => {
                 const expected: Array<Delay> = [
                     {
-                        projectIdentifier: "project",
                         identifier: "delay2",
                         name: "Delay 2",
                         description: "Description 2",
                         date: new Date(2016, 9, 15)
                     },
                     {
-                        projectIdentifier: "project",
                         identifier: "delay1",
                         name: "Delay 1",
                         description: "Description 1",
@@ -98,7 +94,6 @@ describe("Redis", () => {
             db.getDelays("project", ["delay2", "delay1"]).then((delays: Array<Delay>) => {
                 const expected: Array<Delay | null> = [
                     {
-                        projectIdentifier: "project",
                         identifier: "delay2",
                         name: "Delay 2",
                         description: "Description 2",
@@ -123,7 +118,6 @@ describe("Redis", () => {
             db.getDelays("project", ["delay2", "delay1"]).then((delays: Array<Delay>) => {
                 const expected: Array<Delay | null> = [
                     {
-                        projectIdentifier: "project",
                         identifier: "delay2",
                         name: "Delay 2",
                         description: "Description 2",
@@ -151,23 +145,21 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const delay1: Delay = {
-                    projectIdentifier: "project",
                     identifier: "delay1",
                     name: "Delay 1",
                     description: "Description 1",
                     date: new Date(2016, 9, 1)
                 }
                 const delay2: Delay = {
-                    projectIdentifier: "project",
                     identifier: "delay2",
                     name: "Delay 2",
                     description: "Description 2",
                     date: new Date(2016, 9, 15)
                 }
 
-                return db.addDelay(delay1).then(() => {
+                return db.addDelay("project", delay1).then(() => {
                 }).then(() => {
-                    return db.addDelay(delay2)
+                    return db.addDelay("project", delay2)
                 }).then(() => {
                     done()
                 })
@@ -178,7 +170,6 @@ describe("Redis", () => {
         it("Should get delay", (done) => {
             db.getDelay("project", "delay1").then((delay: Delay) => {
                 const expected: Delay = {
-                    projectIdentifier: "project",
                     identifier: "delay1",
                     name: "Delay 1",
                     description: "Description 1",
@@ -249,14 +240,13 @@ describe("Redis", () => {
         })
         it("Should add delay", (done) => {
             const delay1: Delay = {
-                projectIdentifier: "project",
                 identifier: "delay1",
                 name: "Delay 1",
                 description: "Description 1",
                 date: new Date(2016, 9, 1)
             }
 
-            db.addDelay(delay1).then(() => {
+            db.addDelay("project", delay1).then(() => {
                done()
             }).catch((error) => {
                 done(error)
@@ -264,14 +254,13 @@ describe("Redis", () => {
         })
         it("Should get an exception when adding delay on invalid project", (done) => {
             const delay2: Delay = {
-                projectIdentifier: "project2",
                 identifier: "delay2",
                 name: "Delay 2",
                 description: "Description 2",
                 date: new Date(2016, 9, 1)
             }
 
-            db.addDelay(delay2).then(() => {
+            db.addDelay("project2", delay2).then(() => {
                 done(new Error("addDelay should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -280,14 +269,13 @@ describe("Redis", () => {
         })
         it("Should get an exception when adding an existing delay", (done) => {
             const delay1_2: Delay = {
-                projectIdentifier: "project",
                 identifier: "delay1",
                 name: "Delay 2",
                 description: "Description 2",
                 date: new Date(2016, 9, 1)
             }
 
-            db.addDelay(delay1_2).then(() => {
+            db.addDelay("project", delay1_2).then(() => {
                 done(new Error("addDelay should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)

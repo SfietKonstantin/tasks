@@ -34,7 +34,6 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task: Task = {
-                    projectIdentifier: "project",
                     identifier: "task",
                     name: "Task",
                     description: "Description",
@@ -42,23 +41,21 @@ describe("Redis", () => {
                     estimatedDuration: 30
                 }
 
-                return db.addTask(task).then(() => {
+                return db.addTask("project", task).then(() => {
                     const modifier1: Modifier = {
-                        projectIdentifier: "project",
                         name: "Modifier 1",
                         description: "Description 1",
                         duration: 40,
                         location: TaskLocation.End
                     }
                     const modifier2: Modifier = {
-                        projectIdentifier: "project",
                         name: "Modifier 2",
                         description: "Description 2",
                         duration: 10,
                         location: TaskLocation.Beginning
                     }
-                    return db.addModifier(modifier1).then(() => {
-                        return db.addModifier(modifier2)
+                    return db.addModifier("project", modifier1).then(() => {
+                        return db.addModifier("project", modifier2)
                     })
                 }).then(() => {
                     done()
@@ -77,14 +74,12 @@ describe("Redis", () => {
             db.getModifiers("project", [2, 1]).then((modifiers: Array<Modifier>) => {
                 const expected: Array<Modifier> = [
                     {
-                        projectIdentifier: "project",
                         name: "Modifier 2",
                         description: "Description 2",
                         duration: 10,
                         location: TaskLocation.Beginning
                     },
                     {
-                        projectIdentifier: "project",
                         name: "Modifier 1",
                         description: "Description 1",
                         duration: 40,
@@ -106,7 +101,6 @@ describe("Redis", () => {
             db.getModifiers("project", [2, 1]).then((modifiers: Array<Modifier>) => {
                 const expected: Array<Modifier | null> = [
                     {
-                        projectIdentifier: "project",
                         name: "Modifier 2",
                         description: "Description 2",
                         duration: 10,
@@ -131,7 +125,6 @@ describe("Redis", () => {
             db.getModifiers("project", [2, 1]).then((modifiers: Array<Modifier>) => {
                 const expected: Array<Modifier | null> = [
                     {
-                        projectIdentifier: "project",
                         name: "Modifier 2",
                         description: "Description 2",
                         duration: 10,

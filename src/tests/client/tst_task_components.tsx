@@ -20,7 +20,6 @@ describe("Task components", () => {
                 description: ""
             }
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task",
                 name: "Task",
                 description: "",
@@ -50,7 +49,6 @@ describe("Task components", () => {
                 description: ""
             }
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task",
                 name: "Task with a very very very very very long name and this name continues",
                 description: "",

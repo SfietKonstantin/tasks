@@ -35,7 +35,6 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -43,7 +42,6 @@ describe("Redis", () => {
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -51,9 +49,9 @@ describe("Redis", () => {
                     estimatedDuration: 15
                 }
 
-                return db.addTask(task1).then(() => {
+                return db.addTask("project", task1).then(() => {
                 }).then(() => {
-                    return db.addTask(task2)
+                    return db.addTask("project", task2)
                 }).then(() => {
                     done()
                 })
@@ -71,7 +69,6 @@ describe("Redis", () => {
             db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
                 const expected: Array<Task> = [
                     {
-                        projectIdentifier: "project",
                         identifier: "task2",
                         name: "Task 2",
                         description: "Description 2",
@@ -79,7 +76,6 @@ describe("Redis", () => {
                         estimatedDuration: 15
                     },
                     {
-                        projectIdentifier: "project",
                         identifier: "task1",
                         name: "Task 1",
                         description: "Description 1",
@@ -102,7 +98,6 @@ describe("Redis", () => {
             db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
                 const expected: Array<Task | null> = [
                     {
-                        projectIdentifier: "project",
                         identifier: "task2",
                         name: "Task 2",
                         description: "Description 2",
@@ -128,7 +123,6 @@ describe("Redis", () => {
             db.getTasks("project", ["task2", "task1"]).then((tasks: Array<Task>) => {
                 const expected: Array<Task | null> = [
                     {
-                        projectIdentifier: "project",
                         identifier: "task2",
                         name: "Task 2",
                         description: "Description 2",
@@ -157,7 +151,6 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -165,7 +158,6 @@ describe("Redis", () => {
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -173,9 +165,9 @@ describe("Redis", () => {
                     estimatedDuration: 15
                 }
 
-                return db.addTask(task1).then(() => {
+                return db.addTask("project", task1).then(() => {
                 }).then(() => {
-                    return db.addTask(task2)
+                    return db.addTask("project", task2)
                 }).then(() => {
                     done()
                 })
@@ -187,7 +179,6 @@ describe("Redis", () => {
             db.getProjectTasks("project").then((tasks: Array<Task>) => {
                 const expected: Array<Task> = [
                     {
-                        projectIdentifier: "project",
                         identifier: "task1",
                         name: "Task 1",
                         description: "Description 1",
@@ -195,7 +186,6 @@ describe("Redis", () => {
                         estimatedDuration: 30
                     },
                     {
-                        projectIdentifier: "project",
                         identifier: "task2",
                         name: "Task 2",
                         description: "Description 2",
@@ -231,7 +221,6 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -239,7 +228,6 @@ describe("Redis", () => {
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -247,9 +235,9 @@ describe("Redis", () => {
                     estimatedDuration: 15
                 }
 
-                return db.addTask(task1).then(() => {
+                return db.addTask("project", task1).then(() => {
                 }).then(() => {
-                    return db.addTask(task2)
+                    return db.addTask("project", task2)
                 }).then(() => {
                     done()
                 })
@@ -260,7 +248,6 @@ describe("Redis", () => {
         it("Should get task", (done) => {
             db.getTask("project", "task1").then((task: Task) => {
                 const expected: Task = {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -383,7 +370,6 @@ describe("Redis", () => {
         })
         it("Should add task", (done) => {
             const task1: Task = {
-                projectIdentifier: "project",
                 identifier: "task1",
                 name: "Task 1",
                 description: "Description 1",
@@ -391,7 +377,7 @@ describe("Redis", () => {
                 estimatedDuration: 30
             }
 
-            db.addTask(task1).then(() => {
+            db.addTask("project", task1).then(() => {
                done()
             }).catch((error) => {
                 done(error)
@@ -399,7 +385,6 @@ describe("Redis", () => {
         })
         it("Should get an exception when adding task on invalid project", (done) => {
             const task2: Task = {
-                projectIdentifier: "project2",
                 identifier: "task2",
                 name: "Task 2",
                 description: "Description 2",
@@ -407,7 +392,7 @@ describe("Redis", () => {
                 estimatedDuration: 30
             }
 
-            db.addTask(task2).then(() => {
+            db.addTask("project2", task2).then(() => {
                 done(new Error("addTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -416,7 +401,6 @@ describe("Redis", () => {
         })
         it("Should get an exception when adding an existing task", (done) => {
             const task1_2: Task = {
-                projectIdentifier: "project",
                 identifier: "task1",
                 name: "Task 2",
                 description: "Description 2",
@@ -424,7 +408,7 @@ describe("Redis", () => {
                 estimatedDuration: 30
             }
 
-            db.addTask(task1_2).then(() => {
+            db.addTask("project", task1_2).then(() => {
                 done(new Error("addTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
@@ -445,7 +429,6 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -453,7 +436,6 @@ describe("Redis", () => {
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -461,8 +443,8 @@ describe("Redis", () => {
                     estimatedDuration: 15
                 }
 
-                return db.addTask(task1).then(() => {
-                    return db.addTask(task2)
+                return db.addTask("project", task1).then(() => {
+                    return db.addTask("project", task2)
                 }).then(() => {
                     done()
                 })
@@ -471,8 +453,7 @@ describe("Redis", () => {
             })
         })
         it("Should add task relation", (done) => {
-            db.addTaskRelation({
-                projectIdentifier: "project",
+            db.addTaskRelation("project", {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
@@ -485,8 +466,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid parent task", (done) => {
-            db.addTaskRelation({
-                projectIdentifier: "project",
+            db.addTaskRelation("project", {
                 previous: "task3",
                 previousLocation: TaskLocation.End,
                 next: "task2",
@@ -500,8 +480,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid child task", (done) => {
-            db.addTaskRelation({
-                projectIdentifier: "project",
+            db.addTaskRelation("project", {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task3",
@@ -522,8 +501,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted parent task", (done) => {
-            db.addTaskRelation({
-                projectIdentifier: "project",
+            db.addTaskRelation("project", {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
@@ -544,8 +522,7 @@ describe("Redis", () => {
             })
         })
         it("Should set task relation", (done) => {
-            db.addTaskRelation({
-                projectIdentifier: "project",
+            db.addTaskRelation("project", {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
@@ -571,7 +548,6 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -579,7 +555,6 @@ describe("Redis", () => {
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -587,7 +562,6 @@ describe("Redis", () => {
                     estimatedDuration: 15
                 }
                 const task3: Task = {
-                    projectIdentifier: "project",
                     identifier: "task3",
                     name: "Task 3",
                     description: "Description 3",
@@ -595,13 +569,12 @@ describe("Redis", () => {
                     estimatedDuration: 10
                 }
 
-                return db.addTask(task1).then(() => {
-                    return db.addTask(task2)
+                return db.addTask("project", task1).then(() => {
+                    return db.addTask("project", task2)
                 }).then(() => {
-                    return db.addTask(task3)
+                    return db.addTask("project", task3)
                 }).then(() => {
-                    return db.addTaskRelation({
-                        projectIdentifier: "project",
+                    return db.addTaskRelation("project", {
                         previous: "task1",
                         previousLocation: TaskLocation.End,
                         next: "task2",
@@ -609,8 +582,7 @@ describe("Redis", () => {
                         lag: 12
                     })
                 }).then(() => {
-                    return db.addTaskRelation({
-                        projectIdentifier: "project",
+                    return db.addTaskRelation("project", {
                         previous: "task1",
                         previousLocation: TaskLocation.Beginning,
                         next: "task3",
@@ -628,7 +600,6 @@ describe("Redis", () => {
             db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
                 const expected: Array<TaskRelation> = [
                     {
-                        projectIdentifier: "project",
                         previous: "task1",
                         previousLocation: TaskLocation.End,
                         next: "task2",
@@ -636,7 +607,6 @@ describe("Redis", () => {
                         lag: 12
                     },
                     {
-                        projectIdentifier: "project",
                         previous: "task1",
                         previousLocation: TaskLocation.Beginning,
                         next: "task3",

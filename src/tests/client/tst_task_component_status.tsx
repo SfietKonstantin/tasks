@@ -47,7 +47,6 @@ describe("Task components", () => {
         }
         it("Should create Status for not started and on time task", () => {
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task",
                 name: "Task",
                 description: "",
@@ -55,8 +54,6 @@ describe("Task components", () => {
                 estimatedDuration: 20
             }
             const taskResults: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task",
                 startDate: new Date(2016, 3, 1),
                 duration: 20
             }
@@ -69,7 +66,6 @@ describe("Task components", () => {
         })
         it("Should create Status for not started and ending late task", () => {
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task",
                 name: "Task",
                 description: "",
@@ -77,8 +73,6 @@ describe("Task components", () => {
                 estimatedDuration: 20
             }
             const taskResults: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task",
                 startDate: new Date(2016, 3, 1),
                 duration: 25
             }
@@ -91,7 +85,6 @@ describe("Task components", () => {
         })
         it("Should create Status for not started and starting late task", () => {
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task",
                 name: "Task",
                 description: "",
@@ -99,8 +92,6 @@ describe("Task components", () => {
                 estimatedDuration: 20
             }
             const taskResults: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task",
                 startDate: new Date(2016, 3, 6),
                 duration: 15
             }
@@ -113,7 +104,6 @@ describe("Task components", () => {
         })
         it("Should create Status for in progress and on time task", () => {
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task",
                 name: "Task",
                 description: "",
@@ -121,8 +111,6 @@ describe("Task components", () => {
                 estimatedDuration: 20
             }
             const taskResults: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task",
                 startDate: new Date(2016, 2, 1),
                 duration: 20
             }

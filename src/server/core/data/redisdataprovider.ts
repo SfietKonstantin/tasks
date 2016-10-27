@@ -131,9 +131,8 @@ class RedisTask {
         this.name = task.name
         this.description = task.description
     }
-    static save(task: Task, client: redis.RedisClient): Promise<void> {
+    static save(projectIdentifier: string, task: Task, client: redis.RedisClient): Promise<void> {
         const redisTask = new RedisTask(task)
-        const projectIdentifier = task.projectIdentifier
         const taskIdentifier = task.identifier
         return client.multi().hmset(taskRootKey(projectIdentifier, taskIdentifier), redisTask)
                              .mset(taskKey(projectIdentifier, taskIdentifier, "estimatedStartDate"),
@@ -166,7 +165,6 @@ class RedisTask {
 
                 const task: Task = {
                     identifier: taskIdentifier,
-                    projectIdentifier,
                     name,
                     description,
                     estimatedStartDate: new Date(+result[0]),
@@ -189,9 +187,8 @@ class RedisTaskRelation {
         this.lag = taskRelation.lag
     }
 
-    static save(relation: TaskRelation, client: redis.RedisClient): Promise<void> {
+    static save(projectIdentifier: string, relation: TaskRelation, client: redis.RedisClient): Promise<void> {
         const redisTaskRelation = new RedisTaskRelation(relation)
-        const projectIdentifier = relation.projectIdentifier
         return client.hmsetAsync(taskRelationKey(projectIdentifier, relation.previous, relation.next),
                                  redisTaskRelation).then(() => {
             return client.saddAsync(taskKey(projectIdentifier, relation.previous, "relations"), relation.next)
@@ -221,7 +218,6 @@ class RedisTaskRelation {
                 throw new CorruptedError("TaskRelation " + previous + "-" + next + " has an invalid nextLocation")
             }
             const relation: TaskRelation = {
-                projectIdentifier,
                 previous,
                 previousLocation,
                 next,
@@ -243,12 +239,11 @@ class RedisModifier {
         this.description = modifier.description
         this.location = fromTaskLocation(modifier.location)
     }
-    static save(id: number, modifier: Modifier, client: redis.RedisClient): Promise<number> {
+    static save(projectIdentifier: string, modifierId: number, modifier: Modifier, client: redis.RedisClient): Promise<number> {
         const redisModifier = new RedisModifier(modifier)
-        const projectIdentifier = modifier.projectIdentifier
-        return client.multi().hmset(modifierRootKey(projectIdentifier, id), redisModifier)
-                             .set(modifierKey(projectIdentifier, id, "duration"), modifier.duration)
-                             .execAsync().then((result: any) => { return id })
+        return client.multi().hmset(modifierRootKey(projectIdentifier, modifierId), redisModifier)
+                             .set(modifierKey(projectIdentifier, modifierId, "duration"), modifier.duration)
+                             .execAsync().then((result: any) => { return modifierId })
     }
     static load(projectIdentifier: string, modifierId: number, client: redis.RedisClient): Promise<Modifier> {
         return client.hgetallAsync(modifierRootKey(projectIdentifier, modifierId)).then((result: any) => {
@@ -273,7 +268,6 @@ class RedisModifier {
                     throw new CorruptedError("Modifier " + modifierId + " do not have property duration")
                 }
                 const modifier: Modifier = {
-                    projectIdentifier,
                     name,
                     description,
                     duration: +result,
@@ -295,9 +289,8 @@ class RedisDelay {
         this.description = delay.description
         this.date = delay.date.getTime()
     }
-    static save(delay: Delay, client: redis.RedisClient): Promise<void> {
+    static save(projectIdentifier: string, delay: Delay, client: redis.RedisClient): Promise<void> {
         const redisDelay = new RedisDelay(delay)
-        const projectIdentifier = delay.projectIdentifier
         const delayIdentifier = delay.identifier
         return client.multi().hmset(delayRootKey(projectIdentifier, delayIdentifier), redisDelay)
                              .sadd(projectKey(projectIdentifier, "delays"), delayIdentifier)
@@ -319,7 +312,6 @@ class RedisDelay {
 
             const delay: Delay = {
                 identifier: delayIdentifier,
-                projectIdentifier,
                 name,
                 description,
                 date: new Date(+result["date"]),
@@ -370,12 +362,11 @@ export class RedisDataProvider implements IDataProvider {
             return this.getTasks(projectIdentifier, taskIdentifiers.sort())
         })
     }
-    addTask(task: Task): Promise<void> {
-        const projectIdentifier = task.projectIdentifier
+    addTask(projectIdentifier: string, task: Task): Promise<void> {
         return this.hasProject(projectIdentifier).then(() => {
             return this.notHasTask(projectIdentifier, task.identifier)
         }).then(() => {
-            return RedisTask.save(task, this.client)
+            return RedisTask.save(projectIdentifier, task, this.client)
         })
     }
     isTaskImportant(projectIdentifier: string, taskIdentifier: string): Promise<boolean> {
@@ -395,11 +386,11 @@ export class RedisDataProvider implements IDataProvider {
             }
         })
     }
-    addTaskRelation(relation: TaskRelation): Promise<void> {
-        return this.hasTask(relation.projectIdentifier, relation.previous).then(() => {
-            return this.hasTask(relation.projectIdentifier, relation.next)
+    addTaskRelation(projectIdentifier: string, relation: TaskRelation): Promise<void> {
+        return this.hasTask(projectIdentifier, relation.previous).then(() => {
+            return this.hasTask(projectIdentifier, relation.next)
         }).then(() => {
-            return RedisTaskRelation.save(relation, this.client)
+            return RedisTaskRelation.save(projectIdentifier, relation, this.client)
         })
     }
     getTaskRelations(projectIdentifier: string, taskIdentifier: string): Promise<Array<TaskRelation>> {
@@ -423,21 +414,18 @@ export class RedisDataProvider implements IDataProvider {
                 throw new CorruptedError("Task " + taskIdentifier + " do not have property duration")
             }
             const taskResults: TaskResults = {
-                projectIdentifier,
-                taskIdentifier,
                 startDate: new Date(+results[0]),
                 duration: +results[1]
             }
             return taskResults
         })
     }
-    setTaskResults(taskResults: TaskResults): Promise<void> {
-        const projectIdentifier = taskResults.projectIdentifier
-        return this.hasTask(projectIdentifier, taskResults.taskIdentifier).then(() => {
+    setTaskResults(projectIdentifier: string, taskIdentifier: string, taskResults: TaskResults): Promise<void> {
+        return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
             const set = [
-                taskKey(projectIdentifier, taskResults.taskIdentifier, "duration"),
+                taskKey(projectIdentifier, taskIdentifier, "duration"),
                 +taskResults.duration,
-                taskKey(projectIdentifier, taskResults.taskIdentifier, "startDate"),
+                taskKey(projectIdentifier, taskIdentifier, "startDate"),
                 +taskResults.startDate.getTime()
             ]
             return this.client.msetAsync(set)
@@ -466,9 +454,9 @@ export class RedisDataProvider implements IDataProvider {
             return ids.sort()
         })
     }
-    addModifier(modifier: Modifier): Promise<number> {
-        return this.getNextId("modifier").then((id: number) => {
-            return RedisModifier.save(id, modifier, this.client)
+    addModifier(projectIdentifier: string, modifier: Modifier): Promise<number> {
+        return this.getNextId("modifier").then((modifierId: number) => {
+            return RedisModifier.save(projectIdentifier, modifierId, modifier, this.client)
         })
     }
     setModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void> {
@@ -488,12 +476,11 @@ export class RedisDataProvider implements IDataProvider {
             return RedisDelay.load(projectIdentifier, delayIdentifier, this.client)
         })
     }
-    addDelay(delay: Delay): Promise<void> {
-        const projectIdentifier = delay.projectIdentifier
+    addDelay(projectIdentifier: string, delay: Delay): Promise<void> {
         return this.hasProject(projectIdentifier).then(() => {
             return this.notHasDelay(projectIdentifier, delay.identifier)
         }).then(() => {
-            return RedisDelay.save(delay, this.client)
+            return RedisDelay.save(projectIdentifier, delay, this.client)
         })
     }
     getProjectDelays(projectIdentifier: string): Promise<Array<Delay>> {

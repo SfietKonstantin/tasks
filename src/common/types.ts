@@ -2,32 +2,24 @@ export interface Identifiable {
     identifier: string
 }
 
-export interface ProjectBased {
-    projectIdentifier: string
-}
-
-export interface TaskBased {
-    taskIdentifier: string
-}
-
 export interface Project extends Identifiable {
     name: string
     description: string
 }
 
-export interface Task extends Identifiable, ProjectBased {
+export interface Task extends Identifiable {
     name: string
     description: string
     estimatedStartDate: Date
     estimatedDuration: number
 }
 
-export interface TaskResults extends ProjectBased, TaskBased {
+export interface TaskResults {
     startDate: Date
     duration: number
 }
 
-export interface TaskRelation extends ProjectBased {
+export interface TaskRelation {
     previous: string
     previousLocation: TaskLocation
     next: string
@@ -40,14 +32,14 @@ export enum TaskLocation {
     End
 }
 
-export interface Modifier extends ProjectBased {
+export interface Modifier {
     name: string
     description: string
     duration: number
     location: TaskLocation
 }
 
-export interface Delay extends Identifiable, ProjectBased {
+export interface Delay extends Identifiable {
     name: string
     description: string
     date: Date

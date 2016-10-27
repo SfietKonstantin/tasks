@@ -1,8 +1,9 @@
-import { TaskBased, Task, TaskRelation } from "../../../common/types"
+import { Task, TaskRelation } from "../../../common/types"
 import { GraphError } from "./types"
 import * as maputils from "../../../common/maputils"
 
-interface Node extends TaskBased {
+interface Node {
+    taskIdentifier: string
     children: Array<Node>
 }
 

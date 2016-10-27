@@ -6,7 +6,7 @@ import * as dateutils from "../../../common/dateutils"
 import * as maputils from "../../../common/maputils"
 
 export class TaskNode implements ITaskNode {
-    projectIdentifier: string
+    parent: IProjectNode
     taskIdentifier: string
     startDate: Date
     duration: number
@@ -19,11 +19,11 @@ export class TaskNode implements ITaskNode {
     private childrenRelations: Map<string, TaskRelation>
     private parentsRelations: Map<string, TaskRelation>
     constructor(dataProvider: IDataProvider,
-                projectIdentifier: string, taskIdentifier: string,
+                parent: IProjectNode, taskIdentifier: string,
                 estimatedStartDate: Date, estimatedDuration: number,
                 startDate: Date, duration: number) {
         this.dataProvider = dataProvider
-        this.projectIdentifier = projectIdentifier
+        this.parent = parent
         this.taskIdentifier = taskIdentifier
         this.estimatedStartDate = estimatedStartDate
         this.estimatedDuration = estimatedDuration
@@ -39,11 +39,9 @@ export class TaskNode implements ITaskNode {
         return this.markAndCompute(new Set<ITaskNode>())
     }
     addModifier(modifier: Modifier): Promise<Modifier> {
-        if (modifier.projectIdentifier !== this.projectIdentifier) {
-            return Promise.reject(new InputError("Invalid project for modifier"))
-        }
-        return this.dataProvider.addModifier(modifier).then((id: number) => {
-            return this.dataProvider.setModifierForTask(this.projectIdentifier, id, this.taskIdentifier)
+        const projectIdentifier = this.parent.projectIdentifier
+        return this.dataProvider.addModifier(projectIdentifier, modifier).then((id: number) => {
+            return this.dataProvider.setModifierForTask(projectIdentifier, id, this.taskIdentifier)
         }).then(() => {
             this.modifiers.push(modifier)
             return this.compute()
@@ -117,11 +115,10 @@ export class TaskNode implements ITaskNode {
             }
 
             // Try computing children first
+            const projectIdentifier = this.parent.projectIdentifier
             return this.computeChildren(markedNodes).then(() => {
                 // Then save results
-                return this.dataProvider.setTaskResults({
-                    projectIdentifier: this.projectIdentifier,
-                    taskIdentifier: this.taskIdentifier,
+                return this.dataProvider.setTaskResults(projectIdentifier, this.taskIdentifier, {
                     startDate: this.startDate,
                     duration: this.duration
                 })
@@ -138,34 +135,36 @@ export class TaskNode implements ITaskNode {
 }
 
 export class ProjectNode implements IProjectNode {
+    parent: IGraph
     projectIdentifier: string
     nodes: Map<string, ITaskNode>
     private dataProvider: IDataProvider
-    constructor(dataProvider: IDataProvider, projectIdentifier: string) {
+    constructor(dataProvider: IDataProvider, parent: IGraph, projectIdentifier: string) {
         this.dataProvider = dataProvider
+        this.parent = parent
         this.projectIdentifier = projectIdentifier
         this.nodes = new Map<string, ITaskNode>()
     }
     load(): Promise<void> {
         return this.dataProvider.getProjectTasks(this.projectIdentifier).then((tasks: Array<Task>) => {
             return Promise.all(tasks.map((task: Task) => {
-                return this.dataProvider.getTaskResults(task.projectIdentifier, task.identifier)
+                return this.dataProvider.getTaskResults(this.projectIdentifier, task.identifier)
                            .then((results: TaskResults) => {
-                    const node = new TaskNode(this.dataProvider, task.projectIdentifier, task.identifier,
+                    const node = new TaskNode(this.dataProvider, this, task.identifier,
                                               task.estimatedStartDate, task.estimatedDuration,
                                               results.startDate, results.duration)
                     this.nodes.set(task.identifier, node)
                 })
             })).then(() => {
                 return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
-                    return this.dataProvider.getTaskModifiers(node.projectIdentifier, node.taskIdentifier)
+                    return this.dataProvider.getTaskModifiers(this.projectIdentifier, node.taskIdentifier)
                                .then((modifiers: Array<Modifier>) => {
                         node.modifiers = modifiers
                     })
                 }))
             }).then(() => {
                 return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
-                    return this.dataProvider.getTaskRelations(node.projectIdentifier, node.taskIdentifier)
+                    return this.dataProvider.getTaskRelations(this.projectIdentifier, node.taskIdentifier)
                                .then((taskRelations: Array<TaskRelation>) => {
                         taskRelations.forEach((taskRelation: TaskRelation) => {
                             const child = maputils.get(this.nodes, taskRelation.next) as TaskNode
@@ -178,22 +177,17 @@ export class ProjectNode implements IProjectNode {
         })
     }
     addTask(task: Task): Promise<ITaskNode> {
-        if (task.projectIdentifier !== this.projectIdentifier) {
-            return Promise.reject(new InputError("Invalid project for task"))
-        }
         if (this.nodes.has(task.identifier)) {
             return Promise.reject(new ExistsError("Task \"" + task.identifier + "\" is already present in project"))
         }
-        return this.dataProvider.addTask(task).then(() => {
+        return this.dataProvider.addTask(this.projectIdentifier, task).then(() => {
             const taskResults: TaskResults = {
-                projectIdentifier: task.projectIdentifier,
-                taskIdentifier: task.identifier,
                 startDate: task.estimatedStartDate,
                 duration: task.estimatedDuration
             }
-            return this.dataProvider.setTaskResults(taskResults)
+            return this.dataProvider.setTaskResults(this.projectIdentifier, task.identifier, taskResults)
         }).then(() => {
-            const node = new TaskNode(this.dataProvider, task.projectIdentifier, task.identifier,
+            const node = new TaskNode(this.dataProvider, this, task.identifier,
                                       task.estimatedStartDate, task.estimatedDuration,
                                       task.estimatedStartDate, task.estimatedDuration)
             this.nodes.set(task.identifier, node)
@@ -201,9 +195,6 @@ export class ProjectNode implements IProjectNode {
         })
     }
     addRelation(relation: TaskRelation): Promise<void> {
-        if (relation.projectIdentifier !== this.projectIdentifier) {
-            return Promise.reject(new InputError("Invalid project for relation"))
-        }
         if (!this.nodes.has(relation.previous)) {
             return Promise.reject(new NotFoundError("Task \"" + relation.previous + "\" is not present in project"))
         }
@@ -211,7 +202,7 @@ export class ProjectNode implements IProjectNode {
             return Promise.reject(new NotFoundError("Task \"" + relation.next + "\" is not present in project"))
         }
 
-        return this.dataProvider.addTaskRelation(relation).then(() => {
+        return this.dataProvider.addTaskRelation(this.projectIdentifier, relation).then(() => {
             const child = maputils.get(this.nodes, relation.next) as TaskNode
             let taskNode = maputils.get(this.nodes, relation.previous) as TaskNode
             return taskNode.addChild(child, relation)
@@ -229,7 +220,7 @@ export class Graph implements IGraph {
     load(): Promise<void> {
         return this.dataProvider.getAllProjects().then((projects: Array<Project>) => {
             return Promise.all(projects.map((project: Project) => {
-                let node = new ProjectNode(this.dataProvider, project.identifier)
+                let node = new ProjectNode(this.dataProvider, this, project.identifier)
                 return node.load().then(() => {
                     this.nodes.set(project.identifier, node)
                 })
@@ -241,7 +232,7 @@ export class Graph implements IGraph {
             return Promise.reject(new ExistsError("Project \"" + project.identifier + "\" is already present"))
         }
         return this.dataProvider.addProject(project).then(() => {
-            const node = new ProjectNode(this.dataProvider, project.identifier)
+            const node = new ProjectNode(this.dataProvider, this, project.identifier)
             this.nodes.set(project.identifier, node)
             return node
         })

@@ -127,7 +127,6 @@ describe("API", () => {
             let mock = sinon.mock(dataProvider)
             const tasks: Array<Task> = [
                 {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -135,7 +134,6 @@ describe("API", () => {
                     estimatedDuration: 30
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -145,14 +143,13 @@ describe("API", () => {
             ]
             mock.expects("getProjectTasks").once().withArgs("project")
                 .returns(Promise.resolve(tasks))
-            let projectNode = new FakeProjectNode()
-            projectNode.nodes.set("task1", new FakeTaskNode(new Date(2016, 1, 5), 35))
-            projectNode.nodes.set("task2", new FakeTaskNode(new Date(2016, 1, 15), 16))
+            let projectNode = new FakeProjectNode(graph, "project")
+            projectNode.nodes.set("task1", new FakeTaskNode(projectNode, "task1", new Date(2016, 1, 5), 35))
+            projectNode.nodes.set("task2", new FakeTaskNode(projectNode, "task2", new Date(2016, 1, 15), 16))
             graph.nodes.set("project", projectNode)
 
             const expected: Array<ApiTask> = [
                 {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -162,7 +159,6 @@ describe("API", () => {
                     duration: 35
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -219,7 +215,6 @@ describe("API", () => {
             let mock = sinon.mock(dataProvider)
             const tasks: Array<Task> = [
                 {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -227,7 +222,6 @@ describe("API", () => {
                     estimatedDuration: 30
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -253,7 +247,6 @@ describe("API", () => {
             let mock = sinon.mock(dataProvider)
             const tasks: Array<Task> = [
                 {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -261,7 +254,6 @@ describe("API", () => {
                     estimatedDuration: 30
                 },
                 {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -271,7 +263,7 @@ describe("API", () => {
             ]
             mock.expects("getProjectTasks").once().withArgs("project")
                 .returns(Promise.resolve(tasks))
-            let projectNode = new FakeProjectNode()
+            let projectNode = new FakeProjectNode(graph, "project")
             graph.nodes.set("project", projectNode)
 
             api.getProjectTasks("project").then((tasks: Array<ApiTask>) => {
@@ -309,7 +301,6 @@ describe("API", () => {
             }
             mock.expects("getProject").once().withArgs("project").returns(Promise.resolve(project))
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -317,17 +308,15 @@ describe("API", () => {
                 estimatedDuration: 15
             }
             mock.expects("getTask").once().withArgs("project", "task").returns(Promise.resolve(task))
-            graph.nodes.set("project", new ProjectNode(dataProvider, "project"))
+            graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
             const modifiers: Array<Modifier> = [
                 {
-                    projectIdentifier: "project",
                     name: "Modifier 1",
                     description: "Description 1",
                     duration: 4,
                     location: TaskLocation.Beginning
                 },
                 {
-                    projectIdentifier: "project",
                     name: "Modifier 2",
                     description: "Description 2",
                     duration: 2,
@@ -335,7 +324,7 @@ describe("API", () => {
                 }
             ]
             let projectNode = maputils.get(graph.nodes, "project")
-            let taskNode = new TaskNode(dataProvider, task.projectIdentifier, task.identifier,
+            let taskNode = new TaskNode(dataProvider, projectNode, task.identifier,
                                         task.estimatedStartDate, task.estimatedDuration,
                                         new Date(2016, 2, 5), 17)
             taskNode.modifiers = modifiers
@@ -401,7 +390,6 @@ describe("API", () => {
             }
             mock.expects("getProject").once().withArgs("project").returns(Promise.resolve(project))
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -430,7 +418,6 @@ describe("API", () => {
             }
             mock.expects("getProject").once().withArgs("project").returns(Promise.resolve(project))
             const task: Task = {
-                projectIdentifier: "project",
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -438,7 +425,7 @@ describe("API", () => {
                 estimatedDuration: 15
             }
             mock.expects("getTask").once().withArgs("project", "task").returns(Promise.resolve(task))
-            graph.nodes.set("project", new ProjectNode(dataProvider, "project"))
+            graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
 
             api.getTask("project", "task").then((task: ApiProjectTaskModifiers) => {
                 done(new Error("getTask should not be a success"))
@@ -595,7 +582,7 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
             let mock = sinon.mock(dataProvider)
-            mock.expects("setTaskImportant").once().withArgs("project", "task").returns(Promise.reject(new Error("Some error")))
+            mock.expects("setTaskImportant").once().withArgs("project", "task", true).returns(Promise.reject(new Error("Some error")))
 
             api.setTaskImportant("project", "task", true).then((important: boolean) => {
                 done(new Error("setTaskImportant should not be a success"))
@@ -610,7 +597,7 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
             let mock = sinon.mock(dataProvider)
-            mock.expects("setTaskImportant").once().withArgs("project", "task").returns(Promise.reject(new NotFoundError("Some error")))
+            mock.expects("setTaskImportant").once().withArgs("project", "task", true).returns(Promise.reject(new NotFoundError("Some error")))
 
             api.setTaskImportant("project", "task", true).then((important: boolean) => {
                 done(new Error("setTaskImportant should not be a success"))
@@ -689,13 +676,13 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            let projectNode = new FakeProjectNode()
+            let projectNode = new FakeProjectNode(graph, "project")
             mock.expects("addProject").once().withArgs(project).returns(Promise.resolve(projectNode))
             let projectNodeMock = sinon.mock(projectNode)
             tasks.map((task: ApiInputTask) => {
                 const startDate = new Date(task.estimatedStartDate)
-                projectNodeMock.expects("addTask").once().withArgs(createTask(task, "project"))
-                               .returns(Promise.resolve(new FakeTaskNode(startDate, task.estimatedDuration)))
+                projectNodeMock.expects("addTask").once().withArgs(createTask(task))
+                               .returns(Promise.resolve(new FakeTaskNode(projectNode, task.identifier, startDate, task.estimatedDuration)))
             })
 
             api.import(project, tasks).then(() => {
@@ -745,7 +732,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            let projectNode = new FakeProjectNode()
+            let projectNode = new FakeProjectNode(graph, "project")
             mock.expects("addProject").once().withArgs(project).returns(Promise.reject(new ExistsError("Some error")))
 
             api.import(project, tasks).then(() => {
@@ -797,11 +784,11 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            let projectNode = new FakeProjectNode()
+            let projectNode = new FakeProjectNode(graph, "project")
             mock.expects("addProject").once().withArgs(project).returns(Promise.resolve(projectNode))
             let projectNodeMock = sinon.mock(projectNode)
             tasks.map((task: ApiInputTask) => {
-                projectNodeMock.expects("addTask").once().withArgs(createTask(task, "project"))
+                projectNodeMock.expects("addTask").once().withArgs(createTask(task))
                                .returns(Promise.reject(new ExistsError("Some error")))
             })
 
@@ -854,11 +841,11 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            let projectNode = new FakeProjectNode()
+            let projectNode = new FakeProjectNode(graph, "project")
             mock.expects("addProject").once().withArgs(project).returns(Promise.resolve(projectNode))
             let projectNodeMock = sinon.mock(projectNode)
             tasks.map((task: ApiInputTask) => {
-                projectNodeMock.expects("addTask").once().withArgs(createTask(task, "project"))
+                projectNodeMock.expects("addTask").once().withArgs(createTask(task))
                                .returns(Promise.reject(new InputError("Some error")))
             })
 
@@ -911,7 +898,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            let projectNode = new FakeProjectNode()
+            let projectNode = new FakeProjectNode(graph, "project")
             mock.expects("addProject").once().withArgs(project).returns(Promise.reject(new Error("Some error")))
 
             api.import(project, tasks).then(() => {
@@ -963,11 +950,11 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            let projectNode = new FakeProjectNode()
+            let projectNode = new FakeProjectNode(graph, "project")
             mock.expects("addProject").once().withArgs(project).returns(Promise.resolve(projectNode))
             let projectNodeMock = sinon.mock(projectNode)
             tasks.map((task: ApiInputTask) => {
-                projectNodeMock.expects("addTask").once().withArgs(createTask(task, "project"))
+                projectNodeMock.expects("addTask").once().withArgs("project", createTask(task))
                                .returns(Promise.reject(new Error("Some error")))
             })
 

@@ -73,9 +73,10 @@ export class ApiRoutes {
         })
     }
     putModifier(req: express.Request, res: express.Response) {
-        const modifier = req.body.modifier
+        const projectIdentifier = req.body.projectIdentifier
         const taskIdentifier = req.body.taskIdentifier
-        this.api.addModifier(modifier, taskIdentifier).then((task: ApiProjectTaskModifiers) => {
+        const modifier = req.body.modifier
+        this.api.addModifier(projectIdentifier, taskIdentifier, modifier).then((task: ApiProjectTaskModifiers) => {
             res.json(task)
         }).catch((error: RequestError) => {
             res.status(error.status).json(error.json)

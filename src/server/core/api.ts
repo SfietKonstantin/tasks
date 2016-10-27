@@ -131,18 +131,29 @@ export class Api {
             }
         })
     }
-    addModifier(modifier: any, taskIdentifier: any): Promise<ApiProjectTaskModifiers> {
-        const projectNode = maputils.get(this.graph.nodes, modifier.projectIdentifier)
+    addModifier(projectIdentifier: any, taskIdentifier: any, modifier: any): Promise<ApiProjectTaskModifiers> {
+        if (typeof projectIdentifier !== "string") {
+            winston.error("projectIdentifier must be a string, not " + projectIdentifier)
+            const error = new RequestError(404, "Project \"" + projectIdentifier + "\" not found")
+            return Promise.reject(error)
+        }
+        if (typeof taskIdentifier !== "string") {
+            winston.error("taskIdentifier must be a string, not " + taskIdentifier)
+            const error = new RequestError(404, "Task \"" + taskIdentifier + "\" not found")
+            return Promise.reject(error)
+        }
+        const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
         let taskNode = maputils.get(projectNode.nodes, taskIdentifier)
-        return taskNode.addModifier(modifier).then(() => {
-            return this.getTask(modifier.projectIdentifier, taskIdentifier)
-        }).catch((error: Error) => {
+        return taskNode.addModifier(modifier).catch((error) => {
             if (error instanceof InputError) {
                 winston.debug(error.message)
                 throw new RequestError(400, "Invalid input for modifier")
             } else {
-                throw error // Simply forward from getTask
+                winston.error(error.message)
+                throw new RequestError(500, "Internal error")
             }
+        }).then(() => {
+            return this.sendTask(projectIdentifier, taskIdentifier)
         })
     }
     import(project: any, tasks: any): Promise<void> {
@@ -152,7 +163,7 @@ export class Api {
                 throw new InputError("tasks must be an array, not " + tasks)
             }
             const inputTasks = tasks.map((task) => {
-                return createTask(task, inputProject.identifier)
+                return createTask(task)
             })
 
             // findCyclicDependency(inputTasks)
@@ -177,7 +188,7 @@ export class Api {
     }
     private sendTask(projectIdentifier: string, taskIdentifier: string): Promise<ApiProjectTaskModifiers> {
         return this.dataProvider.getTask(projectIdentifier, taskIdentifier).then((task: Task) => {
-            return this.dataProvider.getProject(task.projectIdentifier).then((project: Project) => {
+            return this.dataProvider.getProject(projectIdentifier).then((project: Project) => {
                 const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
                 let taskNode = maputils.get(projectNode.nodes, taskIdentifier)
 

@@ -36,7 +36,6 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task: Task = {
-                    projectIdentifier: "project",
                     identifier: "task",
                     name: "Task",
                     description: "Description",
@@ -44,14 +43,12 @@ describe("Redis", () => {
                     estimatedDuration: 30
                 }
 
-                return db.addTask(task).then(() => {
+                return db.addTask("project", task).then(() => {
                     const taskResults: TaskResults = {
-                        projectIdentifier: "project",
-                        taskIdentifier: "task",
                         startDate: new Date(2016, 9, 15),
                         duration: 40
                     }
-                    return db.setTaskResults(taskResults)
+                    return db.setTaskResults("project", "task", taskResults)
                 }).then(() => {
                     done()
                 })
@@ -62,8 +59,6 @@ describe("Redis", () => {
         it("Should get task results", (done) => {
             db.getTaskResults("project", "task").then((result: TaskResults) => {
                 const expected: TaskResults = {
-                    projectIdentifier: "project",
-                    taskIdentifier: "task",
                     startDate: new Date(2016, 9, 15),
                     duration: 40
                 }
@@ -137,7 +132,6 @@ describe("Redis", () => {
 
             db.addProject(project).then(() => {
                 const task1: Task = {
-                    projectIdentifier: "project",
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -145,7 +139,6 @@ describe("Redis", () => {
                     estimatedDuration: 30
                 }
                 const task2: Task = {
-                    projectIdentifier: "project",
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -153,8 +146,8 @@ describe("Redis", () => {
                     estimatedDuration: 15
                 }
 
-                return db.addTask(task1).then(() => {
-                    return db.addTask(task2)
+                return db.addTask("project", task1).then(() => {
+                    return db.addTask("project", task2)
                 }).then(() => {
                     done()
                 })
@@ -164,19 +157,15 @@ describe("Redis", () => {
         })
         it("Should set task results", (done) => {
             const taskResults1: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task2",
                 startDate: new Date(2016, 10, 2),
                 duration: 61
             }
             const taskResults2: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task1",
                 startDate: new Date(2016, 9, 16),
                 duration: 45
             }
-            db.setTaskResults(taskResults1).then(() => {
-                return db.setTaskResults(taskResults2).then(() => {
+            db.setTaskResults("project", "task2", taskResults1).then(() => {
+                return db.setTaskResults("project", "task1", taskResults2).then(() => {
                     done()
                 })
             }).catch((error) => {
@@ -186,8 +175,6 @@ describe("Redis", () => {
         it("Should get task results", (done) => {
             db.getTaskResults("project", "task1").then((result: TaskResults) => {
                 const expected: TaskResults = {
-                    projectIdentifier: "project",
-                    taskIdentifier: "task1",
                     startDate: new Date(2016, 9, 16),
                     duration: 45
                 }
@@ -196,8 +183,6 @@ describe("Redis", () => {
                 return db.getTaskResults("project", "task2")
             }).then((result: TaskResults) => {
                 const expected: TaskResults = {
-                    projectIdentifier: "project",
-                    taskIdentifier: "task2",
                     startDate: new Date(2016, 10, 2),
                     duration: 61
                 }
@@ -210,12 +195,10 @@ describe("Redis", () => {
         })
         it("Should get an exception on invalid task", (done) => {
             const taskResults: TaskResults = {
-                projectIdentifier: "project",
-                taskIdentifier: "task3",
                 startDate: new Date(2016, 9, 15),
                 duration: 40
             }
-            db.setTaskResults(taskResults).then(() => {
+            db.setTaskResults("project", "task3", taskResults).then(() => {
                 done(new Error("setTaskResults should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)

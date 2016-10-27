@@ -14,7 +14,6 @@ const fillProjectsData = (graph: IGraph): Promise<IProjectNode> => {
 const fillTasksData = (projectNode: IProjectNode): Promise<void> => {
     const tasks: Array<Task> = [
         {
-            projectIdentifier: "project",
             identifier: "root",
             name: "Root task",
             description: "Project beginning",
@@ -22,7 +21,6 @@ const fillTasksData = (projectNode: IProjectNode): Promise<void> => {
             estimatedDuration: 31
         },
         {
-            projectIdentifier: "project",
             identifier: "long",
             name: "Long task",
             description: "Some long task",
@@ -30,7 +28,6 @@ const fillTasksData = (projectNode: IProjectNode): Promise<void> => {
             estimatedDuration: 60
         },
         {
-            projectIdentifier: "project",
             identifier: "short",
             name: "Short task",
             description: "Some short task",
@@ -38,7 +35,6 @@ const fillTasksData = (projectNode: IProjectNode): Promise<void> => {
             estimatedDuration: 31
         },
         {
-            projectIdentifier: "project",
             identifier: "reducing",
             name: "Reducing task",
             description: "Task depending on two tasks",
@@ -55,7 +51,6 @@ const fillTasksData = (projectNode: IProjectNode): Promise<void> => {
 const fillTaskRelations = (projectNode: IProjectNode): Promise<void> => {
     const relations: Array<TaskRelation> = [
         {
-            projectIdentifier: "project",
             previous: "root",
             previousLocation: TaskLocation.End,
             next: "long",
@@ -63,7 +58,6 @@ const fillTaskRelations = (projectNode: IProjectNode): Promise<void> => {
             lag: 0
         },
         {
-            projectIdentifier: "project",
             previous: "root",
             previousLocation: TaskLocation.End,
             next: "short",
@@ -71,7 +65,6 @@ const fillTaskRelations = (projectNode: IProjectNode): Promise<void> => {
             lag: 0
         },
         {
-            projectIdentifier: "project",
             previous: "long",
             previousLocation: TaskLocation.End,
             next: "reducing",
@@ -79,7 +72,6 @@ const fillTaskRelations = (projectNode: IProjectNode): Promise<void> => {
             lag: 0
         },
         {
-            projectIdentifier: "project",
             previous: "short",
             previousLocation: TaskLocation.End,
             next: "reducing",
