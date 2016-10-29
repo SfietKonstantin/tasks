@@ -74,6 +74,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove task results startDate", (done) => {
@@ -86,10 +88,11 @@ describe("Redis", () => {
         it("Should get an exception on corrupted task results", (done) => {
             db.getTaskResults("project", "task").then((result: TaskResults) => {
                 done(new Error("getTaskResults should not be a success"))
-                done()
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove task results duration", (done) => {
@@ -104,10 +107,11 @@ describe("Redis", () => {
         it("Should get an exception on corrupted task results", (done) => {
             db.getTaskResults("project", "task").then((result: TaskResults) => {
                 done(new Error("getTaskResults should not be a success"))
-                done()
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should revert task results properties corruption", (done) => {
@@ -214,6 +218,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         after(() => {

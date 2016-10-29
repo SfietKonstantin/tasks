@@ -1,6 +1,6 @@
 import * as winston from "winston"
 import { Project, Task, TaskResults, Modifier } from "../../common/types"
-import { IDataProvider } from "../core/data/idataprovider"
+import { IDataProvider, isKnownError } from "../core/data/idataprovider"
 import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"
 import { findCyclicDependency } from "../core/graph/analyzer"
 import { ApiTask, ApiProjectTaskModifiers, createProject, createTask, createApiTask } from "../../common/apitypes"
@@ -9,6 +9,10 @@ import * as maputils from "../../common/maputils"
 
 interface ErrorJson {
     error: string
+}
+
+const isApiKnownError = (error: Error): boolean => {
+    return isKnownError(error) || error instanceof GraphError
 }
 
 export class RequestError extends Error implements Error {
@@ -31,7 +35,11 @@ export class Api {
     getProjects(): Promise<Array<Project>> {
         return this.dataProvider.getAllProjects().catch((error: Error) => {
             winston.error(error.message)
-            throw new RequestError(500, "Internal error")
+            if (isApiKnownError(error)) {
+                throw new RequestError(500, "Internal error")
+            } else {
+                throw error
+            }
         })
     }
     getProject(projectIdentifier: any): Promise<Project> {
@@ -44,9 +52,11 @@ export class Api {
             if (error instanceof NotFoundError) {
                 winston.debug(error.message)
                 throw new RequestError(404, "Project \"" + projectIdentifier + "\" not found")
-            } else {
+            } else if (isApiKnownError(error)) {
                 winston.error(error.message)
                 throw new RequestError(500, "Internal error")
+            } else {
+                throw error
             }
         })
     }
@@ -68,9 +78,11 @@ export class Api {
             if (error instanceof NotFoundError) {
                 winston.debug(error.message)
                 throw new RequestError(404, "Project \"" + projectIdentifier + "\" not found")
-            } else {
+            } else if (isApiKnownError(error)) {
                 winston.error(error.message)
                 throw new RequestError(500, "Internal error")
+            } else {
+                throw error
             }
         })
     }
@@ -102,9 +114,11 @@ export class Api {
             if (error instanceof NotFoundError) {
                 winston.debug(error.message)
                 throw new RequestError(404, "Task \"" + taskIdentifier + "\" not found")
-            } else {
+            } else if (isApiKnownError(error)) {
                 winston.error(error.message)
                 throw new RequestError(500, "Internal error")
+            } else {
+                throw error
             }
         })
     }
@@ -125,9 +139,11 @@ export class Api {
             if (error instanceof NotFoundError) {
                 winston.debug(error.message)
                 throw new RequestError(404, "Task \"" + taskIdentifier + "\" not found")
-            } else {
+            } else if (isApiKnownError(error)) {
                 winston.error(error.message)
                 throw new RequestError(500, "Internal error")
+            } else {
+                throw error
             }
         })
     }
@@ -148,9 +164,11 @@ export class Api {
             if (error instanceof NotFoundError) {
                 winston.debug(error.message)
                 throw new RequestError(404, "Task \"" + taskIdentifier + "\" not found")
-            } else {
+            } else if (isApiKnownError(error)) {
                 winston.error(error.message)
                 throw new RequestError(500, "Internal error")
+            } else {
+                throw error
             }
         }).then(() => {
             return this.sendTask(projectIdentifier, taskIdentifier)
@@ -180,9 +198,11 @@ export class Api {
             } else if (error instanceof NotFoundError) {
                 winston.debug(error.message)
                 throw new RequestError(404, "Invalid input for import")
-            } else {
+            } else if (isApiKnownError(error)) {
                 winston.error(error.message)
                 throw new RequestError(500, "Internal error")
+            } else {
+                throw error
             }
         })
     }
@@ -203,9 +223,11 @@ export class Api {
             if (error instanceof NotFoundError) {
                 winston.debug(error.message)
                 throw new RequestError(404, "Task \"" + taskIdentifier + "\" not found")
-            } else {
+            } else if (isApiKnownError(error)) {
                 winston.error(error.message)
                 throw new RequestError(500, "Internal error")
+            } else {
+                throw error
             }
         })
     }

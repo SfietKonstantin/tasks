@@ -42,7 +42,6 @@ export interface TasksState {
 
 export interface RelationsState {
     relations: Array<PrimaveraTaskRelation>
-    warnings: Array<string>
     isImporting: boolean
     invalidFormat: boolean
 }

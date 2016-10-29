@@ -170,7 +170,7 @@ class UnconnectedMain extends React.Component<MainProperties, {}> {
 
 const mapStateToProps = (state: State) => {
     let warnings = new Array<string>()
-    warnings = warnings.concat(state.tasks.warnings, state.relations.warnings)
+    warnings = state.tasks.warnings.slice(0)
 
     const tasks = state.tasks.tasks
     const relations = state.relations.relations.filter((relation: PrimaveraTaskRelation) => {

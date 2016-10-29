@@ -3,7 +3,7 @@ import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task, Modifier, TaskLocation } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
-import { CorruptedError } from "../../server/core/data/idataprovider"
+import { CorruptedError, InternalError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -99,6 +99,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should get an exception on invalid modifier", (done) => {
@@ -107,6 +109,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove modifier name", (done) => {
@@ -122,6 +126,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove modifier description", (done) => {
@@ -139,6 +145,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove modifier location", (done) => {
@@ -156,6 +164,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should set an invalid modifier location", (done) => {
@@ -171,6 +181,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove modifier duration", (done) => {
@@ -188,6 +200,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should revert modifier properties corruption", (done) => {
@@ -222,8 +236,10 @@ describe("Redis", () => {
             db.getModifier("project", 3).then((modifier: Modifier) => {
                 done(new Error("getModifier should not be a success"))
             }).catch((error) => {
-                chai.expect(error).to.not.null
+                chai.expect(error).to.instanceOf(InternalError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         after(() => {

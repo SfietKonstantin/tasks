@@ -1,5 +1,5 @@
 import { Project, Task, TaskRelation, TaskResults, TaskLocation, Modifier } from "../../../common/types"
-import { ExistsError, NotFoundError, InputError } from "../../../common/errors"
+import { ExistsError, NotFoundError } from "../../../common/errors"
 import { GraphError, ITaskNode, IProjectNode, IGraph } from "./types"
 import { IDataProvider } from "../data/idataprovider"
 import * as dateutils from "../../../common/dateutils"

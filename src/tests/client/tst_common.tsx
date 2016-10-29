@@ -29,10 +29,10 @@ describe("Common components", () => {
             const component = testutils.renderIntoDocument(
                 <TabBar tabs={tabs} tabChangedCallback={callback} />
             ) as React.Component<any, any>
-            const nav = testutils.findRenderedDOMComponentWithClass(component, "nav")
-
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWith(0)).to.true
+
+            const nav = testutils.findRenderedDOMComponentWithClass(component, "nav")
             chai.expect(nav.classList.toString()).to.contains("nav-tabs")
             const navLi = nav.getElementsByTagName("li")
             chai.expect(navLi).to.length(5)
@@ -54,6 +54,9 @@ describe("Common components", () => {
             const component = testutils.renderIntoDocument(
                 <TabBar tabs={tabs} tabChangedCallback={callback} />
             ) as React.Component<any, any>
+            chai.expect(callback.calledOnce).to.true
+            chai.expect(callback.calledWith(0)).to.true
+
             const nav = testutils.findRenderedDOMComponentWithClass(component, "nav")
             const navLi = nav.getElementsByTagName("li")
             const tab3a = navLi[2].getElementsByTagName("a")

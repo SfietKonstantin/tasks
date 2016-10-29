@@ -3,7 +3,7 @@ import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Delay } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
-import { CorruptedError } from "../../server/core/data/idataprovider"
+import { CorruptedError, InternalError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -77,6 +77,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove delay name", (done) => {
@@ -93,6 +95,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove delay description", (done) => {
@@ -111,6 +115,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove delay date", (done) => {
@@ -129,6 +135,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should revert delay properties corruption", (done) => {
@@ -163,8 +171,10 @@ describe("Redis", () => {
             db.getDelay("project", "delay3").then((delay: Delay) => {
                 done(new Error("getDelay should not be a success"))
             }).catch((error) => {
-                chai.expect(error).to.not.null
+                chai.expect(error).to.instanceOf(InternalError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         after(() => {
@@ -231,6 +241,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should corrupt delay properties", (done) => {
@@ -301,6 +313,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should get an exception when adding an existing delay", (done) => {
@@ -316,6 +330,32 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
                 done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should corrupt task properties", (done) => {
+            client.setAsync("project:project:delays", "test").then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when adding delay", (done) => {
+            const delay2: Delay = {
+                identifier: "delay2",
+                name: "Delay 2",
+                description: "Description 2",
+                date: new Date(2016, 9, 1)
+            }
+
+            db.addDelay("project", delay2).then(() => {
+                done(new Error("addDelay should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(InternalError)
+                done()
+            }).catch((error) => {
+                done(error)
             })
         })
         after(() => {

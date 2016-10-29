@@ -1,4 +1,4 @@
-import { CorruptedError, IDataProvider } from "./idataprovider"
+import { IDataProvider, CorruptedError, InternalError, isKnownError } from "./idataprovider"
 import {
     Identifiable, Project, Task, TaskRelation, TaskResults,
     Modifier, TaskLocation, Delay
@@ -25,8 +25,13 @@ declare module "redis" {
         existsAsync(...args: any[]): Promise<number>
         watchAsync(...args: any[]): Promise<any>
     }
-    export interface Multi {
-        execAsync(): Promise<any>
+}
+
+const wrapUnknownErrors = (error: Error) => {
+    if (!isKnownError(error)) {
+        throw new InternalError(error.message)
+    } else {
+        throw error
     }
 }
 
@@ -99,9 +104,9 @@ class RedisProject {
     static save(project: Project, client: redis.RedisClient): Promise<void> {
         const redisProject = new RedisProject(project)
         const projectIdentifier = project.identifier
-        return client.multi().hmset(projectRootKey(projectIdentifier), redisProject)
-                             .sadd("project:ids", projectIdentifier)
-                             .execAsync().then((result: any) => {})
+        return client.hmsetAsync(projectRootKey(projectIdentifier), redisProject).then(() => {
+            return client.saddAsync("project:ids", projectIdentifier)
+        })
     }
 
     static load(projectIdentifier: string, client: redis.RedisClient): Promise<Project> {
@@ -134,14 +139,14 @@ class RedisTask {
     static save(projectIdentifier: string, task: Task, client: redis.RedisClient): Promise<void> {
         const redisTask = new RedisTask(task)
         const taskIdentifier = task.identifier
-        return client.multi().hmset(taskRootKey(projectIdentifier, taskIdentifier), redisTask)
-                             .mset(taskKey(projectIdentifier, taskIdentifier, "estimatedStartDate"),
-                                   task.estimatedStartDate.getTime(),
-                                   taskKey(projectIdentifier, taskIdentifier, "estimatedDuration"),
-                                   task.estimatedDuration)
-                             .sadd(projectKey(projectIdentifier, "tasks"),
-                                   taskIdentifier)
-                             .execAsync().then((result: any) => {})
+        return client.hmsetAsync(taskRootKey(projectIdentifier, taskIdentifier), redisTask).then(() => {
+            return client.msetAsync(taskKey(projectIdentifier, taskIdentifier, "estimatedStartDate"),
+                                    task.estimatedStartDate.getTime(),
+                                    taskKey(projectIdentifier, taskIdentifier, "estimatedDuration"),
+                                    task.estimatedDuration)
+        }).then(() => {
+            return client.saddAsync(projectKey(projectIdentifier, "tasks"), taskIdentifier)
+        })
     }
     static load(projectIdentifier: string, taskIdentifier: string, client: redis.RedisClient): Promise<Task> {
         return client.hgetallAsync(taskRootKey(projectIdentifier, taskIdentifier)).then((result: any) => {
@@ -242,9 +247,9 @@ class RedisModifier {
     static save(projectIdentifier: string, modifierId: number, modifier: Modifier,
                 client: redis.RedisClient): Promise<number> {
         const redisModifier = new RedisModifier(modifier)
-        return client.multi().hmset(modifierRootKey(projectIdentifier, modifierId), redisModifier)
-                             .set(modifierKey(projectIdentifier, modifierId, "duration"), modifier.duration)
-                             .execAsync().then((result: any) => { return modifierId })
+        return client.hmsetAsync(modifierRootKey(projectIdentifier, modifierId), redisModifier).then(() => {
+            return client.setAsync(modifierKey(projectIdentifier, modifierId, "duration"), modifier.duration)
+        })
     }
     static load(projectIdentifier: string, modifierId: number, client: redis.RedisClient): Promise<Modifier> {
         return client.hgetallAsync(modifierRootKey(projectIdentifier, modifierId)).then((result: any) => {
@@ -293,9 +298,9 @@ class RedisDelay {
     static save(projectIdentifier: string, delay: Delay, client: redis.RedisClient): Promise<void> {
         const redisDelay = new RedisDelay(delay)
         const delayIdentifier = delay.identifier
-        return client.multi().hmset(delayRootKey(projectIdentifier, delayIdentifier), redisDelay)
-                             .sadd(projectKey(projectIdentifier, "delays"), delayIdentifier)
-                             .execAsync().then((result: any) => {})
+        return client.hmsetAsync(delayRootKey(projectIdentifier, delayIdentifier), redisDelay).then(() => {
+            return client.saddAsync(projectKey(projectIdentifier, "delays"), delayIdentifier)
+        })
     }
     static load(projectIdentifier: string, delayIdentifier: string, client: redis.RedisClient): Promise<Delay> {
         return client.hgetallAsync(delayRootKey(projectIdentifier, delayIdentifier)).then((result: any) => {
@@ -341,16 +346,22 @@ export class RedisDataProvider implements IDataProvider {
     getProject(projectIdentifier: string): Promise<Project> {
         return this.hasProject(projectIdentifier).then(() => {
             return RedisProject.load(projectIdentifier, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     addProject(project: Project): Promise<void> {
         return this.notHasProject(project.identifier).then(() => {
             return RedisProject.save(project, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     getTask(projectIdentifier: string, taskIdentifier: string): Promise<Task> {
         return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
             return RedisTask.load(projectIdentifier, taskIdentifier, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     getProjectTasks(projectIdentifier: string): Promise<Array<Task>> {
@@ -362,6 +373,8 @@ export class RedisDataProvider implements IDataProvider {
             return tasks.filter((value: Task | null) => {
                 return value != null
             })
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     addTask(projectIdentifier: string, task: Task): Promise<void> {
@@ -369,6 +382,8 @@ export class RedisDataProvider implements IDataProvider {
             return this.notHasTask(projectIdentifier, task.identifier)
         }).then(() => {
             return RedisTask.save(projectIdentifier, task, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     isTaskImportant(projectIdentifier: string, taskIdentifier: string): Promise<boolean> {
@@ -376,6 +391,8 @@ export class RedisDataProvider implements IDataProvider {
             return this.client.sismemberAsync(projectKey(projectIdentifier, "task:important"), taskIdentifier)
         }).then((result: number) => {
             return (result !== 0)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     setTaskImportant(projectIdentifier: string, taskIdentifier: string, important: boolean): Promise<void> {
@@ -385,6 +402,8 @@ export class RedisDataProvider implements IDataProvider {
             } else {
                 return this.client.sremAsync(projectKey(projectIdentifier, "task:important"), taskIdentifier)
             }
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     addTaskRelation(projectIdentifier: string, relation: TaskRelation): Promise<void> {
@@ -392,6 +411,8 @@ export class RedisDataProvider implements IDataProvider {
             return this.hasTask(projectIdentifier, relation.next)
         }).then(() => {
             return RedisTaskRelation.save(projectIdentifier, relation, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     getTaskRelations(projectIdentifier: string, taskIdentifier: string): Promise<Array<TaskRelation>> {
@@ -401,6 +422,8 @@ export class RedisDataProvider implements IDataProvider {
             return Promise.all(identifiers.sort().map((childIndentifier: string): Promise<TaskRelation> => {
                 return RedisTaskRelation.load(projectIdentifier, taskIdentifier, childIndentifier, this.client)
             }))
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     getTaskResults(projectIdentifier: string, taskIdentifier: string): Promise<TaskResults> {
@@ -419,6 +442,8 @@ export class RedisDataProvider implements IDataProvider {
                 duration: +results[1]
             }
             return taskResults
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     setTaskResults(projectIdentifier: string, taskIdentifier: string, taskResults: TaskResults): Promise<void> {
@@ -430,11 +455,15 @@ export class RedisDataProvider implements IDataProvider {
                 +taskResults.startDate.getTime()
             ]
             return this.client.msetAsync(set)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     getModifier(projectIdentifier: string, modifierId: number): Promise<Modifier> {
         return this.hasModifier(projectIdentifier, modifierId).then(() => {
             return RedisModifier.load(projectIdentifier, modifierId, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     getTaskModifiers(projectIdentifier: string, taskIdentifier: string): Promise<Array<Modifier>> {
@@ -443,25 +472,35 @@ export class RedisDataProvider implements IDataProvider {
         }).then((ids: Array<string>) => {
             const sorted = ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
             return this.getModifiers(projectIdentifier, sorted)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     addModifier(projectIdentifier: string, modifier: Modifier): Promise<number> {
         return this.getNextId("modifier").then((modifierId: number) => {
-            return RedisModifier.save(projectIdentifier, modifierId, modifier, this.client)
+            return RedisModifier.save(projectIdentifier, modifierId, modifier, this.client).then(() => {
+                return modifierId
+            })
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     setModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void> {
         return this.hasModifier(projectIdentifier, modifierId).then(() => {
             return this.hasTask(projectIdentifier, taskIdentifier)
         }).then(() => {
-            return this.client.multi().sadd(modifierKey(projectIdentifier, modifierId, "tasks"), taskIdentifier)
-                                      .sadd(taskKey(projectIdentifier, taskIdentifier, "modifiers"), modifierId)
-                                      .execAsync()
+            return this.client.saddAsync(modifierKey(projectIdentifier, modifierId, "tasks"), taskIdentifier)
+        }).then(() => {
+            return this.client.saddAsync(taskKey(projectIdentifier, taskIdentifier, "modifiers"), modifierId)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     getDelay(projectIdentifier: string, delayIdentifier: string): Promise<Delay> {
         return this.hasDelay(projectIdentifier, delayIdentifier).then(() => {
             return RedisDelay.load(projectIdentifier, delayIdentifier, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     getProjectDelays(projectIdentifier: string): Promise<Array<Delay>> {
@@ -473,6 +512,8 @@ export class RedisDataProvider implements IDataProvider {
             return delays.filter((value: Delay | null) => {
                 return value != null
             })
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     addDelay(projectIdentifier: string, delay: Delay): Promise<void> {
@@ -480,15 +521,19 @@ export class RedisDataProvider implements IDataProvider {
             return this.notHasDelay(projectIdentifier, delay.identifier)
         }).then(() => {
             return RedisDelay.save(projectIdentifier, delay, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     addDelayTaskRelation(projectIdentifier: string, delayIdentifier: string, taskIdentifier: string): Promise<void> {
         return this.hasDelay(projectIdentifier, delayIdentifier).then(() => {
             return this.hasTask(projectIdentifier, taskIdentifier)
         }).then(() => {
-            return this.client.multi().sadd(delayKey(projectIdentifier, delayIdentifier, "tasks"), taskIdentifier)
-                                      .sadd(taskKey(projectIdentifier, taskIdentifier, "delays"), delayIdentifier)
-                                      .execAsync()
+            return this.client.saddAsync(delayKey(projectIdentifier, delayIdentifier, "tasks"), taskIdentifier)
+        }).then(() => {
+            return this.client.saddAsync(taskKey(projectIdentifier, taskIdentifier, "delays"), delayIdentifier)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
         })
     }
     private static indexFromString(id: string): number {

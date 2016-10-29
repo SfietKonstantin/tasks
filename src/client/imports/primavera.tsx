@@ -38,7 +38,6 @@ export const render = () => {
             invalidFormat: false
         }, relations: {
             relations: new Array<PrimaveraTaskRelation>(),
-            warnings: new Array<string>(),
             isImporting: false,
             invalidFormat: false
         }

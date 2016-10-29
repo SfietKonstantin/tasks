@@ -1,6 +1,6 @@
 import { Action, Dispatch } from "redux"
 import { State, PrimaveraTask, PrimaveraTaskRelation } from "../types"
-import { ErrorAction, processError } from "../../../common/actions/error"
+import { ErrorAction, processError } from "../../../common/actions/errors"
 import { Project } from "../../../../common/types"
 import { ApiInputTask } from "../../../../common/apitypes"
 import { InputError } from "../../../../common/errors"

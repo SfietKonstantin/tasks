@@ -3,7 +3,7 @@ import * as redis from "redis"
 import * as bluebird from "bluebird"
 import { Project, Task } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
-import { CorruptedError } from "../../server/core/data/idataprovider"
+import { CorruptedError, InternalError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
 
 const redisAsync: any = bluebird.promisifyAll(redis)
@@ -80,6 +80,8 @@ describe("Redis", () => {
         it("Should remove project", (done) => {
             client.delAsync("project:project1").then((result) => {
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should get all valid projects", (done) => {
@@ -182,6 +184,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove project name", (done) => {
@@ -197,6 +201,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should remove project description", (done) => {
@@ -214,6 +220,8 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         it("Should revert project properties corruption", (done) => {
@@ -247,8 +255,10 @@ describe("Redis", () => {
             db.getProject("project3").then((project: Project) => {
                 done(new Error("getProject should not be a success"))
             }).catch((error) => {
-                chai.expect(error).to.not.null
+                chai.expect(error).to.instanceOf(InternalError)
                 done()
+            }).catch((error) => {
+                done(error)
             })
         })
         after(() => {
@@ -281,6 +291,31 @@ describe("Redis", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
                 done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should corrupt project properties", (done) => {
+            client.setAsync("project:ids", "test").then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when adding project", (done) => {
+            const project2: Project = {
+                identifier: "project2",
+                name: "Project 2",
+                description: "Description 2"
+            }
+
+            db.addProject(project2).then(() => {
+                done(new Error("addProject should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(InternalError)
+                done()
+            }).catch((error) => {
+                done(error)
             })
         })
         after(() => {

@@ -18,22 +18,34 @@ export class ApiRoutes {
     getProjects(req: express.Request, res: express.Response) {
         this.api.getProjects().then((projects: Array<Project>) => {
             res.json({projects: projects})
-        }).catch((error: RequestError) => {
-            res.status(error.status).json(error.json)
+        }).catch((error) => {
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
     getProject(req: express.Request, res: express.Response) {
         this.api.getProject(req.params.projectIdentifier).then((project: Project) => {
             res.json(project)
-        }).catch((error: RequestError) => {
-            res.status(error.status).json(error.json)
+        }).catch((error) => {
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
     getProjectTasks(req: express.Request, res: express.Response) {
         this.api.getProjectTasks(req.params.projectIdentifier).then((tasks: Array<ApiTask>) => {
             res.json(tasks)
-        }).catch((error: RequestError) => {
-            res.status(error.status).json(error.json)
+        }).catch((error) => {
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
     getTask(req: express.Request, res: express.Response) {
@@ -41,8 +53,12 @@ export class ApiRoutes {
         const taskIdentifier = req.params.taskIdentifier
         this.api.getTask(projectIdentifier, taskIdentifier).then((task: ApiProjectTaskModifiers) => {
             res.json(task)
-        }).catch((error: RequestError) => {
-            res.status(error.status).json(error.json)
+        }).catch((error) => {
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
     isTaskImportant(req: express.Request, res: express.Response) {
@@ -50,8 +66,12 @@ export class ApiRoutes {
         const taskIdentifier = req.params.taskIdentifier
         this.api.isTaskImportant(projectIdentifier, taskIdentifier).then((important: boolean) => {
             res.json({important})
-        }).catch((error: RequestError) => {
-            res.status(error.status).json(error.json)
+        }).catch((error) => {
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
     putTaskImportant(req: express.Request, res: express.Response) {
@@ -59,8 +79,12 @@ export class ApiRoutes {
         const taskIdentifier = req.params.taskIdentifier
         this.api.setTaskImportant(projectIdentifier, taskIdentifier, true).then((important: boolean) => {
             res.json({important})
-        }).catch((error: RequestError) => {
-            res.status(error.status).json(error.json)
+        }).catch((error) => {
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
     deleteTaskImportant(req: express.Request, res: express.Response) {
@@ -68,8 +92,12 @@ export class ApiRoutes {
         const taskIdentifier = req.params.taskIdentifier
         this.api.setTaskImportant(projectIdentifier, taskIdentifier, false).then((important: boolean) => {
             res.json({important})
-        }).catch((error: RequestError) => {
-            res.status(error.status).json(error.json)
+        }).catch((error) => {
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
     putModifier(req: express.Request, res: express.Response) {
@@ -78,8 +106,12 @@ export class ApiRoutes {
         const modifier = req.body.modifier
         this.api.addModifier(projectIdentifier, taskIdentifier, modifier).then((task: ApiProjectTaskModifiers) => {
             res.json(task)
-        }).catch((error: RequestError) => {
-            res.status(error.status).json(error.json)
+        }).catch((error) => {
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
     putImport(req: express.Request, res: express.Response) {
@@ -87,15 +119,23 @@ export class ApiRoutes {
         const tasks = req.body.tasks
         this.api.import(project, tasks).then(() => {
             res.sendStatus(301)
-        }).catch((error: RequestError) => {
-            res.status(error.status).json(error.json)
+        }).catch((error) => {
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
     getDemoData(req: express.Request, res: express.Response) {
         testdata.fillTestData(this.dataProvider, this.graph).then(() => {
             res.sendStatus(200)
         }).catch((error) => {
-            res.sendStatus(500)
+            if (error instanceof RequestError) {
+                res.status(error.status).json(error.json)
+            } else {
+                res.sendStatus(500)
+            }
         })
     }
 }

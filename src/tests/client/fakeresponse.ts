@@ -7,7 +7,7 @@ export class FakeResponse {
         this.body = body
         this.shouldThrow = shouldThrow
     }
-    json(): Promise<string> {
+    json(): Promise<any> {
         if (this.shouldThrow) {
             return Promise.reject(new Error("Some error"))
         } else {

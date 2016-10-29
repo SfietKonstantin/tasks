@@ -26,7 +26,6 @@ describe("Primavera reducers", () => {
         },
         relations: {
             relations: new Array<PrimaveraTaskRelation>(),
-            warnings: new Array<string>(),
             isImporting: false,
             invalidFormat: false
         }
@@ -43,24 +42,7 @@ describe("Primavera reducers", () => {
         })
         it("Should reduce PROJECT_REQUEST_ADD", () => {
             // Mock
-            const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {}))
-            global.fetch = fetch
-            const dispatch = sinon.spy()
-
-            addProject({
-                identifier: "identifier",
-                name: "Name",
-                description: "Description"
-            })(dispatch)
-
-            const action = dispatch.args[0][0]
-            const state = main.mainReducer(initialState, action)
-            chai.expect(state).to.deep.equal(initialState)
-        })
-        it("Should reduce PROJECT_REQUEST_ADD", () => {
-            // Mock
-            const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {}))
-            global.fetch = fetch
+            global.fetch = sinon.mock().once().returns(new Promise<Response>(() => {}))
             const dispatch = sinon.spy()
 
             addProject({
@@ -75,11 +57,7 @@ describe("Primavera reducers", () => {
         })
         it("Should reduce PROJECT_RECEIVE_ADD", (done) => {
             // Mock
-            let promiseResolve: ((response: any) => void) | null = null
-            const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
-                promiseResolve = resolve
-            }))
-            global.fetch = fetch
+            global.fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(true, {})))
             const dispatch = sinon.spy()
 
             addProject({
@@ -94,18 +72,10 @@ describe("Primavera reducers", () => {
             }).catch((error) => {
                 done(error)
             })
-
-            const response = new FakeResponse(true, {})
-            if (promiseResolve) { // Workaround typescript
-                promiseResolve(response)
-            }
         })
         it("Should reduce PROJECT_RECEIVE_ADD_FAILURE", (done) => {
             // Mock
-            let promiseResolve: ((response: any) => void) | null = null
-            const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
-                promiseResolve = resolve
-            }))
+            const fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(false, {error: "Error message"})))
             global.fetch = fetch
             const dispatch = sinon.spy()
 
@@ -122,11 +92,6 @@ describe("Primavera reducers", () => {
             }).catch((error) => {
                 done(error)
             })
-
-            const response = new FakeResponse(false, {error: "Error message"})
-            if (promiseResolve) { // Workaround typescript
-                promiseResolve(response)
-            }
         })
     })
 })

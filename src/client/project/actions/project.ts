@@ -1,7 +1,7 @@
 import { Action, Dispatch } from "redux"
 import "whatwg-fetch"
 import { State } from "../types"
-import { ErrorAction, processError } from "../../common/actions/error"
+import { ErrorAction, processError } from "../../common/actions/errors"
 import { Project } from "../../../common/types"
 import { createProject } from "../../../common/apitypes"
 

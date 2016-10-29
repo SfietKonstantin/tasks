@@ -1,11 +1,6 @@
-import { PrimaveraTask, PrimaveraDelay } from "./types"
+import { PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./types"
+import { InvalidFormatError } from "../../common/actions/files"
 import * as dateutils from "../../../common/dateutils"
-
-export class InvalidFormatError extends Error implements Error {
-    constructor(message: string) {
-        super(message)
-    }
-}
 
 export interface TaskParseResults {
     tasks: Map<string, PrimaveraTask>
@@ -78,4 +73,67 @@ export const parseTasks = (content: string): TaskParseResults => {
     })
 
     return { tasks, delays, warnings }
+}
+
+const parseType = (type: string): "FS" | "SF" | "FF" | "SS" | null => {
+    switch (type) {
+        case "FS":
+            return "FS"
+        case "SF":
+            return "SF"
+        case "FF":
+            return "FF"
+        case "SS":
+            return "SS"
+        default:
+            return null
+    }
+}
+
+export const parseRelations = (content: string): Array<PrimaveraTaskRelation> => {
+    const splitted = content.split("\n")
+    if (splitted.length < 2) {
+        throw new InvalidFormatError("Task file should have at least two lines")
+    }
+
+    splitted.shift()
+    splitted.shift()
+
+    let relations = new Array<PrimaveraTaskRelation>()
+    splitted.forEach((line: string) =>  {
+        const splittedLine = line.split("\t")
+        if (splittedLine.length < 10) {
+            return
+        }
+
+        const previous = splittedLine[0]
+        const next = splittedLine[1]
+        const type = parseType(splittedLine[2])
+        const lag = +splittedLine[9]
+
+        if (Number.isNaN(lag) || type == null) {
+            return
+        }
+
+        let relation: PrimaveraTaskRelation = {
+            previous,
+            next,
+            type,
+            lag
+        }
+
+        if (relation.type !== "SF") {
+            const previous = relation.next
+            const next = relation.previous
+            Object.assign(relation, {
+                previous,
+                next,
+                type: "FS"
+            })
+        }
+
+        relations.push(relation)
+    })
+
+    return relations
 }

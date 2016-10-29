@@ -1,5 +1,5 @@
 import { Action } from "redux"
-import { ErrorAction } from "../../../common/actions/error"
+import { ErrorAction } from "../../../common/actions/errors"
 import { Project } from "../../../../common/types"
 import { ProjectState } from "../types"
 import {

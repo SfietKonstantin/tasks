@@ -1,9 +1,23 @@
 import { Project, Task, TaskResults, TaskRelation, Modifier, Delay } from "../../../common/types"
+import { ExistsError, NotFoundError } from "../../../common/errors"
+
+export class InternalError extends Error implements Error {
+    constructor(message: string) {
+        super(message)
+    }
+}
 
 export class CorruptedError extends Error implements Error {
     constructor(message: string) {
         super(message)
     }
+}
+
+export const isKnownError = (error: Error): boolean => {
+    return error instanceof ExistsError
+           || error instanceof NotFoundError
+           || error instanceof CorruptedError
+           || error instanceof InternalError
 }
 
 export interface IDataProvider {

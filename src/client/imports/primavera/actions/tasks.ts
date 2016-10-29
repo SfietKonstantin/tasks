@@ -1,6 +1,8 @@
 import { Action, Dispatch } from "redux"
 import { State, PrimaveraTask, PrimaveraDelay } from "../types"
-import { parseTasks, InvalidFormatError } from "../import"
+import { TaskParseResults, parseTasks } from "../imports"
+import { processFile } from "../../../common/actions/files"
+import { ErrorAction } from "../../../common/actions/errors"
 
 export const TASKS_IMPORT_BEGIN = "TASKS_IMPORT_BEGIN"
 export const TASKS_IMPORT_END = "TASKS_IMPORT_END"
@@ -20,53 +22,24 @@ const beginTasksImport = (): Action => {
     }
 }
 
-const endTasksImport = (tasks: Map<string, PrimaveraTask>, delays: Map<string, PrimaveraDelay>,
-                        warnings: Array<string>): TasksAction => {
+const endTasksImport = (results: TaskParseResults): TasksAction => {
     return {
         type: TASKS_IMPORT_END,
-        tasks,
-        delays,
-        warnings
+        tasks: results.tasks,
+        delays: results.delays,
+        warnings: results.warnings
     }
 }
 
-const tasksImportInvalidFormat = (): Action => {
+const tasksImportInvalidFormat = (): ErrorAction => {
     return {
-        type: TASKS_IMPORT_INVALID_FORMAT
-    }
-}
-
-const doParseTasks = (reader: FileReader, dispatch: Dispatch<State>, resolve: () => void,
-                      reject: (reason: any) => void) => {
-    try {
-        const results = parseTasks(reader.result)
-        dispatch(endTasksImport(results.tasks, results.delays, results.warnings))
-        resolve()
-    }
-    catch (e) {
-        if (e instanceof InvalidFormatError) {
-            dispatch(tasksImportInvalidFormat())
-            resolve()
-        } else {
-            reject(e)
-        }
+        type: TASKS_IMPORT_INVALID_FORMAT,
+        message: "Invalid format for tasks CSV file"
     }
 }
 
 export const importTasks = (file: File) => {
-    return (dispatch: Dispatch<State>) => {
-        dispatch(beginTasksImport())
-        return new Promise<void>((resolve, reject) => {
-            if (file.type === "text/csv") {
-                const reader = new FileReader()
-                reader.onload = doParseTasks.bind(reader, reader, dispatch, resolve, reject)
-                reader.readAsText(file)
-            } else {
-                dispatch(tasksImportInvalidFormat())
-                resolve()
-            }
-        })
-    }
+    return processFile(file, "text/csv", parseTasks, beginTasksImport, endTasksImport, tasksImportInvalidFormat)
 }
 
 export const dismissInvalidTasksFormat = (): Action => {

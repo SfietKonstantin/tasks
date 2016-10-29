@@ -32,7 +32,7 @@ describe("Project reducers", () => {
     describe("Project reducers", () => {
         it("Should reduce PROJECT_REQUEST", () => {
             // Mock
-            const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {}))
+            const fetch = sinon.mock().once().returns(new Promise<Response>(() => {}))
             global.fetch = fetch
             const dispatch = sinon.spy()
 
@@ -45,18 +45,13 @@ describe("Project reducers", () => {
         })
         it("Should reduce PROJECT_RECEIVE", (done) => {
             // Mock
-            let promiseResolve: ((response: any) => void) | null = null
-            const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
-                promiseResolve = resolve
-            }))
-            global.fetch = fetch
-            const dispatch = sinon.spy()
-
             const project: Project = {
                 identifier: "identifier",
                 name: "Name",
                 description: "Description"
             }
+            global.fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(true, project)))
+            const dispatch = sinon.spy()
 
             fetchProject("identifier")(dispatch).then(() => {
                 const action = dispatch.args[1][0]
@@ -67,19 +62,10 @@ describe("Project reducers", () => {
             }).catch((error) => {
                 done(error)
             })
-
-            const response = new FakeResponse(true, project)
-            if (promiseResolve) { // Workaround typescript
-                promiseResolve(response)
-            }
         })
         it("Should reduce PROJECT_RECEIVE_ADD_FAILURE", (done) => {
             // Mock
-            let promiseResolve: ((response: any) => void) | null = null
-            const fetch = sinon.mock().once().returns(new Promise<Response>((resolve, reject) => {
-                promiseResolve = resolve
-            }))
-            global.fetch = fetch
+            global.fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(false, {error: "Error message"})))
             const dispatch = sinon.spy()
 
             fetchProject("identifier")(dispatch).then(() => {
@@ -91,11 +77,6 @@ describe("Project reducers", () => {
             }).catch((error) => {
                 done(error)
             })
-
-            const response = new FakeResponse(false, {error: "Error message"})
-            if (promiseResolve) { // Workaround typescript
-                promiseResolve(response)
-            }
         })
     })
 })
