@@ -102,7 +102,7 @@ describe("API", () => {
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier)
                         .returns(Promise.reject(new InternalError("Some error")))
 
-            api.addModifier("project", "task", modifier).then((task: ApiProjectTaskModifiers) => {
+            api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -139,7 +139,7 @@ describe("API", () => {
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier)
                         .returns(Promise.reject(new NotFoundError("Some error")))
 
-            api.addModifier("project", "task", modifier).then((task: ApiProjectTaskModifiers) => {
+            api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -176,7 +176,7 @@ describe("API", () => {
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier)
                         .returns(Promise.reject(new GraphError("Some error")))
 
-            api.addModifier("project", "task", modifier).then((task: ApiProjectTaskModifiers) => {
+            api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -212,9 +212,10 @@ describe("API", () => {
             let taskNodeMock = sinon.mock(taskNode)
             projectNode.nodes.set("task", taskNode)
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
-            mock.expects("getTask").once().withExactArgs("project", "task").returns(Promise.reject(new CorruptedError("Some error")))
+            mock.expects("getTask").once().withExactArgs("project", "task")
+                .returns(Promise.reject(new CorruptedError("Some error")))
 
-            api.addModifier("project", "task", modifier).then((task: ApiProjectTaskModifiers) => {
+            api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -250,9 +251,10 @@ describe("API", () => {
             let taskNodeMock = sinon.mock(taskNode)
             projectNode.nodes.set("task", taskNode)
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
-            mock.expects("getTask").once().withExactArgs("project", "task").returns(Promise.reject(new InternalError("Some error")))
+            mock.expects("getTask").once().withExactArgs("project", "task")
+                .returns(Promise.reject(new InternalError("Some error")))
 
-            api.addModifier("project", "task", modifier).then((task: ApiProjectTaskModifiers) => {
+            api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -273,7 +275,8 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            mock.expects("getProject").once().withExactArgs("project").returns(Promise.reject(new CorruptedError("Some error")))
+            mock.expects("getProject").once().withExactArgs("project")
+                .returns(Promise.reject(new CorruptedError("Some error")))
             const task: Task = {
                 identifier: "task",
                 name: "Task",
@@ -291,7 +294,7 @@ describe("API", () => {
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
             mock.expects("getTask").once().withExactArgs("project", "task").returns(Promise.resolve(task))
 
-            api.addModifier("project", "task", modifier).then((task: ApiProjectTaskModifiers) => {
+            api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -312,7 +315,8 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            mock.expects("getProject").once().withExactArgs("project").returns(Promise.reject(new InternalError("Some error")))
+            mock.expects("getProject").once().withExactArgs("project")
+                .returns(Promise.reject(new InternalError("Some error")))
             const task: Task = {
                 identifier: "task",
                 name: "Task",
@@ -330,7 +334,7 @@ describe("API", () => {
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
             mock.expects("getTask").once().withExactArgs("project", "task").returns(Promise.resolve(task))
 
-            api.addModifier("project", "task", modifier).then((task: ApiProjectTaskModifiers) => {
+            api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -351,7 +355,7 @@ describe("API", () => {
                 location: TaskLocation.End
             }
 
-            api.addModifier({value: "test"}, "task", modifier).then((task: ApiProjectTaskModifiers) => {
+            api.addModifier({value: "test"}, "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -372,7 +376,7 @@ describe("API", () => {
                 location: TaskLocation.End
             }
 
-            api.addModifier("project", {value: "test"}, modifier).then((task: ApiProjectTaskModifiers) => {
+            api.addModifier("project", {value: "test"}, modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)

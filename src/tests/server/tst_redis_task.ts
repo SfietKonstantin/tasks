@@ -171,7 +171,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid project", (done) => {
-            db.getTask("project2", "task1").then((task: Task) => {
+            db.getTask("project2", "task1").then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -181,7 +181,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.getTask("project", "task3").then((task: Task) => {
+            db.getTask("project", "task3").then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -198,7 +198,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getTask("project", "task1").then((task: Task) => {
+            db.getTask("project", "task1").then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -217,7 +217,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getTask("project", "task1").then((task: Task) => {
+            db.getTask("project", "task1").then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -236,7 +236,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getTask("project", "task1").then((task: Task) => {
+            db.getTask("project", "task1").then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -256,7 +256,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getTask("project", "task1").then((task: Task) => {
+            db.getTask("project", "task1").then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -295,7 +295,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getTask("project", "task3").then((task: Task) => {
+            db.getTask("project", "task3").then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)

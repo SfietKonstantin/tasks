@@ -94,7 +94,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid project", (done) => {
-            db.getModifier("project2", 1).then((modifier: Modifier) => {
+            db.getModifier("project2", 1).then(() => {
                 done(new Error("getModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -104,7 +104,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid modifier", (done) => {
-            db.getModifier("project", 4).then((modifier: Modifier) => {
+            db.getModifier("project", 4).then(() => {
                 done(new Error("getModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -121,7 +121,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted modifier", (done) => {
-            db.getModifier("project", 1).then((modifier: Modifier) => {
+            db.getModifier("project", 1).then(() => {
                 done(new Error("getModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -140,7 +140,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted modifier", (done) => {
-            db.getModifier("project", 1).then((modifier: Modifier) => {
+            db.getModifier("project", 1).then(() => {
                 done(new Error("getModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -159,7 +159,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted modifier", (done) => {
-            db.getModifier("project", 1).then((modifier: Modifier) => {
+            db.getModifier("project", 1).then(() => {
                 done(new Error("getModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -176,7 +176,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted modifier", (done) => {
-            db.getModifier("project", 1).then((modifier: Modifier) => {
+            db.getModifier("project", 1).then(() => {
                 done(new Error("getModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -195,7 +195,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted modifier", (done) => {
-            db.getModifier("project", 1).then((modifier: Modifier) => {
+            db.getModifier("project", 1).then(() => {
                 done(new Error("getModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -233,7 +233,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted modifier", (done) => {
-            db.getModifier("project", 3).then((modifier: Modifier) => {
+            db.getModifier("project", 3).then(() => {
                 done(new Error("getModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)

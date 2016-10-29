@@ -50,7 +50,8 @@ describe("Project reducers", () => {
                 name: "Name",
                 description: "Description"
             }
-            global.fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(true, project)))
+            const response = new FakeResponse(true, project)
+            global.fetch = sinon.mock().once().returns(Promise.resolve(response))
             const dispatch = sinon.spy()
 
             fetchProject("identifier")(dispatch).then(() => {
@@ -65,7 +66,8 @@ describe("Project reducers", () => {
         })
         it("Should reduce PROJECT_RECEIVE_ADD_FAILURE", (done) => {
             // Mock
-            global.fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(false, {error: "Error message"})))
+            const response = new FakeResponse(false, {error: "Error message"})
+            global.fetch = sinon.mock().once().returns(Promise.resolve(response))
             const dispatch = sinon.spy()
 
             fetchProject("identifier")(dispatch).then(() => {

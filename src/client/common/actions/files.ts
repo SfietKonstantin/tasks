@@ -11,8 +11,7 @@ const fileReader = <Result>(reader: FileReader, parser: (content: string) => Res
                             resolve: (result: Result) => void, reject: (reason: any) => void) => {
     try {
         resolve(parser(reader.result))
-    }
-    catch (e) {
+    } catch (e) {
         reject(e)
     }
 }
@@ -38,7 +37,7 @@ export const processFile = <State, Result>(file: File, type: string,
             }
             return doProcessFile(file, parser)
         }).then((result: Result) => {
-            endAction(result)
+            dispatch(endAction(result))
         }).catch((error) => {
             if (error instanceof InvalidFormatError) {
                 dispatch(errorAction(error))

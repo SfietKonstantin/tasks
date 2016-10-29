@@ -111,7 +111,8 @@ describe("API", () => {
                 }
             ]
             let projectNode = new FakeProjectNode(graph, "project")
-            mock.expects("addProject").once().withExactArgs(project).returns(Promise.reject(new ExistsError("Some error")))
+            mock.expects("addProject").once().withExactArgs(project)
+                .returns(Promise.reject(new ExistsError("Some error")))
 
             api.import(project, tasks).then(() => {
                 done(new Error("import should not be a success"))
@@ -165,7 +166,8 @@ describe("API", () => {
                 }
             ]
             let projectNode = new FakeProjectNode(graph, "project")
-            mock.expects("addProject").once().withExactArgs(project).returns(Promise.reject(new InternalError("Some error")))
+            mock.expects("addProject").once().withExactArgs(project)
+                .returns(Promise.reject(new InternalError("Some error")))
 
             api.import(project, tasks).then(() => {
                 done(new Error("import should not be a success"))

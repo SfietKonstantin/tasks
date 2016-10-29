@@ -8,6 +8,11 @@ export interface TaskParseResults {
     warnings: Array<string>
 }
 
+export interface RelationParseResults {
+    relations: Array<PrimaveraTaskRelation>
+    warnings: Array<string>
+}
+
 const convertDate = (date: string): Date | null => {
     const convertedDate = date.replace(/(\d+)\/(\d+)\/(\d+) (\d+):(\d+):(\d+)/, "$2/$1/$3")
     const returned = new Date(convertedDate)
@@ -45,6 +50,10 @@ export const parseTasks = (content: string): TaskParseResults => {
             return
         }
 
+        if (Number.isNaN(duration) || (startDate == null && endDate == null)) {
+            return
+        }
+
         if (duration > 0 && startDate != null && endDate != null) {
             const computedDuration = dateutils.getDateDiff(startDate, endDate)
             if (duration !== computedDuration) {
@@ -59,7 +68,7 @@ export const parseTasks = (content: string): TaskParseResults => {
         }
 
         if (tasks.has(identifier)) {
-            warnings.push("Task identifier \"" + identifier + "\" is duplicated")
+            warnings.push("Task \"" + identifier + "\" is duplicated")
             return
         }
 
@@ -90,20 +99,25 @@ const parseType = (type: string): "FS" | "SF" | "FF" | "SS" | null => {
     }
 }
 
-export const parseRelations = (content: string): Array<PrimaveraTaskRelation> => {
+export const parseRelations = (content: string): RelationParseResults => {
     const splitted = content.split("\n")
     if (splitted.length < 2) {
-        throw new InvalidFormatError("Task file should have at least two lines")
+        throw new InvalidFormatError("Relations file should have at least two lines")
     }
 
     splitted.shift()
     splitted.shift()
 
     let relations = new Array<PrimaveraTaskRelation>()
+    let warnings = new Array<string>()
     splitted.forEach((line: string) =>  {
+        if (line.length === 0) {
+            return
+        }
         const splittedLine = line.split("\t")
         if (splittedLine.length < 10) {
-            return
+            throw new InvalidFormatError("Relations file should have at least 10 columns. Line content: \""
+                                         + line + "\"")
         }
 
         const previous = splittedLine[0]
@@ -122,18 +136,26 @@ export const parseRelations = (content: string): Array<PrimaveraTaskRelation> =>
             lag
         }
 
-        if (relation.type !== "SF") {
-            const previous = relation.next
-            const next = relation.previous
-            Object.assign(relation, {
-                previous,
-                next,
-                type: "FS"
-            })
+        if (relation.type === "SF") {
+            if (relation.lag === 0) {
+                warnings.push("Relation between task \"" + relation.previous + "\" and task \""
+                            + relation.next + "\" is of type SF and has been flipped")
+                const previous = relation.next
+                const next = relation.previous
+                Object.assign(relation, {
+                    previous,
+                    next,
+                    type: "FS"
+                })
+            } else {
+                warnings.push("Relation between task \"" + relation.previous + "\" and task \""
+                            + relation.next + "\" is of type SF with a lag. This is not supported.")
+                return
+            }
         }
 
         relations.push(relation)
     })
 
-    return relations
+    return { relations, warnings }
 }

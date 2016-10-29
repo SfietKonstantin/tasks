@@ -69,7 +69,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.getTaskResults("project", "task2").then((result: TaskResults) => {
+            db.getTaskResults("project", "task2").then(() => {
                 done(new Error("getTaskResults should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -86,7 +86,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task results", (done) => {
-            db.getTaskResults("project", "task").then((result: TaskResults) => {
+            db.getTaskResults("project", "task").then(() => {
                 done(new Error("getTaskResults should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -105,7 +105,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task results", (done) => {
-            db.getTaskResults("project", "task").then((result: TaskResults) => {
+            db.getTaskResults("project", "task").then(() => {
                 done(new Error("getTaskResults should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)

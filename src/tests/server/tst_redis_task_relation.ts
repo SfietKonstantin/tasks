@@ -233,7 +233,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid project", (done) => {
-            db.getTaskRelations("project2", "task1").then((taskRelations: Array<TaskRelation>) => {
+            db.getTaskRelations("project2", "task1").then(() => {
                 done(new Error("getTaskRelations should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -243,7 +243,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid task", (done) => {
-            db.getTaskRelations("project", "task4").then((taskRelations: Array<TaskRelation>) => {
+            db.getTaskRelations("project", "task4").then(() => {
                 done(new Error("getTaskRelations should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -260,7 +260,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task relations", (done) => {
-            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+            db.getTaskRelations("project", "task1").then(() => {
                 done(new Error("getTaskRelations should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -279,7 +279,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task relations", (done) => {
-            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+            db.getTaskRelations("project", "task1").then(() => {
                 done(new Error("getTaskRelations should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -298,7 +298,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task relations", (done) => {
-            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+            db.getTaskRelations("project", "task1").then(() => {
                 done(new Error("getTaskRelations should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -317,7 +317,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task relations", (done) => {
-            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+            db.getTaskRelations("project", "task1").then(() => {
                 done(new Error("getTaskRelations should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -336,7 +336,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task relations", (done) => {
-            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+            db.getTaskRelations("project", "task1").then(() => {
                 done(new Error("getTaskRelations should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -384,7 +384,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted task", (done) => {
-            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+            db.getTaskRelations("project", "task1").then(() => {
                 done(new Error("getTaskRelations should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)

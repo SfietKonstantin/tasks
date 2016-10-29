@@ -203,7 +203,8 @@ describe("Graph", () => {
                 duration: 10
             }
             mock.expects("addTask").once().withExactArgs("project", task).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
+                .returns(Promise.resolve())
 
             node.addTask(task).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
@@ -237,7 +238,8 @@ describe("Graph", () => {
                 duration: 10
             }
             mock.expects("addTask").once().withExactArgs("project", task).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
+                .returns(Promise.resolve())
 
             node.addTask(task).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
@@ -301,7 +303,8 @@ describe("Graph", () => {
                 duration: 10
             }
             mock.expects("addTaskRelation").once().withExactArgs("project", relation).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
+                .returns(Promise.resolve())
 
             node.addRelation(relation).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")

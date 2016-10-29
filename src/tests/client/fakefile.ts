@@ -1,11 +1,11 @@
 export class FakeFile implements File {
-    readonly lastModifiedDate: any;
-    readonly name: string;
-    readonly webkitRelativePath: string;
-    readonly size: number;
-    readonly type: string;
-    fileReader: FakeFileReader
-    constructor(type: string, fileReader: FakeFileReader) {
+    readonly lastModifiedDate: any
+    readonly name: string
+    readonly webkitRelativePath: string
+    readonly size: number
+    readonly type: string
+    private fileReader: FakeFileReader  | null
+    constructor(type: string, fileReader: FakeFileReader | null = null) {
         this.type = type
         this.fileReader = fileReader
     }
@@ -19,7 +19,11 @@ export class FakeFile implements File {
         throw new Error("Not mocked")
     }
     onload() {
-        this.fileReader.onload(null)
+        if (this.fileReader) {
+            this.fileReader.onload(null)
+        } else {
+            throw new Error("Not mocked")
+        }
     }
 }
 

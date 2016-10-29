@@ -86,7 +86,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when checking task status on invalid project", (done) => {
-            db.isTaskImportant("project2", "task").then((important: boolean) => {
+            db.isTaskImportant("project2", "task").then(() => {
                 done(new Error("isTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -96,7 +96,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when checking task status on invalid task", (done) => {
-            db.isTaskImportant("project", "task2").then((important: boolean) => {
+            db.isTaskImportant("project", "task2").then(() => {
                 done(new Error("isTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -113,7 +113,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted project", (done) => {
-            db.isTaskImportant("project", "task").then((important: boolean) => {
+            db.isTaskImportant("project", "task").then(() => {
                 done(new Error("isTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)

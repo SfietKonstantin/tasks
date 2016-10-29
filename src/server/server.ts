@@ -6,19 +6,11 @@ import * as http from "http"
 import * as redis from "redis"
 import * as winston from "winston"
 import { Graph } from "./core/graph/graph"
-import { Api } from "./core/api"
+import { Api, RequestError } from "./core/api"
 import { ApiRoutes } from "./routes/api"
 import { Routes } from "./routes/routes"
 import { IDataProvider } from "./core/data/idataprovider"
 import { RedisDataProvider } from "./core/data/redisdataprovider"
-
-class HttpError extends Error {
-    constructor(status: number, message: string) {
-        super(message)
-        this.status = status
-    }
-    status: number
-}
 
 export class Server {
     private app: express.Application
@@ -93,7 +85,7 @@ export class Server {
     }
 
     private errorHandler(req: express.Request, res: express.Response, next: express.NextFunction) {
-        const error: HttpError = new HttpError(404, "Not found")
+        const error = new RequestError(404, "Not found")
         next(error)
     }
 
@@ -104,7 +96,7 @@ export class Server {
         this.app.use(this.defaultErrorHandler)
     }
 
-    private devErrorHandler(error: HttpError, req: express.Request, res: express.Response,
+    private devErrorHandler(error: RequestError, req: express.Request, res: express.Response,
                             next: express.NextFunction) {
         res.status(error.status || 500)
         res.render("error", {
@@ -113,7 +105,7 @@ export class Server {
         })
     }
 
-    private defaultErrorHandler(error: HttpError, req: express.Request, res: express.Response,
+    private defaultErrorHandler(error: RequestError, req: express.Request, res: express.Response,
                                 next: express.NextFunction) {
         res.status(error.status || 500)
         res.render("error", {

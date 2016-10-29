@@ -72,7 +72,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid delay", (done) => {
-            db.getDelay("project", "delay3").then((delay: Delay) => {
+            db.getDelay("project", "delay3").then(() => {
                 done(new Error("getDelay should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -89,7 +89,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted delay", (done) => {
-            db.getDelay("project", "delay1").then((delay: Delay) => {
+            db.getDelay("project", "delay1").then(() => {
                 done(new Error("getDelay should not be a success"))
                 done()
             }).catch((error) => {
@@ -109,7 +109,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted delay", (done) => {
-            db.getDelay("project", "delay1").then((delay: Delay) => {
+            db.getDelay("project", "delay1").then(() => {
                 done(new Error("getDelay should not be a success"))
                 done()
             }).catch((error) => {
@@ -129,7 +129,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted delay", (done) => {
-            db.getDelay("project", "delay1").then((delay: Delay) => {
+            db.getDelay("project", "delay1").then(() => {
                 done(new Error("getDelay should not be a success"))
                 done()
             }).catch((error) => {
@@ -168,7 +168,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted delay", (done) => {
-            db.getDelay("project", "delay3").then((delay: Delay) => {
+            db.getDelay("project", "delay3").then(() => {
                 done(new Error("getDelay should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)

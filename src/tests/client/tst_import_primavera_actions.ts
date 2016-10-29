@@ -8,7 +8,8 @@ import {
     TasksAction, TASKS_DISMISS_INVALID_FORMAT, importTasks, dismissInvalidTasksFormat
 } from "../../client/imports/primavera/actions/tasks"
 import {
-    RelationsAction, RELATIONS_IMPORT_BEGIN, RELATIONS_IMPORT_END, RELATIONS_IMPORT_INVALID_FORMAT, RELATIONS_DISMISS_INVALID_FORMAT,
+    RelationsAction, RELATIONS_IMPORT_BEGIN, RELATIONS_IMPORT_END,
+    RELATIONS_IMPORT_INVALID_FORMAT, RELATIONS_DISMISS_INVALID_FORMAT,
     importRelations, dismissInvalidRelationsFormat
 } from "../../client/imports/primavera/actions/relations"
 import { Project } from "../../common/types"
@@ -36,7 +37,8 @@ describe("Primavera actions", () => {
                     description: "Description"
                 }
                 const dispatch = sinon.spy()
-                global.fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(true, {})))
+                const response = new FakeResponse(true, {})
+                global.fetch = sinon.mock().once().returns(Promise.resolve(response))
 
                 // Test
                 addProject(project)(dispatch).then(() => {
@@ -65,7 +67,8 @@ describe("Primavera actions", () => {
             it("Should react to PUT error from server", (done) => {
                 // Mock
                 const dispatch = sinon.spy()
-                global.fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(false, {error: "Error message"})))
+                const response = new FakeResponse(false, {error: "Error message"})
+                global.fetch = sinon.mock().once().returns(Promise.resolve(response))
 
                 // Test
                 addProject({
@@ -89,7 +92,8 @@ describe("Primavera actions", () => {
             it("Should react to PUT error from server without cause", (done) => {
                 // Mock
                 const dispatch = sinon.spy()
-                global.fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(false, {})))
+                const response = new FakeResponse(false, {})
+                global.fetch = sinon.mock().once().returns(Promise.resolve(response))
 
                 // Test
                 addProject({
@@ -113,7 +117,8 @@ describe("Primavera actions", () => {
             it("Should react to PUT result JSON parsing error", (done) => {
                 // Mock
                 const dispatch = sinon.spy()
-                global.fetch = sinon.mock().once().returns(Promise.resolve(new FakeResponse(false, {}, true)))
+                const response = new FakeResponse(false, {}, true)
+                global.fetch = sinon.mock().once().returns(Promise.resolve(response))
 
                 // Test
                 addProject({

@@ -48,7 +48,7 @@ describe("API", () => {
             mock.expects("isTaskImportant").once().withExactArgs("project", "task")
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            api.isTaskImportant("project", "task").then((important: boolean) => {
+            api.isTaskImportant("project", "task").then(() => {
                 done(new Error("isTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -66,7 +66,7 @@ describe("API", () => {
             mock.expects("isTaskImportant").once().withExactArgs("project", "task")
                 .returns(Promise.reject(new NotFoundError("Some error")))
 
-            api.isTaskImportant("project", "task").then((important: boolean) => {
+            api.isTaskImportant("project", "task").then(() => {
                 done(new Error("isTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -81,7 +81,7 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
 
-            api.isTaskImportant({ test: "test" }, "task").then((important: boolean) => {
+            api.isTaskImportant({ test: "test" }, "task").then(() => {
                 done(new Error("isTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -96,7 +96,7 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
 
-            api.isTaskImportant("project", { test: "test" }).then((important: boolean) => {
+            api.isTaskImportant("project", { test: "test" }).then(() => {
                 done(new Error("isTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -113,7 +113,8 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
             let mock = sinon.mock(dataProvider)
-            mock.expects("setTaskImportant").once().withExactArgs("project", "task", true).returns(Promise.resolve(true))
+            mock.expects("setTaskImportant").once().withExactArgs("project", "task", true)
+                .returns(Promise.resolve(true))
 
             api.setTaskImportant("project", "task", true).then((important: boolean) => {
                 chai.expect(important).to.be.true
@@ -127,7 +128,8 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
             let mock = sinon.mock(dataProvider)
-            mock.expects("setTaskImportant").once().withExactArgs("project", "task", false).returns(Promise.resolve(false))
+            mock.expects("setTaskImportant").once().withExactArgs("project", "task", false)
+                .returns(Promise.resolve(false))
 
             api.setTaskImportant("project", "task", false).then((important: boolean) => {
                 chai.expect(important).to.be.false
@@ -144,7 +146,7 @@ describe("API", () => {
             mock.expects("setTaskImportant").once().withExactArgs("project", "task", true)
                 .returns(Promise.reject(new CorruptedError("Some error")))
 
-            api.setTaskImportant("project", "task", true).then((important: boolean) => {
+            api.setTaskImportant("project", "task", true).then(() => {
                 done(new Error("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -162,7 +164,7 @@ describe("API", () => {
             mock.expects("setTaskImportant").once().withExactArgs("project", "task", true)
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            api.setTaskImportant("project", "task", true).then((important: boolean) => {
+            api.setTaskImportant("project", "task", true).then(() => {
                 done(new Error("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -180,7 +182,7 @@ describe("API", () => {
             mock.expects("setTaskImportant").once().withExactArgs("project", "task", true)
                 .returns(Promise.reject(new NotFoundError("Some error")))
 
-            api.setTaskImportant("project", "task", true).then((important: boolean) => {
+            api.setTaskImportant("project", "task", true).then(() => {
                 done(new Error("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -195,7 +197,7 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
 
-            api.setTaskImportant({ test: "test" }, "task", true).then((important: boolean) => {
+            api.setTaskImportant({ test: "test" }, "task", true).then(() => {
                 done(new CorruptedError("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -213,7 +215,7 @@ describe("API", () => {
             mock.expects("setTaskImportant").once().withExactArgs("project", "task", false)
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            api.setTaskImportant("project", "task", false).then((important: boolean) => {
+            api.setTaskImportant("project", "task", false).then(() => {
                 done(new Error("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -228,7 +230,7 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
 
-            api.setTaskImportant("project", { test: "test" }, true).then((important: boolean) => {
+            api.setTaskImportant("project", { test: "test" }, true).then(() => {
                 done(new Error("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)

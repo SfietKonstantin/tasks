@@ -179,7 +179,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on invalid project", (done) => {
-            db.getProject("project3").then((project: Project) => {
+            db.getProject("project3").then(() => {
                 done(new Error("getProject should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -196,7 +196,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted project", (done) => {
-            db.getProject("project1").then((project: Project) => {
+            db.getProject("project1").then(() => {
                 done(new Error("getProject should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -215,7 +215,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted project", (done) => {
-            db.getProject("project1").then((project: Project) => {
+            db.getProject("project1").then(() => {
                 done(new Error("getProject should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -252,7 +252,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception on corrupted project", (done) => {
-            db.getProject("project3").then((project: Project) => {
+            db.getProject("project3").then(() => {
                 done(new Error("getProject should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)

@@ -8,6 +8,7 @@ import { Api, RequestError } from "../../server/core/api"
 import { ProjectNode, TaskNode } from "../../server/core/graph/graph"
 import { FakeDataProvider } from "./fakedataprovider"
 import { FakeGraph } from "./fakegraph"
+import { FakeError } from "./fakeerror"
 import * as maputils from "../../common/maputils"
 
 describe("API", () => {
@@ -45,7 +46,7 @@ describe("API", () => {
             let mock = sinon.mock(dataProvider)
             mock.expects("getAllProjects").once().returns(Promise.reject(new CorruptedError("Some error")))
 
-            api.getProjects().then((projects: Array<Project>) => {
+            api.getProjects().then(() => {
                 done(new Error("getProjects should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -62,7 +63,7 @@ describe("API", () => {
             let mock = sinon.mock(dataProvider)
             mock.expects("getAllProjects").once().returns(Promise.reject(new InternalError("Some error")))
 
-            api.getProjects().then((projects: Array<Project>) => {
+            api.getProjects().then(() => {
                 done(new Error("getProjects should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -79,11 +80,27 @@ describe("API", () => {
             let mock = sinon.mock(dataProvider)
             mock.expects("getAllProjects").once().returns(Promise.reject(new InternalError("Some error")))
 
-            api.getProjects().then((projects: Array<Project>) => {
+            api.getProjects().then(() => {
                 done(new Error("getProjects should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should throw an error when getting projects 4", (done) => {
+            let dataProvider = new FakeDataProvider()
+            let graph = new FakeGraph()
+            let api = new Api(dataProvider, graph)
+            let mock = sinon.mock(dataProvider)
+            mock.expects("getAllProjects").once().returns(Promise.reject(new FakeError("Some error")))
+
+            api.getProjects().then(() => {
+                done(new Error("getProjects should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(FakeError)
                 done()
             }).catch((error) => {
                 done(error)
@@ -115,9 +132,10 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
             let mock = sinon.mock(dataProvider)
-            mock.expects("getProject").once().withExactArgs("project").returns(Promise.reject(new CorruptedError("Some error")))
+            mock.expects("getProject").once().withExactArgs("project")
+                .returns(Promise.reject(new CorruptedError("Some error")))
 
-            api.getProject("project").then((project: Project) => {
+            api.getProject("project").then(() => {
                 done(new Error("getProject should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -132,9 +150,10 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
             let mock = sinon.mock(dataProvider)
-            mock.expects("getProject").once().withExactArgs("project").returns(Promise.reject(new InternalError("Some error")))
+            mock.expects("getProject").once().withExactArgs("project")
+                .returns(Promise.reject(new InternalError("Some error")))
 
-            api.getProject("project").then((project: Project) => {
+            api.getProject("project").then(() => {
                 done(new Error("getProject should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -152,7 +171,7 @@ describe("API", () => {
             mock.expects("getProject").once().withExactArgs("project")
                 .returns(Promise.reject(new NotFoundError("Some error")))
 
-            api.getProject("project").then((project: Project) => {
+            api.getProject("project").then(() => {
                 done(new Error("getProject should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -167,11 +186,27 @@ describe("API", () => {
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
 
-            api.getProject({value: "test"}).then((project: Project) => {
+            api.getProject({value: "test"}).then(() => {
                 done(new Error("getProject should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should throw an error when getting project 5", (done) => {
+            let dataProvider = new FakeDataProvider()
+            let graph = new FakeGraph()
+            let api = new Api(dataProvider, graph)
+            let mock = sinon.mock(dataProvider)
+            mock.expects("getProject").once().returns(Promise.reject(new FakeError("Some error")))
+
+            api.getProject("project").then(() => {
+                done(new Error("getProject should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(FakeError)
                 done()
             }).catch((error) => {
                 done(error)
