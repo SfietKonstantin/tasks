@@ -54,28 +54,24 @@ const fillTaskRelations = (projectNode: IProjectNode): Promise<void> => {
             previous: "root",
             previousLocation: TaskLocation.End,
             next: "long",
-            nextLocation: TaskLocation.Beginning,
             lag: 0
         },
         {
             previous: "root",
             previousLocation: TaskLocation.End,
             next: "short",
-            nextLocation: TaskLocation.Beginning,
             lag: 0
         },
         {
             previous: "long",
             previousLocation: TaskLocation.End,
             next: "reducing",
-            nextLocation: TaskLocation.Beginning,
             lag: 0
         },
         {
             previous: "short",
             previousLocation: TaskLocation.End,
             next: "reducing",
-            nextLocation: TaskLocation.Beginning,
             lag: 0
         }
     ]

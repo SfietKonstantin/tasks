@@ -179,12 +179,10 @@ class RedisTask {
 
 class RedisTaskRelation {
     previousLocation: string
-    nextLocation: string
     lag: number
 
     constructor(taskRelation: TaskRelation) {
         this.previousLocation = fromTaskLocation(taskRelation.previousLocation)
-        this.nextLocation = fromTaskLocation(taskRelation.nextLocation)
         this.lag = taskRelation.lag
     }
 
@@ -204,9 +202,6 @@ class RedisTaskRelation {
                 throw new CorruptedError("TaskRelation " + previous + "-" + next
                                                          + " do not have property previousLocation")
             }
-            if (!result.hasOwnProperty("nextLocation")) {
-                throw new CorruptedError("TaskRelation " + previous + "-" + next + " do not have property nextLocation")
-            }
             if (!result.hasOwnProperty("lag")) {
                 throw new CorruptedError("TaskRelation " + previous + "-" + next + " do not have property lag")
             }
@@ -214,15 +209,10 @@ class RedisTaskRelation {
             if (previousLocation == null) {
                 throw new CorruptedError("TaskRelation " + previous + "-" + next + " has an invalid previousLocation")
             }
-            const nextLocation = toTaskLocation(result["nextLocation"])
-            if (nextLocation == null) {
-                throw new CorruptedError("TaskRelation " + previous + "-" + next + " has an invalid nextLocation")
-            }
             const relation: TaskRelation = {
                 previous,
                 previousLocation,
                 next,
-                nextLocation,
                 lag: +(result["lag"] as string)
             }
             return relation

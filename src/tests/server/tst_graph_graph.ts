@@ -167,14 +167,12 @@ describe("Graph", () => {
                     previous: "root",
                     previousLocation: TaskLocation.End,
                     next: "long",
-                    nextLocation: TaskLocation.Beginning,
                     lag: 0
                 },
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
                     next: "short",
-                    nextLocation: TaskLocation.Beginning,
                     lag: 0
                 }
             ]
@@ -185,7 +183,6 @@ describe("Graph", () => {
                     previous: "long",
                     previousLocation: TaskLocation.End,
                     next: "reducing",
-                    nextLocation: TaskLocation.Beginning,
                     lag: 0
                 }
             ]
@@ -196,7 +193,6 @@ describe("Graph", () => {
                     previous: "short",
                     previousLocation: TaskLocation.End,
                     next: "reducing",
-                    nextLocation: TaskLocation.Beginning,
                     lag: 0
 
                 }

@@ -151,7 +151,6 @@ describe("Graph", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }).then(() => {
                 done()
@@ -213,7 +212,6 @@ describe("Graph", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }).then(() => {
                 chai.expect(expectations[0].called).to.true
@@ -285,14 +283,12 @@ describe("Graph", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }).then(() => {
                 return node2.addChild(node1, {
                 previous: "task2",
                 previousLocation: TaskLocation.End,
                 next: "task1",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             })
             }).then(() => {

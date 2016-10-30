@@ -45,7 +45,6 @@ describe("Graph analyzer", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }
         ]
@@ -73,21 +72,18 @@ describe("Graph analyzer", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             },
             {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task3",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             },
             {
                 previous: "task3",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }
         ]
@@ -122,21 +118,18 @@ describe("Graph analyzer", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             },
             {
                 previous: "task2",
                 previousLocation: TaskLocation.End,
                 next: "task3",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             },
             {
                 previous: "task3",
                 previousLocation: TaskLocation.End,
                 next: "task1",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }
         ]

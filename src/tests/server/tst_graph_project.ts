@@ -114,14 +114,12 @@ describe("Graph", () => {
                     previous: "root",
                     previousLocation: TaskLocation.End,
                     next: "long",
-                    nextLocation: TaskLocation.Beginning,
                     lag: 0
                 },
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
                     next: "short",
-                    nextLocation: TaskLocation.Beginning,
                     lag: 0
                 }
             ]
@@ -132,7 +130,6 @@ describe("Graph", () => {
                     previous: "long",
                     previousLocation: TaskLocation.End,
                     next: "reducing",
-                    nextLocation: TaskLocation.Beginning,
                     lag: 0
                 }
             ]
@@ -143,7 +140,6 @@ describe("Graph", () => {
                     previous: "short",
                     previousLocation: TaskLocation.End,
                     next: "reducing",
-                    nextLocation: TaskLocation.Beginning,
                     lag: 0
 
                 }
@@ -295,7 +291,6 @@ describe("Graph", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }
             const taskResults: TaskResults = {
@@ -333,7 +328,6 @@ describe("Graph", () => {
                 previous: "task3",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }
             node.addRelation(relation).then(() => {
@@ -362,7 +356,6 @@ describe("Graph", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task3",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }
             node.addRelation(relation).then(() => {

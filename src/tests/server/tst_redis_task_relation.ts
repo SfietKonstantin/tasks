@@ -63,7 +63,6 @@ describe("Redis", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }).then(() => {
                 done()
@@ -76,7 +75,6 @@ describe("Redis", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
@@ -92,7 +90,6 @@ describe("Redis", () => {
                 previous: "task3",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
@@ -108,7 +105,6 @@ describe("Redis", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task3",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
@@ -131,7 +127,6 @@ describe("Redis", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }).then(() => {
                 done(new Error("addTaskRelation should not be a success"))
@@ -154,7 +149,6 @@ describe("Redis", () => {
                 previous: "task1",
                 previousLocation: TaskLocation.End,
                 next: "task2",
-                nextLocation: TaskLocation.Beginning,
                 lag: 0
             }).then(() => {
                 done()
@@ -206,7 +200,6 @@ describe("Redis", () => {
                         previous: "task1",
                         previousLocation: TaskLocation.End,
                         next: "task2",
-                        nextLocation: TaskLocation.Beginning,
                         lag: 12
                     })
                 }).then(() => {
@@ -214,7 +207,6 @@ describe("Redis", () => {
                         previous: "task1",
                         previousLocation: TaskLocation.Beginning,
                         next: "task3",
-                        nextLocation: TaskLocation.End,
                         lag: 23
                     })
                 }).then(() => {
@@ -231,14 +223,12 @@ describe("Redis", () => {
                         previous: "task1",
                         previousLocation: TaskLocation.End,
                         next: "task2",
-                        nextLocation: TaskLocation.Beginning,
                         lag: 12
                     },
                     {
                         previous: "task1",
                         previousLocation: TaskLocation.Beginning,
                         next: "task3",
-                        nextLocation: TaskLocation.End,
                         lag: 23
                     }
                 ]
@@ -285,27 +275,8 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should remove task relation nextLocation", (done) => {
-            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result) => {
-                return client.hdelAsync("task:project:task1:relation:task2", "nextLocation")
-            }).then((result: number) => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception on corrupted task relations", (done) => {
-            db.getTaskRelations("project", "task1").then(() => {
-                done(new Error("getTaskRelations should not be a success"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(CorruptedError)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
         it("Should remove task relation lag", (done) => {
-            client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "Beginning").then((result) => {
+            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result) => {
                 return client.hdelAsync("task:project:task1:relation:task2", "lag")
             }).then((result: number) => {
                 done()
@@ -342,27 +313,8 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should set an invalid task relation nextLocation", (done) => {
-            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result) => {
-                return client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "")
-            }).then((result) => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception on corrupted task relations", (done) => {
-            db.getTaskRelations("project", "task1").then(() => {
-                done(new Error("getTaskRelations should not be a success"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(CorruptedError)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
         it("Should revert relation properties corruption", (done) => {
-            client.hsetAsync("task:project:task1:relation:task2", "nextLocation", "Beginning").then((result) => {
+            client.hsetAsync("task:project:task1:relation:task2", "previousLocation", "End").then((result) => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -375,14 +327,12 @@ describe("Redis", () => {
                         previous: "task1",
                         previousLocation: TaskLocation.End,
                         next: "task2",
-                        nextLocation: TaskLocation.Beginning,
                         lag: 12
                     },
                     {
                         previous: "task1",
                         previousLocation: TaskLocation.Beginning,
                         next: "task3",
-                        nextLocation: TaskLocation.End,
                         lag: 23
                     }
                 ]

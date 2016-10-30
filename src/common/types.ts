@@ -23,7 +23,6 @@ export interface TaskRelation {
     previous: string
     previousLocation: TaskLocation
     next: string
-    nextLocation: TaskLocation
     lag: number
 }
 
