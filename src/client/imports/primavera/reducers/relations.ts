@@ -10,6 +10,7 @@ import {
 
 const initialState: RelationsState = {
     relations: [],
+    warnings: [],
     isImporting: false,
     invalidFormat: false
 }
@@ -25,12 +26,14 @@ export const relationsReducer = (state: RelationsState = initialState, action: A
             const relationsAction = action as RelationsAction
             return Object.assign({}, state, {
                 relations: relationsAction.relations,
+                warnings: relationsAction.warnings,
                 isImporting: false,
                 invalidFormat: false
             })
         case RELATIONS_IMPORT_INVALID_FORMAT:
             return Object.assign({}, state, {
                 relations: new Array<PrimaveraTaskRelation>(),
+                warnings: new Array<string>(),
                 isImporting: false,
                 invalidFormat: true
             })

@@ -136,6 +136,7 @@ gulp.task("test:pre", function () {
         "!tests/client/task.js",
         "!tests/client/imports.js",
         "!tests/client/imports/primavera.js",
+        "!**/connectedcomponents.js"
     ])
     return gulp.src(["tests/common/**/*.js", "tests/server/**/*.js", "tests/client/**/*.js"])
                .pipe(f)

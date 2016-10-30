@@ -11,7 +11,7 @@ export class FilterButton extends React.Component<FilterButtonProperties, {}> {
         return <div className="project-all-tasks-filter">
             <DropdownButton id="tasks-filter" title="Filters" bsStyle="link" >
                 <MenuItem eventKey="milestonesOnly" active={this.props.milestonesOnly}
-                        onSelect={this.handleToggleMilestonesOnly.bind(this)}>Milestones only</MenuItem>
+                          onSelect={this.handleToggleMilestonesOnly.bind(this)}>Milestones only</MenuItem>
             </DropdownButton>
         </div>
     }

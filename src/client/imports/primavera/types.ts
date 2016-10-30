@@ -1,6 +1,19 @@
 import { Project } from "../../../common/types"
 
+export enum Stage {
+    Project,
+    Tasks,
+    Relations,
+    Overview
+}
+
+export interface Stages {
+    current: Stage
+    max: Stage
+}
+
 export interface State {
+    stage: Stages
     project: ProjectState
     tasks: TasksState
     relations: RelationsState
@@ -42,6 +55,7 @@ export interface TasksState {
 
 export interface RelationsState {
     relations: Array<PrimaveraTaskRelation>
+    warnings: Array<string>
     isImporting: boolean
     invalidFormat: boolean
 }

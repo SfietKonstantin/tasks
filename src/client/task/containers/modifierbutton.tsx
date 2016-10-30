@@ -140,7 +140,6 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
         this.setState(Object.assign(this.state, { location: TaskLocation.End }))
     }
     private handleSave(e: React.MouseEvent) {
-        e.preventDefault()
         const modifier: Modifier = {
             name: this.state.name,
             description: this.state.description,

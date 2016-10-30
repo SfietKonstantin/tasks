@@ -33,7 +33,6 @@ class UnconnectedImportantButton extends React.Component<ImportantButtonProperti
         return this.props.important ? "Important" : "Set as important"
     }
     private handleImportant(e: React.MouseEvent) {
-        e.preventDefault()
         this.props.onImportantChanged(this.props.projectIdentifier, this.props.taskIdentifier, !this.props.important)
     }
 }

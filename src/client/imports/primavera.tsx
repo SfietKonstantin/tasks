@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom"
 import * as Redux from "redux"
 import * as ReduxThunk from "redux-thunk"
 import { Provider } from "react-redux"
-import { State, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./primavera/types"
+import { State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./primavera/types"
 import { mainReducer } from "./primavera/reducers/main"
 import { Main } from "./primavera/containers/main"
 import { Project } from "../../common/types"
@@ -22,6 +22,10 @@ class Root extends React.Component<RootProperties, {}> {
 
 export const render = () => {
     const initialState: State = {
+        stage: {
+            current: Stage.Project,
+            max: Stage.Project
+        },
         project: {
             project: {
                 identifier: "",
@@ -38,6 +42,7 @@ export const render = () => {
             invalidFormat: false
         }, relations: {
             relations: [],
+            warnings: [],
             isImporting: false,
             invalidFormat: false
         }

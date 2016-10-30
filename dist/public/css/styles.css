@@ -48,6 +48,10 @@
     display: none
 }
 
+.clickable {
+    cursor: pointer
+}
+
 /* Page header */
 .page-header {
     padding-bottom: 0px;
@@ -114,4 +118,11 @@
     padding: 10px 15px;
     margin-left: 40px;
     border-left: 2px solid #333;
+}
+
+/* Imports */
+
+.import-primavera-warning-content {
+    overflow-y: auto;
+    height: 400px;
 }

@@ -1,7 +1,10 @@
 import { Action } from "redux"
 import { TasksState, TaskFilters } from "../types"
 import { ApiTask } from "../../../common/apitypes"
-import { TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE, TASKS_FILTER_DISPLAY } from "../actions/tasks"
+import {
+    TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE,
+    TASKS_FILTER_DISPLAY
+} from "../actions/tasks"
 import * as dateutils from "../../../common/dateutils"
 
 const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | null): Array<ApiTask> => {

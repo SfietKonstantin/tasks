@@ -9,6 +9,7 @@ import { importTasks, dismissInvalidTasksFormat } from "../actions/tasks"
 import { importRelations, dismissInvalidRelationsFormat } from "../actions/relations"
 import { submit } from "../actions/submit"
 import { Project } from "../../../../common/types"
+import { ProjectEditor, TasksSelector, RelationsSelector } from "../connectedcomponents"
 
 interface MainProperties {
     project: Project
@@ -56,22 +57,6 @@ class UnconnectedMain extends React.Component<MainProperties, {}> {
         const tasksButtonText = tasksLength > 0 ? "Imported " + tasksLength + " tasks" : "Import tasks"
         const relationsButtonText = relationsLength > 0 ? "Imported " + relationsLength + " relations"
                                                         : "Import relations"
-        let warnings: JSX.Element | null = null
-        if (this.props.warnings.length > 0) {
-            const warningTexts = this.props.warnings.map((warning: string) => {
-                return <p>{warning}</p>
-            })
-            warnings = <FormGroup>
-                <Col componentClass={ControlLabel} xd={12} md={2}>
-                    Warnings
-                </Col>
-                <Col xd={12} md={10}>
-                    <Alert bsStyle="warning">
-                        {warningTexts}
-                    </Alert>
-                </Col>
-            </FormGroup>
-        }
         return <Grid>
             <Col xs={12} md={12}>
                 <h1>Import from Oracle Primavera</h1>
@@ -81,29 +66,14 @@ class UnconnectedMain extends React.Component<MainProperties, {}> {
                 </p>
                 {tasksAlert}
                 {relationsAlert}
+                <ProjectEditor />
+                <TasksSelector />
+                <RelationsSelector />
                 <Form horizontal>
                     <input type="file" ref="tasksInput" className="hidden"
                            onChange={this.handleImportTasksFile.bind(this)}/>
                     <input type="file" ref="relationsInput" className="hidden"
                            onChange={this.handleImportRelationsFile.bind(this)}/>
-                    <FormGroup validationState={identifierValidation}>
-                        <Col componentClass={ControlLabel} xd={12} md={2}>
-                            Project identifier
-                        </Col>
-                        <Col xd={12} md={10}>
-                            <FormControl type="text" placeholder="Project identifier"
-                                         onInput={this.handleIdentifierInput.bind(this)} />
-                        </Col>
-                    </FormGroup>
-                    <FormGroup validationState={this.getNameValidationState()}>
-                        <Col componentClass={ControlLabel} xd={12} md={2}>
-                            Project name
-                        </Col>
-                        <Col xd={12} md={10}>
-                            <FormControl type="text" placeholder="Project name"
-                                         onInput={this.handleNameInput.bind(this)} />
-                        </Col>
-                    </FormGroup>
                     <FormGroup>
                         <Col componentClass={ControlLabel} xd={12} md={2}>
                             Tasks
@@ -117,7 +87,6 @@ class UnconnectedMain extends React.Component<MainProperties, {}> {
                             </ButtonGroup>
                         </Col>
                     </FormGroup>
-                    {warnings}
                     <FormGroup>
                         <Button bsStyle="primary" disabled={!canImport}
                                 onClick={this.handleSubmit.bind(this)}>Import</Button>
@@ -126,43 +95,27 @@ class UnconnectedMain extends React.Component<MainProperties, {}> {
             </Col>
         </Grid>
     }
-    private handleIdentifierInput(e: React.FormEvent) {
-        const input = e.target as HTMLInputElement
-        this.props.onProjectChanged(input.value, this.props.project.name, this.props.project.description)
-    }
-    private getNameValidationState(): "success" | "error" {
-        return this.props.project.name.length > 0 ? "success" : "error"
-    }
-    private handleNameInput(e: React.FormEvent) {
-        const input = e.target as HTMLInputElement
-        this.props.onProjectChanged(this.props.project.identifier, input.value, this.props.project.description)
-    }
     private handleImportTasks(e: React.MouseEvent) {
-        e.preventDefault()
         const input = ReactDOM.findDOMNode(this.refs["tasksInput"]) as HTMLInputElement
         input.click()
     }
     private handleImportTasksFile(e: React.FormEvent) {
-        e.preventDefault()
         const input = ReactDOM.findDOMNode(this.refs["tasksInput"]) as HTMLInputElement
         const fileList = input.files as FileList
         const file = fileList[0]
         this.props.onTasksFileSelected(file)
     }
     private handleImportRelations(e: React.FormEvent) {
-        e.preventDefault()
         const input = ReactDOM.findDOMNode(this.refs["relationsInput"]) as HTMLInputElement
         input.click()
     }
     private handleImportRelationsFile(e: React.FormEvent) {
-        e.preventDefault()
         const input = ReactDOM.findDOMNode(this.refs["relationsInput"]) as HTMLInputElement
         const fileList = input.files as FileList
         const file = fileList[0]
         this.props.onRelationsFileSelected(file)
     }
     private handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
         this.props.onSubmit(this.props.project, this.props.tasks)
 
     }

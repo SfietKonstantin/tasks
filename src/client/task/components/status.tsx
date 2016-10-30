@@ -8,7 +8,7 @@ interface StateIndicatorProperties {
     text: string
 }
 
-class StateIndicator extends React.Component<StateIndicatorProperties, {}> {
+export class StatusStateIndicator extends React.Component<StateIndicatorProperties, {}> {
     render() {
         const className = "glyphicon glyphicon-" + this.props.icon
         return <div className="task-overview-state">
@@ -25,7 +25,7 @@ interface StatusTimeProperties {
     todayDiff: string
 }
 
-class StatusTime extends React.Component<StatusTimeProperties, {}> {
+export class StatusTime extends React.Component<StatusTimeProperties, {}> {
     render() {
         return <Col className={this.props.className} xs={12} md={6}>
             <div className="task-overview-label">
@@ -68,11 +68,11 @@ export class Status extends React.Component<StatusProperties, {}> {
         }
 
         return <Panel className="task-overview">
-            <StateIndicator icon={stateInfo[0]} text={stateInfo[1]} />
+            <StatusStateIndicator icon={stateInfo[0]} text={stateInfo[1]} />
             <ProgressBar className="task-overview-progress" now={progressInfo} />
             <Row>
                 <StatusTime className="task-overview-start" color={startState[0]} state={startState[1]}
-                                    date={startDateLabel} todayDiff={startTodayDiff} />
+                            date={startDateLabel} todayDiff={startTodayDiff} />
                 {endStatusTime}
             </Row>
         </Panel>

@@ -1,8 +1,8 @@
 import * as chai from "chai"
-import * as testutils from "react-addons-test-utils"
 import * as React from "react"
+import * as enzyme from "enzyme"
 import * as sinon from "sinon"
-import { Status } from "../../client/task/components/status"
+import { Status, StatusStateIndicator, StatusTime } from "../../client/task/components/status"
 import { Task, TaskResults } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
@@ -13,6 +13,26 @@ describe("Task components", () => {
     afterEach(() => {
         clearFakeGlobal()
     })
+    describe("Status components", () => {
+        it("Should create a StatusStateIndicator", () => {
+            const component = enzyme.shallow(<StatusStateIndicator icon="test" text="Hello World" />)
+            chai.expect(component.children()).to.length(3)
+            chai.expect(component.childAt(0).hasClass("glyphicon glyphicon-test")).to.true
+            chai.expect(component.childAt(2).text()).to.equal("Hello World")
+        })
+        it("Should create a StatusTime", () => {
+            const component = enzyme.shallow(<StatusTime className="someclass" color="danger" state="State"
+                                                         date="23/12/2015" todayDiff="10 days" />)
+            chai.expect(component.hasClass("someclass")).to.true
+            chai.expect(component.children()).to.length(3)
+            const label = component.childAt(0).children()
+            chai.expect(label).to.length(1)
+            chai.expect(label.prop("bsStyle")).to.equal("danger")
+            chai.expect(label.children().text()).to.equal("State")
+            chai.expect(component.childAt(1).text()).to.equal("23/12/2015")
+            chai.expect(component.childAt(2).text()).to.equal("10 days")
+        })
+    })
     describe("Status", () => {
         let sandbox: Sinon.SinonSandbox
         beforeEach(() => {
@@ -22,33 +42,44 @@ describe("Task components", () => {
         afterEach(() => {
             sandbox.restore()
         })
-        const check = (component: React.Component<any, any>, stateText: string, progressStyle: string,
-                       startText: string, startClass: string, startDate: string, startDays: string,
-                       endText: string, endClass: string, endDate: string, endDays: string) => {
-            const state = testutils.findRenderedDOMComponentWithClass(component, "task-overview-state")
-            chai.expect(state.textContent).to.equal(" " + stateText)
-            const progress = testutils.findRenderedDOMComponentWithClass(component, "task-overview-progress")
-            const progressDivs = progress.getElementsByTagName("div")
-            chai.expect(progressDivs).to.length(1)
-            chai.expect(progressDivs[0].style.width).to.equal(progressStyle)
-            const start = testutils.findRenderedDOMComponentWithClass(component, "task-overview-start")
-            const startDivs = start.getElementsByTagName("div")
-            chai.expect(startDivs).to.length(3)
-            chai.expect(startDivs[0].textContent).to.equal(startText)
-            const startDivs1Labels = startDivs[0].getElementsByClassName("label")
-            chai.expect(startDivs1Labels).to.length(1)
-            chai.expect(startDivs1Labels[0].className).to.contains(startClass)
-            chai.expect(startDivs[1].textContent).to.equal(startDate)
-            chai.expect(startDivs[2].textContent).to.equal(startDays)
-            const end = testutils.findRenderedDOMComponentWithClass(component, "task-overview-end")
-            const endDivs = end.getElementsByTagName("div")
-            chai.expect(endDivs).to.length(3)
-            chai.expect(endDivs[0].textContent).to.equal(endText)
-            const endDivs1Labels = endDivs[0].getElementsByClassName("label")
-            chai.expect(endDivs1Labels).to.length(1)
-            chai.expect(endDivs1Labels[0].className).to.contains(endClass)
-            chai.expect(endDivs[1].textContent).to.equal(endDate)
-            chai.expect(endDivs[2].textContent).to.equal(endDays)
+        const checkState = (component: enzyme.CommonWrapper<any, {}>,
+                            stateIcon: string, stateText: string,
+                            progressPercentage: number) => {
+            const state = component.find("StatusStateIndicator")
+            chai.expect(state).to.length(1)
+            chai.expect(state.prop("icon")).to.equal(stateIcon)
+            chai.expect(state.prop("text")).to.equal(stateText)
+
+            const progress = component.find("ProgressBar")
+            chai.expect(progress).to.length(1)
+            chai.expect(progress.prop("now")).to.equal(progressPercentage)
+        }
+        const checkTask = (component: enzyme.CommonWrapper<any, {}>,
+                           startColor: string, startState: string, startDate: string, startDays: string,
+                           endColor: string, endState: string, endDate: string, endDays: string) => {
+            const times = component.find("StatusTime")
+            chai.expect(times).to.length(2)
+
+            chai.expect(times.at(0).prop("color")).to.equal(startColor)
+            chai.expect(times.at(0).prop("state")).to.equal(startState)
+            chai.expect(times.at(0).prop("date")).to.equal(startDate)
+            chai.expect(times.at(0).prop("todayDiff")).to.equal(startDays)
+
+            chai.expect(times.at(1).prop("color")).to.equal(endColor)
+            chai.expect(times.at(1).prop("state")).to.equal(endState)
+            chai.expect(times.at(1).prop("date")).to.equal(endDate)
+            chai.expect(times.at(1).prop("todayDiff")).to.equal(endDays)
+        }
+        const checkMilestone = (component: enzyme.CommonWrapper<any, {}>,
+                                startColor: string, startState: string,
+                                startDate: string, startDays: string) => {
+            const times = component.find("StatusTime")
+            chai.expect(times).to.length(1)
+
+            chai.expect(times.prop("color")).to.equal(startColor)
+            chai.expect(times.prop("state")).to.equal(startState)
+            chai.expect(times.prop("date")).to.equal(startDate)
+            chai.expect(times.prop("todayDiff")).to.equal(startDays)
         }
         it("Should create Status for not started and on time task", () => {
             const task: Task = {
@@ -62,12 +93,11 @@ describe("Task components", () => {
                 startDate: new Date(2016, 3, 1),
                 duration: 20
             }
-            const component = testutils.renderIntoDocument(
-                <Status task={task} taskResults={taskResults} />
-            ) as React.Component<any, any>
-            check(component, "Not started", "0%",
-                  "On time", "label-success", "Starting the 1/4/2016", "In 26 days",
-                  "On time", "label-success", "Ending the 21/4/2016", "In 46 days")
+            const component = enzyme.shallow(<Status task={task} taskResults={taskResults} />)
+            checkState(component, "time", "Not started", 0)
+            checkTask(component,
+                      "success", "On time", "Starting the 1/4/2016", "In 26 days",
+                      "success", "On time", "Ending the 21/4/2016", "In 46 days")
         })
         it("Should create Status for not started and ending late task", () => {
             const task: Task = {
@@ -81,12 +111,11 @@ describe("Task components", () => {
                 startDate: new Date(2016, 3, 1),
                 duration: 25
             }
-            const component = testutils.renderIntoDocument(
-                <Status task={task} taskResults={taskResults} />
-            ) as React.Component<any, any>
-            check(component, "Not started", "0%",
-                  "On time", "label-success", "Starting the 1/4/2016", "In 26 days",
-                  "Late 5 days", "label-warning", "Ending the 26/4/2016", "In 51 days")
+            const component = enzyme.shallow(<Status task={task} taskResults={taskResults} />)
+            checkState(component, "time", "Not started", 0)
+            checkTask(component,
+                      "success", "On time", "Starting the 1/4/2016", "In 26 days",
+                      "warning", "Late 5 days", "Ending the 26/4/2016", "In 51 days")
         })
         it("Should create Status for not started and starting late task", () => {
             const task: Task = {
@@ -100,12 +129,11 @@ describe("Task components", () => {
                 startDate: new Date(2016, 3, 6),
                 duration: 15
             }
-            const component = testutils.renderIntoDocument(
-                <Status task={task} taskResults={taskResults} />
-            ) as React.Component<any, any>
-            check(component, "Not started", "0%",
-                  "Late 5 days", "label-warning", "Starting the 6/4/2016", "In 31 days",
-                  "On time", "label-success", "Ending the 21/4/2016", "In 46 days")
+            const component = enzyme.shallow(<Status task={task} taskResults={taskResults} />)
+            checkState(component, "time", "Not started", 0)
+            checkTask(component,
+                      "warning", "Late 5 days", "Starting the 6/4/2016", "In 31 days",
+                      "success", "On time", "Ending the 21/4/2016", "In 46 days")
         })
         it("Should create Status for in progress and on time task", () => {
             const task: Task = {
@@ -119,12 +147,11 @@ describe("Task components", () => {
                 startDate: new Date(2016, 2, 1),
                 duration: 20
             }
-            const component = testutils.renderIntoDocument(
-                <Status task={task} taskResults={taskResults} />
-            ) as React.Component<any, any>
-            check(component, "In progress", "25%",
-                  "On time", "label-success", "Started the 1/3/2016", "5 days ago",
-                  "On time", "label-success", "Ending the 21/3/2016", "In 15 days")
+            const component = enzyme.shallow(<Status task={task} taskResults={taskResults} />)
+            checkState(component, "plane", "In progress", 25)
+            checkTask(component,
+                      "success", "On time", "Started the 1/3/2016", "5 days ago",
+                      "success", "On time", "Ending the 21/3/2016", "In 15 days")
         })
     })
 })

@@ -50,7 +50,7 @@ describe("Project actions", () => {
                     project
                  }
                 chai.expect(dispatch.calledTwice).to.true
-                chai.expect(dispatch.calledWith(expected)).to.true
+                chai.expect(dispatch.calledWithExactly(expected)).to.true
                 done()
             }).catch((error) => {
                 done(error)
@@ -58,7 +58,7 @@ describe("Project actions", () => {
 
             const expected: Action = { type: PROJECT_REQUEST }
             chai.expect(dispatch.calledOnce).to.true
-            chai.expect(dispatch.calledWith(expected)).to.true
+            chai.expect(dispatch.calledWithExactly(expected)).to.true
 
             chai.expect(fetchMock.calledOnce).to.true
             chai.expect(fetchMock.args[0]).to.length(1)
@@ -73,7 +73,7 @@ describe("Project actions", () => {
             fetchProject("identifier")(dispatch).then(() => {
                 const expected: Action = { type: PROJECT_RECEIVE_FAILURE }
                 chai.expect(dispatch.calledTwice).to.true
-                chai.expect(dispatch.calledWith(expected)).to.true
+                chai.expect(dispatch.calledWithExactly(expected)).to.true
                 done()
             }).catch((error) => {
                 done(error)
@@ -81,7 +81,7 @@ describe("Project actions", () => {
 
             const expected: Action = { type: PROJECT_REQUEST }
             chai.expect(dispatch.calledOnce).to.true
-            chai.expect(dispatch.calledWith({type: PROJECT_REQUEST})).to.true
+            chai.expect(dispatch.calledWithExactly({type: PROJECT_REQUEST})).to.true
         })
     })
     describe("Tasks", () => {
@@ -156,7 +156,7 @@ describe("Project actions", () => {
                         tasks
                     }
                     chai.expect(dispatch.calledTwice).to.true
-                    chai.expect(dispatch.calledWith(expected)).to.true
+                    chai.expect(dispatch.calledWithExactly(expected)).to.true
                     done()
                 }).catch((error) => {
                     done(error)
@@ -164,7 +164,7 @@ describe("Project actions", () => {
 
                 const expected: Action = { type: TASKS_REQUEST }
                 chai.expect(dispatch.calledOnce).to.true
-                chai.expect(dispatch.calledWith(expected)).to.true
+                chai.expect(dispatch.calledWithExactly(expected)).to.true
 
                 chai.expect(fetchMock.calledOnce).to.true
                 chai.expect(fetchMock.args[0]).to.length(1)
@@ -179,7 +179,7 @@ describe("Project actions", () => {
                 fetchTasks("identifier")(dispatch).then(() => {
                     const expected: Action = { type: TASKS_RECEIVE_FAILURE }
                     chai.expect(dispatch.calledTwice).to.true
-                    chai.expect(dispatch.calledWith(expected)).to.true
+                    chai.expect(dispatch.calledWithExactly(expected)).to.true
                     done()
                 }).catch((error) => {
                     done(error)
@@ -187,7 +187,7 @@ describe("Project actions", () => {
 
                 const expected: Action = { type: TASKS_REQUEST }
                 chai.expect(dispatch.calledOnce).to.true
-                chai.expect(dispatch.calledWith(expected)).to.true
+                chai.expect(dispatch.calledWithExactly(expected)).to.true
             })
         })
     })

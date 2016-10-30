@@ -5,8 +5,7 @@ export class FakeFile implements File {
     readonly size: number
     readonly type: string
     private fileReader: FakeFileReader  | null
-    constructor(type: string, fileReader: FakeFileReader | null = null) {
-        this.type = type
+    constructor(fileReader: FakeFileReader | null = null) {
         this.fileReader = fileReader
     }
     msClose(): void {

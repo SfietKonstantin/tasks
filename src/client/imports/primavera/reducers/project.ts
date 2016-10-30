@@ -24,7 +24,8 @@ export const projectReducer = (state: ProjectState = initialState, action: Actio
                     identifier: projectAction.identifier,
                     name: projectAction.name,
                     description: projectAction.description
-                }
+                },
+                error: null
             })
         case PROJECT_REQUEST_ADD:
             return state

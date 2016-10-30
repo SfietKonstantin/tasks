@@ -2,13 +2,13 @@ import { PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./types"
 import { InvalidFormatError } from "../../common/actions/files"
 import * as dateutils from "../../../common/dateutils"
 
-export interface TaskParseResults {
+export interface TasksParseResults {
     tasks: Map<string, PrimaveraTask>
     delays: Map<string, PrimaveraDelay>
     warnings: Array<string>
 }
 
-export interface RelationParseResults {
+export interface RelationsParseResults {
     relations: Array<PrimaveraTaskRelation>
     warnings: Array<string>
 }
@@ -19,7 +19,7 @@ const convertDate = (date: string): Date | null => {
     return Number.isNaN(returned.getTime()) ? null : returned
 }
 
-export const parseTasks = (content: string): TaskParseResults => {
+export const parseTasks = (content: string): TasksParseResults => {
     const splitted = content.split("\n")
     if (splitted.length < 2) {
         throw new InvalidFormatError("Task file should have at least two lines")
@@ -99,7 +99,7 @@ const parseType = (type: string): "FS" | "SF" | "FF" | "SS" | null => {
     }
 }
 
-export const parseRelations = (content: string): RelationParseResults => {
+export const parseRelations = (content: string): RelationsParseResults => {
     const splitted = content.split("\n")
     if (splitted.length < 2) {
         throw new InvalidFormatError("Relations file should have at least two lines")

@@ -8,7 +8,7 @@ export class FakeResponse implements Response {
     headers: Headers
     body: ReadableStream // | null
     trailer: Promise<Headers>
-    bodyUsed: boolean;
+    bodyUsed: boolean
     private fakeBody: any
     private shouldThrow: boolean
     constructor(ok: boolean, body: any, shouldThrow: boolean = false) {

@@ -55,17 +55,14 @@ export class UnconnectedAllTasks extends React.Component<AllTasksContentProperti
         return checked ? "primary" : "default"
     }
     private handleNotStartedClicked(e: React.MouseEvent) {
-        e.preventDefault()
         const notStartedChecked = !this.props.filters.notStartedChecked
         this.handleFilterTasks(Object.assign({}, this.props.filters, {notStartedChecked}))
     }
     private handleInProgress(e: React.MouseEvent) {
-        e.preventDefault()
         const inProgressChecked = !this.props.filters.inProgressChecked
         this.handleFilterTasks(Object.assign({}, this.props.filters, {inProgressChecked}))
     }
     private handleDoneClicked(e: React.MouseEvent) {
-        e.preventDefault()
         const doneChecked = !this.props.filters.doneChecked
         this.handleFilterTasks(Object.assign({}, this.props.filters, {doneChecked}))
     }

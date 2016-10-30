@@ -1,6 +1,6 @@
 import { Action, Dispatch } from "redux"
 import { State, PrimaveraTask, PrimaveraDelay } from "../types"
-import { TaskParseResults, parseTasks } from "../imports"
+import { TasksParseResults, parseTasks } from "../imports"
 import { processFile } from "../../../common/actions/files"
 import { ErrorAction } from "../../../common/actions/errors"
 
@@ -22,7 +22,7 @@ export const beginTasksImport = (): Action => {
     }
 }
 
-export const endTasksImport = (results: TaskParseResults): TasksAction => {
+export const endTasksImport = (results: TasksParseResults): TasksAction => {
     return {
         type: TASKS_IMPORT_END,
         tasks: results.tasks,
@@ -39,7 +39,7 @@ export const tasksImportInvalidFormat = (): ErrorAction => {
 }
 
 export const importTasks = (file: File) => {
-    return processFile(file, "text/csv", parseTasks, beginTasksImport, endTasksImport, tasksImportInvalidFormat)
+    return processFile(file, parseTasks, beginTasksImport, endTasksImport, tasksImportInvalidFormat)
 }
 
 export const dismissInvalidTasksFormat = (): Action => {

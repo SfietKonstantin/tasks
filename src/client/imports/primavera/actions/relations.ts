@@ -1,6 +1,6 @@
 import { Action, Dispatch } from "redux"
 import { State, PrimaveraTaskRelation } from "../types"
-import { RelationParseResults, parseRelations } from "../imports"
+import { RelationsParseResults, parseRelations } from "../imports"
 import { processFile } from "../../../common/actions/files"
 import { ErrorAction } from "../../../common/actions/errors"
 
@@ -15,13 +15,13 @@ export interface RelationsAction extends Action {
     warnings: Array<string>
 }
 
-const beginRelationsImport = (): Action => {
+export const beginRelationsImport = (): Action => {
     return {
         type: RELATIONS_IMPORT_BEGIN
     }
 }
 
-const endRelationsImport = (results: RelationParseResults): RelationsAction => {
+export const endRelationsImport = (results: RelationsParseResults): RelationsAction => {
     return {
         type: RELATIONS_IMPORT_END,
         relations: results.relations,
@@ -29,7 +29,7 @@ const endRelationsImport = (results: RelationParseResults): RelationsAction => {
     }
 }
 
-const relationsImportInvalidFormat = (): ErrorAction => {
+export const relationsImportInvalidFormat = (): ErrorAction => {
     return {
         type: RELATIONS_IMPORT_INVALID_FORMAT,
         message: "Invalid format for relations CSV file"
@@ -37,7 +37,7 @@ const relationsImportInvalidFormat = (): ErrorAction => {
 }
 
 export const importRelations = (file: File) => {
-    return processFile(file, "text/csv", parseRelations,
+    return processFile(file, parseRelations,
                        beginRelationsImport, endRelationsImport,
                        relationsImportInvalidFormat)
 }
