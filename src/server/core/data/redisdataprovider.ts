@@ -67,10 +67,6 @@ const delayRootKey = (projectIdentifier: string, taskIdentifier: string) => {
     return "delay:" + projectIdentifier + ":" + taskIdentifier
 }
 
-const delayKey = (projectIdentifier: string, taskIdentifier: string, property: string) => {
-    return "delay:" + projectIdentifier + ":" + taskIdentifier + ":" + property
-}
-
 const fromTaskLocation = (location: TaskLocation): string => {
     switch (location) {
         case TaskLocation.Beginning:
@@ -472,12 +468,18 @@ export class RedisDataProvider implements IDataProvider {
         }).then((ids: Array<string>) => {
             const sorted = ids.map(RedisDataProvider.indexFromString).sort(RedisDataProvider.compareNumbers)
             return this.getModifiers(projectIdentifier, sorted)
+        }).then((tasks: Array<Modifier | null>) => {
+            return tasks.filter((value: Modifier | null) => {
+                return value != null
+            })
         }).catch((error: Error) => {
             wrapUnknownErrors(error)
         })
     }
     addModifier(projectIdentifier: string, modifier: Modifier): Promise<number> {
-        return this.getNextId("modifier").then((modifierId: number) => {
+        return this.hasProject(projectIdentifier).then(() => {
+            return this.getNextId("modifier:" + projectIdentifier)
+        }).then((modifierId: number) => {
             return RedisModifier.save(projectIdentifier, modifierId, modifier, this.client).then(() => {
                 return modifierId
             })
@@ -485,7 +487,7 @@ export class RedisDataProvider implements IDataProvider {
             wrapUnknownErrors(error)
         })
     }
-    setModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void> {
+    addModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void> {
         return this.hasModifier(projectIdentifier, modifierId).then(() => {
             return this.hasTask(projectIdentifier, taskIdentifier)
         }).then(() => {
@@ -521,17 +523,6 @@ export class RedisDataProvider implements IDataProvider {
             return this.notHasDelay(projectIdentifier, delay.identifier)
         }).then(() => {
             return RedisDelay.save(projectIdentifier, delay, this.client)
-        }).catch((error: Error) => {
-            wrapUnknownErrors(error)
-        })
-    }
-    addDelayTaskRelation(projectIdentifier: string, delayIdentifier: string, taskIdentifier: string): Promise<void> {
-        return this.hasDelay(projectIdentifier, delayIdentifier).then(() => {
-            return this.hasTask(projectIdentifier, taskIdentifier)
-        }).then(() => {
-            return this.client.saddAsync(delayKey(projectIdentifier, delayIdentifier, "tasks"), taskIdentifier)
-        }).then(() => {
-            return this.client.saddAsync(taskKey(projectIdentifier, taskIdentifier, "delays"), delayIdentifier)
         }).catch((error: Error) => {
             wrapUnknownErrors(error)
         })

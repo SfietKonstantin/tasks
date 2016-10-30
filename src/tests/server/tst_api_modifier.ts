@@ -10,6 +10,9 @@ import { ProjectNode, TaskNode } from "../../server/core/graph/graph"
 import { FakeDataProvider } from "./fakedataprovider"
 import { FakeGraph } from "./fakegraph"
 import * as maputils from "../../common/maputils"
+import * as winston from "winston"
+
+winston.clear()
 
 describe("API", () => {
     describe("addModifier", () => {

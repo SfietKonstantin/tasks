@@ -16,13 +16,13 @@ export interface TasksAction extends Action {
     warnings: Array<string>
 }
 
-const beginTasksImport = (): Action => {
+export const beginTasksImport = (): Action => {
     return {
         type: TASKS_IMPORT_BEGIN
     }
 }
 
-const endTasksImport = (results: TaskParseResults): TasksAction => {
+export const endTasksImport = (results: TaskParseResults): TasksAction => {
     return {
         type: TASKS_IMPORT_END,
         tasks: results.tasks,
@@ -31,7 +31,7 @@ const endTasksImport = (results: TaskParseResults): TasksAction => {
     }
 }
 
-const tasksImportInvalidFormat = (): ErrorAction => {
+export const tasksImportInvalidFormat = (): ErrorAction => {
     return {
         type: TASKS_IMPORT_INVALID_FORMAT,
         message: "Invalid format for tasks CSV file"

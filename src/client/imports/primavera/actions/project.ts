@@ -24,19 +24,19 @@ export const defineProject = (identifier: string, name: string, description: str
     }
 }
 
-const requestAddProject = (): Action => {
+export const requestAddProject = (): Action => {
     return {
         type: PROJECT_REQUEST_ADD
     }
 }
 
-const receiveAddProject = (): Action => {
+export const receiveAddProject = (): Action => {
     return {
         type: PROJECT_RECEIVE_ADD
     }
 }
 
-const receiveAddFailureProject = (message: string): ErrorAction => {
+export const receiveAddFailureProject = (message: string): ErrorAction => {
     return {
         type: PROJECT_RECEIVE_ADD_FAILURE,
         message

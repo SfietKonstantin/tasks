@@ -15,6 +15,7 @@ import {
 import { Project } from "../../common/types"
 import { FakeResponse } from "./fakeresponse"
 import { FakeFile } from "./fakefile"
+import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Primavera actions", () => {
     describe("Project", () => {
@@ -29,6 +30,20 @@ describe("Primavera actions", () => {
             })
         })
         describe("Asynchronous", () => {
+            let sandbox: Sinon.SinonSandbox
+            let dispatch: Sinon.SinonSpy
+            let fetchMock: Sinon.SinonExpectation
+
+            beforeEach(() => {
+                addFakeGlobal()
+                sandbox = sinon.sandbox.create()
+                dispatch = sinon.spy()
+                fetchMock = sandbox.mock(global).expects("fetch")
+            })
+            afterEach(() => {
+                sandbox.restore()
+                clearFakeGlobal()
+            })
             it("Should PUT a project", (done) => {
                 // Mock
                 const project: Project = {
@@ -36,9 +51,8 @@ describe("Primavera actions", () => {
                     name: "Name",
                     description: "Description"
                 }
-                const dispatch = sinon.spy()
                 const response = new FakeResponse(true, {})
-                global.fetch = sinon.mock().once().returns(Promise.resolve(response))
+                fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
                 addProject(project)(dispatch).then(() => {
@@ -52,12 +66,11 @@ describe("Primavera actions", () => {
                 chai.expect(dispatch.calledOnce).to.true
                 chai.expect(dispatch.calledWith({type: PROJECT_REQUEST_ADD})).to.true
 
-                const fetch = global.fetch as Sinon.SinonStub
-                chai.expect(fetch.calledOnce).to.true
-                chai.expect(fetch.args).to.length(1)
-                chai.expect(fetch.args[0]).to.length(2)
-                chai.expect(fetch.args[0][0]).to.equal("/api/project")
-                const requestInit = fetch.args[0][1] as RequestInit
+                chai.expect(fetchMock.calledOnce).to.true
+                chai.expect(fetchMock.args).to.length(1)
+                chai.expect(fetchMock.args[0]).to.length(2)
+                chai.expect(fetchMock.args[0][0]).to.equal("/api/project")
+                const requestInit = fetchMock.args[0][1] as RequestInit
                 chai.expect(requestInit.method).to.equal("PUT")
                 const body = JSON.parse(requestInit.body as string)
                 chai.expect(body).to.haveOwnProperty("project")
@@ -66,9 +79,8 @@ describe("Primavera actions", () => {
             })
             it("Should react to PUT error from server", (done) => {
                 // Mock
-                const dispatch = sinon.spy()
                 const response = new FakeResponse(false, {error: "Error message"})
-                global.fetch = sinon.mock().once().returns(Promise.resolve(response))
+                fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
                 addProject({
@@ -91,9 +103,8 @@ describe("Primavera actions", () => {
             })
             it("Should react to PUT error from server without cause", (done) => {
                 // Mock
-                const dispatch = sinon.spy()
                 const response = new FakeResponse(false, {})
-                global.fetch = sinon.mock().once().returns(Promise.resolve(response))
+                fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
                 addProject({
@@ -116,9 +127,8 @@ describe("Primavera actions", () => {
             })
             it("Should react to PUT result JSON parsing error", (done) => {
                 // Mock
-                const dispatch = sinon.spy()
                 const response = new FakeResponse(false, {}, true)
-                global.fetch = sinon.mock().once().returns(Promise.resolve(response))
+                fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
                 addProject({

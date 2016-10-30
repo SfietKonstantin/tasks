@@ -40,10 +40,9 @@ export interface IDataProvider {
     getModifier(projectIdentifier: string, modifierId: number): Promise<Modifier>
     getTaskModifiers(projectIdentifier: string, taskIdentifier: string): Promise<Array<Modifier>>
     addModifier(projectIdentifier: string, modifier: Modifier): Promise<number>
-    setModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void>
+    addModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void>
 
     getDelay(projectIdentifier: string, delayIdentifier: string): Promise<Delay>
     getProjectDelays(projectIdentifier: string): Promise<Array<Delay>>
     addDelay(projectIdentifier: string, delay: Delay): Promise<void>
-    addDelayTaskRelation(projectIdentifier: string, delayIdentifier: string, taskIdentifier: string): Promise<void>
 }

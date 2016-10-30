@@ -1,21 +1,26 @@
 import * as chai from "chai"
 import * as testutils from "react-addons-test-utils"
 import * as React from "react"
-import * as jsdom from "jsdom"
 import * as sinon from "sinon"
 import { Status } from "../../client/task/components/status"
 import { Task, TaskResults } from "../../common/types"
-
-const document = jsdom.jsdom("<!doctype html><html><body></body></html>")
-const window = document.defaultView
-
-global.document = document
-global.window = window
+import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Task components", () => {
+    beforeEach(() => {
+        addFakeGlobal()
+    })
+    afterEach(() => {
+        clearFakeGlobal()
+    })
     describe("Status", () => {
-        before(() => {
-            sinon.useFakeTimers(new Date(2016, 2, 6).getTime())
+        let sandbox: Sinon.SinonSandbox
+        beforeEach(() => {
+            sandbox = sinon.sandbox.create()
+            sandbox.useFakeTimers(new Date(2016, 2, 6).getTime())
+        })
+        afterEach(() => {
+            sandbox.restore()
         })
         const check = (component: React.Component<any, any>, stateText: string, progressStyle: string,
                        startText: string, startClass: string, startDate: string, startDays: string,

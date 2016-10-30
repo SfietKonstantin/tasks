@@ -10,6 +10,9 @@ import { FakeDataProvider } from "./fakedataprovider"
 import { FakeGraph } from "./fakegraph"
 import { FakeError } from "./fakeerror"
 import * as maputils from "../../common/maputils"
+import * as winston from "winston"
+
+winston.clear()
 
 describe("API", () => {
     describe("getAllProjects", () => {

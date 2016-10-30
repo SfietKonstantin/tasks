@@ -41,7 +41,7 @@ export class TaskNode implements ITaskNode {
     addModifier(modifier: Modifier): Promise<Modifier> {
         const projectIdentifier = this.parent.projectIdentifier
         return this.dataProvider.addModifier(projectIdentifier, modifier).then((id: number) => {
-            return this.dataProvider.setModifierForTask(projectIdentifier, id, this.taskIdentifier)
+            return this.dataProvider.addModifierForTask(projectIdentifier, id, this.taskIdentifier)
         }).then(() => {
             this.modifiers.push(modifier)
             return this.compute()

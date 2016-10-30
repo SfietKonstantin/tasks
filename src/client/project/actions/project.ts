@@ -15,13 +15,13 @@ export interface ProjectAction extends Action {
     project: Project
 }
 
-const requestProject = (projectIdentifier: string): Action => {
+export const requestProject = (projectIdentifier: string): Action => {
     return {
         type: PROJECT_REQUEST
     }
 }
 
-const receiveProject = (projectIdentifier: string, project: Project): ProjectAction => {
+export const receiveProject = (projectIdentifier: string, project: Project): ProjectAction => {
     return {
         type: PROJECT_RECEIVE,
         projectIdentifier,
@@ -29,7 +29,7 @@ const receiveProject = (projectIdentifier: string, project: Project): ProjectAct
     }
 }
 
-const receiveFailureProject = (): Action => {
+export const receiveFailureProject = (): Action => {
     return {
         type: PROJECT_RECEIVE_FAILURE
     }

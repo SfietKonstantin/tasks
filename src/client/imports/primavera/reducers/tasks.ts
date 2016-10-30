@@ -52,6 +52,7 @@ export const tasksReducer = (state: TasksState = initialState, action: Action): 
         case SUBMIT_RECEIVE:
             return Object.assign({}, state, {
                 tasks: new Map<string, PrimaveraTask>(),
+                delays: new Map<string, PrimaveraDelay>(),
                 warnings: new Array<string>(),
                 isImporting: false,
                 invalidFormat: false

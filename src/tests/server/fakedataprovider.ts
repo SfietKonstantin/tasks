@@ -53,7 +53,7 @@ export class FakeDataProvider implements IDataProvider {
     addModifier(projectIdentifier: string, modifier: Modifier): Promise<number> {
         return Promise.reject(new Error("Not mocked"))
     }
-    setModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void> {
+    addModifierForTask(projectIdentifier: string, modifierId: number, taskIdentifier: string): Promise<void> {
         return Promise.reject(new Error("Not mocked"))
     }
     getDelay(projectIdentifier: string, delayIdentifier: string): Promise<Delay> {

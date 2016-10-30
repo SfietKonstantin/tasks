@@ -1,19 +1,19 @@
 import * as chai from "chai"
 import * as testutils from "react-addons-test-utils"
 import * as React from "react"
-import * as jsdom from "jsdom"
 import * as sinon from "sinon"
 import { Breadcrumb } from "../../client/project/components/breadcrumb"
 import { FilterButton } from "../../client/project/components/filterbutton"
 import { Project } from "../../common/types"
-
-const document = jsdom.jsdom("<!doctype html><html><body></body></html>")
-const window = document.defaultView
-
-global.document = document
-global.window = window
+import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Project components", () => {
+    beforeEach(() => {
+        addFakeGlobal()
+    })
+    afterEach(() => {
+        clearFakeGlobal()
+    })
     describe("Breadcrumb", () => {
         it("Should create a Breadcrumb", () => {
             const project: Project = {

@@ -196,7 +196,7 @@ describe("Graph", () => {
                 ]
             ]
             mock.expects("addModifier").once().withExactArgs("project", modifier).returns(Promise.resolve(1))
-            mock.expects("setModifierForTask").once().withExactArgs("project", 1, "task1")
+            mock.expects("addModifierForTask").once().withExactArgs("project", 1, "task1")
                 .returns(Promise.resolve())
             const expectations = results.map((result: [string, TaskResults]) => {
                 return mock.expects("setTaskResults").once().withExactArgs("project", result[0], result[1])
@@ -247,7 +247,7 @@ describe("Graph", () => {
                 duration: 0
             }
             mock.expects("addModifier").once().withExactArgs("project", modifier).returns(Promise.resolve(1))
-            mock.expects("setModifierForTask").once().withExactArgs("project", 1, "task1")
+            mock.expects("addModifierForTask").once().withExactArgs("project", 1, "task1")
                 .returns(Promise.resolve())
             mock.expects("setTaskResults").once().withExactArgs("project", "task1", results).returns(Promise.resolve())
 

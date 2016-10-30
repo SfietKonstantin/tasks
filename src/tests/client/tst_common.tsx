@@ -1,18 +1,18 @@
 import * as chai from "chai"
 import * as testutils from "react-addons-test-utils"
 import * as React from "react"
-import * as jsdom from "jsdom"
 import * as sinon from "sinon"
 import { Header } from "../../client/common/header"
 import { TabBar } from "../../client/common/tabs"
-
-const document = jsdom.jsdom("<!doctype html><html><body></body></html>")
-const window = document.defaultView
-
-global.document = document
-global.window = window
+import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Common components", () => {
+    beforeEach(() => {
+        addFakeGlobal()
+    })
+    afterEach(() => {
+        clearFakeGlobal()
+    })
     describe("Header", () => {
         it("Should create a Header", () => {
             const component = testutils.renderIntoDocument(

@@ -71,6 +71,22 @@ describe("Redis", () => {
                 done(error)
             })
         })
+        it("Should get an exception on invalid project", (done) => {
+            db.addTaskRelation("project2", {
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                nextLocation: TaskLocation.Beginning,
+                lag: 0
+            }).then(() => {
+                done(new Error("addTaskRelation should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
         it("Should get an exception on invalid parent task", (done) => {
             db.addTaskRelation("project", {
                 previous: "task3",
@@ -133,7 +149,7 @@ describe("Redis", () => {
                 done(error)
             })
         })
-        it("Should set task relation", (done) => {
+        it("Should add task relation", (done) => {
             db.addTaskRelation("project", {
                 previous: "task1",
                 previousLocation: TaskLocation.End,

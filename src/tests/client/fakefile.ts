@@ -30,7 +30,7 @@ export class FakeFile implements File {
 export class FakeFileReader {
     onload: (this: this, ev: any) => any
     readonly result: string
-    constructor(result: string) {
+    constructor(result: string = "") {
         this.result = result
     }
     readAsText(blob: Blob, encoding?: string): void {
