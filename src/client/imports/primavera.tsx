@@ -33,11 +33,11 @@ export const render = () => {
         tasks: {
             tasks: new Map<string, PrimaveraTask>(),
             delays: new Map<string, PrimaveraDelay>(),
-            warnings: new Array<string>(),
+            warnings: [],
             isImporting: false,
             invalidFormat: false
         }, relations: {
-            relations: new Array<PrimaveraTaskRelation>(),
+            relations: [],
             isImporting: false,
             invalidFormat: false
         }

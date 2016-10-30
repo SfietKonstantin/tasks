@@ -12,7 +12,7 @@ import { SUBMIT_REQUEST, SUBMIT_RECEIVE } from "../actions/submit"
 const initialState: TasksState = {
     tasks: new Map<string, PrimaveraTask>(),
     delays: new Map<string, PrimaveraDelay>(),
-    warnings: new Array<string>(),
+    warnings: [],
     isImporting: false,
     invalidFormat: false
 }

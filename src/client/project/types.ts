@@ -12,7 +12,7 @@ export interface ProjectState {
     project: Project | null
 }
 
-export interface TasksFilter {
+export interface TaskFilters {
     notStartedChecked: boolean
     inProgressChecked: boolean
     doneChecked: boolean
@@ -22,7 +22,7 @@ export interface TasksFilter {
 export interface TasksState {
     isFetching: boolean
     tasks: Array<ApiTask>
-    filter: TasksFilter
+    filters: TaskFilters
     today: Date | null
     filteredTasks: Array<ApiTask>
 }

@@ -1,28 +1,34 @@
 import { Action, Dispatch } from "redux"
-import { State, TasksFilter } from "../types"
+import { State, TaskFilters } from "../types"
+import { processError } from "../../common/actions/errors"
 import { ApiTask } from "../../../common/apitypes"
 
 export const TASKS_REQUEST = "TASKS_REQUEST"
 export const TASKS_RECEIVE = "TASKS_RECEIVE"
+export const TASKS_RECEIVE_FAILURE = "TASKS_RECEIVE_FAILURE"
 export const TASKS_FILTER_DISPLAY = "TASKS_FILTER_DISPLAY"
 
 export interface TasksAction extends Action {
     type: string,
-    projectIdentifier: string
     tasks: Array<ApiTask>
 }
 
-const requestTasks = (): Action => {
+export const requestTasks = (): Action => {
     return {
         type: TASKS_REQUEST
     }
 }
 
-const receiveTasks = (projectIdentifier: string, tasks: Array<ApiTask>): TasksAction => {
+export const receiveTasks = (tasks: Array<ApiTask>): TasksAction => {
     return {
         type: TASKS_RECEIVE,
-        projectIdentifier,
         tasks
+    }
+}
+
+export const receiveFailureTasks = (): Action => {
+    return {
+        type: TASKS_RECEIVE_FAILURE
     }
 }
 
@@ -30,20 +36,22 @@ export const fetchTasks = (projectIdentifier: string) => {
     return (dispatch: Dispatch<State>) => {
         dispatch(requestTasks())
         return fetch("/api/project/" + projectIdentifier + "/tasks").then((response: Response) => {
-            return response.json()
+            return processError(response)
         }).then((tasks: Array<ApiTask>) => {
-            dispatch(receiveTasks(projectIdentifier, tasks))
+            dispatch(receiveTasks(tasks))
+        }).catch(() => {
+            dispatch(receiveFailureTasks())
         })
     }
 }
 
-export interface TasksFilterAction extends Action {
+export interface TaskFiltersAction extends Action {
     type: string,
-    filters: TasksFilter
+    filters: TaskFilters
     today: Date
 }
 
-export const filterTasks = (filters: TasksFilter): TasksFilterAction => {
+export const filterTasks = (filters: TaskFilters): TaskFiltersAction => {
     return {
         type: TASKS_FILTER_DISPLAY,
         filters,

@@ -1,15 +1,10 @@
 import { Action } from "redux"
-import { TasksState, TasksFilter } from "../types"
+import { TasksState, TaskFilters } from "../types"
 import { ApiTask } from "../../../common/apitypes"
-import { TasksAction, TasksFilterAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_FILTER_DISPLAY } from "../actions/tasks"
+import { TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE, TASKS_FILTER_DISPLAY } from "../actions/tasks"
+import * as dateutils from "../../../common/dateutils"
 
-const getEndDate = (task: ApiTask): Date => {
-    let returned = new Date(task.startDate)
-    returned.setDate(returned.getDate() + task.duration)
-    return returned
-}
-
-const filterTasks = (tasks: Array<ApiTask>, filter: TasksFilter, today: Date | null): Array<ApiTask> => {
+const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | null): Array<ApiTask> => {
     if (!today) {
         return []
     }
@@ -17,19 +12,19 @@ const filterTasks = (tasks: Array<ApiTask>, filter: TasksFilter, today: Date | n
     let returned = new Array<ApiTask>()
     const todayTime = today.getTime()
     const filtered = tasks.filter((task: ApiTask) => {
-        if (filter.milestonesOnlyChecked && task.estimatedDuration !== 0) {
+        if (filters.milestonesOnlyChecked && task.estimatedDuration !== 0) {
             return false
         }
 
         const startDate = new Date(task.startDate).getTime()
-        const endDate = getEndDate(task).getTime()
-        if (filter.notStartedChecked && startDate >= todayTime) {
+        const endDate = dateutils.addDays(new Date(task.startDate), task.duration).getTime()
+        if (filters.notStartedChecked && startDate >= todayTime) {
             return true
         }
-        if (filter.inProgressChecked && startDate < todayTime && endDate >= todayTime) {
+        if (filters.inProgressChecked && startDate < todayTime && endDate >= todayTime) {
             return true
         }
-        if (filter.doneChecked && endDate < todayTime) {
+        if (filters.doneChecked && endDate < todayTime) {
             return true
         }
         return false
@@ -41,8 +36,8 @@ const filterTasks = (tasks: Array<ApiTask>, filter: TasksFilter, today: Date | n
 
 const initialState: TasksState = {
     isFetching: false,
-    tasks: new Array<ApiTask>(),
-    filter: {
+    tasks: [],
+    filters: {
         notStartedChecked: false,
         inProgressChecked: false,
         doneChecked: false,
@@ -66,14 +61,16 @@ export const tasksReducer = (state: TasksState = initialState, action: Action): 
             return Object.assign({}, state, {
                 isFetching: false,
                 tasks,
-                filteredTasks: filterTasks(tasks, state.filter, state.today)
+                filteredTasks: filterTasks(tasks, state.filters, state.today)
             })
+        case TASKS_RECEIVE_FAILURE:
+            return Object.assign({}, state, { isFetching: false })
         case TASKS_FILTER_DISPLAY:
-            const tasksFilterAction = action as TasksFilterAction
+            const taskFiltersAction = action as TaskFiltersAction
             return Object.assign({}, state, {
-                filter: tasksFilterAction.filters,
-                today: tasksFilterAction.today,
-                filteredTasks: filterTasks(state.tasks, tasksFilterAction.filters, tasksFilterAction.today)
+                filters: taskFiltersAction.filters,
+                today: taskFiltersAction.today,
+                filteredTasks: filterTasks(state.tasks, taskFiltersAction.filters, taskFiltersAction.today)
             })
         default:
             return state

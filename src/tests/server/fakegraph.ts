@@ -14,9 +14,9 @@ export class FakeTaskNode implements ITaskNode {
         this.taskIdentifier = taskIdentifier
         this.startDate = startDate
         this.duration = duration
-        this.children = new Array<ITaskNode>()
-        this.parents = new Array<ITaskNode>()
-        this.modifiers = new Array<Modifier>()
+        this.children = []
+        this.parents = []
+        this.modifiers = []
     }
     addModifier(modifier: Modifier): Promise<Modifier> {
         return Promise.reject(new Error("Not mocked"))

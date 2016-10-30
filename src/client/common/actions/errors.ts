@@ -4,20 +4,30 @@ export interface ErrorAction extends Action {
     message: string
 }
 
-export const processError = (response: Response): Promise<string | null> => {
-    return Promise.resolve().then(() => {
-        if (response.ok) {
-            return null
-        }
+export class ErrorResponseError extends Error implements Error {
+    constructor(message: string) {
+        super(message)
+    }
+}
 
-        return response.json().then((result: any): string | null => {
+export const processError = (response: Response): Promise<any> => {
+    return Promise.resolve().then(() => {
+        return response.json()
+    }).then((result: any) => {
+        if (response.ok) {
+            return result
+        } else {
             if (result.hasOwnProperty("error")) {
-                return result["error"] as string
+                throw new ErrorResponseError(result["error"] as string)
             } else {
-                return "Unknown error"
+                throw new ErrorResponseError("Unknown error")
             }
-        })
+        }
     }).catch((error) => {
-        return "Unknown error"
+        if (error instanceof ErrorResponseError) {
+            throw error
+        } else {
+            throw new ErrorResponseError("Unknown error")
+        }
     })
 }

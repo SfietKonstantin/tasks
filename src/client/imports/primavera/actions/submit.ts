@@ -78,11 +78,11 @@ export const submit = (project: Project, tasks: Array<PrimaveraTask>,
             })
         }
         return fetch("/api/import", requestInit).then((response: Response) => {
-            return processError(response).then(() => {
-                dispatch(receiveSubmit())
-            }).catch((error: Error) => {
-                dispatch(receiveSubmitFailure(error.message))
-            })
+            return processError(response)
+        }).then(() => {
+            dispatch(receiveSubmit())
+        }).catch((error: Error) => {
+            dispatch(receiveSubmitFailure(error.message))
         })
     }
 }

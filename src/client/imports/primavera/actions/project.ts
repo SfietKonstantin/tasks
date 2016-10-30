@@ -58,12 +58,10 @@ export const addProject = (project: Project) => {
         }
         return fetch("/api/project", requestInit).then((response: Response) => {
             return processError(response)
-        }).then((error: string | null) => {
-            if (error == null) {
-                dispatch(receiveAddProject())
-            } else {
-                dispatch(receiveAddFailureProject(error))
-            }
+        }).then(() => {
+            dispatch(receiveAddProject())
+        }).catch((error: Error) => {
+            dispatch(receiveAddFailureProject(error.message))
         })
     }
 }

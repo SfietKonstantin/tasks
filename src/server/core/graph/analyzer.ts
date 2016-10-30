@@ -23,7 +23,7 @@ export const findCyclicDependency = (tasks: Array<Task>, relations: Array<TaskRe
     tasks.forEach((task: Task) => {
         nodes.set(task.identifier, {
             taskIdentifier: task.identifier,
-            children: new Array<Node>()
+            children: []
         })
     })
 

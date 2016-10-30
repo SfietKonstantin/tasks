@@ -9,7 +9,7 @@ import {
 } from "../actions/relations"
 
 const initialState: RelationsState = {
-    relations: new Array<PrimaveraTaskRelation>(),
+    relations: [],
     isImporting: false,
     invalidFormat: false
 }

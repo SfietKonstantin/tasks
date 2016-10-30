@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Dispatch } from "redux"
-import { State, TasksFilter } from "../types"
+import { State, TaskFilters } from "../types"
 import { fetchTasks, filterTasks } from "../actions/tasks"
 import { Grid, Col, Button, ButtonGroup, ListGroup, ListGroupItem } from "react-bootstrap"
 import { FilterButton } from "../components/filterbutton"
@@ -9,16 +9,16 @@ import { ApiTask } from "../../../common/apitypes"
 interface AllTasksContentProperties {
     projectIdentifier: string
     tasks: Array<ApiTask>
-    filter: TasksFilter
-    onFilterChanged: (filter: TasksFilter) => void
+    filters: TaskFilters
+    onFilterChanged: (filters: TaskFilters) => void
     dispatch: Dispatch<State>
 }
 
 export class UnconnectedAllTasks extends React.Component<AllTasksContentProperties, {}> {
     render() {
-        const notStartedChecked = UnconnectedAllTasks.getButtonStyle(this.props.filter.notStartedChecked)
-        const inProgressChecked = UnconnectedAllTasks.getButtonStyle(this.props.filter.inProgressChecked)
-        const doneChecked = UnconnectedAllTasks.getButtonStyle(this.props.filter.doneChecked)
+        const notStartedChecked = UnconnectedAllTasks.getButtonStyle(this.props.filters.notStartedChecked)
+        const inProgressChecked = UnconnectedAllTasks.getButtonStyle(this.props.filters.inProgressChecked)
+        const doneChecked = UnconnectedAllTasks.getButtonStyle(this.props.filters.doneChecked)
         const content = this.props.tasks.map((task: ApiTask) => {
             const taskLink = "/project/" + this.props.projectIdentifier + "/task/" + task.identifier
             return <ListGroupItem href={taskLink}>
@@ -39,7 +39,7 @@ export class UnconnectedAllTasks extends React.Component<AllTasksContentProperti
                             <span className="glyphicon glyphicon-ok" aria-hidden="true"></span> Done
                         </Button>
                     </ButtonGroup>
-                    <FilterButton milestonesOnly={this.props.filter.milestonesOnlyChecked}
+                    <FilterButton milestonesOnly={this.props.filters.milestonesOnlyChecked}
                                   onToggleMilestonesOnly={this.handleToggleMilestonesOnly.bind(this)} />
                 </div>
                 <ListGroup fill hover>
@@ -56,24 +56,24 @@ export class UnconnectedAllTasks extends React.Component<AllTasksContentProperti
     }
     private handleNotStartedClicked(e: React.MouseEvent) {
         e.preventDefault()
-        const notStartedChecked = !this.props.filter.notStartedChecked
-        this.handleFilterTasks(Object.assign({}, this.props.filter, {notStartedChecked}))
+        const notStartedChecked = !this.props.filters.notStartedChecked
+        this.handleFilterTasks(Object.assign({}, this.props.filters, {notStartedChecked}))
     }
     private handleInProgress(e: React.MouseEvent) {
         e.preventDefault()
-        const inProgressChecked = !this.props.filter.inProgressChecked
-        this.handleFilterTasks(Object.assign({}, this.props.filter, {inProgressChecked}))
+        const inProgressChecked = !this.props.filters.inProgressChecked
+        this.handleFilterTasks(Object.assign({}, this.props.filters, {inProgressChecked}))
     }
     private handleDoneClicked(e: React.MouseEvent) {
         e.preventDefault()
-        const doneChecked = !this.props.filter.doneChecked
-        this.handleFilterTasks(Object.assign({}, this.props.filter, {doneChecked}))
+        const doneChecked = !this.props.filters.doneChecked
+        this.handleFilterTasks(Object.assign({}, this.props.filters, {doneChecked}))
     }
     private handleToggleMilestonesOnly() {
-        const milestonesOnlyChecked = !this.props.filter.milestonesOnlyChecked
-        this.handleFilterTasks(Object.assign({}, this.props.filter, {milestonesOnlyChecked}))
+        const milestonesOnlyChecked = !this.props.filters.milestonesOnlyChecked
+        this.handleFilterTasks(Object.assign({}, this.props.filters, {milestonesOnlyChecked}))
     }
-    private handleFilterTasks(filter: TasksFilter) {
+    private handleFilterTasks(filter: TaskFilters) {
         localStorage.setItem(this.props.projectIdentifier, JSON.stringify(filter))
         this.props.onFilterChanged(filter)
     }
@@ -83,14 +83,14 @@ const mapStateToProps = (state: State) => {
     return {
         projectIdentifier: state.projectIdentifier,
         tasks: state.tasks.filteredTasks,
-        filter: state.tasks.filter
+        filters: state.tasks.filters
     }
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
-        onFilterChanged: (tasksFilter: TasksFilter) => {
-            dispatch(filterTasks(tasksFilter))
+        onFilterChanged: (taskFilters: TaskFilters) => {
+            dispatch(filterTasks(taskFilters))
         },
         dispatch
     }

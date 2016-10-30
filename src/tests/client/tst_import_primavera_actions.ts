@@ -1,5 +1,7 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
+import { Action } from "redux"
+import { ErrorAction } from "../../client/common/actions/errors"
 import {
     ProjectAction, PROJECT_DEFINE, PROJECT_REQUEST_ADD, PROJECT_RECEIVE_ADD, PROJECT_RECEIVE_ADD_FAILURE,
     defineProject, addProject
@@ -21,12 +23,13 @@ describe("Primavera actions", () => {
     describe("Project", () => {
         describe("Synchronous", () => {
             it("Should create PROJECT_DEFINE", () => {
-                chai.expect(defineProject("identifier", "Name", "Description")).to.deep.equal({
+                const expected: ProjectAction = {
                     type: PROJECT_DEFINE,
                     identifier: "identifier",
                     name: "Name",
                     description: "Description"
-                })
+                }
+                chai.expect(defineProject("identifier", "Name", "Description")).to.deep.equal(expected)
             })
         })
         describe("Asynchronous", () => {
@@ -56,18 +59,19 @@ describe("Primavera actions", () => {
 
                 // Test
                 addProject(project)(dispatch).then(() => {
+                    const expected: Action = { type: PROJECT_RECEIVE_ADD }
                     chai.expect(dispatch.calledTwice).to.true
-                    chai.expect(dispatch.calledWith({type: PROJECT_RECEIVE_ADD})).to.true
+                    chai.expect(dispatch.calledWith(expected)).to.true
                     done()
                 }).catch((error) => {
                     done(error)
                 })
 
+                const expected: Action = { type: PROJECT_REQUEST_ADD }
                 chai.expect(dispatch.calledOnce).to.true
-                chai.expect(dispatch.calledWith({type: PROJECT_REQUEST_ADD})).to.true
+                chai.expect(dispatch.calledWith(expected)).to.true
 
                 chai.expect(fetchMock.calledOnce).to.true
-                chai.expect(fetchMock.args).to.length(1)
                 chai.expect(fetchMock.args[0]).to.length(2)
                 chai.expect(fetchMock.args[0][0]).to.equal("/api/project")
                 const requestInit = fetchMock.args[0][1] as RequestInit
@@ -75,7 +79,6 @@ describe("Primavera actions", () => {
                 const body = JSON.parse(requestInit.body as string)
                 chai.expect(body).to.haveOwnProperty("project")
                 chai.expect(body.project).to.deep.equal(project)
-
             })
             it("Should react to PUT error from server", (done) => {
                 // Mock
@@ -88,75 +91,30 @@ describe("Primavera actions", () => {
                     name: "Name",
                     description: "Description"
                 })(dispatch).then(() => {
-                    chai.expect(dispatch.calledTwice).to.true
-                    chai.expect(dispatch.calledWith({
+                    const expected: ErrorAction = {
                         type: PROJECT_RECEIVE_ADD_FAILURE,
                         message: "Error message"
-                    })).to.true
-                    done()
-                }).catch((error) => {
-                    done(error)
-                })
-
-                chai.expect(dispatch.calledOnce).to.true
-                chai.expect(dispatch.calledWith({type: PROJECT_REQUEST_ADD})).to.true
-            })
-            it("Should react to PUT error from server without cause", (done) => {
-                // Mock
-                const response = new FakeResponse(false, {})
-                fetchMock.once().returns(Promise.resolve(response))
-
-                // Test
-                addProject({
-                    identifier: "identifier",
-                    name: "Name",
-                    description: "Description"
-                })(dispatch).then(() => {
+                    }
                     chai.expect(dispatch.calledTwice).to.true
-                    chai.expect(dispatch.calledWith({
-                        type: PROJECT_RECEIVE_ADD_FAILURE,
-                        message: "Unknown error"
-                    })).to.true
+                    chai.expect(dispatch.calledWith(expected)).to.true
                     done()
                 }).catch((error) => {
                     done(error)
                 })
 
+                const expected: Action = { type: PROJECT_REQUEST_ADD }
                 chai.expect(dispatch.calledOnce).to.true
-                chai.expect(dispatch.calledWith({type: PROJECT_REQUEST_ADD})).to.true
-            })
-            it("Should react to PUT result JSON parsing error", (done) => {
-                // Mock
-                const response = new FakeResponse(false, {}, true)
-                fetchMock.once().returns(Promise.resolve(response))
-
-                // Test
-                addProject({
-                    identifier: "identifier",
-                    name: "Name",
-                    description: "Description"
-                })(dispatch).then(() => {
-                    chai.expect(dispatch.calledTwice).to.true
-                    chai.expect(dispatch.calledWith({
-                        type: PROJECT_RECEIVE_ADD_FAILURE,
-                        message: "Unknown error"
-                    })).to.true
-                    done()
-                }).catch((error) => {
-                    done(error)
-                })
-
-                chai.expect(dispatch.calledOnce).to.true
-                chai.expect(dispatch.calledWith({type: PROJECT_REQUEST_ADD})).to.true
+                chai.expect(dispatch.calledWith(expected)).to.true
             })
         })
     })
     describe("Tasks", () => {
         describe("Synchronous", () => {
             it("Should create TASKS_DISMISS_INVALID_FORMAT", () => {
-                chai.expect(dismissInvalidTasksFormat()).to.deep.equal({
+                const expected: Action = {
                     type: TASKS_DISMISS_INVALID_FORMAT
-                })
+                }
+                chai.expect(dismissInvalidTasksFormat()).to.deep.equal(expected)
             })
         })
         describe("Asynchronous", () => {
@@ -168,9 +126,10 @@ describe("Primavera actions", () => {
     describe("Relations", () => {
         describe("Synchronous", () => {
             it("Should create RELATIONS_DISMISS_INVALID_FORMAT", () => {
-                chai.expect(dismissInvalidRelationsFormat()).to.deep.equal({
+                const expected: Action = {
                     type: RELATIONS_DISMISS_INVALID_FORMAT
-                })
+                }
+                chai.expect(dismissInvalidRelationsFormat()).to.deep.equal(expected)
             })
         })
         describe("Asynchronous", () => {
