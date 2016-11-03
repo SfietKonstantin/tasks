@@ -27,7 +27,7 @@ interface StatusTimeProperties {
 
 export class StatusTime extends React.Component<StatusTimeProperties, {}> {
     render() {
-        return <Col className={this.props.className} xs={12} md={6}>
+        return <Col className={this.props.className} xs={12} sm={6}>
             <div className="task-overview-label">
                 <Label bsStyle={this.props.color}>{this.props.state}</Label>
             </div>

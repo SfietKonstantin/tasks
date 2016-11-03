@@ -6,6 +6,7 @@ import {
     TASKS_FILTER_DISPLAY
 } from "../actions/tasks"
 import * as dateutils from "../../../common/dateutils"
+import * as latinize from "latinize"
 
 const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | null): Array<ApiTask> => {
     if (!today) {
@@ -17,6 +18,13 @@ const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | 
     const filtered = tasks.filter((task: ApiTask) => {
         if (filters.milestonesOnlyChecked && task.estimatedDuration !== 0) {
             return false
+        }
+        if (filters.text.length > 0) {
+            const lowerFilter = latinize(filters.text.trim()).toLowerCase()
+            const lowerName = latinize(task.name.trim()).toLowerCase()
+            if (lowerName.indexOf(lowerFilter) === -1) {
+                return false
+            }
         }
 
         const startDate = new Date(task.startDate).getTime()
@@ -44,7 +52,8 @@ const initialState: TasksState = {
         notStartedChecked: false,
         inProgressChecked: false,
         doneChecked: false,
-        milestonesOnlyChecked: false
+        milestonesOnlyChecked: false,
+        text: ""
     },
     today: null,
     filteredTasks: Array<ApiTask>()

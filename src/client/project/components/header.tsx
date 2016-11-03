@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Col } from "react-bootstrap"
-import { TabBar } from "../../common/tabs"
-import * as CommonHeader from "../../common/header"
+import { TabBar } from "../../common/components/tabs"
+import * as CommonHeader from "../../common/components/header"
 import { Breadcrumb } from "./breadcrumb"
 import { Project } from "../../../common/types"
 
@@ -14,7 +14,7 @@ export class Header extends React.Component<HeaderProperties, {}> {
     render() {
         const tabs = ["Overview", "Tasks"]
         return <CommonHeader.Header identifier={this.props.project.identifier} name={this.props.project.name}>
-            <Col xs={12} md={8}>
+            <Col xs={12} sm={8}>
                 <Breadcrumb project={this.props.project} />
             </Col>
             <TabBar tabs={tabs} tabChangedCallback={this.props.tabChangedCallback}/>

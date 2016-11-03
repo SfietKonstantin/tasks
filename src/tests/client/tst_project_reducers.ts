@@ -87,7 +87,8 @@ describe("Project reducers", () => {
                     notStartedChecked: false,
                     inProgressChecked: false,
                     doneChecked: false,
-                    milestonesOnlyChecked: false
+                    milestonesOnlyChecked: false,
+                    text: ""
                 },
                 today: null,
                 filteredTasks: []
@@ -106,7 +107,8 @@ describe("Project reducers", () => {
                     notStartedChecked: true,
                     inProgressChecked: true,
                     doneChecked: true,
-                    milestonesOnlyChecked: true
+                    milestonesOnlyChecked: true,
+                    text: "Some filter"
                 },
                 today: new Date(2016, 9, 1),
                 filteredTasks: tasks.slice(0)
@@ -183,7 +185,8 @@ describe("Project reducers", () => {
                     notStartedChecked: true,
                     inProgressChecked: false,
                     doneChecked: false,
-                    milestonesOnlyChecked: false
+                    milestonesOnlyChecked: false,
+                    text: ""
                 }
                 const state = main.mainReducer(initialState, filterTasks(filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
@@ -200,7 +203,8 @@ describe("Project reducers", () => {
                     notStartedChecked: false,
                     inProgressChecked: true,
                     doneChecked: false,
-                    milestonesOnlyChecked: false
+                    milestonesOnlyChecked: false,
+                    text: ""
                 }
                 const state = main.mainReducer(initialState, filterTasks(filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
@@ -217,7 +221,8 @@ describe("Project reducers", () => {
                     notStartedChecked: false,
                     inProgressChecked: false,
                     doneChecked: true,
-                    milestonesOnlyChecked: false
+                    milestonesOnlyChecked: false,
+                    text: ""
                 }
                 const state = main.mainReducer(initialState, filterTasks(filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
@@ -227,19 +232,38 @@ describe("Project reducers", () => {
             checkState(initialState1)
             checkState(initialState2)
         })
-        it("Should reduce TASKS_FILTER_DISPLAY 3", () => {
+        it("Should reduce TASKS_FILTER_DISPLAY 4", () => {
             const checkState = (initialState: State) => {
                 initialState.tasks.tasks = tasks.slice(0)
                 const filters: TaskFilters = {
                     notStartedChecked: true,
                     inProgressChecked: true,
                     doneChecked: true,
-                    milestonesOnlyChecked: true
+                    milestonesOnlyChecked: true,
+                    text: ""
                 }
                 const state = main.mainReducer(initialState, filterTasks(filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
                 chai.expect(state.tasks.today).to.deep.equal(new Date(2016, 9, 1))
                 chai.expect(state.tasks.filteredTasks).to.deep.equal([ tasks[3], tasks[4] ])
+            }
+            checkState(initialState1)
+            checkState(initialState2)
+        })
+        it("Should reduce TASKS_FILTER_DISPLAY 5", () => {
+            const checkState = (initialState: State) => {
+                initialState.tasks.tasks = tasks.slice(0)
+                const filters: TaskFilters = {
+                    notStartedChecked: true,
+                    inProgressChecked: true,
+                    doneChecked: true,
+                    milestonesOnlyChecked: false,
+                    text: " 1"
+                }
+                const state = main.mainReducer(initialState, filterTasks(filters))
+                chai.expect(state.tasks.filters).to.deep.equal(filters)
+                chai.expect(state.tasks.today).to.deep.equal(new Date(2016, 9, 1))
+                chai.expect(state.tasks.filteredTasks).to.deep.equal([ tasks[0], tasks[3] ])
             }
             checkState(initialState1)
             checkState(initialState2)

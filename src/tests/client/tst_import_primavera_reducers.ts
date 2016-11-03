@@ -22,6 +22,7 @@ import {
 import * as projectEditor from "../../client/imports/primavera/components/projecteditor"
 import * as tasksSelector from "../../client/imports/primavera/components/tasksselector"
 import * as relationsSelector from "../../client/imports/primavera/components/relationsselector"
+import * as overview from "../../client/imports/primavera/components/overview"
 import { TasksParseResults, RelationsParseResults } from "../../client/imports/primavera/imports"
 import { Project, TaskRelation, TaskLocation } from "../../common/types"
 import { ApiInputTask } from "../../common/apitypes"
@@ -351,6 +352,24 @@ describe("Primavera reducers", () => {
                     chai.expect(mapped.relations).to.deep.equal(initialState.relations.relations)
                     chai.expect(mapped.warnings).to.deep.equal(initialState.relations.warnings)
                     chai.expect(mapped.isImporting).to.equal(initialState.tasks.isImporting)
+                }
+                checkMapped(initialState1)
+                checkMapped(initialState2)
+            })
+        })
+        describe("Overview", () => {
+            it("Should map the states", () => {
+                const checkMapped = (initialState: State) => {
+                    const mapped = overview.mapStateToProps(initialState)
+                    chai.expect(mapped.stage).to.equal(initialState.stage.current)
+                    chai.expect(mapped.maxStage).to.equal(initialState.stage.max)
+                    chai.expect(mapped.project).to.deep.equal(initialState.project)
+                    chai.expect(mapped.totalTasks).to.deep.equal(initialState.tasks.length)
+                    chai.expect(mapped.tasks).to.deep.equal(initialState.overview.tasks)
+                    chai.expect(mapped.totalRelations).to.deep.equal(initialState.relations.length)
+                    chai.expect(mapped.relations).to.deep.equal(initialState.overview.relations)
+                    chai.expect(mapped.warnings).to.deep.equal(initialState.overview.warnings)
+                    chai.expect(mapped.submitState).to.deep.equal(initialState.overview.submitState)
                 }
                 checkMapped(initialState1)
                 checkMapped(initialState2)

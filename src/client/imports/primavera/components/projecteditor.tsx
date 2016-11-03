@@ -23,19 +23,19 @@ export class ProjectEditor extends React.Component<ProjectEditorProperties, {}> 
                            onCurrent={this.props.onCurrentStage.bind(this)}>
             <Form horizontal>
                 <FormGroup validationState={this.getIdentifierValidationState()}>
-                    <Col componentClass={ControlLabel} xd={12} md={2}>
+                    <Col componentClass={ControlLabel} xd={12} sm={2}>
                         Project identifier
                     </Col>
-                    <Col xd={12} md={10}>
+                    <Col xd={12} sm={10}>
                         <FormControl type="text" placeholder="Project identifier"
                                      onInput={this.handleIdentifierInput.bind(this)} />
                     </Col>
                 </FormGroup>
                 <FormGroup validationState={this.getNameValidationState()}>
-                    <Col componentClass={ControlLabel} xd={12} md={2}>
+                    <Col componentClass={ControlLabel} xd={12} sm={2}>
                         Project name
                     </Col>
-                    <Col xd={12} md={10}>
+                    <Col xd={12} sm={10}>
                         <FormControl type="text" placeholder="Project name"
                                      onInput={this.handleNameInput.bind(this)} />
                     </Col>

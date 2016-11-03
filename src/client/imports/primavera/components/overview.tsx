@@ -60,24 +60,24 @@ export class Overview extends React.Component<OverviewProperties, {}> {
         switch (this.props.submitState) {
             case SubmitState.Idle:
                 return "primary"
-            case SubmitState.Submitting:
-                return "default"
             case SubmitState.Submitted:
                 return "success"
             case SubmitState.SubmitError:
                 return "danger"
+            default:
+                return "default"
         }
     }
     private getButtonText(): string {
         switch (this.props.submitState) {
-            case SubmitState.Idle:
-                return "Import"
             case SubmitState.Submitting:
                 return "Importing"
             case SubmitState.Submitted:
                 return "Import successful"
             case SubmitState.SubmitError:
                 return "Import failed"
+            default:
+                return "Import"
         }
     }
 }

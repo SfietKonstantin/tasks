@@ -5,7 +5,7 @@ import { ProjectEditor, TasksSelector, RelationsSelector, Overview } from "../co
 export class Main extends React.Component<{}, {}> {
     render() {
         return <Grid>
-            <Col xs={12} md={12}>
+            <Col xs={12} sm={12}>
                 <h1>Import from Oracle Primavera</h1>
                 <p>
                     Only CSV files can be imported. Oracle Primavera Excel files should

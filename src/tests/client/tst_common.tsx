@@ -3,8 +3,9 @@ import * as React from "react"
 import * as enzyme from "enzyme"
 import { Nav, NavItem } from "react-bootstrap"
 import * as sinon from "sinon"
-import { Header } from "../../client/common/header"
-import { TabBar } from "../../client/common/tabs"
+import { Header } from "../../client/common/components/header"
+import { TabBar } from "../../client/common/components/tabs"
+import { ItemList } from "../../client/common/components/itemlist"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Common components", () => {
@@ -64,6 +65,68 @@ describe("Common components", () => {
             chai.expect(navItems.at(0).prop<boolean>("active")).to.false
             chai.expect(navItems.at(1).prop<boolean>("active")).to.false
             chai.expect(navItems.at(2).prop<boolean>("active")).to.true
+        })
+    })
+    describe("ItemList", () => {
+        it("Should create a ItemList", () => {
+            class TestItemList extends ItemList<number> {}
+
+            const createElement = sinon.stub()
+            createElement.withArgs(1).returns(<p>test 1</p>)
+            createElement.withArgs(2).returns(<p>test 2</p>)
+            createElement.withArgs(3).returns(<p>test 3</p>)
+            const onTextFilter = sinon.spy()
+            const component = enzyme.mount(<TestItemList items={[1, 2, 3]}
+                                                         createElement={createElement}
+                                                         onTextFilter={onTextFilter} />)
+            const p = component.find("p")
+            chai.expect(p).to.length(3)
+        })
+        it("Should handle text changed", () => {
+            class TestItemList extends ItemList<number> {}
+
+            const createElement = sinon.stub()
+            const onTextFilter = sinon.spy()
+            const component = enzyme.mount(<TestItemList items={[]}
+                                                         createElement={createElement}
+                                                         onTextFilter={onTextFilter} />)
+            const formControls = component.children().find("FormControl")
+            chai.expect(formControls).to.length(1)
+
+            formControls.at(0).simulate("input", { target: { value: "Test" } })
+            chai.expect(component.state("filter")).to.equal("Test")
+        })
+        it("Should handle blur", () => {
+            class TestItemList extends ItemList<number> {}
+
+            const createElement = sinon.stub()
+            const onTextFilter = sinon.spy()
+            const component = enzyme.mount(<TestItemList items={[]}
+                                                         createElement={createElement}
+                                                         onTextFilter={onTextFilter} />)
+            const formControls = component.children().find("FormControl")
+            chai.expect(formControls).to.length(1)
+
+            formControls.at(0).simulate("input", { target: { value: "Test" } })
+            formControls.at(0).simulate("blur")
+            chai.expect(onTextFilter.calledOnce)
+            chai.expect(onTextFilter.calledWithExactly("Test"))
+        })
+        it("Should handle submit", () => {
+            class TestItemList extends ItemList<number> {}
+
+            const createElement = sinon.stub()
+            const onTextFilter = sinon.spy()
+            const component = enzyme.mount(<TestItemList items={[]}
+                                                         createElement={createElement}
+                                                         onTextFilter={onTextFilter} />)
+            const formControls = component.children().find("FormControl")
+            chai.expect(formControls).to.length(1)
+
+            formControls.at(0).simulate("input", { target: { value: "Test" } })
+            formControls.at(0).simulate("submit")
+            chai.expect(onTextFilter.calledOnce)
+            chai.expect(onTextFilter.calledWithExactly("Test"))
         })
     })
 })

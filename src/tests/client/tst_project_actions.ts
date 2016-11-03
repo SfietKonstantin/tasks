@@ -99,7 +99,8 @@ describe("Project actions", () => {
                     notStartedChecked: false,
                     inProgressChecked: true,
                     doneChecked: false,
-                    milestonesOnlyChecked: true
+                    milestonesOnlyChecked: true,
+                    text: "hello"
                 }
                 const expected: TaskFiltersAction = {
                     type: TASKS_FILTER_DISPLAY,

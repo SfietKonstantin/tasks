@@ -1,5 +1,5 @@
 import { Action } from "redux"
-import { OverviewState,SubmitState } from "../types"
+import { OverviewState, SubmitState } from "../types"
 import { ErrorAction } from "../../../common/actions/errors"
 import { TaskRelation } from "../../../../common/types"
 import { ApiInputTask } from "../../../../common/apitypes"
@@ -21,7 +21,7 @@ const initialState: OverviewState = {
 export const overviewReducer = (state: OverviewState = initialState, action: Action): OverviewState => {
     switch (action.type) {
         case OVERVIEW_FILTER:
-        const overviewAction = action as OverviewFilterAction
+            const overviewAction = action as OverviewFilterAction
             return Object.assign({}, state, {
                 tasks: overviewAction.tasks,
                 relations: overviewAction.relations,

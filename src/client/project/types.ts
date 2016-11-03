@@ -17,6 +17,7 @@ export interface TaskFilters {
     inProgressChecked: boolean
     doneChecked: boolean
     milestonesOnlyChecked: boolean
+    text: string
 }
 
 export interface TasksState {

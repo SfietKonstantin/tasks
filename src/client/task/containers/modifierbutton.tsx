@@ -41,19 +41,19 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
                 <Modal.Body>
                     <Form horizontal>
                         <FormGroup validationState={this.getNameValidationState()}>
-                            <Col componentClass={ControlLabel} xd={12} md={2}>
+                            <Col componentClass={ControlLabel} xd={12} sm={2}>
                                 Title
                             </Col>
-                            <Col xd={12} md={10}>
+                            <Col xd={12} sm={10}>
                                 <FormControl type="text" placeholder="Title"
                                              onInput={this.handleNameInput.bind(this)} />
                             </Col>
                         </FormGroup>
                         <FormGroup validationState={this.getDurationValidationState()}>
-                            <Col componentClass={ControlLabel} xd={12} md={2}>
+                            <Col componentClass={ControlLabel} xd={12} sm={2}>
                                 Duration
                             </Col>
-                            <Col xd={12} md={10}>
+                            <Col xd={12} sm={10}>
                                 <InputGroup>
                                     <FormControl type="number" placeholder="Duration"
                                                  onInput={this.handleDurationInput.bind(this)}/>
@@ -62,10 +62,10 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
                             </Col>
                         </FormGroup>
                         <FormGroup>
-                            <Col componentClass={ControlLabel} xd={12} md={2}>
+                            <Col componentClass={ControlLabel} xd={12} sm={2}>
                                 Modifier type
                             </Col>
-                            <Col xd={12} md={10}>
+                            <Col xd={12} sm={10}>
                                 <InputGroup>
                                     <Radio checked={this.state.location === TaskLocation.Beginning}
                                            onClick={this.handleBeginningRadio.bind(this)}>
@@ -79,10 +79,10 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
                             </Col>
                         </FormGroup>
                         <FormGroup>
-                            <Col componentClass={ControlLabel} xd={12} md={2}>
+                            <Col componentClass={ControlLabel} xd={12} sm={2}>
                                 Description
                             </Col>
-                            <Col xd={12} md={10}>
+                            <Col xd={12} sm={10}>
                                 <FormControl type="text" componentClass="textarea" placeholder="Description"
                                              onInput={this.handleDescriptionInput.bind(this)} />
                             </Col>

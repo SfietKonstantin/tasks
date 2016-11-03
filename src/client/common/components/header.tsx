@@ -11,7 +11,7 @@ export class Header extends React.Component<HeaderProperties, {}> {
     render() {
         return <div className="page-header navbar-default">
             <Grid className="page-header-container">
-                <Col xs={8} md={8}>
+                <Col xs={8} sm={8}>
                     <h1 className="title-h1">{this.props.name} <small>#{this.props.identifier}</small></h1>
                 </Col>
                 {this.props.children}

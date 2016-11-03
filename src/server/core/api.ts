@@ -3,7 +3,9 @@ import { Project, Task, TaskResults, TaskRelation, Modifier } from "../../common
 import { IDataProvider, isKnownError } from "../core/data/idataprovider"
 import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"
 import { findCyclicDependency } from "../core/graph/analyzer"
-import { ApiTask, ApiProjectTaskModifiers, createProject, createTask, createApiTask, createRelation } from "../../common/apitypes"
+import {
+    ApiTask, ApiProjectTaskModifiers, createProject, createTask, createApiTask, createRelation
+} from "../../common/apitypes"
 import { NotFoundError, ExistsError, InputError } from "../../common/errors"
 import * as maputils from "../../common/maputils"
 

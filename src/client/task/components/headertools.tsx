@@ -5,7 +5,7 @@ import { ModifierButton } from "../containers/modifierbutton"
 
 export class HeaderTools extends React.Component<{}, {}> {
     render() {
-        return <Col xs={4} md={4}>
+        return <Col xs={4} sm={4}>
             <div className="task-header-tools">
                 <ButtonGroup>
                     <ModifierButton>

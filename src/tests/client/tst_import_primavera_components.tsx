@@ -7,11 +7,15 @@ import {TasksSelector } from "../../client/imports/primavera/components/taskssel
 import * as tasksActions from "../../client/imports/primavera/actions/tasks"
 import * as relationsSelector from "../../client/imports/primavera/components/relationsselector"
 import { RelationsSelector } from "../../client/imports/primavera/components/relationsselector"
+import * as overview from "../../client/imports/primavera/components/overview"
 import { Main } from "../../client/imports/primavera/components/main"
 import * as relationsActions from "../../client/imports/primavera/actions/relations"
 import { filterForOverview } from "../../client/imports/primavera/actions/overview"
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
+import { submit } from "../../client/imports/primavera/actions/overview"
 import { Stage, PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
+import { ApiInputTask } from "../../common/apitypes"
+import { Project, TaskRelation, TaskLocation } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { FakeFile } from "./fakefile"
 import * as connectedcomponents from "../../client/imports/primavera/connectedcomponents"
@@ -282,6 +286,51 @@ describe("Primavera components", () => {
 
             mapped.onDismissInvalidFormat()
             chai.expect(dispatch.calledWithExactly(relationsActions.dismissInvalidRelationsFormat())).to.true
+        })
+    })
+    describe("Overview", () => {
+        it("Should map the onCurrentStage callback", () => {
+            let dispatch = sinon.spy()
+            const mapped = overview.mapDispatchToProps(dispatch)
+
+            mapped.onCurrentStage()
+            dispatch.calledWithExactly(defineStage(Stage.Overview))
+        })
+        it("Should map the onSubmit callback", () => {
+            const project: Project = {
+                identifier: "identifier",
+                name: "Project",
+                description: "Description"
+            }
+            const tasks: Array<ApiInputTask> = [
+                {
+                    identifier: "task1",
+                    name: "Task 1",
+                    description: "",
+                    estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+                    estimatedDuration: 30
+                },
+                {
+                    identifier: "milestone1",
+                    name: "Milestone 1",
+                    description: "",
+                    estimatedStartDate: new Date(2016, 10, 1).toISOString(),
+                    estimatedDuration: 0
+                }
+            ]
+            const relations: Array<TaskRelation> = [
+                {
+                    previous: "task1",
+                    previousLocation: TaskLocation.Beginning,
+                    next: "milestone1",
+                    lag: 3
+                }
+            ]
+            let dispatch = sinon.spy()
+            const mapped = overview.mapDispatchToProps(dispatch)
+
+            mapped.onSubmit(project, tasks, relations)
+            dispatch.calledWithExactly(submit(project, tasks, relations))
         })
     })
     describe("Main", () => {

@@ -25,12 +25,13 @@ export const render = (projectIdentifier: string) => {
         notStartedChecked: true,
         inProgressChecked: true,
         doneChecked: false,
-        milestonesOnlyChecked: false
+        milestonesOnlyChecked: false,
+        text: ""
     }
 
     const filterJson = localStorage.getItem(projectIdentifier)
     if (filterJson != null) {
-        filters = JSON.parse(filterJson)
+        filters = Object.assign(filters, JSON.parse(filterJson))
     }
     filters.milestonesOnlyChecked = false
 

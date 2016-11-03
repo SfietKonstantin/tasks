@@ -47,10 +47,10 @@ export class FileSelector extends React.Component<FileSelectorProperties, {}> {
                 <FormGroup>
                     <input type="file" ref="input" className="hidden"
                            onChange={this.handleFile.bind(this)}/>
-                    <Col componentClass={ControlLabel} xd={12} md={2}>
+                    <Col componentClass={ControlLabel} xd={12} sm={2}>
                         {this.props.formLabel}
                     </Col>
-                    <Col xd={12} md={10}>
+                    <Col xd={12} sm={10}>
                         <ButtonGroup>
                             <Button bsStyle={buttonColor} disabled={this.props.isImporting}
                                     onClick={this.handleImport.bind(this)}>
