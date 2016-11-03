@@ -66,7 +66,7 @@ export class ProjectEditor extends React.Component<ProjectEditorProperties, {}> 
 export const mapStateToProps = (state: State) => {
     return {
         stage: state.stage.current,
-        project: state.project.project
+        project: state.project
     }
 }
 

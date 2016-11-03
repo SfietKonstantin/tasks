@@ -2,10 +2,7 @@ import * as chai from "chai"
 import * as sinon from "sinon"
 import * as main from "../../client/imports/primavera/reducers/main"
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
-import {
-    defineProject, requestAddProject, receiveAddProject,
-    receiveAddFailureProject
-} from "../../client/imports/primavera/actions/project"
+import { defineProject } from "../../client/imports/primavera/actions/project"
 import {
     beginTasksImport, endTasksImport, tasksImportInvalidFormat,
     dismissInvalidTasksFormat
@@ -105,12 +102,9 @@ describe("Primavera reducers", () => {
                 max: Stage.Project
             },
             project: {
-                project: {
-                    identifier: "",
-                    name: "",
-                    description: ""
-                },
-                error: null
+                identifier: "",
+                name: "",
+                description: ""
             },
             tasks: {
                 length: 0,
@@ -139,10 +133,7 @@ describe("Primavera reducers", () => {
                 current: Stage.Overview,
                 max: Stage.Overview
             },
-            project: {
-                project: Object.assign({}, project),
-                error: "Error message"
-            },
+            project: Object.assign({}, project),
             tasks: {
                 length: 123,
                 tasks: new Map<string, PrimaveraTask>(tasks),
@@ -186,33 +177,7 @@ describe("Primavera reducers", () => {
         it("Should reduce PROJECT_DEFINE", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, defineProject("identifier", "Name", "Description"))
-                chai.expect(state.project.project).to.deep.equal(project)
-                chai.expect(state.project.error).to.null
-            }
-            checkState(initialState1)
-            checkState(initialState2)
-        })
-        it("Should reduce PROJECT_REQUEST_ADD", () => {
-            const checkState = (initialState: State) => {
-                const state = main.mainReducer(initialState, requestAddProject())
-                chai.expect(state).to.deep.equal(initialState)
-            }
-            checkState(initialState1)
-            checkState(initialState2)
-        })
-        it("Should reduce PROJECT_RECEIVE_ADD", () => {
-            const checkState = (initialState: State) => {
-                const state = main.mainReducer(initialState, receiveAddProject())
-                chai.expect(state).to.deep.equal(initialState)
-            }
-            checkState(initialState1)
-            checkState(initialState2)
-        })
-        it("Should reduce PROJECT_RECEIVE_ADD_FAILURE", () => {
-            const checkState = (initialState: State) => {
-                const state = main.mainReducer(initialState, receiveAddFailureProject("Error message"))
-                chai.expect(state.project.project).to.deep.equal(initialState.project.project)
-                chai.expect(state.project.error).to.equal("Error message")
+                chai.expect(state.project).to.deep.equal(project)
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -356,7 +321,7 @@ describe("Primavera reducers", () => {
             it("Should map the states", () => {
                 const checkMapped = (initialState: State) => {
                     const mapped = projectEditor.mapStateToProps(initialState)
-                    chai.expect(mapped.project).to.deep.equal(initialState.project.project)
+                    chai.expect(mapped.project).to.deep.equal(initialState.project)
                     chai.expect(mapped.stage).to.equal(initialState.stage.current)
                 }
                 checkMapped(initialState1)

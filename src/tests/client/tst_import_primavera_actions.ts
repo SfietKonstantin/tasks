@@ -5,9 +5,7 @@ import { ErrorAction } from "../../client/common/actions/errors"
 import { Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import { StageAction, STAGE_DEFINE, defineStage } from "../../client/imports/primavera/actions/stages"
 import {
-    ProjectAction, PROJECT_DEFINE, PROJECT_REQUEST_ADD, PROJECT_RECEIVE_ADD, PROJECT_RECEIVE_ADD_FAILURE,
-    defineProject, requestAddProject, receiveAddProject, receiveAddFailureProject,
-    addProject
+    ProjectAction, PROJECT_DEFINE, defineProject
 } from "../../client/imports/primavera/actions/project"
 import {
     TasksAction, TASKS_IMPORT_BEGIN, TASKS_IMPORT_END, TASKS_IMPORT_INVALID_FORMAT, TASKS_DISMISS_INVALID_FORMAT,
@@ -20,9 +18,15 @@ import {
     importRelations, beginRelationsImport, endRelationsImport, relationsImportInvalidFormat,
     dismissInvalidRelationsFormat
 } from "../../client/imports/primavera/actions/relations"
+import {
+    OverviewFilterAction, OVERVIEW_FILTER, OVERVIEW_SUBMIT_REQUEST, OVERVIEW_SUBMIT_RECEIVE,
+    OVERVIEW_SUBMIT_RECEIVE_FAILURE,
+    filterForOverview, requestSubmit, receiveSubmit, receiveSubmitFailure, submit
+} from "../../client/imports/primavera/actions/overview"
 import * as files from "../../client/common/actions/files"
 import { parseTasks, parseRelations } from "../../client/imports/primavera/imports"
-import { Project } from "../../common/types"
+import { Project, TaskRelation, TaskLocation } from "../../common/types"
+import { ApiInputTask } from "../../common/apitypes"
 import { FakeResponse } from "./fakeresponse"
 import { FakeFile } from "./fakefile"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
@@ -77,100 +81,6 @@ describe("Primavera actions", () => {
                     description: "Description"
                 }
                 chai.expect(defineProject("identifier", "Name", "Description")).to.deep.equal(expected)
-            })
-            it("Should create PROJECT_REQUEST_ADD", () => {
-                const expected: Action = {
-                    type: PROJECT_REQUEST_ADD
-                }
-                chai.expect(requestAddProject()).to.deep.equal(expected)
-            })
-            it("Should create PROJECT_RECEIVE_ADD", () => {
-                const expected: Action = {
-                    type: PROJECT_RECEIVE_ADD
-                }
-                chai.expect(receiveAddProject()).to.deep.equal(expected)
-            })
-            it("Should create PROJECT_RECEIVE_ADD_FAILURE", () => {
-                const expected: ErrorAction = {
-                    type: PROJECT_RECEIVE_ADD_FAILURE,
-                    message: "Some error"
-                }
-                chai.expect(receiveAddFailureProject("Some error")).to.deep.equal(expected)
-            })
-        })
-        describe("Asynchronous", () => {
-            let sandbox: Sinon.SinonSandbox
-            let dispatch: Sinon.SinonSpy
-            let fetchMock: Sinon.SinonExpectation
-
-            beforeEach(() => {
-                addFakeGlobal()
-                sandbox = sinon.sandbox.create()
-                dispatch = sinon.spy()
-                fetchMock = sandbox.mock(global).expects("fetch")
-            })
-            afterEach(() => {
-                sandbox.restore()
-                clearFakeGlobal()
-            })
-            it("Should PUT a project", (done) => {
-                // Mock
-                const project: Project = {
-                    identifier: "identifier",
-                    name: "Name",
-                    description: "Description"
-                }
-                const response = new FakeResponse(true, {})
-                fetchMock.once().returns(Promise.resolve(response))
-
-                // Test
-                addProject(project)(dispatch).then(() => {
-                    const expected: Action = { type: PROJECT_RECEIVE_ADD }
-                    chai.expect(dispatch.calledTwice).to.true
-                    chai.expect(dispatch.calledWithExactly(expected)).to.true
-                    done()
-                }).catch((error) => {
-                    done(error)
-                })
-
-                const expected: Action = { type: PROJECT_REQUEST_ADD }
-                chai.expect(dispatch.calledOnce).to.true
-                chai.expect(dispatch.calledWithExactly(expected)).to.true
-
-                chai.expect(fetchMock.calledOnce).to.true
-                chai.expect(fetchMock.args[0]).to.length(2)
-                chai.expect(fetchMock.args[0][0]).to.equal("/api/project")
-                const requestInit = fetchMock.args[0][1] as RequestInit
-                chai.expect(requestInit.method).to.equal("PUT")
-                const body = JSON.parse(requestInit.body as string)
-                chai.expect(body).to.haveOwnProperty("project")
-                chai.expect(body.project).to.deep.equal(project)
-            })
-            it("Should react to PUT error from server", (done) => {
-                // Mock
-                const response = new FakeResponse(false, {error: "Error message"})
-                fetchMock.once().returns(Promise.resolve(response))
-
-                // Test
-                addProject({
-                    identifier: "identifier",
-                    name: "Name",
-                    description: "Description"
-                })(dispatch).then(() => {
-                    const expected: ErrorAction = {
-                        type: PROJECT_RECEIVE_ADD_FAILURE,
-                        message: "Error message"
-                    }
-                    chai.expect(dispatch.calledTwice).to.true
-                    chai.expect(dispatch.calledWithExactly(expected)).to.true
-                    done()
-                }).catch((error) => {
-                    done(error)
-                })
-
-                const expected: Action = { type: PROJECT_REQUEST_ADD }
-                chai.expect(dispatch.calledOnce).to.true
-                chai.expect(dispatch.calledWithExactly(expected)).to.true
             })
         })
     })
@@ -288,6 +198,217 @@ describe("Primavera actions", () => {
                                        relationsImportInvalidFormat)
                 importRelations(fakeFile)
                 chai.expect(mock.calledOnce).to.true
+            })
+        })
+    })
+    describe("Overview", () => {
+        describe("Synchronous", () => {
+            it("Should create OVERVIEW_FILTER", () => {
+                let tasks: Map<string, PrimaveraTask> = new Map<string, PrimaveraTask>()
+                tasks.set("task1", {
+                    identifier: "task1",
+                    name: "Task 1",
+                    duration: 30,
+                    startDate: new Date(2016, 9, 1),
+                    endDate: new Date(2016, 10, 1)
+                }),
+                tasks.set("milestone1", {
+                    identifier: "milestone1",
+                    name: "Milestone 1",
+                    duration: 0,
+                    startDate: null,
+                    endDate: new Date(2016, 10, 1)
+                })
+
+                const filteredTasks: Array<ApiInputTask> = [
+                    {
+                        identifier: "task1",
+                        name: "Task 1",
+                        description: "",
+                        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+                        estimatedDuration: 31
+                    },
+                    {
+                        identifier: "milestone1",
+                        name: "Milestone 1",
+                        description: "",
+                        estimatedStartDate: new Date(2016, 10, 1).toISOString(),
+                        estimatedDuration: 0
+                    },
+                ]
+                const relations: Array<PrimaveraTaskRelation> = [
+                    {
+                        previous: "task1",
+                        next: "milestone1",
+                        type: "FS",
+                        lag: 3
+                    }
+                ]
+
+                const filteredRelations: Array<TaskRelation> = [
+                    {
+                        previous: "task1",
+                        next: "milestone1",
+                        previousLocation: TaskLocation.End,
+                        lag: 3
+                    }
+                ]
+                const expected: OverviewFilterAction = {
+                    type: OVERVIEW_FILTER,
+                    tasks: filteredTasks,
+                    relations: filteredRelations,
+                    warnings: new Map<string, Array<string>>()
+                }
+                chai.expect(filterForOverview(tasks, relations)).to.deep.equal(expected)
+            })
+            it("Should create OVERVIEW_SUBMIT_REQUEST", () => {
+                const expected: Action = {
+                    type: OVERVIEW_SUBMIT_REQUEST
+                }
+                chai.expect(requestSubmit()).to.deep.equal(expected)
+            })
+            it("Should create OVERVIEW_SUBMIT_RECEIVE", () => {
+                const expected: Action = {
+                    type: OVERVIEW_SUBMIT_RECEIVE
+                }
+                chai.expect(receiveSubmit()).to.deep.equal(expected)
+            })
+            it("Should create OVERVIEW_SUBMIT_RECEIVE_FAILURE", () => {
+                const expected: ErrorAction = {
+                    type: OVERVIEW_SUBMIT_RECEIVE_FAILURE,
+                    message: "Some error"
+                }
+                chai.expect(receiveSubmitFailure("Some error")).to.deep.equal(expected)
+            })
+        })
+        describe("Asynchronous", () => {
+            let sandbox: Sinon.SinonSandbox
+            let dispatch: Sinon.SinonSpy
+            let fetchMock: Sinon.SinonExpectation
+
+            beforeEach(() => {
+                addFakeGlobal()
+                sandbox = sinon.sandbox.create()
+                dispatch = sinon.spy()
+                fetchMock = sandbox.mock(global).expects("fetch")
+            })
+            afterEach(() => {
+                sandbox.restore()
+                clearFakeGlobal()
+            })
+            it("Should submit", (done) => {
+                // Mock
+                const project: Project = {
+                    identifier: "identifier",
+                    name: "Name",
+                    description: "Description"
+                }
+                const tasks: Array<ApiInputTask> = [
+                    {
+                        identifier: "task1",
+                        name: "Task 1",
+                        description: "",
+                        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+                        estimatedDuration: 31
+                    },
+                    {
+                        identifier: "milestone1",
+                        name: "Milestone 1",
+                        description: "",
+                        estimatedStartDate: new Date(2016, 10, 1).toISOString(),
+                        estimatedDuration: 0
+                    },
+                ]
+                const relations: Array<TaskRelation> = [
+                    {
+                        previous: "task1",
+                        next: "milestone1",
+                        previousLocation: TaskLocation.End,
+                        lag: 3
+                    }
+                ]
+                const response = new FakeResponse(true, {})
+                fetchMock.once().returns(Promise.resolve(response))
+
+                // Test
+                submit(project, tasks, relations)(dispatch).then(() => {
+                    const expected: Action = {
+                        type: OVERVIEW_SUBMIT_RECEIVE
+                    }
+                    chai.expect(dispatch.calledTwice).to.true
+                    chai.expect(dispatch.calledWithExactly(expected)).to.true
+                    done()
+                }).catch((error) => {
+                    done(error)
+                })
+
+                const expected: Action = { type: OVERVIEW_SUBMIT_REQUEST }
+                chai.expect(dispatch.calledOnce).to.true
+                chai.expect(dispatch.calledWithExactly(expected)).to.true
+
+                chai.expect(fetchMock.calledOnce).to.true
+                chai.expect(fetchMock.args[0]).to.length(2)
+                chai.expect(fetchMock.args[0][0]).to.equal("/api/import")
+                const requestInit = fetchMock.args[0][1] as RequestInit
+                chai.expect(requestInit.method).to.equal("PUT")
+                const body = JSON.parse(requestInit.body as string)
+                chai.expect(body).to.haveOwnProperty("project")
+                chai.expect(body.project).to.deep.equal(project)
+                chai.expect(body).to.haveOwnProperty("tasks")
+                chai.expect(body.tasks).to.deep.equal(tasks)
+                chai.expect(body).to.haveOwnProperty("relations")
+                chai.expect(body.relations).to.deep.equal(relations)
+            })
+            it("Should react to error from server", (done) => {
+                // Mock
+                const project: Project = {
+                    identifier: "identifier",
+                    name: "Name",
+                    description: "Description"
+                }
+                const tasks: Array<ApiInputTask> = [
+                    {
+                        identifier: "task1",
+                        name: "Task 1",
+                        description: "",
+                        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+                        estimatedDuration: 31
+                    },
+                    {
+                        identifier: "milestone1",
+                        name: "Milestone 1",
+                        description: "",
+                        estimatedStartDate: new Date(2016, 10, 1).toISOString(),
+                        estimatedDuration: 0
+                    },
+                ]
+                const relations: Array<TaskRelation> = [
+                    {
+                        previous: "task1",
+                        next: "milestone1",
+                        previousLocation: TaskLocation.End,
+                        lag: 3
+                    }
+                ]
+                const response = new FakeResponse(false, {error: "Error message"})
+                fetchMock.once().returns(Promise.resolve(response))
+
+                // Test
+                submit(project, tasks, relations)(dispatch).then(() => {
+                    const expected: ErrorAction = {
+                        type: OVERVIEW_SUBMIT_RECEIVE_FAILURE,
+                        message: "Error message"
+                    }
+                    chai.expect(dispatch.calledTwice).to.true
+                    chai.expect(dispatch.calledWithExactly(expected)).to.true
+                    done()
+                }).catch((error) => {
+                    done(error)
+                })
+
+                const expected: Action = { type: OVERVIEW_SUBMIT_REQUEST }
+                chai.expect(dispatch.calledOnce).to.true
+                chai.expect(dispatch.calledWithExactly(expected)).to.true
             })
         })
     })

@@ -86,7 +86,7 @@ export const mapStateToProps = (state: State) => {
     return {
         stage: state.stage.current,
         maxStage: state.stage.max,
-        project: state.project.project,
+        project: state.project,
         totalTasks: state.tasks.length,
         tasks: state.overview.tasks,
         totalRelations: state.relations.length,

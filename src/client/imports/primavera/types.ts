@@ -15,7 +15,7 @@ export interface Stages {
 
 export interface State {
     stage: Stages
-    project: ProjectState
+    project: Project
     tasks: TasksState
     relations: RelationsState
     overview: OverviewState
@@ -40,11 +40,6 @@ export interface PrimaveraTaskRelation {
     next: string
     type: "FS" | "SF" | "FF" | "SS"
     lag: number
-}
-
-export interface ProjectState {
-    project: Project
-    error: string | null
 }
 
 export interface TasksState {

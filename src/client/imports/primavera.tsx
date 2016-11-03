@@ -27,12 +27,9 @@ export const render = () => {
             max: Stage.Project
         },
         project: {
-            project: {
-                identifier: "",
-                name: "",
-                description: ""
-            },
-            error: null
+            identifier: "",
+            name: "",
+            description: ""
         },
         tasks: {
             length: 0,
