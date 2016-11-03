@@ -66,7 +66,7 @@ describe("API", () => {
                                .returns(Promise.resolve(taskNode))
             })
 
-            api.import(project, tasks).then(() => {
+            api.import(project, tasks, []).then(() => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -117,7 +117,7 @@ describe("API", () => {
             mock.expects("addProject").once().withExactArgs(project)
                 .returns(Promise.reject(new ExistsError("Some error")))
 
-            api.import(project, tasks).then(() => {
+            api.import(project, tasks, []).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -172,7 +172,7 @@ describe("API", () => {
             mock.expects("addProject").once().withExactArgs(project)
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            api.import(project, tasks).then(() => {
+            api.import(project, tasks, []).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -231,7 +231,7 @@ describe("API", () => {
                                .returns(Promise.reject(new ExistsError("Some error")))
             })
 
-            api.import(project, tasks).then(() => {
+            api.import(project, tasks, []).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -290,7 +290,7 @@ describe("API", () => {
                                .returns(Promise.reject(new InternalError("Some error")))
             })
 
-            api.import(project, tasks).then(() => {
+            api.import(project, tasks, []).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -337,7 +337,7 @@ describe("API", () => {
                 }
             ]
 
-            api.import({ test: "test" }, tasks).then(() => {
+            api.import({ test: "test" }, tasks, []).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -358,7 +358,7 @@ describe("API", () => {
                 description: "Description"
             }
 
-            api.import(project, { test: "test" }).then(() => {
+            api.import(project, { test: "test" }, []).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -379,7 +379,7 @@ describe("API", () => {
                 description: "Description"
             }
 
-            api.import(project, [{ test: "test" }]).then(() => {
+            api.import(project, [{ test: "test" }], []).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)

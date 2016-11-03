@@ -1,9 +1,9 @@
 import * as winston from "winston"
-import { Project, Task, TaskResults, Modifier } from "../../common/types"
+import { Project, Task, TaskResults, TaskRelation, Modifier } from "../../common/types"
 import { IDataProvider, isKnownError } from "../core/data/idataprovider"
 import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"
 import { findCyclicDependency } from "../core/graph/analyzer"
-import { ApiTask, ApiProjectTaskModifiers, createProject, createTask, createApiTask } from "../../common/apitypes"
+import { ApiTask, ApiProjectTaskModifiers, createProject, createTask, createApiTask, createRelation } from "../../common/apitypes"
 import { NotFoundError, ExistsError, InputError } from "../../common/errors"
 import * as maputils from "../../common/maputils"
 
@@ -174,7 +174,7 @@ export class Api {
             return this.sendTask(projectIdentifier, taskIdentifier)
         })
     }
-    import(project: any, tasks: any): Promise<void> {
+    import(project: any, tasks: any, relations: any): Promise<void> {
         return Promise.resolve().then(() => {
             const inputProject = createProject(project)
             if (!(tasks instanceof Array)) {
@@ -183,13 +183,23 @@ export class Api {
             const inputTasks = tasks.map((task) => {
                 return createTask(task)
             })
+            if (!(relations instanceof Array)) {
+                throw new InputError("relations must be an array, not " + relations)
+            }
+            const inputRelations = relations.map((relation) => {
+                return createRelation(relation)
+            })
 
-            // findCyclicDependency(inputTasks)
+            findCyclicDependency(inputTasks, inputRelations)
 
             return this.graph.addProject(project).then((projectNode: IProjectNode) => {
                 return Promise.all(inputTasks.map((task: Task) => {
                     return projectNode.addTask(task)
-                }))
+                })).then(() => {
+                    return Promise.all(inputRelations.map((relation: TaskRelation) => {
+                        return projectNode.addRelation(relation)
+                    }))
+                })
             })
         }).catch((error: Error) => {
             if (error instanceof InputError || error instanceof ExistsError) {

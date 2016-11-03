@@ -9,10 +9,11 @@ import {
 } from "../actions/relations"
 
 const initialState: RelationsState = {
+    length: 0,
     relations: [],
-    warnings: [],
+    warnings: new Map<string, Array<string>>(),
     isImporting: false,
-    invalidFormat: false
+    isInvalidFormat: false
 }
 
 export const relationsReducer = (state: RelationsState = initialState, action: Action): RelationsState => {
@@ -20,26 +21,28 @@ export const relationsReducer = (state: RelationsState = initialState, action: A
         case RELATIONS_IMPORT_BEGIN:
             return Object.assign({}, state, {
                 isImporting: true,
-                invalidFormat: false
+                isInvalidFormat: false
             })
         case RELATIONS_IMPORT_END:
             const relationsAction = action as RelationsAction
             return Object.assign({}, state, {
+                length: relationsAction.length,
                 relations: relationsAction.relations,
                 warnings: relationsAction.warnings,
                 isImporting: false,
-                invalidFormat: false
+                isInvalidFormat: false
             })
         case RELATIONS_IMPORT_INVALID_FORMAT:
             return Object.assign({}, state, {
+                length: 0,
                 relations: new Array<PrimaveraTaskRelation>(),
-                warnings: new Array<string>(),
+                warnings: new Map<string, Array<string>>(),
                 isImporting: false,
-                invalidFormat: true
+                isInvalidFormat: true
             })
         case RELATIONS_DISMISS_INVALID_FORMAT:
             return Object.assign({}, state, {
-                invalidFormat: false
+                isInvalidFormat: false
             })
         default:
             return state

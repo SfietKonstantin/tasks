@@ -1,4 +1,5 @@
-import { Project } from "../../../common/types"
+import { Project, TaskRelation } from "../../../common/types"
+import { ApiInputTask } from "../../../common/apitypes"
 
 export enum Stage {
     Project,
@@ -17,6 +18,7 @@ export interface State {
     project: ProjectState
     tasks: TasksState
     relations: RelationsState
+    overview: OverviewState
 }
 
 export interface PrimaveraTask {
@@ -46,16 +48,25 @@ export interface ProjectState {
 }
 
 export interface TasksState {
+    length: number
     tasks: Map<string, PrimaveraTask>
     delays: Map<string, PrimaveraDelay>
-    warnings: Array<string>
+    warnings: Map<string, Array<string>>
     isImporting: boolean
-    invalidFormat: boolean
+    isInvalidFormat: boolean
 }
 
 export interface RelationsState {
+    length: number
     relations: Array<PrimaveraTaskRelation>
-    warnings: Array<string>
+    warnings: Map<string, Array<string>>
     isImporting: boolean
-    invalidFormat: boolean
+    isInvalidFormat: boolean
+}
+
+export interface OverviewState {
+    tasks: Array<ApiInputTask>
+    relations: Array<TaskRelation>
+    warnings: Map<string, Array<string>>
+    isSubmitting: boolean
 }

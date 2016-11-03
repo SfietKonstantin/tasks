@@ -117,7 +117,8 @@ export class ApiRoutes {
     putImport(req: express.Request, res: express.Response) {
         const project = req.body.project
         const tasks = req.body.tasks
-        this.api.import(project, tasks).then(() => {
+        const relations = req.body.relations
+        this.api.import(project, tasks, relations).then(() => {
             res.sendStatus(201)
         }).catch((error) => {
             if (error instanceof RequestError) {

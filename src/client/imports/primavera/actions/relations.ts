@@ -10,9 +10,10 @@ export const RELATIONS_IMPORT_INVALID_FORMAT = "RELATIONS_IMPORT_INVALID_FORMAT"
 export const RELATIONS_DISMISS_INVALID_FORMAT = "RELATIONS_DISMISS_INVALID_FORMAT"
 
 export interface RelationsAction extends Action {
+    length: number
     type: string,
     relations: Array<PrimaveraTaskRelation>
-    warnings: Array<string>
+    warnings: Map<string, Array<string>>
 }
 
 export const beginRelationsImport = (): Action => {
@@ -23,6 +24,7 @@ export const beginRelationsImport = (): Action => {
 
 export const endRelationsImport = (results: RelationsParseResults): RelationsAction => {
     return {
+        length: results.length,
         type: RELATIONS_IMPORT_END,
         relations: results.relations,
         warnings: results.warnings

@@ -22,7 +22,8 @@ import * as projectEditor from "../../client/imports/primavera/components/projec
 import * as tasksSelector from "../../client/imports/primavera/components/tasksselector"
 import * as relationsSelector from "../../client/imports/primavera/components/relationsselector"
 import { TasksParseResults, RelationsParseResults } from "../../client/imports/primavera/imports"
-import { Project } from "../../common/types"
+import { Project, TaskRelation, TaskLocation } from "../../common/types"
+import { ApiInputTask } from "../../common/apitypes"
 import { FakeFile, FakeFileReader } from "./fakefile"
 import { FakeResponse } from "./fakeresponse"
 
@@ -48,6 +49,23 @@ tasks.set("milestone1", {
     endDate: new Date(2016, 10, 1)
 })
 
+const filteredTasks: Array<ApiInputTask> = [
+    {
+        identifier: "task1",
+        name: "Task 1",
+        description: "",
+        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+        estimatedDuration: 30
+    },
+    {
+        identifier: "milestone1",
+        name: "Milestone 1",
+        description: "",
+        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+        estimatedDuration: 0
+    },
+]
+
 const relations: Array<PrimaveraTaskRelation> = [
     {
         previous: "task1",
@@ -57,7 +75,18 @@ const relations: Array<PrimaveraTaskRelation> = [
     }
 ]
 
-const warnings = [ "Warning 1", "Warning 2" ]
+const filteredRelations: Array<TaskRelation> = [
+    {
+        previous: "task1",
+        next: "milestone1",
+        previousLocation: TaskLocation.Beginning,
+        lag: 3
+    }
+]
+
+const warnings = new Map<string, Array<string>>()
+warnings.set("task1", ["Warning 1", "Warning 2"])
+warnings.set("task2", ["Warning 3"])
 
 describe("Primavera reducers", () => {
     let dispatch: Sinon.SinonSpy
@@ -80,17 +109,25 @@ describe("Primavera reducers", () => {
                 error: null
             },
             tasks: {
+                length: 0,
                 tasks: new Map<string, PrimaveraTask>(),
                 delays: new Map<string, PrimaveraDelay>(),
-                warnings: [],
+                warnings: new Map<string, Array<string>>(),
                 isImporting: false,
-                invalidFormat: false,
+                isInvalidFormat: false,
             },
             relations: {
+                length: 0,
                 relations: [],
-                warnings: [],
+                warnings: new Map<string, Array<string>>(),
                 isImporting: false,
-                invalidFormat: false
+                isInvalidFormat: false
+            },
+            overview: {
+                tasks: [],
+                relations: [],
+                warnings: new Map<string, Array<string>>(),
+                isSubmitting: false
             }
         }
         initialState2 = {
@@ -103,17 +140,25 @@ describe("Primavera reducers", () => {
                 error: "Error message"
             },
             tasks: {
+                length: 123,
                 tasks: new Map<string, PrimaveraTask>(tasks),
                 delays: new Map<string, PrimaveraDelay>(),
-                warnings: warnings.slice(0),
+                warnings: new Map<string, Array<string>>(warnings),
                 isImporting: true,
-                invalidFormat: true,
+                isInvalidFormat: true,
             },
             relations: {
+                length: 123,
                 relations: relations.slice(0),
-                warnings: warnings.slice(0),
+                warnings: new Map<string, Array<string>>(warnings),
                 isImporting: true,
-                invalidFormat: true
+                isInvalidFormat: true
+            },
+            overview: {
+                tasks: filteredTasks.slice(0),
+                relations: filteredRelations.slice(0),
+                warnings: new Map<string, Array<string>>(warnings),
+                isSubmitting: false
             }
         }
     })
@@ -174,7 +219,7 @@ describe("Primavera reducers", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, beginTasksImport())
                 chai.expect(state.tasks.isImporting).to.true
-                chai.expect(state.tasks.invalidFormat).to.false
+                chai.expect(state.tasks.isInvalidFormat).to.false
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -182,13 +227,15 @@ describe("Primavera reducers", () => {
         it("Should reduce TASKS_IMPORT_END", () => {
             const checkState = (initialState: State) => {
                 const results: TasksParseResults = {
+                    length: 123,
                     tasks: new Map<string, PrimaveraTask>(tasks),
                     delays: new Map<string, PrimaveraDelay>(),
-                    warnings: warnings.slice(0)
+                    warnings: new Map<string, Array<string>>(warnings)
                 }
                 const state = main.mainReducer(initialState, endTasksImport(results))
                 chai.expect(state.tasks.isImporting).to.false
-                chai.expect(state.tasks.invalidFormat).to.false
+                chai.expect(state.tasks.isInvalidFormat).to.false
+                chai.expect(state.tasks.length).to.equal(123)
                 chai.expect(state.tasks.tasks).to.deep.equal(tasks)
                 chai.expect(state.tasks.delays).to.empty
                 chai.expect(state.tasks.warnings).to.deep.equal(warnings)
@@ -200,7 +247,7 @@ describe("Primavera reducers", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, tasksImportInvalidFormat())
                 chai.expect(state.tasks.isImporting).to.false
-                chai.expect(state.tasks.invalidFormat).to.true
+                chai.expect(state.tasks.isInvalidFormat).to.true
                 chai.expect(state.tasks.tasks).to.empty
                 chai.expect(state.tasks.delays).to.empty
                 chai.expect(state.tasks.warnings).to.empty
@@ -211,7 +258,7 @@ describe("Primavera reducers", () => {
         it("Should reduce TASKS_DISMISS_INVALID_FORMAT", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, dismissInvalidTasksFormat())
-                chai.expect(state.tasks.invalidFormat).to.false
+                chai.expect(state.tasks.isInvalidFormat).to.false
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -222,7 +269,7 @@ describe("Primavera reducers", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, beginRelationsImport())
                 chai.expect(state.relations.isImporting).to.true
-                chai.expect(state.relations.invalidFormat).to.false
+                chai.expect(state.relations.isInvalidFormat).to.false
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -230,12 +277,14 @@ describe("Primavera reducers", () => {
         it("Should reduce RELATIONS_IMPORT_END", () => {
             const checkState = (initialState: State) => {
                 const results: RelationsParseResults = {
+                    length: 123,
                     relations: relations.slice(0),
-                    warnings: warnings.slice(0)
+                    warnings: new Map<string, Array<string>>(warnings)
                 }
                 const state = main.mainReducer(initialState, endRelationsImport(results))
                 chai.expect(state.relations.isImporting).to.false
-                chai.expect(state.relations.invalidFormat).to.false
+                chai.expect(state.relations.isInvalidFormat).to.false
+                chai.expect(state.relations.length).to.equal(123)
                 chai.expect(state.relations.relations).to.deep.equal(relations)
                 chai.expect(state.relations.warnings).to.deep.equal(warnings)
             }
@@ -246,7 +295,7 @@ describe("Primavera reducers", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, relationsImportInvalidFormat())
                 chai.expect(state.relations.isImporting).to.false
-                chai.expect(state.relations.invalidFormat).to.true
+                chai.expect(state.relations.isInvalidFormat).to.true
                 chai.expect(state.relations.relations).to.empty
                 chai.expect(state.relations.warnings).to.empty
             }
@@ -256,7 +305,7 @@ describe("Primavera reducers", () => {
         it("Should reduce RELATIONS_DISMISS_INVALID_FORMAT", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, dismissInvalidRelationsFormat())
-                chai.expect(state.relations.invalidFormat).to.false
+                chai.expect(state.relations.isInvalidFormat).to.false
             }
             checkState(initialState1)
             checkState(initialState2)

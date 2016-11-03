@@ -7,11 +7,9 @@ import { Stage } from "../../client/imports/primavera/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Primavera import WarningsButton", () => {
-    const warnings = [
-        "Warning 1",
-        "Warning 2",
-        "Warning 3"
-    ]
+    const warnings = new Map<string, Array<string>>()
+    warnings.set("task1", ["Warning 1", "Warning 2"])
+    warnings.set("task2", ["Warning 3"])
     beforeEach(() => {
         addFakeGlobal()
     })
@@ -25,9 +23,12 @@ describe("Primavera import WarningsButton", () => {
         const alert = component.find("Alert")
         chai.expect(alert.children()).to.length(3)
 
-        chai.expect(alert.childAt(0).children().text()).to.equal("Warning 1")
-        chai.expect(alert.childAt(1).children().text()).to.equal("Warning 2")
-        chai.expect(alert.childAt(2).children().text()).to.equal("Warning 3")
+        chai.expect(alert.childAt(0).childAt(0).text()).to.equal("task1")
+        chai.expect(alert.childAt(0).childAt(2).text()).to.equal("Warning 1")
+        chai.expect(alert.childAt(1).childAt(0).text()).to.equal("task1")
+        chai.expect(alert.childAt(1).childAt(2).text()).to.equal("Warning 2")
+        chai.expect(alert.childAt(2).childAt(0).text()).to.equal("task2")
+        chai.expect(alert.childAt(2).childAt(2).text()).to.equal("Warning 3")
     })
     it("Should be hidden by default", () => {
         const onCurrent = sinon.spy()

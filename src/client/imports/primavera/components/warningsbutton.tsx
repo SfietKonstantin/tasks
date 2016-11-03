@@ -1,8 +1,9 @@
 import * as React from "react"
 import { Button, Modal, Alert } from "react-bootstrap"
+import * as maputils from "../../../../common/maputils"
 
 interface WarningsButtonProperties {
-    warnings: Array<String>
+    warnings: Map<string, Array<string>>
 }
 
 interface WarningButtonState {
@@ -17,9 +18,16 @@ export class WarningsButton extends React.Component<WarningsButtonProperties, Wa
         }
     }
     render() {
-        const warningTexts = this.props.warnings.map((warning: string, index: number) => {
-            return <p key={index}>{warning}</p>
+        let warningTexts = new Array<JSX.Element>()
+        this.props.warnings.forEach((warnings: Array<string>, identifier: string) => {
+            warnings.forEach((warning: string, index: number) => {
+                const key = identifier + "-" + index
+                warningTexts.push(<p key={key}>
+                    <strong>{identifier}</strong> {warning}
+                </p>)
+            })
         })
+        let totalWarnings = maputils.lengthOfMapOfList(this.props.warnings)
         return <Button bsStyle="warning" onClick={this.open.bind(this)}>
             <Modal show={this.state.show} bsSize="large" onHide={this.close.bind(this)}>
                 <Modal.Header closeButton>
@@ -36,7 +44,7 @@ export class WarningsButton extends React.Component<WarningsButtonProperties, Wa
                     <Button onClick={this.close.bind(this)}>Close</Button>
                 </Modal.Footer>
             </Modal>
-            {this.props.warnings.length} warnings
+            {totalWarnings} warnings
         </Button>
     }
     private open() {

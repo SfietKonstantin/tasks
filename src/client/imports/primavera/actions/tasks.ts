@@ -11,9 +11,10 @@ export const TASKS_DISMISS_INVALID_FORMAT = "TASKS_DISMISS_INVALID_FORMAT"
 
 export interface TasksAction extends Action {
     type: string,
+    length: number
     tasks: Map<string, PrimaveraTask>
     delays: Map<string, PrimaveraDelay>
-    warnings: Array<string>
+    warnings: Map<string, Array<string>>
 }
 
 export const beginTasksImport = (): Action => {
@@ -25,6 +26,7 @@ export const beginTasksImport = (): Action => {
 export const endTasksImport = (results: TasksParseResults): TasksAction => {
     return {
         type: TASKS_IMPORT_END,
+        length: results.length,
         tasks: results.tasks,
         delays: results.delays,
         warnings: results.warnings

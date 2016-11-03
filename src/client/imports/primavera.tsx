@@ -35,16 +35,25 @@ export const render = () => {
             error: null
         },
         tasks: {
+            length: 0,
             tasks: new Map<string, PrimaveraTask>(),
             delays: new Map<string, PrimaveraDelay>(),
-            warnings: [],
+            warnings: new Map<string, Array<string>>(),
             isImporting: false,
-            invalidFormat: false
-        }, relations: {
+            isInvalidFormat: false
+        },
+        relations: {
+            length: 0,
             relations: [],
-            warnings: [],
+            warnings: new Map<string, Array<string>>(),
             isImporting: false,
-            invalidFormat: false
+            isInvalidFormat: false
+        },
+        overview: {
+            tasks: [],
+            relations: [],
+            warnings: new Map<string, Array<string>>(),
+            isSubmitting: false
         }
     }
     const store = Redux.createStore(

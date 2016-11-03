@@ -199,14 +199,17 @@ describe("Primavera actions", () => {
                     endDate: new Date(2016, 10, 1)
                 })
                 const delays = new Map<string, PrimaveraDelay>()
-                const warnings = [ "Warning 1", "Warning 2" ]
+                const warnings = new Map<string, Array<string>>()
+                warnings.set("task1", ["Warning 1", "Warning 2"])
+                warnings.set("task2", ["Warning 3"])
                 const expected: TasksAction = {
+                    length: 123,
                     type: TASKS_IMPORT_END,
                     tasks,
                     delays,
                     warnings
                 }
-                chai.expect(endTasksImport({tasks, delays, warnings})).to.deep.equal(expected)
+                chai.expect(endTasksImport({length: 123, tasks, delays, warnings})).to.deep.equal(expected)
             })
             it("Should create TASKS_IMPORT_INVALID_FORMAT", () => {
                 const expected: ErrorAction = {
@@ -251,13 +254,16 @@ describe("Primavera actions", () => {
                         lag: 3
                     }
                 ]
-                const warnings = [ "Warning 1", "Warning 2" ]
+                const warnings = new Map<string, Array<string>>()
+                warnings.set("task1", ["Warning 1", "Warning 2"])
+                warnings.set("task2", ["Warning 3"])
                 const expected: RelationsAction = {
+                    length: 123,
                     type: RELATIONS_IMPORT_END,
                     relations,
                     warnings
                 }
-                chai.expect(endRelationsImport({relations, warnings})).to.deep.equal(expected)
+                chai.expect(endRelationsImport({length: 123, relations, warnings})).to.deep.equal(expected)
             })
             it("Should create RELATIONS_IMPORT_INVALID_FORMAT", () => {
                 const expected: ErrorAction = {

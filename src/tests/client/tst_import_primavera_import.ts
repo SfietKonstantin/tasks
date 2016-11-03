@@ -13,15 +13,17 @@ describe("Primavera import", () => {
         it("Should import a empty task listing", () => {
             const tasks = "header\nsecond_line"
             const results = parseTasks(tasks)
-            chai.expect(results.tasks.size).to.equal(0)
-            chai.expect(results.delays.size).to.equal(0)
+            chai.expect(results).to.length(0)
+            chai.expect(results.tasks).to.empty
+            chai.expect(results.delays).to.empty
             chai.expect(results.warnings).to.empty
         })
         it("Should ignore empty lines", () => {
             const tasks = "header\nsecond_line\n\n\n"
             const results = parseTasks(tasks)
-            chai.expect(results.tasks.size).to.equal(0)
-            chai.expect(results.delays.size).to.equal(0)
+            chai.expect(results).to.length(0)
+            chai.expect(results.tasks).to.empty
+            chai.expect(results.delays).to.empty
             chai.expect(results.warnings).to.empty
         })
         it("Should throw an exception on input < 9 column", () => {
@@ -38,30 +40,34 @@ describe("Primavera import", () => {
                 startDate: new Date(2016, 1, 1),
                 endDate: new Date(2016, 1, 26)
             }
+            chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
-            chai.expect(results.delays.size).to.equal(0)
+            chai.expect(results.delays).to.empty
             chai.expect(results.warnings).to.empty
         })
         it("Should not import a task without id", () => {
             const tasks = "header\nsecond_line\n\t\t\t\tTask\t25\t\t1/02/2016 12:34:56\t26/02/2016 12:34:56"
             const results = parseTasks(tasks)
-            chai.expect(results.tasks.size).to.equal(0)
-            chai.expect(results.delays.size).to.equal(0)
+            chai.expect(results).to.length(0)
+            chai.expect(results.tasks).to.empty
+            chai.expect(results.delays).to.empty
             chai.expect(results.warnings).to.empty
         })
         it("Should not import invalid task with invalid duration", () => {
             const tasks = "header\nsecond_line\nid\t\t\t\tTask\tabcde\t\t1/02/2016 12:34:56\t26/02/2016 12:34:56"
             const results = parseTasks(tasks)
+            chai.expect(results).to.length(1)
             chai.expect(results.tasks).to.empty
-            chai.expect(results.delays.size).to.equal(0)
-            chai.expect(results.warnings).to.empty
+            chai.expect(results.delays).to.empty
+            chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should not import invalid task with invalid start date and end date", () => {
             const tasks = "header\nsecond_line\nid\t\t\t\tTask\t25\t\tabcde\tabcde"
             const results = parseTasks(tasks)
+            chai.expect(results).to.length(1)
             chai.expect(results.tasks).to.empty
-            chai.expect(results.delays.size).to.equal(0)
-            chai.expect(results.warnings).to.empty
+            chai.expect(results.delays).to.empty
+            chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should emit different duration warnings", () => {
             const tasks = "header\nsecond_line\nid\t\t\t\tTask\t30\t\t1/02/2016 12:34:56\t26/02/2016 12:34:56"
@@ -73,9 +79,10 @@ describe("Primavera import", () => {
                 startDate: new Date(2016, 1, 1),
                 endDate: new Date(2016, 1, 26)
             }
+            chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
-            chai.expect(results.delays.size).to.equal(0)
-            chai.expect(results.warnings).to.length(1)
+            chai.expect(results.delays).to.empty
+            chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should emit duplicated warnings", () => {
             const tasks = "header\nsecond_line\n" +
@@ -89,9 +96,10 @@ describe("Primavera import", () => {
                 startDate: new Date(2016, 1, 1),
                 endDate: new Date(2016, 1, 26)
             }
+            chai.expect(results).to.length(2)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
-            chai.expect(results.delays.size).to.equal(0)
-            chai.expect(results.warnings).to.length(1)
+            chai.expect(results.delays).to.empty
+            chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should parse start milestones", () => {
             const tasks = "header\nsecond_line\nid\t\t\t\tTask\t0\t\t1/02/2016 12:34:56\t"
@@ -103,8 +111,9 @@ describe("Primavera import", () => {
                 startDate: new Date(2016, 1, 1),
                 endDate: null
             }
+            chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
-            chai.expect(results.delays.size).to.equal(0)
+            chai.expect(results.delays).to.empty
             chai.expect(results.warnings).to.empty
         })
         it("Should parse end milestones", () => {
@@ -117,8 +126,9 @@ describe("Primavera import", () => {
                 startDate: null,
                 endDate: new Date(2016, 1, 26)
             }
+            chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
-            chai.expect(results.delays.size).to.equal(0)
+            chai.expect(results.delays).to.empty
             chai.expect(results.warnings).to.empty
         })
         it("Should emit milestone with duration warning 1", () => {
@@ -131,9 +141,10 @@ describe("Primavera import", () => {
                 startDate: new Date(2016, 1, 1),
                 endDate: null
             }
+            chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
-            chai.expect(results.delays.size).to.equal(0)
-            chai.expect(results.warnings).to.length(1)
+            chai.expect(results.delays).to.empty
+            chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should emit milestone with duration warning 2", () => {
             const tasks = "header\nsecond_line\nid\t\t\t\tTask\t25\t\t\t26/02/2016 12:34:56"
@@ -145,9 +156,10 @@ describe("Primavera import", () => {
                 startDate: null,
                 endDate: new Date(2016, 1, 26)
             }
+            chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
-            chai.expect(results.delays.size).to.equal(0)
-            chai.expect(results.warnings).to.length(1)
+            chai.expect(results.delays).to.empty
+            chai.expect(results.warnings.size).to.equal(1)
         })
     })
     describe("Relations", () => {
@@ -158,12 +170,14 @@ describe("Primavera import", () => {
         it("Should import a empty relations listing", () => {
             const relations = "header\nsecond_line"
             const results = parseRelations(relations)
+            chai.expect(results).to.length(0)
             chai.expect(results.relations).to.empty
             chai.expect(results.warnings).to.empty
         })
         it("Should ignore empty lines", () => {
             const relations = "header\nsecond_line\n\n\n"
             const results = parseRelations(relations)
+            chai.expect(results).to.length(0)
             chai.expect(results.relations).to.empty
             chai.expect(results.warnings).to.empty
         })
@@ -174,7 +188,7 @@ describe("Primavera import", () => {
         it("Should import various relations", () => {
             const relations = "header\nsecond_line\n"
                               + "task1\ttask2\tFS\t\t\t\t\t\t\t10\n"
-                              + "task3\ttask4\tFF\t\t\t\t\t\t\t5\n"
+                              + "task3\ttask4\tFF\t\t\t\t\t\t\t0\n"
                               + "task5\ttask6\tSS\t\t\t\t\t\t\t1"
             const results = parseRelations(relations)
             const expected: Array<PrimaveraTaskRelation> = [
@@ -188,7 +202,7 @@ describe("Primavera import", () => {
                     previous: "task3",
                     next: "task4",
                     type: "FF",
-                    lag: 5
+                    lag: 0
                 },
                 {
                     previous: "task5",
@@ -197,20 +211,23 @@ describe("Primavera import", () => {
                     lag: 1
                 }
             ]
+            chai.expect(results).to.length(3)
             chai.expect(results.relations).to.deep.equal(expected)
             chai.expect(results.warnings).to.empty
         })
         it("Should not import invalid lag relation", () => {
             const relations = "header\nsecond_line\ntask1\ttask2\tFS\t\t\t\t\t\t\tabcde"
             const results = parseRelations(relations)
+            chai.expect(results).to.length(1)
             chai.expect(results.relations).to.empty
-            chai.expect(results.warnings).to.empty
+            chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should not import invalid type relation", () => {
             const relations = "header\nsecond_line\ntask1\ttask2\tabcde\t\t\t\t\t\t\t10"
             const results = parseRelations(relations)
+            chai.expect(results).to.length(1)
             chai.expect(results.relations).to.empty
-            chai.expect(results.warnings).to.empty
+            chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should flip SF relation", () => {
             const relations = "header\nsecond_line\n"
@@ -224,15 +241,25 @@ describe("Primavera import", () => {
                     lag: 0
                 }
             ]
+            chai.expect(results).to.length(1)
             chai.expect(results.relations).to.deep.equal(expected)
-            chai.expect(results.warnings).to.length(1)
+            chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should not import non-flippable SF relation", () => {
             const relations = "header\nsecond_line\n"
                               + "task1\ttask2\tSF\t\t\t\t\t\t\t5"
             const results = parseRelations(relations)
+            chai.expect(results).to.length(1)
             chai.expect(results.relations).to.empty
-            chai.expect(results.warnings).to.length(1)
+            chai.expect(results.warnings.size).to.equal(1)
+        })
+        it("Should not import FF relation with lag", () => {
+            const relations = "header\nsecond_line\n"
+                              + "task1\ttask2\tFF\t\t\t\t\t\t\t5"
+            const results = parseRelations(relations)
+            chai.expect(results).to.length(1)
+            chai.expect(results.relations).to.empty
+            chai.expect(results.warnings.size).to.equal(1)
         })
     })
 })

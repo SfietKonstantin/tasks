@@ -135,4 +135,63 @@ describe("Graph analyzer", () => {
         ]
         chai.expect(() => { findCyclicDependency(tasks, relations) }).to.throw(GraphError)
     })
+    it("Should not detect diamonds", () => {
+        const tasks: Array<Task> = [
+            {
+                identifier: "task1",
+                name: "Task 1",
+                description: "Description 1",
+                estimatedStartDate: new Date(2016, 1, 1),
+                estimatedDuration: 30
+            },
+            {
+                identifier: "task2",
+                name: "Task 2",
+                description: "Description 2",
+                estimatedStartDate: new Date(2016, 1, 1),
+                estimatedDuration: 15
+            },
+            {
+                identifier: "task3",
+                name: "Task 3",
+                description: "Description 3",
+                estimatedStartDate: new Date(2016, 1, 1),
+                estimatedDuration: 10
+            },
+            {
+                identifier: "task4",
+                name: "Task 4",
+                description: "Description 3",
+                estimatedStartDate: new Date(2016, 1, 1),
+                estimatedDuration: 5
+            }
+        ]
+        const relations: Array<TaskRelation> = [
+            {
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                lag: 0
+            },
+            {
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task3",
+                lag: 0
+            },
+            {
+                previous: "task2",
+                previousLocation: TaskLocation.End,
+                next: "task4",
+                lag: 0
+            },
+            {
+                previous: "task3",
+                previousLocation: TaskLocation.End,
+                next: "task4",
+                lag: 0
+            }
+        ]
+        findCyclicDependency(tasks, relations)
+    })
 })

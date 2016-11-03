@@ -1,30 +1,50 @@
 import { Action, Dispatch } from "redux"
 import { State, PrimaveraTask, PrimaveraTaskRelation } from "../types"
 import { ErrorAction, processError } from "../../../common/actions/errors"
-import { Project } from "../../../../common/types"
+import { Project, TaskRelation } from "../../../../common/types"
 import { ApiInputTask } from "../../../../common/apitypes"
 import { InputError } from "../../../../common/errors"
 import { getDateDiff } from "../../../../common/dateutils"
+import { filterTasks, filterRelations } from "../imports"
 
-export const SUBMIT_REQUEST = "SUBMIT_REQUEST"
-export const SUBMIT_RECEIVE = "SUBMIT_RECEIVE"
-export const SUBMIT_RECEIVE_FAILURE = "SUBMIT_RECEIVE_FAILURE"
+export const OVERVIEW_FILTER = "OVERVIEW_FILTER"
+export const OVERVIEW_SUBMIT_REQUEST = "OVERVIEW_SUBMIT_REQUEST"
+export const OVERVIEW_SUBMIT_RECEIVE = "OVERVIEW_SUBMIT_RECEIVE"
+export const OVERVIEW_SUBMIT_RECEIVE_FAILURE = "OVERVIEW_SUBMIT_RECEIVE_FAILURE"
+
+export interface OverviewFilterAction extends Action {
+    type: string,
+    tasks: Array<ApiInputTask>
+    relations: Array<TaskRelation>
+    warnings: Map<string, Array<string>>
+}
+
+export const filterForOverview = (tasks: Map<string, PrimaveraTask>,
+                                  relations: Array<PrimaveraTaskRelation>): OverviewFilterAction => {
+    const relationsResults = filterRelations(tasks, relations)
+    return {
+        type: OVERVIEW_FILTER,
+        tasks: filterTasks(tasks),
+        relations: relationsResults.relations,
+        warnings: relationsResults.warnings
+    }
+}
 
 const requestSubmit = (): Action => {
     return {
-        type: SUBMIT_REQUEST
+        type: OVERVIEW_SUBMIT_REQUEST
     }
 }
 
 const receiveSubmit = (): Action => {
     return {
-        type: SUBMIT_RECEIVE
+        type: OVERVIEW_SUBMIT_RECEIVE
     }
 }
 
 const receiveSubmitFailure = (message: string): ErrorAction => {
     return {
-        type: SUBMIT_RECEIVE_FAILURE,
+        type: OVERVIEW_SUBMIT_RECEIVE_FAILURE,
         message
     }
 }
@@ -44,27 +64,10 @@ const getDates = (task: PrimaveraTask): [Date, number] => {
     throw new InputError("Invalid duration")
 }
 
-export const submit = (project: Project, tasks: Array<PrimaveraTask>,
-                       relations: Array<PrimaveraTaskRelation>) => {
+export const submit = (project: Project, tasks: Array<ApiInputTask>,
+                       relations: Array<TaskRelation>) => {
     return (dispatch: Dispatch<State>) => {
         dispatch(requestSubmit())
-        const inputTasks = tasks.map((task: PrimaveraTask) => {
-            try {
-                const dates = getDates(task)
-                const returned: ApiInputTask = {
-                    identifier: task.identifier,
-                    name: task.name,
-                    description: "",
-                    estimatedStartDate: dates[0].toISOString(),
-                    estimatedDuration: dates[1]
-                }
-                return returned
-            } catch (error) {
-                return null
-            }
-        }).filter((task: ApiInputTask | null) => {
-            return task != null
-        }) as Array<ApiInputTask>
         const requestInit: RequestInit = {
             method: "PUT",
             headers: {
@@ -73,7 +76,7 @@ export const submit = (project: Project, tasks: Array<PrimaveraTask>,
             },
             body: JSON.stringify({
                 project,
-                tasks: inputTasks,
+                tasks,
                 relations
             })
         }

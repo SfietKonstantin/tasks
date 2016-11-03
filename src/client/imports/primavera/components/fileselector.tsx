@@ -1,8 +1,9 @@
 import * as React from "react"
-import { Col, Form, FormGroup, ControlLabel, Button, ButtonGroup } from "react-bootstrap"
+import { Col, Form, FormGroup, ControlLabel, Button, ButtonGroup, Alert } from "react-bootstrap"
 import { Stage } from "../types"
 import { StagePanel } from "./stagepanel"
 import { WarningsButton } from "./warningsbutton"
+import * as maputils from "../../../../common/maputils"
 
 interface FileSelectorProperties {
     displayStage: Stage
@@ -12,27 +13,36 @@ interface FileSelectorProperties {
     formLabel: string
     buttonText: string
     itemCount: number
-    warnings: Array<string>
+    warnings: Map<string, Array<string>>
     isImporting: boolean
+    isInvalidFormat: boolean
     onFileSelected: (file: File) => void
     onCurrentStage: () => void
     onNextStage: () => void
+    onDismissInvalidFormat: () => void
 }
 
 export class FileSelector extends React.Component<FileSelectorProperties, {}> {
     render() {
         const canNext = this.props.itemCount > 0 && !this.props.isImporting
         const buttonColor = this.props.itemCount > 0 ? "success" : "default"
-        const hasWarnings = this.props.warnings.length > 0
+        let totalWarnings = maputils.lengthOfMapOfList(this.props.warnings)
         let warningsButton: JSX.Element | null = null
-        if (hasWarnings) {
+        if (totalWarnings > 0) {
             warningsButton = <WarningsButton warnings={this.props.warnings} />
+        }
+        let alert: JSX.Element | null = null
+        if (this.props.isInvalidFormat) {
+            alert = <Alert bsStyle="danger" onDismiss={this.props.onDismissInvalidFormat}>
+                Invalid file format
+            </Alert>
         }
         return <StagePanel displayStage={this.props.displayStage}
                            currentStage={this.props.currentStage}
                            maxStage={this.props.maxStage} title={this.props.title}
-                           warnings={this.props.warnings.length}
+                           warnings={totalWarnings}
                            onCurrent={this.props.onCurrentStage.bind(this)}>
+            {alert}
             <Form horizontal>
                 <FormGroup>
                     <input type="file" ref="input" className="hidden"

@@ -1,16 +1,15 @@
 import { PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./types"
 import { InvalidFormatError } from "../../common/actions/files"
+import { ApiInputTask } from "../../../common/apitypes"
+import { TaskRelation, TaskLocation } from "../../../common/types"
 import * as dateutils from "../../../common/dateutils"
+import * as maputils from "../../../common/maputils"
 
 export interface TasksParseResults {
+    length: number
     tasks: Map<string, PrimaveraTask>
     delays: Map<string, PrimaveraDelay>
-    warnings: Array<string>
-}
-
-export interface RelationsParseResults {
-    relations: Array<PrimaveraTaskRelation>
-    warnings: Array<string>
+    warnings: Map<string, Array<string>>
 }
 
 const convertDate = (date: string): Date | null => {
@@ -30,9 +29,11 @@ export const parseTasks = (content: string): TasksParseResults => {
 
     let tasks = new Map<string, PrimaveraTask>()
     let delays = new Map<string, PrimaveraDelay>()
-    let warnings = new Array<string>()
+    let warnings = new Map<string, Array<string>>()
+    let length = splitted.length
     splitted.forEach((line: string) =>  {
         if (line.length === 0) {
+            --length
             return
         }
         const splittedLine = line.split("\t")
@@ -47,28 +48,35 @@ export const parseTasks = (content: string): TasksParseResults => {
         const endDate = convertDate(splittedLine[8])
 
         if (identifier.length === 0) {
+            --length
             return
         }
 
-        if (Number.isNaN(duration) || (startDate == null && endDate == null)) {
+        if (Number.isNaN(duration)) {
+            maputils.addToMapOfList(warnings, identifier, "Not a valid duration")
             return
         }
 
-        if (duration > 0 && startDate != null && endDate != null) {
-            const computedDuration = dateutils.getDateDiff(startDate, endDate)
-            if (duration !== computedDuration) {
-                warnings.push("Task \"" + identifier + "\"'s duration do not match with the computed duration")
+        if (startDate == null && endDate == null) {
+            maputils.addToMapOfList(warnings, identifier, "Not a valid dates")
+            return
+        } else {
+            if (duration > 0 && startDate != null && endDate != null) {
+                const computedDuration = dateutils.getDateDiff(startDate, endDate)
+                if (duration !== computedDuration) {
+                    maputils.addToMapOfList(warnings, identifier, "Duration do not match with the computed duration")
+                }
             }
-        }
-        if (startDate == null || endDate == null) {
-            if (duration > 0) {
-                duration = 0
-                warnings.push("Task \"" + identifier + "\" is a milestone but have a duration")
+            if (startDate == null || endDate == null) {
+                if (duration > 0) {
+                    duration = 0
+                    maputils.addToMapOfList(warnings, identifier, "A milestone cannot have a duration")
+                }
             }
         }
 
         if (tasks.has(identifier)) {
-            warnings.push("Task \"" + identifier + "\" is duplicated")
+            maputils.addToMapOfList(warnings, identifier, "Duplicated task")
             return
         }
 
@@ -81,7 +89,7 @@ export const parseTasks = (content: string): TasksParseResults => {
         })
     })
 
-    return { tasks, delays, warnings }
+    return { length, tasks, delays, warnings }
 }
 
 const parseType = (type: string): "FS" | "SF" | "FF" | "SS" | null => {
@@ -99,6 +107,12 @@ const parseType = (type: string): "FS" | "SF" | "FF" | "SS" | null => {
     }
 }
 
+export interface RelationsParseResults {
+    length: number
+    relations: Array<PrimaveraTaskRelation>
+    warnings: Map<string, Array<string>>
+}
+
 export const parseRelations = (content: string): RelationsParseResults => {
     const splitted = content.split("\n")
     if (splitted.length < 2) {
@@ -109,9 +123,11 @@ export const parseRelations = (content: string): RelationsParseResults => {
     splitted.shift()
 
     let relations = new Array<PrimaveraTaskRelation>()
-    let warnings = new Array<string>()
+    let warnings = new Map<string, Array<string>>()
+    let length = splitted.length
     splitted.forEach((line: string) =>  {
         if (line.length === 0) {
+            --length
             return
         }
         const splittedLine = line.split("\t")
@@ -125,7 +141,15 @@ export const parseRelations = (content: string): RelationsParseResults => {
         const type = parseType(splittedLine[2])
         const lag = +splittedLine[9]
 
-        if (Number.isNaN(lag) || type == null) {
+        if (type == null) {
+            maputils.addToMapOfList(warnings, previous + " - " + next,
+                                    "Relation have an invalid type")
+            return
+        }
+
+        if (isNaN(lag)) {
+            maputils.addToMapOfList(warnings, previous + " - " + next,
+                                    "Relation have an invalid lag")
             return
         }
 
@@ -138,8 +162,8 @@ export const parseRelations = (content: string): RelationsParseResults => {
 
         if (relation.type === "SF") {
             if (relation.lag === 0) {
-                warnings.push("Relation between task \"" + relation.previous + "\" and task \""
-                            + relation.next + "\" is of type SF and has been flipped")
+                maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                        "SF relation has been converted to FS")
                 const previous = relation.next
                 const next = relation.previous
                 Object.assign(relation, {
@@ -148,8 +172,14 @@ export const parseRelations = (content: string): RelationsParseResults => {
                     type: "FS"
                 })
             } else {
-                warnings.push("Relation between task \"" + relation.previous + "\" and task \""
-                            + relation.next + "\" is of type SF with a lag. This is not supported.")
+                maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                        "SF relation with lag is not supported")
+                return
+            }
+        } else if (relation.type === "FF") {
+            if (relation.lag !== 0) {
+                maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                   "FF relation with lag is not supported")
                 return
             }
         }
@@ -157,5 +187,93 @@ export const parseRelations = (content: string): RelationsParseResults => {
         relations.push(relation)
     })
 
-    return { relations, warnings }
+    return { length, relations, warnings }
+}
+
+export const filterTasks = (tasks: Map<string, PrimaveraTask>): Array<ApiInputTask> => {
+    const filtered = Array.from(tasks.values()).filter((task: PrimaveraTask) => {
+        // Invalid duration
+        if (Number.isNaN(task.duration)) {
+            return false
+        }
+
+        // No date
+        if (task.startDate == null && task.endDate == null) {
+            return false
+        }
+
+        // Milestone with duration
+        if ((task.startDate == null || task.endDate == null) && task.duration !== 0) {
+            return false
+        }
+        return true
+    })
+    return filtered.map((task: PrimaveraTask) => {
+        let date = task.startDate
+        let estimatedDuration = 0
+        if (task.startDate == null) {
+            date = task.endDate
+        }
+        if (task.startDate != null && task.endDate != null) {
+            estimatedDuration = dateutils.getDateDiff(task.endDate, task.startDate)
+        } else {
+            estimatedDuration = 0
+        }
+        const estimatedStartDate = (date as Date).toISOString()
+
+        const returned: ApiInputTask = {
+            identifier: task.identifier,
+            name: task.name,
+            description: "",
+            estimatedStartDate,
+            estimatedDuration
+        }
+        return returned
+    })
+}
+
+export interface FilterRelationsResults {
+    relations: Array<TaskRelation>
+    warnings: Map<string, Array<string>>
+}
+
+export const filterRelations = (tasks: Map<string, PrimaveraTask>,
+                                relations: Array<PrimaveraTaskRelation>): FilterRelationsResults => {
+    let warnings = new Map<string, Array<string>>()
+    let ffRelations = new Array<PrimaveraTaskRelation>()
+    const filtered = relations.filter((relation: PrimaveraTaskRelation) => {
+        if (!tasks.has(relation.previous) || !tasks.has(relation.next)) {
+            maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                        "No corresponding tasks")
+            return false
+        }
+        if (relation.type === "SF") {
+            return false
+        }
+        if (relation.type === "FF") {
+            if (relation.lag === 0) {
+                ffRelations.push(relation)
+            }
+            return false
+        }
+        return true
+    })
+    // Handle FF relations: TODO
+
+    const mappedRelations = filtered.map((relation: PrimaveraTaskRelation) => {
+        let previousLocation = TaskLocation.End
+        if (relation.type === "SS") {
+            previousLocation = TaskLocation.Beginning
+        }
+
+        const returned: TaskRelation = {
+            previous: relation.previous,
+            next: relation.next,
+            previousLocation,
+            lag: relation.lag
+        }
+        return returned
+    })
+
+    return { relations: mappedRelations, warnings }
 }

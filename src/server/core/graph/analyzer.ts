@@ -1,3 +1,4 @@
+import * as winston from "winston"
 import { Task, TaskRelation } from "../../../common/types"
 import { GraphError } from "./types"
 import * as maputils from "../../../common/maputils"
@@ -7,15 +8,22 @@ interface Node {
     children: Array<Node>
 }
 
-const markAndProcessChildren = (node: Node, marked: Set<string>) => {
+const markAndProcessChildren = (node: Node, marked: Set<string>, nodes: Map<string, Node>) => {
     if (marked.has(node.taskIdentifier)) {
+        winston.error("Cyclic dependency found for nodes")
+        winston.error(Array.from(marked.values(), (node: string) => {
+            return node
+        }).join(" "))
         throw new GraphError("Cyclic dependency found")
     }
 
     marked.add(node.taskIdentifier)
     node.children.forEach((child: Node) => {
-        markAndProcessChildren(child, marked)
+        if (nodes.has(child.taskIdentifier)) {
+            markAndProcessChildren(child, marked, nodes)
+        }
     })
+    nodes.delete(node.taskIdentifier)
 }
 
 export const findCyclicDependency = (tasks: Array<Task>, relations: Array<TaskRelation>) => {
@@ -38,12 +46,6 @@ export const findCyclicDependency = (tasks: Array<Task>, relations: Array<TaskRe
 
     while (nodes.size > 0) {
         const key = Array.from(nodes.keys())[0]
-
-        let marked = new Set<string>()
-        markAndProcessChildren(maputils.get(nodes, key), marked)
-
-        marked.forEach((key: string) => {
-            nodes.delete(key)
-        })
+        markAndProcessChildren(maputils.get(nodes, key), new Set<string>(), nodes)
     }
 }

@@ -15,14 +15,13 @@ describe("Primavera import FileSelector", () => {
         clearFakeGlobal()
     })
     it("Should render the component correctly", () => {
-        const warnings = [
-            "Warning 1",
-            "Warning 2",
-            "Warning 3"
-        ]
+        const warnings = new Map<string, Array<string>>()
+        warnings.set("task1", ["Warning 1", "Warning 2"])
+        warnings.set("task2", ["Warning 3"])
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
+        const onDismissInvalidFormat = sinon.spy()
         const component = enzyme.shallow(<FileSelector displayStage={Stage.Overview}
                                                        currentStage={Stage.Project}
                                                        maxStage={Stage.Relations}
@@ -32,9 +31,11 @@ describe("Primavera import FileSelector", () => {
                                                        itemCount={123}
                                                        warnings={warnings}
                                                        isImporting={false}
+                                                       isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
                                                        onCurrentStage={onCurrentStage}
-                                                       onNextStage={onNextStage} />)
+                                                       onNextStage={onNextStage}
+                                                       onDismissInvalidFormat={onDismissInvalidFormat} />)
         chai.expect(component.prop("title")).to.equal("Some title")
         chai.expect(component.prop("displayStage")).to.equal(Stage.Overview)
         chai.expect(component.prop("currentStage")).to.equal(Stage.Project)
@@ -49,10 +50,11 @@ describe("Primavera import FileSelector", () => {
         chai.expect(cols.at(0).children().text()).to.equal("Form label")
     })
     it("Should render the buttons correctly 1", () => {
-        const warnings = []
+        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
+        const onDismissInvalidFormat = sinon.spy()
         const component = enzyme.shallow(<FileSelector displayStage={Stage.Overview}
                                                        currentStage={Stage.Project}
                                                        maxStage={Stage.Relations}
@@ -62,9 +64,11 @@ describe("Primavera import FileSelector", () => {
                                                        itemCount={0}
                                                        warnings={warnings}
                                                        isImporting={false}
+                                                       isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
                                                        onCurrentStage={onCurrentStage}
-                                                       onNextStage={onNextStage} />)
+                                                       onNextStage={onNextStage}
+                                                       onDismissInvalidFormat={onDismissInvalidFormat} />)
         const buttonGroup = component.find("ButtonGroup")
         chai.expect(buttonGroup.children()).to.length(1)
         chai.expect(buttonGroup.childAt(0).children().text()).to.equal("Button text")
@@ -76,10 +80,11 @@ describe("Primavera import FileSelector", () => {
         chai.expect(button.prop("disabled")).to.true
     })
     it("Should render the buttons correctly 2", () => {
-        const warnings = []
+        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
+        const onDismissInvalidFormat = sinon.spy()
         const component = enzyme.shallow(<FileSelector displayStage={Stage.Overview}
                                                        currentStage={Stage.Project}
                                                        maxStage={Stage.Relations}
@@ -89,9 +94,11 @@ describe("Primavera import FileSelector", () => {
                                                        itemCount={123}
                                                        warnings={warnings}
                                                        isImporting={false}
+                                                       isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
                                                        onCurrentStage={onCurrentStage}
-                                                       onNextStage={onNextStage} />)
+                                                       onNextStage={onNextStage}
+                                                       onDismissInvalidFormat={onDismissInvalidFormat} />)
         const buttonGroup = component.find("ButtonGroup")
         chai.expect(buttonGroup.children()).to.length(1)
         chai.expect(buttonGroup.childAt(0).children().text()).to.equal("Button text")
@@ -103,10 +110,11 @@ describe("Primavera import FileSelector", () => {
         chai.expect(button.prop("disabled")).to.false
     })
     it("Should render the buttons correctly 3", () => {
-        const warnings = []
+        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
+        const onDismissInvalidFormat = sinon.spy()
         const component = enzyme.shallow(<FileSelector displayStage={Stage.Overview}
                                                        currentStage={Stage.Project}
                                                        maxStage={Stage.Relations}
@@ -116,9 +124,11 @@ describe("Primavera import FileSelector", () => {
                                                        itemCount={0}
                                                        warnings={warnings}
                                                        isImporting={true}
+                                                       isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
                                                        onCurrentStage={onCurrentStage}
-                                                       onNextStage={onNextStage} />)
+                                                       onNextStage={onNextStage}
+                                                       onDismissInvalidFormat={onDismissInvalidFormat} />)
         const buttonGroup = component.find("ButtonGroup")
         chai.expect(buttonGroup.children()).to.length(1)
         chai.expect(buttonGroup.childAt(0).children().text()).to.equal("Button text")
@@ -130,10 +140,11 @@ describe("Primavera import FileSelector", () => {
         chai.expect(button.prop("disabled")).to.true
     })
     it("Should render the buttons correctly 4", () => {
-        const warnings = []
+        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
+        const onDismissInvalidFormat = sinon.spy()
         const component = enzyme.shallow(<FileSelector displayStage={Stage.Overview}
                                                        currentStage={Stage.Project}
                                                        maxStage={Stage.Relations}
@@ -143,9 +154,11 @@ describe("Primavera import FileSelector", () => {
                                                        itemCount={123}
                                                        warnings={warnings}
                                                        isImporting={true}
+                                                       isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
                                                        onCurrentStage={onCurrentStage}
-                                                       onNextStage={onNextStage} />)
+                                                       onNextStage={onNextStage}
+                                                       onDismissInvalidFormat={onDismissInvalidFormat} />)
         const buttonGroup = component.find("ButtonGroup")
         chai.expect(buttonGroup.children()).to.length(1)
         chai.expect(buttonGroup.childAt(0).children().text()).to.equal("Button text")
@@ -157,14 +170,13 @@ describe("Primavera import FileSelector", () => {
         chai.expect(button.prop("disabled")).to.true
     })
     it("Should render the warning button correctly", () => {
-        const warnings = [
-            "Warning 1",
-            "Warning 2",
-            "Warning 3"
-        ]
+        const warnings = new Map<string, Array<string>>()
+        warnings.set("task1", ["Warning 1", "Warning 2"])
+        warnings.set("task2", ["Warning 3"])
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
+        const onDismissInvalidFormat = sinon.spy()
         const component = enzyme.shallow(<FileSelector displayStage={Stage.Overview}
                                                        currentStage={Stage.Project}
                                                        maxStage={Stage.Relations}
@@ -174,17 +186,48 @@ describe("Primavera import FileSelector", () => {
                                                        itemCount={0}
                                                        warnings={warnings}
                                                        isImporting={false}
+                                                       isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
                                                        onCurrentStage={onCurrentStage}
-                                                       onNextStage={onNextStage} />)
+                                                       onNextStage={onNextStage}
+                                                       onDismissInvalidFormat={onDismissInvalidFormat} />)
         const button = component.find("WarningsButton")
         chai.expect(button.prop("warnings")).to.deep.equal(warnings)
     })
-    it("Should react to file selection", () => {
-        const warnings = []
+    it("Should render the error alert correctly", () => {
+        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
+        const onDismissInvalidFormat = sinon.spy()
+        const component = enzyme.shallow(<FileSelector displayStage={Stage.Overview}
+                                                       currentStage={Stage.Project}
+                                                       maxStage={Stage.Relations}
+                                                       title="Some title"
+                                                       formLabel="Form label"
+                                                       buttonText="Button text"
+                                                       itemCount={0}
+                                                       warnings={warnings}
+                                                       isImporting={true}
+                                                       isInvalidFormat={true}
+                                                       onFileSelected={onFileSelected}
+                                                       onCurrentStage={onCurrentStage}
+                                                       onNextStage={onNextStage}
+                                                       onDismissInvalidFormat={onDismissInvalidFormat} />)
+        const alert = component.find("Alert")
+        chai.expect(alert.children().text()).to.deep.equal("Invalid file format")
+
+        alert.simulate("dismiss")
+
+        chai.expect(onDismissInvalidFormat.calledOnce).to.true
+        chai.expect(onDismissInvalidFormat.calledWithExactly()).to.true
+    })
+    it("Should react to file selection", () => {
+        const warnings = new Map<string, Array<string>>()
+        const onFileSelected = sinon.spy()
+        const onCurrentStage = sinon.spy()
+        const onNextStage = sinon.spy()
+        const onDismissInvalidFormat = sinon.spy()
         const component = enzyme.shallow(<FileSelector displayStage={Stage.Tasks}
                                                        currentStage={Stage.Tasks}
                                                        maxStage={Stage.Tasks}
@@ -194,9 +237,11 @@ describe("Primavera import FileSelector", () => {
                                                        itemCount={0}
                                                        warnings={warnings}
                                                        isImporting={false}
+                                                       isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
                                                        onCurrentStage={onCurrentStage}
-                                                       onNextStage={onNextStage} />)
+                                                       onNextStage={onNextStage}
+                                                       onDismissInvalidFormat={onDismissInvalidFormat} />)
         const instance = component.instance()
         class FakeInput extends React.Component<{}, {}> {
             constructor(files: FileList) {
@@ -239,10 +284,11 @@ describe("Primavera import FileSelector", () => {
         chai.expect(onFileSelected.calledWithExactly(fakeFile)).to.true
     })
     it("Should react to next", () => {
-        const warnings = []
+        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
+        const onDismissInvalidFormat = sinon.spy()
         const component = enzyme.shallow(<FileSelector displayStage={Stage.Tasks}
                                                        currentStage={Stage.Tasks}
                                                        maxStage={Stage.Tasks}
@@ -252,9 +298,11 @@ describe("Primavera import FileSelector", () => {
                                                        itemCount={0}
                                                        warnings={warnings}
                                                        isImporting={false}
+                                                       isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
                                                        onCurrentStage={onCurrentStage}
-                                                       onNextStage={onNextStage} />)
+                                                       onNextStage={onNextStage}
+                                                       onDismissInvalidFormat={onDismissInvalidFormat} />)
         const instance = component.instance()
         const buttons = component.find("Button")
         const button = buttons.at(buttons.length - 1)

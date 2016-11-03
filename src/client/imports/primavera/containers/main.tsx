@@ -5,58 +5,12 @@ import * as ReactRedux from "react-redux"
 import { Grid, Col, ButtonGroup, Button, Alert, Form, FormGroup, FormControl, ControlLabel } from "react-bootstrap"
 import { State, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "../types"
 import { defineProject, addProject } from "../actions/project"
-import { importTasks, dismissInvalidTasksFormat } from "../actions/tasks"
-import { importRelations, dismissInvalidRelationsFormat } from "../actions/relations"
-import { submit } from "../actions/submit"
+import { submit } from "../actions/overview"
 import { Project } from "../../../../common/types"
-import { ProjectEditor, TasksSelector, RelationsSelector } from "../connectedcomponents"
+import { ProjectEditor, TasksSelector, RelationsSelector, Overview } from "../connectedcomponents"
 
-interface MainProperties {
-    project: Project
-    tasks: Map<string, PrimaveraTask>
-    delays: Map<string, PrimaveraDelay>
-    relations: Array<PrimaveraTaskRelation>
-    warnings: Array<string>
-    isTasksImporting: boolean
-    isRelationsImporting: boolean
-    invalidTasksFormat: boolean
-    invalidRelationsFormat: boolean
-    onTasksFileSelected: (file: File) => void
-    onRelationsFileSelected: (file: File) => void
-    onProjectChanged: (projectIdentifier: string, name: string, description: string) => void
-    onDismissInvalidTasksFormat: () => void
-    onDismissInvalidRelationsFormat: () => void
-    onSubmit: (project: Project, tasks: Map<string, PrimaveraTask>) => void
-    dispatch: Dispatch<State>
-}
-
-class UnconnectedMain extends React.Component<MainProperties, {}> {
+class UnconnectedMain extends React.Component<{}, {}> {
     render() {
-        let tasksAlert: JSX.Element | null = null
-        if (this.props.invalidTasksFormat) {
-            tasksAlert = <Alert bsStyle="danger" onDismiss={this.props.onDismissInvalidTasksFormat}>
-                Invalid format for tasks. Please check that you are trying to import a CSV file.
-            </Alert>
-        }
-        let relationsAlert: JSX.Element | null = null
-        if (this.props.invalidRelationsFormat) {
-            relationsAlert = <Alert bsStyle="danger" onDismiss={this.props.onDismissInvalidRelationsFormat}>
-                Invalid format for relations. Please check that you are trying to import a CSV file.
-            </Alert>
-        }
-        const projectIdentifierLength = this.props.project.identifier.length
-        const tasksLength = this.props.tasks.size + this.props.delays.size
-        const relationsLength = this.props.relations.length
-
-        const identifierValidation: "success" | "error" = projectIdentifierLength > 0 ? "success" : "error"
-        const tasksColor = tasksLength > 0 ? "success" : "default"
-        const relationsColor = relationsLength > 0 ? "success" : "default"
-        const canImport = projectIdentifierLength > 0
-                          && this.props.project.name.length > 0
-                          && tasksLength > 0 && relationsLength > 0
-        const tasksButtonText = tasksLength > 0 ? "Imported " + tasksLength + " tasks" : "Import tasks"
-        const relationsButtonText = relationsLength > 0 ? "Imported " + relationsLength + " relations"
-                                                        : "Import relations"
         return <Grid>
             <Col xs={12} md={12}>
                 <h1>Import from Oracle Primavera</h1>
@@ -64,66 +18,23 @@ class UnconnectedMain extends React.Component<MainProperties, {}> {
                     Only CSV files can be imported. Oracle Primavera Excel files should
                     be converted to CSV files, with the tabulation as separator.
                 </p>
-                {tasksAlert}
-                {relationsAlert}
                 <ProjectEditor />
                 <TasksSelector />
                 <RelationsSelector />
-                <Form horizontal>
-                    <input type="file" ref="tasksInput" className="hidden"
-                           onChange={this.handleImportTasksFile.bind(this)}/>
-                    <input type="file" ref="relationsInput" className="hidden"
-                           onChange={this.handleImportRelationsFile.bind(this)}/>
-                    <FormGroup>
-                        <Col componentClass={ControlLabel} xd={12} md={2}>
-                            Tasks
-                        </Col>
-                        <Col xd={12} md={10}>
-                            <ButtonGroup>
-                                <Button bsStyle={tasksColor} disabled={this.props.isTasksImporting}
-                                        onClick={this.handleImportTasks.bind(this)}>{tasksButtonText}</Button>
-                                <Button bsStyle={relationsColor} disabled={this.props.isRelationsImporting}
-                                        onClick={this.handleImportRelations.bind(this)}>{relationsButtonText}</Button>
-                            </ButtonGroup>
-                        </Col>
-                    </FormGroup>
-                    <FormGroup>
-                        <Button bsStyle="primary" disabled={!canImport}
-                                onClick={this.handleSubmit.bind(this)}>Import</Button>
-                    </FormGroup>
-                </Form>
+                <Overview />
             </Col>
         </Grid>
     }
-    private handleImportTasks(e: React.MouseEvent) {
-        const input = ReactDOM.findDOMNode(this.refs["tasksInput"]) as HTMLInputElement
-        input.click()
-    }
-    private handleImportTasksFile(e: React.FormEvent) {
-        const input = ReactDOM.findDOMNode(this.refs["tasksInput"]) as HTMLInputElement
-        const fileList = input.files as FileList
-        const file = fileList[0]
-        this.props.onTasksFileSelected(file)
-    }
-    private handleImportRelations(e: React.FormEvent) {
-        const input = ReactDOM.findDOMNode(this.refs["relationsInput"]) as HTMLInputElement
-        input.click()
-    }
-    private handleImportRelationsFile(e: React.FormEvent) {
-        const input = ReactDOM.findDOMNode(this.refs["relationsInput"]) as HTMLInputElement
-        const fileList = input.files as FileList
-        const file = fileList[0]
-        this.props.onRelationsFileSelected(file)
-    }
-    private handleSubmit(e: React.FormEvent) {
-        this.props.onSubmit(this.props.project, this.props.tasks)
-
-    }
+    // private handleSubmit(e: React.FormEvent) {
+        // this.props.onSubmit(this.props.project, this.props.tasks)
+    // }
 }
+
+/*
 
 const mapStateToProps = (state: State) => {
     let warnings = new Array<string>()
-    warnings = state.tasks.warnings.slice(0)
+    // warnings = state.tasks.warnings.slice(0)
 
     const tasks = state.tasks.tasks
     const relations = state.relations.relations.filter((relation: PrimaveraTaskRelation) => {
@@ -165,36 +76,20 @@ const mapStateToProps = (state: State) => {
         tasks,
         delays: state.tasks.delays,
         relations,
-        warnings,
-        isTasksImporting: state.tasks.isImporting,
-        isRelationsImporting: state.relations.isImporting,
-        invalidTasksFormat: state.tasks.invalidFormat,
-        invalidRelationsFormat: state.relations.invalidFormat
+        warnings
     }
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
-        onProjectChanged: (projectIdentifier: string, name: string, description: string) => {
-            dispatch(defineProject(projectIdentifier, name, description))
-        },
-        onTasksFileSelected: (file: File) => {
-            dispatch(importTasks(file))
-        },
-        onRelationsFileSelected: (file: File) => {
-            dispatch(importRelations(file))
-        },
-        onDismissInvalidTasksFormat: () => {
-            dispatch(dismissInvalidTasksFormat())
-        },
-        onDismissInvalidRelationsFormat: () => {
-            dispatch(dismissInvalidRelationsFormat())
-        },
         onSubmit: (project: Project, tasks: Map<string, PrimaveraTask>) => {
             dispatch(submit(project, Array.from(tasks.values()), []))
         },
         dispatch
     }
 }
+*/
 
-export const Main = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(UnconnectedMain)
+const mapStateToProps = (state: State) => {}
+
+export const Main = ReactRedux.connect()(UnconnectedMain)

@@ -1,6 +1,7 @@
 import * as projectEditor from "./components/projecteditor"
 import * as tasksSelector from "./components/tasksselector"
 import * as relationsSelector from "./components/relationsselector"
+import * as overview from "./components/overview"
 
 const projectEditorConnection = ReactRedux.connect(projectEditor.mapStateToProps,
                                                    projectEditor.mapDispatchToProps)
@@ -13,3 +14,7 @@ export const TasksSelector = tasksSelectorConnection(tasksSelector.TasksSelector
 const relationsSelectorConnection = ReactRedux.connect(relationsSelector.mapStateToProps,
                                                        relationsSelector.mapDispatchToProps)
 export const RelationsSelector = relationsSelectorConnection(relationsSelector.RelationsSelector)
+
+const overviewConnection = ReactRedux.connect(overview.mapStateToProps,
+                                              overview.mapDispatchToProps)
+export const Overview = overviewConnection(overview.Overview)
