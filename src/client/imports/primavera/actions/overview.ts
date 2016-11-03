@@ -30,38 +30,23 @@ export const filterForOverview = (tasks: Map<string, PrimaveraTask>,
     }
 }
 
-const requestSubmit = (): Action => {
+export const requestSubmit = (): Action => {
     return {
         type: OVERVIEW_SUBMIT_REQUEST
     }
 }
 
-const receiveSubmit = (): Action => {
+export const receiveSubmit = (): Action => {
     return {
         type: OVERVIEW_SUBMIT_RECEIVE
     }
 }
 
-const receiveSubmitFailure = (message: string): ErrorAction => {
+export const receiveSubmitFailure = (message: string): ErrorAction => {
     return {
         type: OVERVIEW_SUBMIT_RECEIVE_FAILURE,
         message
     }
-}
-
-const getDates = (task: PrimaveraTask): [Date, number] => {
-    if (task.startDate) {
-        const date = task.startDate
-        if (task.endDate) {
-            return [date, getDateDiff(task.endDate, date)]
-        } else {
-            return [date, 0]
-        }
-    }
-    if (!task.startDate && task.endDate) {
-        return [task.endDate, 0]
-    }
-    throw new InputError("Invalid duration")
 }
 
 export const submit = (project: Project, tasks: Array<ApiInputTask>,

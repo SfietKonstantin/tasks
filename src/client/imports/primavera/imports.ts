@@ -215,7 +215,7 @@ export const filterTasks = (tasks: Map<string, PrimaveraTask>): Array<ApiInputTa
             date = task.endDate
         }
         if (task.startDate != null && task.endDate != null) {
-            estimatedDuration = dateutils.getDateDiff(task.endDate, task.startDate)
+            estimatedDuration = dateutils.getDateDiff(task.startDate, task.endDate)
         } else {
             estimatedDuration = 0
         }

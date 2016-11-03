@@ -5,7 +5,7 @@ import * as ReduxThunk from "redux-thunk"
 import { Provider } from "react-redux"
 import { State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./primavera/types"
 import { mainReducer } from "./primavera/reducers/main"
-import { Main } from "./primavera/containers/main"
+import { Main } from "./primavera/components/main"
 import { Project } from "../../common/types"
 
 interface RootProperties {

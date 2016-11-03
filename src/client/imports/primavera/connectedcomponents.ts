@@ -1,7 +1,9 @@
+import * as ReactRedux from "react-redux"
 import * as projectEditor from "./components/projecteditor"
 import * as tasksSelector from "./components/tasksselector"
 import * as relationsSelector from "./components/relationsselector"
 import * as overview from "./components/overview"
+import * as main from "./components/main"
 
 const projectEditorConnection = ReactRedux.connect(projectEditor.mapStateToProps,
                                                    projectEditor.mapDispatchToProps)

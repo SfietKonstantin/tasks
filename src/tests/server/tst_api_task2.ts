@@ -8,6 +8,7 @@ import { Api, RequestError } from "../../server/core/api"
 import { ProjectNode, TaskNode } from "../../server/core/graph/graph"
 import { FakeDataProvider } from "./fakedataprovider"
 import { FakeGraph } from "./fakegraph"
+import { FakeError } from "./fakeerror"
 import * as maputils from "../../common/maputils"
 import * as winston from "winston"
 
@@ -83,6 +84,23 @@ describe("API", () => {
             let dataProvider = new FakeDataProvider()
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
+            let mock = sinon.mock(dataProvider)
+            mock.expects("isTaskImportant").once().withExactArgs("project", "task")
+                .returns(Promise.reject(new FakeError("Some error")))
+
+            api.isTaskImportant("project", "task").then(() => {
+                done(new Error("isTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(FakeError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should throw an error when getting if task is important 4", (done) => {
+            let dataProvider = new FakeDataProvider()
+            let graph = new FakeGraph()
+            let api = new Api(dataProvider, graph)
 
             api.isTaskImportant({ test: "test" }, "task").then(() => {
                 done(new Error("isTaskImportant should not be a success"))
@@ -94,7 +112,7 @@ describe("API", () => {
                 done(error)
             })
         })
-        it("Should throw an error when getting if task is important 4", (done) => {
+        it("Should throw an error when getting if task is important 5", (done) => {
             let dataProvider = new FakeDataProvider()
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
@@ -210,7 +228,7 @@ describe("API", () => {
                 done(error)
             })
         })
-        it("Should throw an error when setting if task is important 1", (done) => {
+        it("Should throw an error when setting if task is important 5", (done) => {
             let dataProvider = new FakeDataProvider()
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
@@ -228,7 +246,24 @@ describe("API", () => {
                 done(error)
             })
         })
-        it("Should throw an error when setting if task is important 5", (done) => {
+        it("Should throw an error when setting if task is important 6", (done) => {
+            let dataProvider = new FakeDataProvider()
+            let graph = new FakeGraph()
+            let api = new Api(dataProvider, graph)
+            let mock = sinon.mock(dataProvider)
+            mock.expects("setTaskImportant").once().withExactArgs("project", "task", false)
+                .returns(Promise.reject(new FakeError("Some error")))
+
+            api.setTaskImportant("project", "task", false).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(FakeError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should throw an error when setting if task is important 7", (done) => {
             let dataProvider = new FakeDataProvider()
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)

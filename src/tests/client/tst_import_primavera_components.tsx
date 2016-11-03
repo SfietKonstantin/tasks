@@ -7,12 +7,14 @@ import {TasksSelector } from "../../client/imports/primavera/components/taskssel
 import * as tasksActions from "../../client/imports/primavera/actions/tasks"
 import * as relationsSelector from "../../client/imports/primavera/components/relationsselector"
 import { RelationsSelector } from "../../client/imports/primavera/components/relationsselector"
+import { Main } from "../../client/imports/primavera/components/main"
 import * as relationsActions from "../../client/imports/primavera/actions/relations"
 import { filterForOverview } from "../../client/imports/primavera/actions/overview"
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
 import { Stage, PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { FakeFile } from "./fakefile"
+import * as connectedcomponents from "../../client/imports/primavera/connectedcomponents"
 
 describe("Primavera components", () => {
     let sandbox: Sinon.SinonSandbox
@@ -280,6 +282,15 @@ describe("Primavera components", () => {
 
             mapped.onDismissInvalidFormat()
             chai.expect(dispatch.calledWithExactly(relationsActions.dismissInvalidRelationsFormat())).to.true
+        })
+    })
+    describe("Main", () => {
+        it("Should render the component correctly", () => {
+            const component = enzyme.shallow(<Main  />)
+            chai.expect(component.find(connectedcomponents.ProjectEditor)).to.length(1)
+            chai.expect(component.find(connectedcomponents.TasksSelector)).to.length(1)
+            chai.expect(component.find(connectedcomponents.RelationsSelector)).to.length(1)
+            chai.expect(component.find(connectedcomponents.Overview)).to.length(1)
         })
     })
 })

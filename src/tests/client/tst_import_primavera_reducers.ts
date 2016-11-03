@@ -14,6 +14,10 @@ import {
     beginRelationsImport, endRelationsImport, relationsImportInvalidFormat,
     dismissInvalidRelationsFormat
 } from "../../client/imports/primavera/actions/relations"
+import {
+    filterForOverview, requestSubmit, receiveSubmit,
+    receiveSubmitFailure
+} from "../../client/imports/primavera/actions/overview"
 import * as imports from "../../client/imports/primavera/imports"
 import {
     State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation
@@ -55,13 +59,13 @@ const filteredTasks: Array<ApiInputTask> = [
         name: "Task 1",
         description: "",
         estimatedStartDate: new Date(2016, 9, 1).toISOString(),
-        estimatedDuration: 30
+        estimatedDuration: 31
     },
     {
         identifier: "milestone1",
         name: "Milestone 1",
         description: "",
-        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+        estimatedStartDate: new Date(2016, 10, 1).toISOString(),
         estimatedDuration: 0
     },
 ]
@@ -70,7 +74,7 @@ const relations: Array<PrimaveraTaskRelation> = [
     {
         previous: "task1",
         next: "milestone1",
-        type: "FF",
+        type: "FS",
         lag: 3
     }
 ]
@@ -79,7 +83,7 @@ const filteredRelations: Array<TaskRelation> = [
     {
         previous: "task1",
         next: "milestone1",
-        previousLocation: TaskLocation.Beginning,
+        previousLocation: TaskLocation.End,
         lag: 3
     }
 ]
@@ -306,6 +310,42 @@ describe("Primavera reducers", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, dismissInvalidRelationsFormat())
                 chai.expect(state.relations.isInvalidFormat).to.false
+            }
+            checkState(initialState1)
+            checkState(initialState2)
+        })
+    })
+    describe("Overview reducers", () => {
+        it("Should reduce OVERVIEW_FILTER", () => {
+            const checkState = (initialState: State) => {
+                const state = main.mainReducer(initialState, filterForOverview(tasks, relations))
+                chai.expect(state.overview.tasks).to.deep.equal(filteredTasks)
+                chai.expect(state.overview.relations).to.deep.equal(filteredRelations)
+                chai.expect(state.overview.warnings.size).to.empty
+            }
+            checkState(initialState1)
+            checkState(initialState2)
+        })
+        it("Should reduce OVERVIEW_SUBMIT_REQUEST", () => {
+            const checkState = (initialState: State) => {
+                const state = main.mainReducer(initialState, requestSubmit())
+                chai.expect(state.overview.isSubmitting).to.true
+            }
+            checkState(initialState1)
+            checkState(initialState2)
+        })
+        it("Should reduce OVERVIEW_SUBMIT_RECEIVE", () => {
+            const checkState = (initialState: State) => {
+                const state = main.mainReducer(initialState, receiveSubmit())
+                chai.expect(state.overview.isSubmitting).to.false
+            }
+            checkState(initialState1)
+            checkState(initialState2)
+        })
+        it("Should reduce OVERVIEW_SUBMIT_RECEIVE_FAILURE", () => {
+            const checkState = (initialState: State) => {
+                const state = main.mainReducer(initialState, receiveSubmitFailure("Some error"))
+                chai.expect(state.overview.isSubmitting).to.false
             }
             checkState(initialState1)
             checkState(initialState2)

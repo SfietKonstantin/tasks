@@ -1,15 +1,8 @@
 import * as React from "react"
-import * as ReactDOM from "react-dom"
-import { Dispatch } from "redux"
-import * as ReactRedux from "react-redux"
-import { Grid, Col, ButtonGroup, Button, Alert, Form, FormGroup, FormControl, ControlLabel } from "react-bootstrap"
-import { State, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "../types"
-import { defineProject, addProject } from "../actions/project"
-import { submit } from "../actions/overview"
-import { Project } from "../../../../common/types"
+import { Grid, Col } from "react-bootstrap"
 import { ProjectEditor, TasksSelector, RelationsSelector, Overview } from "../connectedcomponents"
 
-class UnconnectedMain extends React.Component<{}, {}> {
+export class Main extends React.Component<{}, {}> {
     render() {
         return <Grid>
             <Col xs={12} md={12}>
@@ -25,9 +18,6 @@ class UnconnectedMain extends React.Component<{}, {}> {
             </Col>
         </Grid>
     }
-    // private handleSubmit(e: React.FormEvent) {
-        // this.props.onSubmit(this.props.project, this.props.tasks)
-    // }
 }
 
 /*
@@ -90,6 +80,3 @@ const mapDispatchToProps = (dispatch: Dispatch<State>) => {
 }
 */
 
-const mapStateToProps = (state: State) => {}
-
-export const Main = ReactRedux.connect()(UnconnectedMain)

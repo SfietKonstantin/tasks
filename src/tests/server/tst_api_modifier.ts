@@ -9,6 +9,7 @@ import { GraphError } from "../../server/core/graph/types"
 import { ProjectNode, TaskNode } from "../../server/core/graph/graph"
 import { FakeDataProvider } from "./fakedataprovider"
 import { FakeGraph } from "./fakegraph"
+import { FakeError } from "./fakeerror"
 import * as maputils from "../../common/maputils"
 import * as winston from "winston"
 
@@ -193,7 +194,6 @@ describe("API", () => {
             let dataProvider = new FakeDataProvider()
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
-            let mock = sinon.mock(dataProvider)
             const modifier: Modifier = {
                 name: "Modifier 3",
                 description: "Description 3",
@@ -210,19 +210,17 @@ describe("API", () => {
             graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
             let projectNode = maputils.get(graph.nodes, "project")
             let taskNode = new TaskNode(dataProvider, projectNode, task.identifier,
-                            task.estimatedStartDate, task.estimatedDuration,
-                            new Date(2016, 2, 5), 32)
+                                        task.estimatedStartDate, task.estimatedDuration,
+                                        new Date(2016, 2, 5), 32)
             let taskNodeMock = sinon.mock(taskNode)
             projectNode.nodes.set("task", taskNode)
-            taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
-            mock.expects("getTask").once().withExactArgs("project", "task")
-                .returns(Promise.reject(new CorruptedError("Some error")))
+            taskNodeMock.expects("addModifier").once().withExactArgs(modifier)
+                        .returns(Promise.reject(new FakeError("Some error")))
 
             api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
-                chai.expect(error).to.instanceOf(RequestError)
-                chai.expect((error as RequestError).status).to.equal(500)
+                chai.expect(error).to.instanceOf(FakeError)
                 done()
             }).catch((error) => {
                 done(error)
@@ -249,13 +247,13 @@ describe("API", () => {
             graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
             let projectNode = maputils.get(graph.nodes, "project")
             let taskNode = new TaskNode(dataProvider, projectNode, task.identifier,
-                            task.estimatedStartDate, task.estimatedDuration,
-                            new Date(2016, 2, 5), 32)
+                                        task.estimatedStartDate, task.estimatedDuration,
+                                        new Date(2016, 2, 5), 32)
             let taskNodeMock = sinon.mock(taskNode)
             projectNode.nodes.set("task", taskNode)
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
             mock.expects("getTask").once().withExactArgs("project", "task")
-                .returns(Promise.reject(new InternalError("Some error")))
+                .returns(Promise.reject(new CorruptedError("Some error")))
 
             api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
@@ -278,8 +276,6 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            mock.expects("getProject").once().withExactArgs("project")
-                .returns(Promise.reject(new CorruptedError("Some error")))
             const task: Task = {
                 identifier: "task",
                 name: "Task",
@@ -290,12 +286,13 @@ describe("API", () => {
             graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
             let projectNode = maputils.get(graph.nodes, "project")
             let taskNode = new TaskNode(dataProvider, projectNode, task.identifier,
-                            task.estimatedStartDate, task.estimatedDuration,
-                            new Date(2016, 2, 5), 32)
+                                        task.estimatedStartDate, task.estimatedDuration,
+                                        new Date(2016, 2, 5), 32)
             let taskNodeMock = sinon.mock(taskNode)
             projectNode.nodes.set("task", taskNode)
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
-            mock.expects("getTask").once().withExactArgs("project", "task").returns(Promise.resolve(task))
+            mock.expects("getTask").once().withExactArgs("project", "task")
+                .returns(Promise.reject(new InternalError("Some error")))
 
             api.addModifier("project", "task", modifier).then(() => {
                 done(new Error("addModifier should not be a success"))
@@ -318,8 +315,6 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            mock.expects("getProject").once().withExactArgs("project")
-                .returns(Promise.reject(new InternalError("Some error")))
             const task: Task = {
                 identifier: "task",
                 name: "Task",
@@ -330,8 +325,48 @@ describe("API", () => {
             graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
             let projectNode = maputils.get(graph.nodes, "project")
             let taskNode = new TaskNode(dataProvider, projectNode, task.identifier,
-                            task.estimatedStartDate, task.estimatedDuration,
-                            new Date(2016, 2, 5), 32)
+                                        task.estimatedStartDate, task.estimatedDuration,
+                                        new Date(2016, 2, 5), 32)
+            let taskNodeMock = sinon.mock(taskNode)
+            projectNode.nodes.set("task", taskNode)
+            taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
+            mock.expects("getTask").once().withExactArgs("project", "task")
+                .returns(Promise.reject(new FakeError("Some error")))
+
+            api.addModifier("project", "task", modifier).then(() => {
+                done(new Error("addModifier should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(FakeError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should throw an error when adding modifier 8", (done) => {
+            let dataProvider = new FakeDataProvider()
+            let graph = new FakeGraph()
+            let api = new Api(dataProvider, graph)
+            let mock = sinon.mock(dataProvider)
+            const modifier: Modifier = {
+                name: "Modifier 3",
+                description: "Description 3",
+                duration: 15,
+                location: TaskLocation.End
+            }
+            mock.expects("getProject").once().withExactArgs("project")
+                .returns(Promise.reject(new CorruptedError("Some error")))
+            const task: Task = {
+                identifier: "task",
+                name: "Task",
+                description: "Description",
+                estimatedStartDate: new Date(2016, 2, 1),
+                estimatedDuration: 15
+            }
+            graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
+            let projectNode = maputils.get(graph.nodes, "project")
+            let taskNode = new TaskNode(dataProvider, projectNode, task.identifier,
+                                        task.estimatedStartDate, task.estimatedDuration,
+                                        new Date(2016, 2, 5), 32)
             let taskNodeMock = sinon.mock(taskNode)
             projectNode.nodes.set("task", taskNode)
             taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
@@ -347,7 +382,47 @@ describe("API", () => {
                 done(error)
             })
         })
-        it("Should throw an error when adding modifier 8", (done) => {
+        it("Should throw an error when adding modifier 9", (done) => {
+            let dataProvider = new FakeDataProvider()
+            let graph = new FakeGraph()
+            let api = new Api(dataProvider, graph)
+            let mock = sinon.mock(dataProvider)
+            const modifier: Modifier = {
+                name: "Modifier 3",
+                description: "Description 3",
+                duration: 15,
+                location: TaskLocation.End
+            }
+            mock.expects("getProject").once().withExactArgs("project")
+                .returns(Promise.reject(new InternalError("Some error")))
+            const task: Task = {
+                identifier: "task",
+                name: "Task",
+                description: "Description",
+                estimatedStartDate: new Date(2016, 2, 1),
+                estimatedDuration: 15
+            }
+            graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
+            let projectNode = maputils.get(graph.nodes, "project")
+            let taskNode = new TaskNode(dataProvider, projectNode, task.identifier,
+                                        task.estimatedStartDate, task.estimatedDuration,
+                                        new Date(2016, 2, 5), 32)
+            let taskNodeMock = sinon.mock(taskNode)
+            projectNode.nodes.set("task", taskNode)
+            taskNodeMock.expects("addModifier").once().withExactArgs(modifier).returns(Promise.resolve(modifier))
+            mock.expects("getTask").once().withExactArgs("project", "task").returns(Promise.resolve(task))
+
+            api.addModifier("project", "task", modifier).then(() => {
+                done(new Error("addModifier should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(RequestError)
+                chai.expect((error as RequestError).status).to.equal(500)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should throw an error when adding modifier 10", (done) => {
             let dataProvider = new FakeDataProvider()
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
@@ -368,7 +443,7 @@ describe("API", () => {
                 done(error)
             })
         })
-        it("Should throw an error when adding modifier 9", (done) => {
+        it("Should throw an error when adding modifier 11", (done) => {
             let dataProvider = new FakeDataProvider()
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)

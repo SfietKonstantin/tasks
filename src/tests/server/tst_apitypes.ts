@@ -1,9 +1,64 @@
 import * as chai from "chai"
 import * as apitypes from "../../common/apitypes"
-import { Project, Task } from "../../common/types"
+import { Project, Task, TaskRelation, TaskLocation } from "../../common/types"
 import { InputError } from "../../common/errors"
 
 describe("API types", () => {
+    describe("createProject", () => {
+        it("Should create a project", () => {
+            const project: Project = {
+                identifier: "project",
+                name: "Project",
+                description: "Description"
+            }
+            chai.expect(apitypes.createProject(project)).to.deep.equal(project)
+        })
+        it("Should not create a project without identifier", () => {
+            const project = {
+                name: "Project",
+                description: "Description"
+            }
+            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+        })
+        it("Should not create a project with wrong identifier", () => {
+            const project = {
+                identifier: { test: "test" },
+                name: "Project",
+                description: "Description"
+            }
+            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+        })
+        it("Should not create a project without name", () => {
+            const project = {
+                identifier: "project",
+                name: { test: "test" },
+                description: "Description"
+            }
+            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+        })
+        it("Should not create a project with wrong name", () => {
+            const project = {
+                identifier: "project",
+                description: "Description"
+            }
+            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+        })
+        it("Should not create a project without description", () => {
+            const project = {
+                identifier: "project",
+                name: "Project",
+            }
+            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+        })
+        it("Should not create a project with wrong description", () => {
+            const project = {
+                identifier: "project",
+                name: "Project",
+                description: { test: "test" }
+            }
+            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+        })
+    })
     describe("createTask", () => {
         it("Should create a Task", () => {
             const apiTask = {
@@ -118,59 +173,101 @@ describe("API types", () => {
             chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
     })
-    describe("createProject", () => {
-        it("Should create a project", () => {
-            const project: Project = {
-                identifier: "project",
-                name: "Project",
-                description: "Description"
+    describe("createRelation", () => {
+        it("Should create a relation 1", () => {
+            const relation: TaskRelation = {
+                previous: "task1",
+                previousLocation: TaskLocation.Beginning,
+                next: "task2",
+                lag: 3
             }
-            chai.expect(apitypes.createProject(project)).to.deep.equal(project)
+            chai.expect(apitypes.createRelation(relation)).to.deep.equal(relation)
         })
-        it("Should not create a project without identifier", () => {
-            const project = {
-                name: "Project",
-                description: "Description"
+        it("Should create a relation 2", () => {
+            const relation: TaskRelation = {
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                lag: 3
             }
-            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+            chai.expect(apitypes.createRelation(relation)).to.deep.equal(relation)
         })
-        it("Should not create a project with wrong identifier", () => {
-            const project = {
-                identifier: { test: "test" },
-                name: "Project",
-                description: "Description"
+        it("Should not create a project without previous", () => {
+            const relation = {
+                previousLocation: TaskLocation.Beginning,
+                next: "task2",
+                lag: 3
             }
-            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project without name", () => {
-            const project = {
-                identifier: "project",
-                name: { test: "test" },
-                description: "Description"
+        it("Should not create a project with wrong previous", () => {
+            const relation = {
+                previous: { test: "test" },
+                previousLocation: TaskLocation.Beginning,
+                next: "task2",
+                lag: 3
             }
-            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project with wrong name", () => {
-            const project = {
-                identifier: "project",
-                description: "Description"
+        it("Should not create a project without previousLocation", () => {
+            const relation = {
+                previous: "task1",
+                next: "task2",
+                lag: 3
             }
-            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project without description", () => {
-            const project = {
-                identifier: "project",
-                name: "Project",
+        it("Should not create a project with wrong previousLocation 1", () => {
+            const relation = {
+                previous: "task1",
+                previousLocation: { test: "test" },
+                next: "task2",
+                lag: 3
             }
-            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project with wrong description", () => {
-            const project = {
-                identifier: "project",
-                name: "Project",
-                description: { test: "test" }
+        it("Should not create a project with wrong previousLocation 2", () => {
+            const relation = {
+                previous: "task1",
+                previousLocation: 123,
+                next: "task2",
+                lag: 3
             }
-            chai.expect(() => { apitypes.createProject(project) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+        })
+        it("Should not create a project without next", () => {
+            const relation = {
+                previous: "task1",
+                previousLocation: TaskLocation.Beginning,
+                lag: 3
+            }
+            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+        })
+        it("Should not create a project with wrong next", () => {
+            const relation = {
+                previous: "task1",
+                previousLocation: TaskLocation.Beginning,
+                next: { test: "test" },
+                lag: 3
+            }
+            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+        })
+        it("Should not create a project without lag", () => {
+            const relation = {
+                previous: "task1",
+                previousLocation: TaskLocation.Beginning,
+                next: "task2"
+            }
+            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+        })
+        it("Should not create a project with wrong lag", () => {
+            const relation = {
+                previous: "task1",
+                previousLocation: TaskLocation.Beginning,
+                next: "task2",
+                lag: { test: "test" }
+            }
+            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
         })
     })
 })
