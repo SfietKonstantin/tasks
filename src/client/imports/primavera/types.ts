@@ -64,9 +64,16 @@ export interface RelationsState {
     isInvalidFormat: boolean
 }
 
+export enum SubmitState {
+    Idle,
+    Submitting,
+    Submitted,
+    SubmitError
+}
+
 export interface OverviewState {
     tasks: Array<ApiInputTask>
     relations: Array<TaskRelation>
     warnings: Map<string, Array<string>>
-    isSubmitting: boolean
+    submitState: SubmitState
 }

@@ -62,7 +62,10 @@ export class TaskNode implements ITaskNode {
     private markAndCompute(markedNodes: Set<ITaskNode>) {
         return Promise.resolve().then(() => {
             if (markedNodes.has(this)) {
-                throw new GraphError("Cyclic dependency found involving task \"" + this.taskIdentifier + "\"")
+                const markedTasks = Array.from(markedNodes, (node: ITaskNode) => {
+                    return "\"" + node.taskIdentifier + "\""
+                }).join(", ")
+                throw new GraphError("Cyclic dependency found involving task " + markedTasks)
             }
             markedNodes.add(this)
             const currentEndDate = this.getEndDate()
@@ -129,7 +132,7 @@ export class TaskNode implements ITaskNode {
     }
     private computeChildren(markedNodes: Set<ITaskNode>): Promise<void> {
         return Promise.all(this.children.map((child: TaskNode) => {
-            return child.markAndCompute(markedNodes)
+            return child.markAndCompute(new Set<ITaskNode>(markedNodes))
         }))
     }
 }

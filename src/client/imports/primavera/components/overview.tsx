@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Dispatch } from "redux"
 import { Button, ButtonGroup, Badge } from "react-bootstrap"
-import { State, Stage } from "../types"
+import { State, Stage, SubmitState } from "../types"
 import { StagePanel } from "./stagepanel"
 import { WarningsButton } from "./warningsbutton"
 import { defineStage, defineMaxStage } from "../actions/stages"
@@ -19,7 +19,7 @@ interface OverviewProperties {
     totalRelations: number
     relations: Array<TaskRelation>
     warnings: Map<string, Array<string>>
-    isSubmitting: boolean
+    submitState: SubmitState
     onCurrentStage: () => void
     onSubmit: (project: Project, tasks: Array<ApiInputTask>, relations: Array<TaskRelation>) => void
 }
@@ -37,6 +37,7 @@ export class Overview extends React.Component<OverviewProperties, {}> {
         const canImport = projectIdentifierLength > 0
                           && this.props.project.name.length > 0
                           && tasksLength > 0 && relationsLength > 0
+                          && this.props.submitState !== SubmitState.Submitted
         return <StagePanel displayStage={Stage.Overview}
                            currentStage={this.props.stage}
                            maxStage={this.props.maxStage} title="4. Overview"
@@ -45,13 +46,39 @@ export class Overview extends React.Component<OverviewProperties, {}> {
             <p><Badge>{tasksLength}</Badge> of the {this.props.totalTasks} tasks will be imported</p>
             <p><Badge>{relationsLength}</Badge> of the {this.props.totalRelations} relations will be imported</p>
             <ButtonGroup>
-                <Button bsStyle="primary" disabled={!canImport} onClick={this.handleSubmit.bind(this)}>Import</Button>
+                <Button bsStyle={this.getButtonStyle()} disabled={!canImport} onClick={this.handleSubmit.bind(this)}>
+                    {this.getButtonText()}
+                </Button>
                 {warningsButton}
             </ButtonGroup>
         </StagePanel>
     }
     private handleSubmit(e: React.MouseEvent) {
         this.props.onSubmit(this.props.project, this.props.tasks, this.props.relations)
+    }
+    private getButtonStyle(): string {
+        switch (this.props.submitState) {
+            case SubmitState.Idle:
+                return "primary"
+            case SubmitState.Submitting:
+                return "default"
+            case SubmitState.Submitted:
+                return "success"
+            case SubmitState.SubmitError:
+                return "danger"
+        }
+    }
+    private getButtonText(): string {
+        switch (this.props.submitState) {
+            case SubmitState.Idle:
+                return "Import"
+            case SubmitState.Submitting:
+                return "Importing"
+            case SubmitState.Submitted:
+                return "Import successful"
+            case SubmitState.SubmitError:
+                return "Import failed"
+        }
     }
 }
 
@@ -65,7 +92,7 @@ export const mapStateToProps = (state: State) => {
         totalRelations: state.relations.length,
         relations: state.overview.relations,
         warnings: state.overview.warnings,
-        isSubmitting: state.overview.isSubmitting,
+        submitState: state.overview.submitState,
     }
 }
 

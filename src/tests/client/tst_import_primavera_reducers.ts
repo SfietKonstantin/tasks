@@ -20,7 +20,7 @@ import {
 } from "../../client/imports/primavera/actions/overview"
 import * as imports from "../../client/imports/primavera/imports"
 import {
-    State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation
+    State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation, SubmitState
 } from "../../client/imports/primavera/types"
 import * as projectEditor from "../../client/imports/primavera/components/projecteditor"
 import * as tasksSelector from "../../client/imports/primavera/components/tasksselector"
@@ -131,7 +131,7 @@ describe("Primavera reducers", () => {
                 tasks: [],
                 relations: [],
                 warnings: new Map<string, Array<string>>(),
-                isSubmitting: false
+                submitState: SubmitState.Idle
             }
         }
         initialState2 = {
@@ -162,7 +162,7 @@ describe("Primavera reducers", () => {
                 tasks: filteredTasks.slice(0),
                 relations: filteredRelations.slice(0),
                 warnings: new Map<string, Array<string>>(warnings),
-                isSubmitting: false
+                submitState: SubmitState.Submitted
             }
         }
     })
@@ -329,7 +329,7 @@ describe("Primavera reducers", () => {
         it("Should reduce OVERVIEW_SUBMIT_REQUEST", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, requestSubmit())
-                chai.expect(state.overview.isSubmitting).to.true
+                chai.expect(state.overview.submitState).to.equal(SubmitState.Submitting)
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -337,7 +337,7 @@ describe("Primavera reducers", () => {
         it("Should reduce OVERVIEW_SUBMIT_RECEIVE", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, receiveSubmit())
-                chai.expect(state.overview.isSubmitting).to.false
+                chai.expect(state.overview.submitState).to.equal(SubmitState.Submitted)
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -345,7 +345,7 @@ describe("Primavera reducers", () => {
         it("Should reduce OVERVIEW_SUBMIT_RECEIVE_FAILURE", () => {
             const checkState = (initialState: State) => {
                 const state = main.mainReducer(initialState, receiveSubmitFailure("Some error"))
-                chai.expect(state.overview.isSubmitting).to.false
+                chai.expect(state.overview.submitState).to.equal(SubmitState.SubmitError)
             }
             checkState(initialState1)
             checkState(initialState2)

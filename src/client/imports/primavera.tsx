@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom"
 import * as Redux from "redux"
 import * as ReduxThunk from "redux-thunk"
 import { Provider } from "react-redux"
-import { State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./primavera/types"
+import { State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation, SubmitState } from "./primavera/types"
 import { mainReducer } from "./primavera/reducers/main"
 import { Main } from "./primavera/components/main"
 import { Project } from "../../common/types"
@@ -53,7 +53,7 @@ export const render = () => {
             tasks: [],
             relations: [],
             warnings: new Map<string, Array<string>>(),
-            isSubmitting: false
+            submitState: SubmitState.Idle
         }
     }
     const store = Redux.createStore(

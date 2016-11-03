@@ -13,6 +13,7 @@ export class FakeResponse implements Response {
     private shouldThrow: boolean
     constructor(ok: boolean, body: any, shouldThrow: boolean = false) {
         this.ok = ok
+        this.bodyUsed = true
         this.fakeBody = body
         this.shouldThrow = shouldThrow
     }

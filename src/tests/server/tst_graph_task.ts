@@ -286,15 +286,69 @@ describe("Graph", () => {
                 lag: 0
             }).then(() => {
                 return node2.addChild(node1, {
-                previous: "task2",
-                previousLocation: TaskLocation.End,
-                next: "task1",
-                lag: 0
-            })
+                    previous: "task2",
+                    previousLocation: TaskLocation.End,
+                    next: "task1",
+                    lag: 0
+                })
             }).then(() => {
                 done(new Error("Cyclic dependency should be detected"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(GraphError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should not detect diamonds", (done) => {
+            // Mock
+            const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            const projectNode = new FakeProjectNode(graph, "project")
+            let mock = sinon.mock(dataProvider)
+            const arg: TaskResults = {
+                startDate: new Date(2015, 2, 1),
+                duration: 0
+            }
+            mock.expects("setTaskResults").withExactArgs("project", "task2", arg).returns(Promise.resolve())
+
+            // Test
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 0,
+                                       new Date(2015, 2, 1), 0)
+            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 2, 1), 0,
+                                       new Date(2015, 2, 1), 0)
+            const node3 = new TaskNode(dataProvider, projectNode, "task3", new Date(2015, 2, 1), 0,
+                                       new Date(2015, 2, 1), 0)
+            const node4 = new TaskNode(dataProvider, projectNode, "task4", new Date(2015, 2, 1), 0,
+                                       new Date(2015, 2, 1), 0)
+
+            node1.addChild(node2, {
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                lag: 0
+            }).then(() => {
+                return node1.addChild(node3, {
+                    previous: "task1",
+                    previousLocation: TaskLocation.End,
+                    next: "task3",
+                    lag: 0
+                })
+            }).then(() => {
+                return node2.addChild(node4, {
+                    previous: "task2",
+                    previousLocation: TaskLocation.End,
+                    next: "task4",
+                    lag: 0
+                })
+            }).then(() => {
+                return node3.addChild(node4, {
+                    previous: "task3",
+                    previousLocation: TaskLocation.End,
+                    next: "task4",
+                    lag: 0
+                })
+            }).then(() => {
                 done()
             }).catch((error) => {
                 done(error)

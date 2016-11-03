@@ -12,6 +12,9 @@ export class ErrorResponseError extends Error implements Error {
 
 export const processError = (response: Response): Promise<any> => {
     return Promise.resolve().then(() => {
+        if (!response.bodyUsed) {
+            return null
+        }
         return response.json()
     }).then((result: any) => {
         if (response.ok) {
