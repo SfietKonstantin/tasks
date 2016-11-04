@@ -48,7 +48,7 @@ describe("Errors processing", () => {
     })
     it("Should not react when there is no body", (done) => {
         let response = new FakeResponse(true, {})
-        response.bodyUsed = false
+        response.status = 201
         processError(response).then((result: string | null) => {
             chai.expect(result).to.null
             done()

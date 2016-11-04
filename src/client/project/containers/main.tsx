@@ -10,7 +10,7 @@ import { Project } from "../../../common/types"
 
 interface MainProperties {
     projectIdentifier: string
-    project: Project
+    project: Project | null
     dispatch: Dispatch<State>
 }
 
