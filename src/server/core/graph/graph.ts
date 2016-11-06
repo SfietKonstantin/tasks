@@ -88,7 +88,14 @@ export class TaskNode implements ITaskNode {
             this.duration = this.estimatedDuration + Math.max(endSum, 0)
 
             // Compute start date
-            let parentEndDates = this.parents.map((node: ITaskNode) => { return (node as TaskNode).getEndDate() })
+            let parentEndDates = this.parents.map((node: ITaskNode) => {
+                const relation = maputils.get(this.parentsRelations, node.taskIdentifier)
+                if (relation.previousLocation == TaskLocation.Beginning) {
+                    return dateutils.addDays(node.startDate, relation.lag)
+                } else {
+                    return dateutils.addDays((node as TaskNode).getEndDate(), relation.lag)
+                }
+            })
             parentEndDates.push(this.estimatedStartDate)
             parentEndDates = parentEndDates.filter((value: Date) => {
                 return !Number.isNaN(value.getTime())

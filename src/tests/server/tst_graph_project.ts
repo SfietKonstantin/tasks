@@ -274,7 +274,7 @@ describe("Graph", () => {
                 done(error)
             })
         })
-        it("Should add a relation", (done) => {
+        it("Should add a relation 1", (done) => {
             const dataProvider = new FakeDataProvider()
             const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
@@ -305,6 +305,80 @@ describe("Graph", () => {
                 const taskNode = maputils.get(node.nodes, "task2")
                 chai.expect(taskNode.taskIdentifier).to.equal("task2")
                 chai.expect(taskNode.startDate).to.deep.equal(new Date(2015, 2, 3))
+                chai.expect(taskNode.duration).to.equal(10)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should add a relation 2", (done) => {
+            const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            let mock = sinon.mock(dataProvider)
+
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
+                                           new Date(2015, 1, 1), 30)
+            node.nodes.set("task1", taskNode1)
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
+                                           new Date(2015, 1, 1), 10)
+            node.nodes.set("task2", taskNode2)
+
+            const relation: TaskRelation = {
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                lag: 5
+            }
+            const taskResults: TaskResults = {
+                startDate: new Date(2015, 2, 8),
+                duration: 10
+            }
+            mock.expects("addTaskRelation").once().withExactArgs("project", relation).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
+                .returns(Promise.resolve())
+
+            node.addRelation(relation).then(() => {
+                const taskNode = maputils.get(node.nodes, "task2")
+                chai.expect(taskNode.taskIdentifier).to.equal("task2")
+                chai.expect(taskNode.startDate).to.deep.equal(new Date(2015, 2, 8))
+                chai.expect(taskNode.duration).to.equal(10)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should add a relation 3", (done) => {
+            const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            let mock = sinon.mock(dataProvider)
+
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
+                                           new Date(2015, 1, 1), 30)
+            node.nodes.set("task1", taskNode1)
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
+                                           new Date(2015, 1, 1), 10)
+            node.nodes.set("task2", taskNode2)
+
+            const relation: TaskRelation = {
+                previous: "task1",
+                previousLocation: TaskLocation.Beginning,
+                next: "task2",
+                lag: 0
+            }
+            const taskResults: TaskResults = {
+                startDate: new Date(2015, 1, 1),
+                duration: 10
+            }
+            mock.expects("addTaskRelation").once().withExactArgs("project", relation).returns(Promise.resolve())
+            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
+                .returns(Promise.resolve())
+
+            node.addRelation(relation).then(() => {
+                const taskNode = maputils.get(node.nodes, "task2")
+                chai.expect(taskNode.taskIdentifier).to.equal("task2")
+                chai.expect(taskNode.startDate).to.deep.equal(new Date(2015, 1, 1))
                 chai.expect(taskNode.duration).to.equal(10)
                 done()
             }).catch((error) => {
