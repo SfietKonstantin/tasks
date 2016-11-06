@@ -53,7 +53,9 @@ export interface TaskFiltersAction extends Action {
 
 export const filterTasks = (projectIdentifier: string, filters: TaskFilters): TaskFiltersAction => {
     try {
-        localStorage.setItem(projectIdentifier, JSON.stringify(filters))
+        let savedFilter = Object.assign({}, filters)
+        delete savedFilter.filters
+        localStorage.setItem(projectIdentifier, JSON.stringify(savedFilter))
     } catch (error) {}
     return {
         type: TASKS_FILTER_DISPLAY,

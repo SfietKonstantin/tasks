@@ -14,13 +14,16 @@ export class TasksHeader extends React.Component<TasksHeaderProperties, {}> {
         const doneChecked = TasksHeader.getButtonStyle(this.props.filters.doneChecked)
         return <ButtonGroup>
             <Button bsStyle={notStartedChecked} onClick={this.handleNotStartedClicked.bind(this)}>
-                <span className="glyphicon glyphicon-time" aria-hidden="true"></span> Not started
+                <span className="glyphicon glyphicon-time" aria-hidden="true"></span>
+                <span className="visible-md-inline visible-lg-inline"> Not started</span>
             </Button>
             <Button bsStyle={inProgressChecked} onClick={this.handleInProgress.bind(this)}>
-                <span className="glyphicon glyphicon-plane" aria-hidden="true"></span> In progress
+                <span className="glyphicon glyphicon-plane" aria-hidden="true"></span>
+                <span className="visible-md-inline visible-lg-inline"> In progress</span>
             </Button>
             <Button bsStyle={doneChecked} onClick={this.handleDoneClicked.bind(this)}>
-                <span className="glyphicon glyphicon-ok" aria-hidden="true"></span> Done
+                <span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                <span className="visible-md-inline visible-lg-inline"> Done</span>
             </Button>
         </ButtonGroup>
     }
@@ -29,15 +32,15 @@ export class TasksHeader extends React.Component<TasksHeaderProperties, {}> {
     }
     private handleNotStartedClicked(e: React.MouseEvent) {
         const notStartedChecked = !this.props.filters.notStartedChecked
-        this.props.onFilterChanged(Object.assign({}, this.props.filters, {notStartedChecked}))
+        this.props.onFilterChanged(Object.assign(this.props.filters, {notStartedChecked}))
     }
     private handleInProgress(e: React.MouseEvent) {
         const inProgressChecked = !this.props.filters.inProgressChecked
-        this.props.onFilterChanged(Object.assign({}, this.props.filters, {inProgressChecked}))
+        this.props.onFilterChanged(Object.assign(this.props.filters, {inProgressChecked}))
     }
     private handleDoneClicked(e: React.MouseEvent) {
         const doneChecked = !this.props.filters.doneChecked
-        this.props.onFilterChanged(Object.assign({}, this.props.filters, {doneChecked}))
+        this.props.onFilterChanged(Object.assign(this.props.filters, {doneChecked}))
     }
 }
 

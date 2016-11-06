@@ -7,7 +7,7 @@ import { Project } from "../../../common/types"
 
 interface HeaderProperties {
     project: Project
-    tabChangedCallback: (index: number) => void
+    onTabChanged: (index: number) => void
 }
 
 export class Header extends React.Component<HeaderProperties, {}> {
@@ -17,7 +17,7 @@ export class Header extends React.Component<HeaderProperties, {}> {
             <Col xs={12} sm={8}>
                 <Breadcrumb project={this.props.project} />
             </Col>
-            <TabBar tabs={tabs} tabChangedCallback={this.props.tabChangedCallback}/>
+            <TabBar tabs={tabs} onTabChanged={this.props.onTabChanged}/>
         </CommonHeader.Header>
     }
 }

@@ -3,9 +3,9 @@ import { Dispatch } from "redux"
 import * as ReactRedux from "react-redux"
 import { State } from "../types"
 import { fetchProject } from "../actions/project"
-import { AllTasks } from "./alltasks"
 import { Header } from "../components/header"
 import { Overview } from "../components/overview"
+import { AllTasks } from "../components/alltasks"
 import { Project } from "../../../common/types"
 
 interface MainProperties {
@@ -29,8 +29,8 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
         let tab1: JSX.Element | null = null
         if (this.props.project) {
             taskHeader = <Header project={this.props.project}
-                                        tabChangedCallback={this.handleTabChange.bind(this)} />
-            tab0 = <Overview visible={this.state.tabIndex === 0} project={this.props.project} />
+                                        onTabChanged={this.handleTabChange.bind(this)} />
+            tab0 = <Overview visible={this.state.tabIndex === 0} />
             tab1 = <AllTasks visible={this.state.tabIndex === 1} />
         }
         return <div>

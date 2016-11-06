@@ -20,7 +20,7 @@ export class Header extends React.Component<HeaderProperties, {}> {
             <Col xs={12} sm={8}>
                 <Breadcrumb project={this.props.project} task={this.props.task} />
             </Col>
-            <TabBar tabs={tabs} tabChangedCallback={this.props.tabChangedCallback}/>
+            <TabBar tabs={tabs} onTabChanged={this.props.tabChangedCallback}/>
         </CommonHeader.Header>
     }
 }

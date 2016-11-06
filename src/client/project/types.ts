@@ -1,5 +1,6 @@
 import { Project } from "../../common/types"
 import { ApiTask } from "../../common/apitypes"
+import { TaskListFilters } from "../common/components/tasklist"
 
 export interface State {
     projectIdentifier: string
@@ -16,8 +17,7 @@ export interface TaskFilters {
     notStartedChecked: boolean
     inProgressChecked: boolean
     doneChecked: boolean
-    milestonesOnlyChecked: boolean
-    text: string
+    filters: TaskListFilters
 }
 
 export interface TasksState {

@@ -1,26 +1,39 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { Row, Col, ListGroup, FormGroup, FormControl } from "react-bootstrap"
+import { TaskListFiltersToolbar } from "./tasklistfilterstoolbar"
 
-interface ItemListProperties<T> {
-    items: Array<T>
+export enum MilestoneFilterMode {
+    NoFilter,
+    TasksOnly,
+    MilestonesOnly
+}
+
+export interface TaskListFilters {
+    milestoneFilterMode: MilestoneFilterMode
+    text: string
+}
+
+interface TaskListProperties<T> {
+    tasks: Array<T>
     createElement: (item: T) => JSX.Element
-    onTextFilter: (text: string) => void
+    filters: TaskListFilters
+    onFiltersChanged: (filters: TaskListFilters) => void
 }
 
-interface ItemListState {
-    filter: string
+interface TaskListState {
+    textFilter: string
 }
 
-export class ItemList<T> extends React.Component<ItemListProperties<T>, ItemListState> {
-    constructor(props: ItemListProperties<T>) {
+export class TaskList<T> extends React.Component<TaskListProperties<T>, TaskListState> {
+    constructor(props: TaskListProperties<T>) {
         super(props)
         this.state = {
-            filter: ""
+            textFilter: ""
         }
     }
     render() {
-        const content: Array<JSX.Element> = this.props.items.map((item) => {
+        const content: Array<JSX.Element> = this.props.tasks.map((item) => {
             return this.props.createElement(item)
         })
         return <div className="tab-table">
@@ -33,6 +46,10 @@ export class ItemList<T> extends React.Component<ItemListProperties<T>, ItemList
                                          onBlur={this.handleBlur.bind(this)} />
                         </FormGroup>
                     </form>
+                </Col>
+                <Col xs={12} sm={6}>
+                    <TaskListFiltersToolbar filters={this.props.filters}
+                                            onFiltersChanged={this.props.onFiltersChanged.bind(this)} />
                 </Col>
             </Row>
             <div className="panel panel-default">
@@ -47,12 +64,16 @@ export class ItemList<T> extends React.Component<ItemListProperties<T>, ItemList
     }
     private handleTextChange(e: React.FormEvent) {
         const input = e.target as HTMLInputElement
-        this.state.filter = input.value
+        this.state.textFilter = input.value
     }
     private handleBlur(e: React.FocusEvent) {
-        this.props.onTextFilter(this.state.filter)
+        this.handleFiltersChanged()
     }
     private handleTextSubmit(e: React.FormEvent) {
-        this.props.onTextFilter(this.state.filter)
+        this.handleFiltersChanged()
+    }
+    private handleFiltersChanged() {
+        const text = this.state.textFilter
+        this.props.onFiltersChanged(Object.assign(this.props.filters, { text }))
     }
 }

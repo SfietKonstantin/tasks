@@ -1,5 +1,6 @@
 import { Action } from "redux"
 import { TasksState, TaskFilters } from "../types"
+import { MilestoneFilterMode } from "../../common/components/tasklist"
 import { ApiTask } from "../../../common/apitypes"
 import {
     TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE,
@@ -16,11 +17,22 @@ const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | 
     let returned = new Array<ApiTask>()
     const todayTime = today.getTime()
     const filtered = tasks.filter((task: ApiTask) => {
-        if (filters.milestonesOnlyChecked && task.estimatedDuration !== 0) {
-            return false
+        switch (filters.filters.milestoneFilterMode) {
+            case MilestoneFilterMode.TasksOnly:
+                if (task.estimatedDuration === 0) {
+                    return false
+                }
+                break
+            case MilestoneFilterMode.MilestonesOnly:
+                if (task.estimatedDuration !== 0) {
+                    return false
+                }
+                break
+            default:
+                break
         }
-        if (filters.text.length > 0) {
-            const lowerFilter = latinize(filters.text.trim()).toLowerCase()
+        if (filters.filters.text.length > 0) {
+            const lowerFilter = latinize(filters.filters.text.trim()).toLowerCase()
             const lowerName = latinize(task.name.trim()).toLowerCase()
             if (lowerName.indexOf(lowerFilter) === -1) {
                 return false
@@ -52,8 +64,10 @@ const initialState: TasksState = {
         notStartedChecked: false,
         inProgressChecked: false,
         doneChecked: false,
-        milestonesOnlyChecked: false,
-        text: ""
+        filters: {
+            milestoneFilterMode: MilestoneFilterMode.NoFilter,
+            text: ""
+        }
     },
     today: null,
     filteredTasks: Array<ApiTask>()

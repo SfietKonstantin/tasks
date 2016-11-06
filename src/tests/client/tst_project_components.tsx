@@ -3,10 +3,14 @@ import * as React from "react"
 import * as enzyme from "enzyme"
 import { MenuItem } from "react-bootstrap"
 import * as sinon from "sinon"
+import * as CommonHeader from "../../client/common/components/header"
 import { Breadcrumb } from "../../client/project/components/breadcrumb"
-import { FilterButton } from "../../client/project/components/filterbutton"
+import { Header } from "../../client/project/components/header"
+import { Overview } from "../../client/project/components/overview"
 import { TasksHeader } from "../../client/project/components/tasksheader"
+import { AllTasks } from "../../client/project/components/alltasks"
 import { TaskFilters } from "../../client/project/types"
+import { MilestoneFilterMode } from "../../client/common/components/tasklist"
 import { Project } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
@@ -31,32 +35,33 @@ describe("Project components", () => {
             chai.expect(items.at(1).children().text()).to.equal("Project")
         })
     })
-    describe("FilterButton", () => {
-        it("Should create a FilterButton with selected milestone", () => {
+    describe("Header", () => {
+        it("Should render a Header", () => {
+            const project: Project = {
+                identifier: "project",
+                name: "Project",
+                description: ""
+            }
             const callback = sinon.spy()
-            const component = enzyme.shallow(<FilterButton milestonesOnly={true} onToggleMilestonesOnly={callback} />)
+            const component = enzyme.shallow(<Header project={project} onTabChanged={callback}/>)
+            const header = component.find(CommonHeader.Header)
+            chai.expect(header.prop("identifier")).to.equal("project")
+            chai.expect(header.prop("name")).to.equal("Project")
 
-            const menuItems = component.find(MenuItem)
-            chai.expect(menuItems).to.length(1)
-            chai.expect(menuItems.at(0).prop("active")).to.true
-        })
-        it("Should create a FilterButton without selected milestone", () => {
-            const callback = sinon.spy()
-            const component = enzyme.shallow(<FilterButton milestonesOnly={false} onToggleMilestonesOnly={callback} />)
-
-            const menuItems = component.find(MenuItem)
-            chai.expect(menuItems).to.length(1)
-            chai.expect(menuItems.at(0).prop("active")).to.false
-        })
-        it("Should call the callback", () => {
-            const callback = sinon.spy()
-            const component = enzyme.shallow(<FilterButton milestonesOnly={false} onToggleMilestonesOnly={callback} />)
-
-            const menuItems = component.find(MenuItem)
-            chai.expect(menuItems).to.length(1)
-            menuItems.at(0).simulate("select")
+            const tabBar = component.find("TabBar")
+            tabBar.simulate("tabChanged")
 
             chai.expect(callback.calledOnce).to.true
+        })
+    })
+    describe("Overview", () => {
+        it("Should render an Overview 1", () => {
+            const component = enzyme.shallow(<Overview visible={false} />)
+            chai.expect(component.hasClass("hidden")).to.true
+        })
+        it("Should render an Overview 2", () => {
+            const component = enzyme.shallow(<Overview visible={true} />)
+            chai.expect(component.hasClass("hidden")).to.false
         })
     })
     describe("TasksHeader", () => {
@@ -66,8 +71,10 @@ describe("Project components", () => {
                 notStartedChecked: true,
                 inProgressChecked: false,
                 doneChecked: false,
-                milestonesOnlyChecked: false,
-                text: ""
+                filters: {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
 
@@ -83,8 +90,10 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: true,
                 doneChecked: false,
-                milestonesOnlyChecked: false,
-                text: ""
+                filters: {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
 
@@ -100,8 +109,10 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: true,
-                milestonesOnlyChecked: false,
-                text: ""
+                filters: {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
 
@@ -117,8 +128,10 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: false,
-                milestonesOnlyChecked: false,
-                text: ""
+                filters: {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
 
@@ -130,8 +143,10 @@ describe("Project components", () => {
                 notStartedChecked: true,
                 inProgressChecked: false,
                 doneChecked: false,
-                milestonesOnlyChecked: false,
-                text: ""
+                filters: {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
             }
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWithExactly(expected)).to.true
@@ -142,8 +157,10 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: false,
-                milestonesOnlyChecked: false,
-                text: ""
+                filters: {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
 
@@ -155,8 +172,10 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: true,
                 doneChecked: false,
-                milestonesOnlyChecked: false,
-                text: ""
+                filters: {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
             }
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWithExactly(expected)).to.true
@@ -167,8 +186,10 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: false,
-                milestonesOnlyChecked: false,
-                text: ""
+                filters: {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
 
@@ -180,11 +201,23 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: true,
-                milestonesOnlyChecked: false,
-                text: ""
+                filters: {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
             }
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWithExactly(expected)).to.true
+        })
+    })
+    describe("AllTasks", () => {
+        it("Should render an AllTasks 1", () => {
+            const component = enzyme.shallow(<AllTasks visible={false} />)
+            chai.expect(component.hasClass("hidden")).to.true
+        })
+        it("Should render an AllTasks 2", () => {
+            const component = enzyme.shallow(<AllTasks visible={true} />)
+            chai.expect(component.hasClass("hidden")).to.false
         })
     })
 })

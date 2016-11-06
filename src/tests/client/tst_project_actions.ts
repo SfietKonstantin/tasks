@@ -11,6 +11,7 @@ import {
     TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE,
     TASKS_RECEIVE_FAILURE, TASKS_FILTER_DISPLAY, fetchTasks, filterTasks
 } from "../../client/project/actions/tasks"
+import { MilestoneFilterMode } from "../../client/common/components/tasklist"
 import { Project } from "../../common/types"
 import { ApiTask } from "../../common/apitypes"
 import { FakeResponse } from "./fakeresponse"
@@ -87,20 +88,26 @@ describe("Project actions", () => {
     describe("Tasks", () => {
         describe("Synchronous", () => {
             let sandbox: Sinon.SinonSandbox
+            let localStorageSetterMock: Sinon.SinonExpectation
             beforeEach(() => {
+                addFakeGlobal()
                 sandbox = sinon.sandbox.create()
+                localStorageSetterMock = sandbox.mock(global.localStorage).expects("setItem")
                 sandbox.useFakeTimers(new Date(2016, 2, 6).getTime())
             })
             afterEach(() => {
                 sandbox.restore()
+                clearFakeGlobal()
             })
             it("Should create PROJECT_DEFINE", () => {
                 const filters: TaskFilters = {
                     notStartedChecked: false,
                     inProgressChecked: true,
                     doneChecked: false,
-                    milestonesOnlyChecked: true,
-                    text: "hello"
+                    filters: {
+                        milestoneFilterMode: MilestoneFilterMode.TasksOnly,
+                        text: "hello"
+                    }
                 }
                 const expected: TaskFiltersAction = {
                     type: TASKS_FILTER_DISPLAY,
@@ -108,6 +115,13 @@ describe("Project actions", () => {
                     today: new Date(2016, 2, 6)
                 }
                 chai.expect(filterTasks("project", filters)).to.deep.equal(expected)
+                const args = {
+                    notStartedChecked: false,
+                    inProgressChecked: true,
+                    doneChecked: false
+                }
+                chai.expect(localStorageSetterMock.calledOnce).to.true
+                chai.expect(localStorageSetterMock.calledWithExactly("project", JSON.stringify(args))).to.true
             })
         })
         describe("Asynchronous", () => {

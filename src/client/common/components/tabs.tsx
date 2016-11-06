@@ -4,7 +4,7 @@ import {Col, Nav, NavItem} from "react-bootstrap"
 
 interface TabBarProperties {
     tabs: Array<String>
-    tabChangedCallback: (index: number) => void
+    onTabChanged: (index: number) => void
 }
 
 interface TabBarState {
@@ -29,10 +29,10 @@ export class TabBar extends React.Component<TabBarProperties, TabBarState> {
         </Col>
     }
     componentDidMount() {
-        this.props.tabChangedCallback(this.state.currentTab)
+        this.props.onTabChanged(this.state.currentTab)
     }
     private handleClick(index: number) {
-        this.props.tabChangedCallback(index)
+        this.props.onTabChanged(index)
         this.setState({currentTab: index})
     }
 }

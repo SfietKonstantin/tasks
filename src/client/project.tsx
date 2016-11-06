@@ -6,6 +6,7 @@ import { Provider } from "react-redux"
 import { State, TaskFilters } from "./project/types"
 import { mainReducer } from "./project/reducers/main"
 import { Main } from "./project/containers/main"
+import { MilestoneFilterMode } from "./common/components/tasklist"
 import { ApiTask } from "../common/apitypes"
 
 interface RootProperties {
@@ -25,15 +26,19 @@ export const render = (projectIdentifier: string) => {
         notStartedChecked: true,
         inProgressChecked: true,
         doneChecked: false,
-        milestonesOnlyChecked: false,
-        text: ""
+        filters: {
+            milestoneFilterMode: MilestoneFilterMode.NoFilter,
+            text: ""
+        }
     }
 
-    const filterJson = localStorage.getItem(projectIdentifier)
-    if (filterJson != null) {
-        filters = Object.assign(filters, JSON.parse(filterJson))
+    try {
+        const filterJson = localStorage.getItem(projectIdentifier)
+        if (filterJson != null) {
+            filters = Object.assign(filters, JSON.parse(filterJson))
+        }
     }
-    filters.milestonesOnlyChecked = false
+    catch (error) {}
 
     const initialState: State = {
         projectIdentifier,

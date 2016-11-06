@@ -52,6 +52,11 @@
     cursor: pointer
 }
 
+/* Common components */
+.common-filters-toolbar {
+    margin-bottom: 15px;
+}
+
 /* Page header */
 .page-header {
     padding-bottom: 0px;
@@ -72,15 +77,10 @@
     margin-top: 30px;
 }
 
-/* Project */
-.project-all-tasks-filter {
-    float: right;
-}
-
 /* Task */
 .task-header-tools {
     float: right;
-}
+}   
 
 .task-overview {
     margin-top: 10px;
