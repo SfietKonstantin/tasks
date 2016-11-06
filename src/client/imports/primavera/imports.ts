@@ -177,11 +177,9 @@ export const parseRelations = (content: string): RelationsParseResults => {
                 return
             }
         } else if (relation.type === "FF") {
-            if (relation.lag !== 0) {
-                maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
-                                   "FF relation with lag is not supported")
-                return
-            }
+            maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                    "FF relation is not supported")
+            return
         }
 
         relations.push(relation)
@@ -240,25 +238,20 @@ export interface FilterRelationsResults {
 export const filterRelations = (tasks: Map<string, PrimaveraTask>,
                                 relations: Array<PrimaveraTaskRelation>): FilterRelationsResults => {
     let warnings = new Map<string, Array<string>>()
-    let ffRelations = new Array<PrimaveraTaskRelation>()
     const filtered = relations.filter((relation: PrimaveraTaskRelation) => {
         if (!tasks.has(relation.previous) || !tasks.has(relation.next)) {
             maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
-                                        "No corresponding tasks")
+                                    "No corresponding tasks")
             return false
         }
         if (relation.type === "SF") {
             return false
         }
         if (relation.type === "FF") {
-            if (relation.lag === 0) {
-                ffRelations.push(relation)
-            }
             return false
         }
         return true
     })
-    // Handle FF relations: TODO
 
     const mappedRelations = filtered.map((relation: PrimaveraTaskRelation) => {
         let previousLocation = TaskLocation.End

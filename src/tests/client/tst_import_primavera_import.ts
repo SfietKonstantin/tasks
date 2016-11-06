@@ -1,8 +1,10 @@
 import * as chai from "chai"
-import { parseTasks, parseRelations } from "../../client/imports/primavera/imports"
+import { parseTasks, parseRelations, filterTasks, filterRelations } from "../../client/imports/primavera/imports"
 import { InvalidFormatError } from "../../client/common/actions/files"
 import { PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import * as maputils from "../../common/maputils"
+import { ApiInputTask } from "../../common/apitypes"
+import { TaskRelation, TaskLocation } from "../../common/types"
 
 describe("Primavera import", () => {
     describe("Tasks", () => {
@@ -188,8 +190,7 @@ describe("Primavera import", () => {
         it("Should import various relations", () => {
             const relations = "header\nsecond_line\n"
                               + "task1\ttask2\tFS\t\t\t\t\t\t\t10\n"
-                              + "task3\ttask4\tFF\t\t\t\t\t\t\t0\n"
-                              + "task5\ttask6\tSS\t\t\t\t\t\t\t1"
+                              + "task3\ttask4\tSS\t\t\t\t\t\t\t1"
             const results = parseRelations(relations)
             const expected: Array<PrimaveraTaskRelation> = [
                 {
@@ -201,17 +202,11 @@ describe("Primavera import", () => {
                 {
                     previous: "task3",
                     next: "task4",
-                    type: "FF",
-                    lag: 0
-                },
-                {
-                    previous: "task5",
-                    next: "task6",
                     type: "SS",
                     lag: 1
                 }
             ]
-            chai.expect(results).to.length(3)
+            chai.expect(results).to.length(2)
             chai.expect(results.relations).to.deep.equal(expected)
             chai.expect(results.warnings).to.empty
         })
@@ -253,13 +248,137 @@ describe("Primavera import", () => {
             chai.expect(results.relations).to.empty
             chai.expect(results.warnings.size).to.equal(1)
         })
-        it("Should not import FF relation with lag", () => {
+        it("Should not import FF relation", () => {
             const relations = "header\nsecond_line\n"
-                              + "task1\ttask2\tFF\t\t\t\t\t\t\t5"
+                              + "task1\ttask2\tFF\t\t\t\t\t\t\t0\n"
+                              + "task3\ttask4\tFF\t\t\t\t\t\t\t5"
             const results = parseRelations(relations)
-            chai.expect(results).to.length(1)
+            chai.expect(results).to.length(2)
             chai.expect(results.relations).to.empty
-            chai.expect(results.warnings.size).to.equal(1)
+            chai.expect(results.warnings.size).to.equal(2)
+        })
+    })
+    describe("Filter tasks", () => {
+        it("Should filter invalid tasks", () => {
+            const input: Map<string, PrimaveraTask> = new Map<string, PrimaveraTask>()
+            input.set("task1", {
+                identifier: "task1",
+                name: "Task 1",
+                duration: 20,
+                startDate: new Date(2016, 9, 1),
+                endDate: new Date(2016, 9, 16)
+            })
+            input.set("task2", {
+                identifier: "task2",
+                name: "Task 2",
+                duration: NaN,
+                startDate: new Date(2016, 9, 1),
+                endDate: new Date(2016, 9, 16)
+            })
+            input.set("task3", {
+                identifier: "task3",
+                name: "Task 3",
+                duration: 0,
+                startDate: null,
+                endDate: null
+            })
+            input.set("task4", {
+                identifier: "task4",
+                name: "Task 4",
+                duration: 20,
+                startDate: new Date(2016, 9, 1),
+                endDate: null
+            })
+            input.set("task5", {
+                identifier: "task5",
+                name: "Task 5",
+                duration: 20,
+                startDate: null,
+                endDate: new Date(2016, 9, 16)
+            })
+            const expected: Array<ApiInputTask> = [
+                {
+                    identifier: "task1",
+                    name: "Task 1",
+                    description: "",
+                    estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+                    estimatedDuration: 15
+                }
+            ]
+            chai.expect(filterTasks(input)).to.deep.equal(expected)
+        })
+    })
+    describe("Filter relations", () => {
+        it("Should filter invalid relations", () => {
+            const tasks: Map<string, PrimaveraTask> = new Map<string, PrimaveraTask>()
+            tasks.set("task1", {
+                identifier: "task1",
+                name: "Task 1",
+                duration: 20,
+                startDate: new Date(2016, 9, 1),
+                endDate: new Date(2016, 9, 16)
+            })
+            tasks.set("task2", {
+                identifier: "task2",
+                name: "Task 2",
+                duration: 20,
+                startDate: new Date(2016, 9, 1),
+                endDate: new Date(2016, 9, 16)
+            })
+            const relations: Array<PrimaveraTaskRelation> = [
+                {
+                    previous: "task1",
+                    next: "task2",
+                    type: "FS",
+                    lag: 3
+                },
+                {
+                    previous: "task1",
+                    next: "task2",
+                    type: "SS",
+                    lag: 5
+                },
+                {
+                    previous: "task1",
+                    next: "task3",
+                    type: "FS",
+                    lag: 0
+                },
+                {
+                    previous: "task3",
+                    next: "task2",
+                    type: "FS",
+                    lag: 0
+                },
+                {
+                    previous: "task1",
+                    next: "task2",
+                    type: "SF",
+                    lag: 0
+                },
+                {
+                    previous: "task1",
+                    next: "task2",
+                    type: "FF",
+                    lag: 0
+                }
+            ]
+            const expected: Array<TaskRelation> = [
+                {
+                    previous: "task1",
+                    previousLocation: TaskLocation.End,
+                    next: "task2",
+                    lag: 3
+                },
+                {
+                    previous: "task1",
+                    previousLocation: TaskLocation.Beginning,
+                    next: "task2",
+                    lag: 5
+                }
+            ]
+            const results = filterRelations(tasks, relations)
+            chai.expect(results.relations).to.deep.equal(expected)
         })
     })
 })
