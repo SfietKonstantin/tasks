@@ -72,9 +72,9 @@ describe("Common components", () => {
             class TestItemList extends ItemList<number> {}
 
             const createElement = sinon.stub()
-            createElement.withArgs(1).returns(<p>test 1</p>)
-            createElement.withArgs(2).returns(<p>test 2</p>)
-            createElement.withArgs(3).returns(<p>test 3</p>)
+            createElement.withArgs(1).returns(<p key="1">test 1</p>)
+            createElement.withArgs(2).returns(<p key="2">test 2</p>)
+            createElement.withArgs(3).returns(<p key="3">test 3</p>)
             const onTextFilter = sinon.spy()
             const component = enzyme.mount(<TestItemList items={[1, 2, 3]}
                                                          createElement={createElement}
