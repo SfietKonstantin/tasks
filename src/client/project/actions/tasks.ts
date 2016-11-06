@@ -51,7 +51,10 @@ export interface TaskFiltersAction extends Action {
     today: Date
 }
 
-export const filterTasks = (filters: TaskFilters): TaskFiltersAction => {
+export const filterTasks = (projectIdentifier: string, filters: TaskFilters): TaskFiltersAction => {
+    try {
+        localStorage.setItem(projectIdentifier, JSON.stringify(filters))
+    } catch (error) {}
     return {
         type: TASKS_FILTER_DISPLAY,
         filters,

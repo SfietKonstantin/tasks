@@ -35,15 +35,15 @@ describe("Common components", () => {
             chai.expect(navItems).to.length(5)
 
             chai.expect(navItems.at(0).children().text()).to.equal("Tab 1")
-            chai.expect(navItems.at(0).prop<boolean>("active")).to.true
+            chai.expect(navItems.at(0).prop("active")).to.true
             chai.expect(navItems.at(1).children().text()).to.equal("Tab 2")
-            chai.expect(navItems.at(1).prop<boolean>("active")).to.false
+            chai.expect(navItems.at(1).prop("active")).to.false
             chai.expect(navItems.at(2).children().text()).to.equal("Tab 3")
-            chai.expect(navItems.at(2).prop<boolean>("active")).to.false
+            chai.expect(navItems.at(2).prop("active")).to.false
             chai.expect(navItems.at(3).children().text()).to.equal("Tab 4")
-            chai.expect(navItems.at(3).prop<boolean>("active")).to.false
+            chai.expect(navItems.at(3).prop("active")).to.false
             chai.expect(navItems.at(4).children().text()).to.equal("Tab 5")
-            chai.expect(navItems.at(4).prop<boolean>("active")).to.false
+            chai.expect(navItems.at(4).prop("active")).to.false
         })
         it("Should handle change", () => {
             const callback = sinon.spy()
@@ -54,17 +54,17 @@ describe("Common components", () => {
 
             const navItems = component.find(NavItem)
             chai.expect(navItems).to.length(3)
-            chai.expect(navItems.at(0).prop<boolean>("active")).to.true
-            chai.expect(navItems.at(1).prop<boolean>("active")).to.false
-            chai.expect(navItems.at(2).prop<boolean>("active")).to.false
+            chai.expect(navItems.at(0).prop("active")).to.true
+            chai.expect(navItems.at(1).prop("active")).to.false
+            chai.expect(navItems.at(2).prop("active")).to.false
 
             navItems.at(2).children().simulate("click")
 
             chai.expect(callback.calledTwice)
             chai.expect(callback.calledWithExactly(2))
-            chai.expect(navItems.at(0).prop<boolean>("active")).to.false
-            chai.expect(navItems.at(1).prop<boolean>("active")).to.false
-            chai.expect(navItems.at(2).prop<boolean>("active")).to.true
+            chai.expect(navItems.at(0).prop("active")).to.false
+            chai.expect(navItems.at(1).prop("active")).to.false
+            chai.expect(navItems.at(2).prop("active")).to.true
         })
     })
     describe("ItemList", () => {

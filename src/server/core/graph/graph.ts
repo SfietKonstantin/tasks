@@ -90,7 +90,7 @@ export class TaskNode implements ITaskNode {
             // Compute start date
             let parentEndDates = this.parents.map((node: ITaskNode) => {
                 const relation = maputils.get(this.parentsRelations, node.taskIdentifier)
-                if (relation.previousLocation == TaskLocation.Beginning) {
+                if (relation.previousLocation === TaskLocation.Beginning) {
                     return dateutils.addDays(node.startDate, relation.lag)
                 } else {
                     return dateutils.addDays((node as TaskNode).getEndDate(), relation.lag)

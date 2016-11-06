@@ -107,7 +107,7 @@ describe("Project actions", () => {
                     filters,
                     today: new Date(2016, 2, 6)
                 }
-                chai.expect(filterTasks(filters)).to.deep.equal(expected)
+                chai.expect(filterTasks("project", filters)).to.deep.equal(expected)
             })
         })
         describe("Asynchronous", () => {
