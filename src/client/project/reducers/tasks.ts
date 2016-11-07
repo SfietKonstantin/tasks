@@ -33,8 +33,9 @@ const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | 
         }
         if (filters.filters.text.length > 0) {
             const lowerFilter = latinize(filters.filters.text.trim()).toLowerCase()
+            const lowerIdentifier = latinize(task.identifier.trim()).toLowerCase()
             const lowerName = latinize(task.name.trim()).toLowerCase()
-            if (lowerName.indexOf(lowerFilter) === -1) {
+            if (lowerIdentifier.indexOf(lowerFilter) === -1 && lowerName.indexOf(lowerFilter) === -1) {
                 return false
             }
         }
