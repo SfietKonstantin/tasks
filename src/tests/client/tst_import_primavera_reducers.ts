@@ -19,6 +19,7 @@ import * as imports from "../../client/imports/primavera/imports"
 import {
     State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation, SubmitState
 } from "../../client/imports/primavera/types"
+import { RelationGraphNode } from "../../client/imports/primavera/graph"
 import * as projectEditor from "../../client/imports/primavera/components/projecteditor"
 import * as tasksSelector from "../../client/imports/primavera/components/tasksselector"
 import * as relationsSelector from "../../client/imports/primavera/components/relationsselector"
@@ -28,6 +29,7 @@ import { Project, TaskRelation, TaskLocation } from "../../common/types"
 import { ApiInputTask } from "../../common/apitypes"
 import { FakeFile, FakeFileReader } from "./fakefile"
 import { FakeResponse } from "./fakeresponse"
+import { makeRelations } from "./primaverahelper"
 
 const project: Project = {
     identifier: "identifier",
@@ -90,6 +92,10 @@ const warnings = new Map<string, Array<string>>()
 warnings.set("task1", ["Warning 1", "Warning 2"])
 warnings.set("task2", ["Warning 3"])
 
+const errors = new Map<string, Array<string>>()
+warnings.set("task1", ["Error 1", "Error 2"])
+warnings.set("task2", ["Error 3"])
+
 describe("Primavera reducers", () => {
     let dispatch: Sinon.SinonSpy
     let initialState1: State
@@ -110,14 +116,13 @@ describe("Primavera reducers", () => {
             tasks: {
                 length: 0,
                 tasks: new Map<string, PrimaveraTask>(),
-                delays: new Map<string, PrimaveraDelay>(),
                 warnings: new Map<string, Array<string>>(),
                 isImporting: false,
                 isInvalidFormat: false,
             },
             relations: {
                 length: 0,
-                relations: [],
+                relations: new Map<string, RelationGraphNode>(),
                 warnings: new Map<string, Array<string>>(),
                 isImporting: false,
                 isInvalidFormat: false
@@ -126,6 +131,7 @@ describe("Primavera reducers", () => {
                 tasks: [],
                 relations: [],
                 warnings: new Map<string, Array<string>>(),
+                errors: new Map<string, Array<string>>(),
                 submitState: SubmitState.Idle
             }
         }
@@ -138,14 +144,13 @@ describe("Primavera reducers", () => {
             tasks: {
                 length: 123,
                 tasks: new Map<string, PrimaveraTask>(tasks),
-                delays: new Map<string, PrimaveraDelay>(),
                 warnings: new Map<string, Array<string>>(warnings),
                 isImporting: true,
                 isInvalidFormat: true,
             },
             relations: {
                 length: 123,
-                relations: relations.slice(0),
+                relations: makeRelations(relations),
                 warnings: new Map<string, Array<string>>(warnings),
                 isImporting: true,
                 isInvalidFormat: true
@@ -154,6 +159,7 @@ describe("Primavera reducers", () => {
                 tasks: filteredTasks.slice(0),
                 relations: filteredRelations.slice(0),
                 warnings: new Map<string, Array<string>>(warnings),
+                errors: new Map<string, Array<string>>(errors),
                 submitState: SubmitState.Submitted
             }
         }
@@ -199,7 +205,6 @@ describe("Primavera reducers", () => {
                 const results: TasksParseResults = {
                     length: 123,
                     tasks: new Map<string, PrimaveraTask>(tasks),
-                    delays: new Map<string, PrimaveraDelay>(),
                     warnings: new Map<string, Array<string>>(warnings)
                 }
                 const state = main.mainReducer(initialState, endTasksImport(results))
@@ -207,7 +212,6 @@ describe("Primavera reducers", () => {
                 chai.expect(state.tasks.isInvalidFormat).to.false
                 chai.expect(state.tasks.length).to.equal(123)
                 chai.expect(state.tasks.tasks).to.deep.equal(tasks)
-                chai.expect(state.tasks.delays).to.empty
                 chai.expect(state.tasks.warnings).to.deep.equal(warnings)
             }
             checkState(initialState1)
@@ -219,7 +223,6 @@ describe("Primavera reducers", () => {
                 chai.expect(state.tasks.isImporting).to.false
                 chai.expect(state.tasks.isInvalidFormat).to.true
                 chai.expect(state.tasks.tasks).to.empty
-                chai.expect(state.tasks.delays).to.empty
                 chai.expect(state.tasks.warnings).to.empty
             }
             checkState(initialState1)
@@ -248,14 +251,14 @@ describe("Primavera reducers", () => {
             const checkState = (initialState: State) => {
                 const results: RelationsParseResults = {
                     length: 123,
-                    relations: relations.slice(0),
+                    relations: makeRelations(relations),
                     warnings: new Map<string, Array<string>>(warnings)
                 }
                 const state = main.mainReducer(initialState, endRelationsImport(results))
                 chai.expect(state.relations.isImporting).to.false
                 chai.expect(state.relations.isInvalidFormat).to.false
                 chai.expect(state.relations.length).to.equal(123)
-                chai.expect(state.relations.relations).to.deep.equal(relations)
+                chai.expect(state.relations.relations).to.deep.equal(makeRelations(relations))
                 chai.expect(state.relations.warnings).to.deep.equal(warnings)
             }
             checkState(initialState1)
@@ -284,7 +287,7 @@ describe("Primavera reducers", () => {
     describe("Overview reducers", () => {
         it("Should reduce OVERVIEW_FILTER", () => {
             const checkState = (initialState: State) => {
-                const state = main.mainReducer(initialState, filterForOverview(tasks, relations))
+                const state = main.mainReducer(initialState, filterForOverview(tasks, makeRelations(relations)))
                 chai.expect(state.overview.tasks).to.deep.equal(filteredTasks)
                 chai.expect(state.overview.relations).to.deep.equal(filteredRelations)
                 chai.expect(state.overview.warnings.size).to.empty

@@ -11,7 +11,6 @@ import {
 const initialState: TasksState = {
     length: 0,
     tasks: new Map<string, PrimaveraTask>(),
-    delays: new Map<string, PrimaveraDelay>(),
     warnings: new Map<string, Array<string>>(),
     isImporting: false,
     isInvalidFormat: false
@@ -29,7 +28,6 @@ export const tasksReducer = (state: TasksState = initialState, action: Action): 
             return Object.assign({}, state, {
                 length: taskAction.length,
                 tasks: taskAction.tasks,
-                delays: taskAction.delays,
                 warnings: taskAction.warnings,
                 isImporting: false,
                 isInvalidFormat: false
@@ -38,7 +36,6 @@ export const tasksReducer = (state: TasksState = initialState, action: Action): 
             return Object.assign({}, state, {
                 length: 0,
                 tasks: new Map<string, PrimaveraTask>(),
-                delays: new Map<string, PrimaveraDelay>(),
                 warnings: new Map<string, Array<string>>(),
                 isImporting: false,
                 isInvalidFormat: true

@@ -8,6 +8,7 @@ interface StagePanelProperties {
     maxStage: Stage
     title: string
     warnings?: number
+    errors?: number
     onCurrent: () => void
 }
 

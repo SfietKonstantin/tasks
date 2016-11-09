@@ -1,5 +1,6 @@
 import { Action } from "redux"
 import { RelationsState, PrimaveraTaskRelation } from "../types"
+import { RelationGraphNode } from "../graph"
 import {
     RelationsAction,
     RELATIONS_IMPORT_BEGIN,
@@ -10,7 +11,7 @@ import {
 
 const initialState: RelationsState = {
     length: 0,
-    relations: [],
+    relations: new Map<string, RelationGraphNode>(),
     warnings: new Map<string, Array<string>>(),
     isImporting: false,
     isInvalidFormat: false

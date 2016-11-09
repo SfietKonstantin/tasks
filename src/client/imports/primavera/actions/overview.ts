@@ -1,5 +1,6 @@
 import { Action, Dispatch } from "redux"
 import { State, PrimaveraTask, PrimaveraTaskRelation } from "../types"
+import { RelationGraphNode } from "../graph"
 import { ErrorAction, processError } from "../../../common/actions/errors"
 import { Project, TaskRelation } from "../../../../common/types"
 import { ApiInputTask } from "../../../../common/apitypes"
@@ -20,7 +21,7 @@ export interface OverviewFilterAction extends Action {
 }
 
 export const filterForOverview = (tasks: Map<string, PrimaveraTask>,
-                                  relations: Array<PrimaveraTaskRelation>): OverviewFilterAction => {
+                                  relations: Map<string, RelationGraphNode>): OverviewFilterAction => {
     const relationsResults = filterRelations(tasks, relations)
     return {
         type: OVERVIEW_FILTER,

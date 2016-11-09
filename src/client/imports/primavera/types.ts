@@ -1,10 +1,12 @@
 import { Project, TaskRelation } from "../../../common/types"
 import { ApiInputTask } from "../../../common/apitypes"
+import { RelationGraphNode } from "./graph"
 
 export enum Stage {
     Project,
     Tasks,
     Relations,
+    Delays,
     Overview
 }
 
@@ -45,7 +47,6 @@ export interface PrimaveraTaskRelation {
 export interface TasksState {
     length: number
     tasks: Map<string, PrimaveraTask>
-    delays: Map<string, PrimaveraDelay>
     warnings: Map<string, Array<string>>
     isImporting: boolean
     isInvalidFormat: boolean
@@ -53,7 +54,7 @@ export interface TasksState {
 
 export interface RelationsState {
     length: number
-    relations: Array<PrimaveraTaskRelation>
+    relations: Map<string, RelationGraphNode>
     warnings: Map<string, Array<string>>
     isImporting: boolean
     isInvalidFormat: boolean
@@ -70,5 +71,6 @@ export interface OverviewState {
     tasks: Array<ApiInputTask>
     relations: Array<TaskRelation>
     warnings: Map<string, Array<string>>
+    errors: Map<string, Array<string>>
     submitState: SubmitState
 }

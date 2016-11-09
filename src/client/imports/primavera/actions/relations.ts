@@ -1,5 +1,6 @@
 import { Action, Dispatch } from "redux"
 import { State, PrimaveraTaskRelation } from "../types"
+import { RelationGraphNode } from "../graph"
 import { RelationsParseResults, parseRelations } from "../imports"
 import { processFile } from "../../../common/actions/files"
 import { ErrorAction } from "../../../common/actions/errors"
@@ -12,7 +13,7 @@ export const RELATIONS_DISMISS_INVALID_FORMAT = "RELATIONS_DISMISS_INVALID_FORMA
 export interface RelationsAction extends Action {
     length: number
     type: string,
-    relations: Array<PrimaveraTaskRelation>
+    relations: Map<string, RelationGraphNode>
     warnings: Map<string, Array<string>>
 }
 

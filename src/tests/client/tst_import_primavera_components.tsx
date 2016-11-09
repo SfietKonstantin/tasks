@@ -14,11 +14,12 @@ import { filterForOverview } from "../../client/imports/primavera/actions/overvi
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
 import { submit } from "../../client/imports/primavera/actions/overview"
 import { Stage, PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
+import * as connectedcomponents from "../../client/imports/primavera/connectedcomponents"
 import { ApiInputTask } from "../../common/apitypes"
 import { Project, TaskRelation, TaskLocation } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { FakeFile } from "./fakefile"
-import * as connectedcomponents from "../../client/imports/primavera/connectedcomponents"
+import { makeRelations } from "./primaverahelper"
 
 describe("Primavera components", () => {
     let sandbox: Sinon.SinonSandbox
@@ -159,7 +160,7 @@ describe("Primavera components", () => {
                 startDate: null,
                 endDate: new Date(2016, 10, 1)
             })
-            const relations: Array<PrimaveraTaskRelation> = [
+            const relationsArray: Array<PrimaveraTaskRelation> = [
                 {
                     previous: "task1",
                     next: "milestone1",
@@ -167,6 +168,7 @@ describe("Primavera components", () => {
                     lag: 3
                 }
             ]
+            const relations = makeRelations(relationsArray)
             const warnings = new Map<string, Array<string>>()
             warnings.set("task1", ["Warning 1", "Warning 2"])
             warnings.set("task2", ["Warning 3"])
@@ -212,7 +214,7 @@ describe("Primavera components", () => {
         })
         it("Should render the component correctly 2", () => {
             const tasks = new Map<string, PrimaveraTask>()
-            const relations = new Array<PrimaveraTaskRelation>()
+            const relations = makeRelations([])
             const warnings = new Map<string, Array<string>>()
             const onFileSelected = sinon.spy()
             const onCurrentStage = sinon.spy()
@@ -264,7 +266,7 @@ describe("Primavera components", () => {
                 startDate: null,
                 endDate: new Date(2016, 10, 1)
             })
-            const relations: Array<PrimaveraTaskRelation> = [
+            const relationsArray: Array<PrimaveraTaskRelation> = [
                 {
                     previous: "task1",
                     next: "milestone1",
@@ -272,6 +274,7 @@ describe("Primavera components", () => {
                     lag: 3
                 }
             ]
+            const relations = makeRelations(relationsArray)
             let dispatch = sinon.spy()
             const mapped = relationsSelector.mapDispatchToProps(dispatch)
 

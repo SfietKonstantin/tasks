@@ -8,6 +8,12 @@ export interface ApiInputTask extends Identifiable {
     estimatedDuration: number
 }
 
+export interface ApiInputDelay extends Identifiable {
+    name: string
+    description: string
+    date: string
+}
+
 export interface ApiTask extends Identifiable {
     name: string
     description: string

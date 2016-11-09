@@ -15,6 +15,7 @@ const initialState: OverviewState = {
     tasks: new Array<ApiInputTask>(),
     relations: Array<TaskRelation>(),
     warnings: new Map<string, Array<string>>(),
+    errors: new Map<string, Array<string>>(),
     submitState: SubmitState.Idle
 }
 

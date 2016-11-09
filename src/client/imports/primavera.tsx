@@ -4,6 +4,7 @@ import * as Redux from "redux"
 import * as ReduxThunk from "redux-thunk"
 import { Provider } from "react-redux"
 import { State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation, SubmitState } from "./primavera/types"
+import { RelationGraphNode } from "./primavera/graph"
 import { mainReducer } from "./primavera/reducers/main"
 import { Main } from "./primavera/components/main"
 import { Project } from "../../common/types"
@@ -34,14 +35,13 @@ export const render = () => {
         tasks: {
             length: 0,
             tasks: new Map<string, PrimaveraTask>(),
-            delays: new Map<string, PrimaveraDelay>(),
             warnings: new Map<string, Array<string>>(),
             isImporting: false,
             isInvalidFormat: false
         },
         relations: {
             length: 0,
-            relations: [],
+            relations: new Map<string, RelationGraphNode>(),
             warnings: new Map<string, Array<string>>(),
             isImporting: false,
             isInvalidFormat: false
@@ -50,6 +50,7 @@ export const render = () => {
             tasks: [],
             relations: [],
             warnings: new Map<string, Array<string>>(),
+            errors: new Map<string, Array<string>>(),
             submitState: SubmitState.Idle
         }
     }

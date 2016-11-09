@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Dispatch } from "redux"
 import { State, Stage, PrimaveraTask, PrimaveraTaskRelation } from "../types"
+import { RelationGraphNode } from "../graph"
 import { FileSelector } from "./fileselector"
 import { defineStage, defineMaxStage } from "../actions/stages"
 import { importRelations, dismissInvalidRelationsFormat } from "../actions/relations"
@@ -10,19 +11,19 @@ interface RelationsSelectorProperties {
     stage: Stage
     maxStage: Stage
     tasks: Map<string, PrimaveraTask>
-    relations: Array<PrimaveraTaskRelation>
+    relations: Map<string, RelationGraphNode>
     warnings: Map<string, Array<string>>
     isImporting: boolean
     isInvalidFormat: boolean
     onFileSelected: (file: File) => void
     onCurrentStage: () => void
-    onNextStage: (tasks: Map<string, PrimaveraTask>, relations: Array<PrimaveraTaskRelation>) => void
+    onNextStage: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>) => void
     onDismissInvalidFormat: () => void
 }
 
 export class RelationsSelector extends React.Component<RelationsSelectorProperties, {}> {
     render() {
-        const relationsLength = this.props.relations.length
+        const relationsLength = RelationsSelector.countRelations(this.props.relations)
         const buttonText = relationsLength > 0 ? "Imported " + relationsLength + " relations" : "Import relations"
 
         return <FileSelector displayStage={Stage.Relations} currentStage={this.props.stage}
@@ -37,6 +38,13 @@ export class RelationsSelector extends React.Component<RelationsSelectorProperti
     }
     private handleNextStage() {
         this.props.onNextStage(this.props.tasks, this.props.relations)
+    }
+    private static countRelations(relations: Map<string, RelationGraphNode>) {
+        return Array.from(relations.values(), (node: RelationGraphNode) => {
+            return node.children.size
+        }).reduce((first: number, second: number) => {
+            return first + second
+        }, 0)
     }
 }
 
@@ -60,7 +68,7 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
         onCurrentStage: () => {
             dispatch(defineStage(Stage.Relations))
         },
-        onNextStage: (tasks: Map<string, PrimaveraTask>, relations: Array<PrimaveraTaskRelation>) => {
+        onNextStage: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>) => {
             dispatch(defineStage(Stage.Overview))
             dispatch(defineMaxStage(Stage.Overview))
             dispatch(filterForOverview(tasks, relations))

@@ -30,6 +30,7 @@ import { ApiInputTask } from "../../common/apitypes"
 import { FakeResponse } from "./fakeresponse"
 import { FakeFile } from "./fakefile"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
+import { makeRelations } from "./primaverahelper"
 
 describe("Primavera actions", () => {
     let sandbox: Sinon.SinonSandbox
@@ -108,7 +109,6 @@ describe("Primavera actions", () => {
                     startDate: null,
                     endDate: new Date(2016, 10, 1)
                 })
-                const delays = new Map<string, PrimaveraDelay>()
                 const warnings = new Map<string, Array<string>>()
                 warnings.set("task1", ["Warning 1", "Warning 2"])
                 warnings.set("task2", ["Warning 3"])
@@ -116,10 +116,9 @@ describe("Primavera actions", () => {
                     length: 123,
                     type: TASKS_IMPORT_END,
                     tasks,
-                    delays,
                     warnings
                 }
-                chai.expect(endTasksImport({length: 123, tasks, delays, warnings})).to.deep.equal(expected)
+                chai.expect(endTasksImport({length: 123, tasks, warnings})).to.deep.equal(expected)
             })
             it("Should create TASKS_IMPORT_INVALID_FORMAT", () => {
                 const expected: ErrorAction = {
@@ -156,7 +155,7 @@ describe("Primavera actions", () => {
                 chai.expect(beginRelationsImport()).to.deep.equal(expected)
             })
             it("Should create RELATIONS_IMPORT_END", () => {
-                const relations: Array<PrimaveraTaskRelation> = [
+                const relationsArray: Array<PrimaveraTaskRelation> = [
                     {
                         previous: "task1",
                         next: "milestone1",
@@ -164,6 +163,7 @@ describe("Primavera actions", () => {
                         lag: 3
                     }
                 ]
+                const relations = makeRelations(relationsArray)
                 const warnings = new Map<string, Array<string>>()
                 warnings.set("task1", ["Warning 1", "Warning 2"])
                 warnings.set("task2", ["Warning 3"])
@@ -236,7 +236,7 @@ describe("Primavera actions", () => {
                         estimatedDuration: 0
                     },
                 ]
-                const relations: Array<PrimaveraTaskRelation> = [
+                const relationsArray: Array<PrimaveraTaskRelation> = [
                     {
                         previous: "task1",
                         next: "milestone1",
@@ -244,7 +244,7 @@ describe("Primavera actions", () => {
                         lag: 3
                     }
                 ]
-
+                const relations = makeRelations(relationsArray)
                 const filteredRelations: Array<TaskRelation> = [
                     {
                         previous: "task1",

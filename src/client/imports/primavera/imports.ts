@@ -1,4 +1,5 @@
 import { PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./types"
+import { RelationGraph, RelationGraphNode } from "./graph"
 import { InvalidFormatError } from "../../common/actions/files"
 import { ApiInputTask } from "../../../common/apitypes"
 import { TaskRelation, TaskLocation } from "../../../common/types"
@@ -8,7 +9,6 @@ import * as maputils from "../../../common/maputils"
 export interface TasksParseResults {
     length: number
     tasks: Map<string, PrimaveraTask>
-    delays: Map<string, PrimaveraDelay>
     warnings: Map<string, Array<string>>
 }
 
@@ -28,7 +28,6 @@ export const parseTasks = (content: string): TasksParseResults => {
     splitted.shift()
 
     let tasks = new Map<string, PrimaveraTask>()
-    let delays = new Map<string, PrimaveraDelay>()
     let warnings = new Map<string, Array<string>>()
     let length = splitted.length
     splitted.forEach((line: string) =>  {
@@ -53,12 +52,12 @@ export const parseTasks = (content: string): TasksParseResults => {
         }
 
         if (Number.isNaN(duration)) {
-            maputils.addToMapOfList(warnings, identifier, "Not a valid duration")
+            maputils.addToMapOfList(warnings, identifier, "Task do not have a valid duration")
             return
         }
 
         if (startDate == null && endDate == null) {
-            maputils.addToMapOfList(warnings, identifier, "Not a valid dates")
+            maputils.addToMapOfList(warnings, identifier, "Task do not have valid dates")
             return
         } else {
             if (duration > 0 && startDate != null && endDate != null) {
@@ -89,7 +88,7 @@ export const parseTasks = (content: string): TasksParseResults => {
         })
     })
 
-    return { length, tasks, delays, warnings }
+    return { length, tasks, warnings }
 }
 
 const parseType = (type: string): "FS" | "SF" | "FF" | "SS" | null => {
@@ -109,7 +108,7 @@ const parseType = (type: string): "FS" | "SF" | "FF" | "SS" | null => {
 
 export interface RelationsParseResults {
     length: number
-    relations: Array<PrimaveraTaskRelation>
+    relations: Map<string, RelationGraphNode>
     warnings: Map<string, Array<string>>
 }
 
@@ -122,7 +121,7 @@ export const parseRelations = (content: string): RelationsParseResults => {
     splitted.shift()
     splitted.shift()
 
-    let relations = new Array<PrimaveraTaskRelation>()
+    let graph = new RelationGraph()
     let warnings = new Map<string, Array<string>>()
     let length = splitted.length
     splitted.forEach((line: string) =>  {
@@ -160,32 +159,14 @@ export const parseRelations = (content: string): RelationsParseResults => {
             lag
         }
 
-        if (relation.type === "SF") {
-            if (relation.lag === 0) {
-                maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
-                                        "SF relation has been converted to FS")
-                const previous = relation.next
-                const next = relation.previous
-                Object.assign(relation, {
-                    previous,
-                    next,
-                    type: "FS"
-                })
-            } else {
-                maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
-                                        "SF relation with lag is not supported")
-                return
-            }
-        } else if (relation.type === "FF") {
-            maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
-                                    "FF relation is not supported")
-            return
+        try {
+            graph.addRelation(relation)
+        } catch (error) {
+            maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next, error.message)
         }
-
-        relations.push(relation)
     })
 
-    return { length, relations, warnings }
+    return { length, relations: graph.nodes, warnings }
 }
 
 export const filterTasks = (tasks: Map<string, PrimaveraTask>): Array<ApiInputTask> => {
@@ -236,21 +217,42 @@ export interface FilterRelationsResults {
 }
 
 export const filterRelations = (tasks: Map<string, PrimaveraTask>,
-                                relations: Array<PrimaveraTaskRelation>): FilterRelationsResults => {
+                                relations: Map<string, RelationGraphNode>): FilterRelationsResults => {
     let warnings = new Map<string, Array<string>>()
-    const filtered = relations.filter((relation: PrimaveraTaskRelation) => {
-        if (!tasks.has(relation.previous) || !tasks.has(relation.next)) {
-            maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
-                                    "No corresponding tasks")
-            return false
-        }
-        if (relation.type === "SF") {
-            return false
-        }
-        if (relation.type === "FF") {
-            return false
-        }
-        return true
+    let filtered = new Array<PrimaveraTaskRelation>()
+    Array.from(relations.values(), (node: RelationGraphNode) => {
+        Array.from(node.children.values(), (relation: PrimaveraTaskRelation) => {
+            if (!tasks.has(relation.previous) || !tasks.has(relation.next)) {
+                maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                        "No corresponding tasks")
+                return
+            }
+            if (relation.type === "SF") {
+                if (relation.lag === 0) {
+                    maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                            "SF relation has been converted to FS")
+                    const previous = relation.next
+                    const next = relation.previous
+                    filtered.push({
+                        previous,
+                        next,
+                        type: "FS",
+                        lag: 0
+                    })
+                    return
+                } else {
+                    maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                            "SF relation with lag is not supported")
+                    return
+                }
+            }
+            if (relation.type === "FF") {
+                maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                        "FF relation is not supported")
+                return
+            }
+            filtered.push(relation)
+        })
     })
 
     const mappedRelations = filtered.map((relation: PrimaveraTaskRelation) => {

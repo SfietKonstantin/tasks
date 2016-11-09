@@ -13,7 +13,6 @@ export interface TasksAction extends Action {
     type: string,
     length: number
     tasks: Map<string, PrimaveraTask>
-    delays: Map<string, PrimaveraDelay>
     warnings: Map<string, Array<string>>
 }
 
@@ -28,7 +27,6 @@ export const endTasksImport = (results: TasksParseResults): TasksAction => {
         type: TASKS_IMPORT_END,
         length: results.length,
         tasks: results.tasks,
-        delays: results.delays,
         warnings: results.warnings
     }
 }
