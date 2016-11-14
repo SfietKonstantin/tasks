@@ -4,10 +4,11 @@ import * as Redux from "redux"
 import * as ReduxThunk from "redux-thunk"
 import { Provider } from "react-redux"
 import { State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation, SubmitState } from "./primavera/types"
-import { RelationGraphNode } from "./primavera/graph"
+import { RelationGraphNode, GraphDiff } from "./primavera/graph"
 import { mainReducer } from "./primavera/reducers/main"
 import { Main } from "./primavera/components/main"
 import { Project } from "../../common/types"
+import { MilestoneFilterMode } from "../common/tasklistfilter"
 
 interface RootProperties {
     store: Redux.Store<State>
@@ -45,6 +46,16 @@ export const render = () => {
             warnings: new Map<string, Array<string>>(),
             isImporting: false,
             isInvalidFormat: false
+        },
+        delays: {
+            filters: {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            },
+            tasks: new Array<PrimaveraTask>(),
+            selection: new Set<string>(),
+            diffs: new Array<GraphDiff>(),
+            warnings: new Map<string, Array<string>>()
         },
         overview: {
             tasks: [],

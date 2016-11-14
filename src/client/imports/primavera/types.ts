@@ -1,6 +1,7 @@
 import { Project, TaskRelation } from "../../../common/types"
 import { ApiInputTask } from "../../../common/apitypes"
-import { RelationGraphNode } from "./graph"
+import { RelationGraphNode, GraphDiff } from "./graph"
+import { TaskListFilters } from "../../common/tasklistfilter"
 
 export enum Stage {
     Project,
@@ -20,6 +21,7 @@ export interface State {
     project: Project
     tasks: TasksState
     relations: RelationsState
+    delays: DelaysState
     overview: OverviewState
 }
 
@@ -40,7 +42,7 @@ export interface PrimaveraDelay {
 export interface PrimaveraTaskRelation {
     previous: string
     next: string
-    type: "FS" | "SF" | "FF" | "SS"
+    type: "FS" | "FF" | "SS"
     lag: number
 }
 
@@ -58,6 +60,14 @@ export interface RelationsState {
     warnings: Map<string, Array<string>>
     isImporting: boolean
     isInvalidFormat: boolean
+}
+
+export interface DelaysState {
+    filters: TaskListFilters
+    tasks: Array<PrimaveraTask>
+    selection: Set<string>
+    diffs: Array<GraphDiff>
+    warnings: Map<string, Array<string>>
 }
 
 export enum SubmitState {

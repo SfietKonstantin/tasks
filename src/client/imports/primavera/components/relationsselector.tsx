@@ -5,7 +5,8 @@ import { RelationGraphNode } from "../graph"
 import { FileSelector } from "./fileselector"
 import { defineStage, defineMaxStage } from "../actions/stages"
 import { importRelations, dismissInvalidRelationsFormat } from "../actions/relations"
-import { filterForOverview } from "../actions/overview"
+import { defineDelayFilters } from "../actions/delays"
+import { MilestoneFilterMode, TaskListFilters } from "../../../common/tasklistfilter"
 
 interface RelationsSelectorProperties {
     stage: Stage
@@ -69,9 +70,13 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
             dispatch(defineStage(Stage.Relations))
         },
         onNextStage: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>) => {
-            dispatch(defineStage(Stage.Overview))
-            dispatch(defineMaxStage(Stage.Overview))
-            dispatch(filterForOverview(tasks, relations))
+            const defaultFilters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
+            dispatch(defineStage(Stage.Delays))
+            dispatch(defineMaxStage(Stage.Delays))
+            dispatch(defineDelayFilters(tasks, defaultFilters))
         },
         onDismissInvalidFormat: () => {
             dispatch(dismissInvalidRelationsFormat())

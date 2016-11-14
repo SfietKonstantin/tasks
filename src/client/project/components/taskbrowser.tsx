@@ -3,7 +3,8 @@ import { Dispatch } from "redux"
 import { State, TaskFilters } from "../types"
 import { fetchTasks, filterTasks } from "../actions/tasks"
 import { ListGroupItem } from "react-bootstrap"
-import { TaskList, TaskListFilters } from "../../common/components/tasklist"
+import { TaskList } from "../../common/components/tasklist"
+import { TaskListFilters } from "../../common/tasklistfilter"
 import { TasksHeader } from "../components/tasksheader"
 import { ApiTask } from "../../../common/apitypes"
 
@@ -11,7 +12,7 @@ interface TaskBrowserProperties {
     projectIdentifier: string
     tasks: Array<ApiTask>
     filters: TaskFilters
-    onFilterChanged: (projectIdentifier: string, filters: TaskFilters) => void
+    onFiltersChanged: (projectIdentifier: string, filters: TaskFilters) => void
     dispatch: Dispatch<State>
 }
 
@@ -21,9 +22,9 @@ export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
     render() {
         return <ApiTaskList tasks={this.props.tasks} createElement={this.createTaskElement.bind(this)}
                             filters={this.props.filters.filters}
-                            onFiltersChanged={this.handleFilterChanged.bind(this)} >
+                            onFiltersChanged={this.handleFiltersChanged.bind(this)} >
             <TasksHeader filters={this.props.filters}
-                         onFilterChanged={this.props.onFilterChanged.bind(this, this.props.projectIdentifier)} />
+                         onFiltersChanged={this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)} />
         </ApiTaskList>
     }
     componentDidMount() {
@@ -35,8 +36,8 @@ export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
             {task.name} <span className="text-muted">#{task.identifier}</span>
         </ListGroupItem>
     }
-    private handleFilterChanged(filters: TaskListFilters) {
-        this.props.onFilterChanged(this.props.projectIdentifier, Object.assign(this.props.filters, {filters}))
+    private handleFiltersChanged(filters: TaskListFilters) {
+        this.props.onFiltersChanged(this.props.projectIdentifier, Object.assign(this.props.filters, {filters}))
     }
 }
 
@@ -50,7 +51,7 @@ export const mapStateToProps = (state: State) => {
 
 export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
-        onFilterChanged: (projectIdentifier: string, taskFilters: TaskFilters) => {
+        onFiltersChanged: (projectIdentifier: string, taskFilters: TaskFilters) => {
             dispatch(filterTasks(projectIdentifier, taskFilters))
         },
         dispatch

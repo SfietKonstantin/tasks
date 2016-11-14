@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ButtonToolbar, ButtonGroup, DropdownButton, MenuItem } from "react-bootstrap"
-import { MilestoneFilterMode, TaskListFilters } from "./tasklist"
+import { MilestoneFilterMode, TaskListFilters } from "../tasklistfilter"
 
 interface TaskListFilterToolbarProperties {
     filters: TaskListFilters

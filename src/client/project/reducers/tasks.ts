@@ -1,6 +1,6 @@
 import { Action } from "redux"
 import { TasksState, TaskFilters } from "../types"
-import { MilestoneFilterMode } from "../../common/components/tasklist"
+import { MilestoneFilterMode, TaskListFilterInterface, filterTaskList } from "../../common/tasklistfilter"
 import { ApiTask } from "../../../common/apitypes"
 import {
     TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE,
@@ -14,32 +14,21 @@ const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | 
         return []
     }
 
-    let returned = new Array<ApiTask>()
-    const todayTime = today.getTime()
-    const filtered = tasks.filter((task: ApiTask) => {
-        switch (filters.filters.milestoneFilterMode) {
-            case MilestoneFilterMode.TasksOnly:
-                if (task.estimatedDuration === 0) {
-                    return false
-                }
-                break
-            case MilestoneFilterMode.MilestonesOnly:
-                if (task.estimatedDuration !== 0) {
-                    return false
-                }
-                break
-            default:
-                break
+    const filterInterface: TaskListFilterInterface<ApiTask> = {
+        isMilestone: (task: ApiTask): boolean => {
+            return task.estimatedDuration === 0
+        },
+        getIdentifier: (task: ApiTask): string => {
+            return task.identifier
+        },
+        getName: (task: ApiTask): string => {
+            return task.name
         }
-        if (filters.filters.text.length > 0) {
-            const lowerFilter = latinize(filters.filters.text.trim()).toLowerCase()
-            const lowerIdentifier = latinize(task.identifier.trim()).toLowerCase()
-            const lowerName = latinize(task.name.trim()).toLowerCase()
-            if (lowerIdentifier.indexOf(lowerFilter) === -1 && lowerName.indexOf(lowerFilter) === -1) {
-                return false
-            }
-        }
+    }
 
+    const initialFiltered = filterTaskList(tasks, filters.filters, filterInterface)
+    const todayTime = today.getTime()
+    const filtered = initialFiltered.filter((task: ApiTask) => {
         const startDate = new Date(task.startDate).getTime()
         const endDate = dateutils.addDays(new Date(task.startDate), task.duration).getTime()
         if (filters.notStartedChecked && startDate >= todayTime) {

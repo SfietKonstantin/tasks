@@ -10,7 +10,7 @@ import { Overview } from "../../client/project/components/overview"
 import { TasksHeader } from "../../client/project/components/tasksheader"
 import { AllTasks } from "../../client/project/components/alltasks"
 import { TaskFilters } from "../../client/project/types"
-import { MilestoneFilterMode } from "../../client/common/components/tasklist"
+import { MilestoneFilterMode } from "../../client/common/tasklistfilter"
 import { Project } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
@@ -76,7 +76,7 @@ describe("Project components", () => {
                     text: ""
                 }
             }
-            const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
+            const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
             const buttons = component.find("Button")
             chai.expect(buttons).to.length(3)
@@ -95,7 +95,7 @@ describe("Project components", () => {
                     text: ""
                 }
             }
-            const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
+            const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
             const buttons = component.find("Button")
             chai.expect(buttons).to.length(3)
@@ -114,7 +114,7 @@ describe("Project components", () => {
                     text: ""
                 }
             }
-            const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
+            const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
             const buttons = component.find("Button")
             chai.expect(buttons).to.length(3)
@@ -133,7 +133,7 @@ describe("Project components", () => {
                     text: ""
                 }
             }
-            const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
+            const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
             const buttons = component.find("Button")
             chai.expect(buttons).to.length(3)
@@ -162,7 +162,7 @@ describe("Project components", () => {
                     text: ""
                 }
             }
-            const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
+            const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
             const buttons = component.find("Button")
             chai.expect(buttons).to.length(3)
@@ -191,7 +191,7 @@ describe("Project components", () => {
                     text: ""
                 }
             }
-            const component = enzyme.shallow(<TasksHeader filters={filters} onFilterChanged={callback} />)
+            const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
             const buttons = component.find("Button")
             chai.expect(buttons).to.length(3)

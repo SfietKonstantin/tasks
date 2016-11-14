@@ -4,7 +4,7 @@ import { TaskFilters } from "../types"
 
 interface TasksHeaderProperties {
     filters: TaskFilters
-    onFilterChanged: (filters: TaskFilters) => void
+    onFiltersChanged: (filters: TaskFilters) => void
 }
 
 export class TasksHeader extends React.Component<TasksHeaderProperties, {}> {
@@ -32,15 +32,15 @@ export class TasksHeader extends React.Component<TasksHeaderProperties, {}> {
     }
     private handleNotStartedClicked(e: React.MouseEvent) {
         const notStartedChecked = !this.props.filters.notStartedChecked
-        this.props.onFilterChanged(Object.assign(this.props.filters, {notStartedChecked}))
+        this.props.onFiltersChanged(Object.assign(this.props.filters, {notStartedChecked}))
     }
     private handleInProgress(e: React.MouseEvent) {
         const inProgressChecked = !this.props.filters.inProgressChecked
-        this.props.onFilterChanged(Object.assign(this.props.filters, {inProgressChecked}))
+        this.props.onFiltersChanged(Object.assign(this.props.filters, {inProgressChecked}))
     }
     private handleDoneClicked(e: React.MouseEvent) {
         const doneChecked = !this.props.filters.doneChecked
-        this.props.onFilterChanged(Object.assign(this.props.filters, {doneChecked}))
+        this.props.onFiltersChanged(Object.assign(this.props.filters, {doneChecked}))
     }
 }
 

@@ -135,10 +135,10 @@ export const parseRelations = (content: string): RelationsParseResults => {
                                          + line + "\"")
         }
 
-        const previous = splittedLine[0]
-        const next = splittedLine[1]
-        const type = parseType(splittedLine[2])
-        const lag = +splittedLine[9]
+        let previous = splittedLine[0]
+        let next = splittedLine[1]
+        let type = parseType(splittedLine[2])
+        let lag = +splittedLine[9]
 
         if (type == null) {
             maputils.addToMapOfList(warnings, previous + " - " + next,
@@ -150,6 +150,17 @@ export const parseRelations = (content: string): RelationsParseResults => {
             maputils.addToMapOfList(warnings, previous + " - " + next,
                                     "Relation have an invalid lag")
             return
+        }
+
+        if (type === "SF") {
+            let oldPrevious = previous
+            let oldNext = next
+            previous = oldNext
+            next = oldPrevious
+            lag = -lag
+            type = "FS"
+            maputils.addToMapOfList(warnings, oldPrevious + " - " + oldNext,
+                                    "SF relation have been converted to FS relation")
         }
 
         let relation: PrimaveraTaskRelation = {
@@ -226,25 +237,6 @@ export const filterRelations = (tasks: Map<string, PrimaveraTask>,
                 maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
                                         "No corresponding tasks")
                 return
-            }
-            if (relation.type === "SF") {
-                if (relation.lag === 0) {
-                    maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
-                                            "SF relation has been converted to FS")
-                    const previous = relation.next
-                    const next = relation.previous
-                    filtered.push({
-                        previous,
-                        next,
-                        type: "FS",
-                        lag: 0
-                    })
-                    return
-                } else {
-                    maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
-                                            "SF relation with lag is not supported")
-                    return
-                }
             }
             if (relation.type === "FF") {
                 maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,

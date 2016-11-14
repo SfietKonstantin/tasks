@@ -6,7 +6,8 @@ import * as sinon from "sinon"
 import { Header } from "../../client/common/components/header"
 import { TabBar } from "../../client/common/components/tabs"
 import { TaskListFiltersToolbar } from "../../client/common/components/tasklistfilterstoolbar"
-import { TaskList, TaskListFilters, MilestoneFilterMode } from "../../client/common/components/tasklist"
+import { TaskList } from "../../client/common/components/tasklist"
+import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklistfilter"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Common components", () => {

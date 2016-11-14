@@ -7,7 +7,7 @@ import { requestTasks, receiveTasks, receiveFailureTasks, filterTasks } from "..
 import {
     State, ProjectState, TaskFilters, TasksState
 } from "../../client/project/types"
-import { MilestoneFilterMode } from "../../client/common/components/tasklist"
+import { MilestoneFilterMode } from "../../client/common/tasklistfilter"
 import { Project } from "../../common/types"
 import { ApiTask } from "../../common/apitypes"
 import { FakeResponse } from "./fakeresponse"

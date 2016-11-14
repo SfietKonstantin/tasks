@@ -12,9 +12,11 @@ import { Main } from "../../client/imports/primavera/components/main"
 import * as relationsActions from "../../client/imports/primavera/actions/relations"
 import { filterForOverview } from "../../client/imports/primavera/actions/overview"
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
+import { defineDelayFilters } from "../../client/imports/primavera/actions/delays"
 import { submit } from "../../client/imports/primavera/actions/overview"
 import { Stage, PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import * as connectedcomponents from "../../client/imports/primavera/connectedcomponents"
+import { MilestoneFilterMode, TaskListFilters } from "../../client/common/tasklistfilter"
 import { ApiInputTask } from "../../common/apitypes"
 import { Project, TaskRelation, TaskLocation } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
@@ -274,14 +276,18 @@ describe("Primavera components", () => {
                     lag: 3
                 }
             ]
+            const defaultFilters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
             const relations = makeRelations(relationsArray)
             let dispatch = sinon.spy()
             const mapped = relationsSelector.mapDispatchToProps(dispatch)
 
             mapped.onNextStage(tasks, relations)
-            chai.expect(dispatch.calledWithExactly(defineStage(Stage.Overview))).to.true
-            chai.expect(dispatch.calledWithExactly(defineMaxStage(Stage.Overview))).to.true
-            chai.expect(dispatch.calledWithExactly(filterForOverview(tasks, relations))).to.true
+            chai.expect(dispatch.calledWithExactly(defineStage(Stage.Delays))).to.true
+            chai.expect(dispatch.calledWithExactly(defineMaxStage(Stage.Delays))).to.true
+            chai.expect(dispatch.calledWithExactly(defineDelayFilters(tasks, defaultFilters))).to.true
         })
         it("Should map the onDismissInvalidFormat callback", () => {
             let dispatch = sinon.spy()

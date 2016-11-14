@@ -6,10 +6,5 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "strictNullChecks": true
-    },
-    "files": [
-        "types.ts",
-        "dateutils.ts",
-        "apitypes.ts"
-    ]
-} 
+    }
+}

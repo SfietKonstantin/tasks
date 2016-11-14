@@ -2,21 +2,11 @@ import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { Row, Col, ListGroup, FormGroup, FormControl } from "react-bootstrap"
 import { TaskListFiltersToolbar } from "./tasklistfilterstoolbar"
-
-export enum MilestoneFilterMode {
-    NoFilter,
-    TasksOnly,
-    MilestonesOnly
-}
-
-export interface TaskListFilters {
-    milestoneFilterMode: MilestoneFilterMode
-    text: string
-}
+import { TaskListFilters } from "../tasklistfilter"
 
 interface TaskListProperties<T> {
     tasks: Array<T>
-    createElement: (item: T) => JSX.Element
+    createElement: (task: T) => JSX.Element
     filters: TaskListFilters
     onFiltersChanged: (filters: TaskListFilters) => void
 }
@@ -33,8 +23,8 @@ export class TaskList<T> extends React.Component<TaskListProperties<T>, TaskList
         }
     }
     render() {
-        const content: Array<JSX.Element> = this.props.tasks.map((item) => {
-            return this.props.createElement(item)
+        const content: Array<JSX.Element> = this.props.tasks.map((task: T) => {
+            return this.props.createElement(task)
         })
         return <div className="tab-table">
             <Row>
@@ -70,6 +60,7 @@ export class TaskList<T> extends React.Component<TaskListProperties<T>, TaskList
         this.handleFiltersChanged()
     }
     private handleTextSubmit(e: React.FormEvent) {
+        e.preventDefault()
         this.handleFiltersChanged()
     }
     private handleFiltersChanged() {

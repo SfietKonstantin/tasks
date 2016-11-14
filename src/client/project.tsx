@@ -6,7 +6,7 @@ import { Provider } from "react-redux"
 import { State, TaskFilters } from "./project/types"
 import { mainReducer } from "./project/reducers/main"
 import { Main } from "./project/containers/main"
-import { MilestoneFilterMode } from "./common/components/tasklist"
+import { MilestoneFilterMode } from "./common/tasklistfilter"
 import { ApiTask } from "../common/apitypes"
 
 interface RootProperties {

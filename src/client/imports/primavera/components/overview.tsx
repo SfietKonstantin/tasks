@@ -26,10 +26,10 @@ interface OverviewProperties {
 
 export class Overview extends React.Component<OverviewProperties, {}> {
     render() {
-        let totalWarnings = maputils.lengthOfMapOfList(this.props.warnings)
         const tasksLength = this.props.tasks.length
         const relationsLength = this.props.relations.length
         let warningsButton: JSX.Element | null = null
+        let totalWarnings = maputils.lengthOfMapOfList(this.props.warnings)
         if (totalWarnings > 0) {
             warningsButton = <WarningsButton warnings={this.props.warnings} />
         }
@@ -40,7 +40,7 @@ export class Overview extends React.Component<OverviewProperties, {}> {
                           && this.props.submitState !== SubmitState.Submitted
         return <StagePanel displayStage={Stage.Overview}
                            currentStage={this.props.stage}
-                           maxStage={this.props.maxStage} title="4. Overview"
+                           maxStage={this.props.maxStage} title="5. Overview"
                            warnings={totalWarnings}
                            onCurrent={this.props.onCurrentStage.bind(this)}>
             <p><Badge>{tasksLength}</Badge> of the {this.props.totalTasks} tasks will be imported</p>

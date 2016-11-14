@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Grid, Col } from "react-bootstrap"
-import { ProjectEditor, TasksSelector, RelationsSelector, Overview } from "../connectedcomponents"
+import { ProjectEditor, TasksSelector, RelationsSelector, DelaysSelector, Overview } from "../connectedcomponents"
 
 export class Main extends React.Component<{}, {}> {
     render() {
@@ -14,6 +14,7 @@ export class Main extends React.Component<{}, {}> {
                 <ProjectEditor />
                 <TasksSelector />
                 <RelationsSelector />
+                <DelaysSelector />
                 <Overview />
             </Col>
         </Grid>

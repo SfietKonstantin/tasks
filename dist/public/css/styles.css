@@ -126,3 +126,7 @@
     overflow-y: auto;
     height: 80vh;
 }
+
+.import-primavera-delay-indicator {
+    margin-right: 10px;
+}

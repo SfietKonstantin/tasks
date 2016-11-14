@@ -199,19 +199,28 @@ describe("Primavera import", () => {
                 {
                     previous: "task5",
                     next: "task6",
-                    type: "SF",
-                    lag: 3
-                },
-                {
-                    previous: "task7",
-                    next: "task8",
                     type: "FF",
-                    lag: 1
+                    lag: 3
                 }
             ]
             chai.expect(results).to.length(4)
             chai.expect(results.relations).to.deep.equal(makeRelations(expected))
             chai.expect(results.warnings).to.empty
+        })
+        it("Should import SF relation", () => {
+            const relations = "header\nsecond_line\ntask1\ttask2\tSF\t\t\t\t\t\t\t1"
+            const results = parseRelations(relations)
+            const expected: Array<PrimaveraTaskRelation> = [
+                {
+                    previous: "task2",
+                    next: "task1",
+                    type: "FS",
+                    lag: -1
+                }
+            ]
+            chai.expect(results).to.length(1)
+            chai.expect(results.relations).to.deep.equal(makeRelations(expected))
+            chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should not import invalid lag relation", () => {
             const relations = "header\nsecond_line\ntask1\ttask2\tFS\t\t\t\t\t\t\tabcde"
@@ -382,70 +391,6 @@ describe("Primavera import", () => {
             const results = filterRelations(tasks, makeRelations(relations))
             chai.expect(results.relations).to.deep.equal(expected)
             chai.expect(results.warnings.size).to.equal(3)
-        })
-        it("Should flip SF relation", () => {
-            const tasks: Map<string, PrimaveraTask> = new Map<string, PrimaveraTask>()
-            tasks.set("task1", {
-                identifier: "task1",
-                name: "Task 1",
-                duration: 20,
-                startDate: new Date(2016, 9, 1),
-                endDate: new Date(2016, 9, 16)
-            })
-            tasks.set("task2", {
-                identifier: "task2",
-                name: "Task 2",
-                duration: 20,
-                startDate: new Date(2016, 9, 1),
-                endDate: new Date(2016, 9, 16)
-            })
-            const relations: Array<PrimaveraTaskRelation> = [
-                {
-                    previous: "task1",
-                    next: "task2",
-                    type: "SF",
-                    lag: 0
-                }
-            ]
-            const expected: Array<TaskRelation> = [
-                {
-                    previous: "task2",
-                    previousLocation: TaskLocation.End,
-                    next: "task1",
-                    lag: 0
-                }
-            ]
-            const results = filterRelations(tasks, makeRelations(relations))
-            chai.expect(results.relations).to.deep.equal(expected)
-            chai.expect(results.warnings.size).to.equal(1)
-        })
-        it("Should not import non-flippable SF relation", () => {
-            const tasks: Map<string, PrimaveraTask> = new Map<string, PrimaveraTask>()
-            tasks.set("task1", {
-                identifier: "task1",
-                name: "Task 1",
-                duration: 20,
-                startDate: new Date(2016, 9, 1),
-                endDate: new Date(2016, 9, 16)
-            })
-            tasks.set("task2", {
-                identifier: "task2",
-                name: "Task 2",
-                duration: 20,
-                startDate: new Date(2016, 9, 1),
-                endDate: new Date(2016, 9, 16)
-            })
-            const relations: Array<PrimaveraTaskRelation> = [
-                {
-                    previous: "task1",
-                    next: "task2",
-                    type: "SF",
-                    lag: 3
-                }
-            ]
-            const results = filterRelations(tasks, makeRelations(relations))
-            chai.expect(results.relations).to.empty
-            chai.expect(results.warnings.size).to.equal(1)
         })
     })
 })
