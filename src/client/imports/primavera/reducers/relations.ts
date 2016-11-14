@@ -36,7 +36,7 @@ export const relationsReducer = (state: RelationsState = initialState, action: A
         case RELATIONS_IMPORT_INVALID_FORMAT:
             return Object.assign({}, state, {
                 length: 0,
-                relations: new Array<PrimaveraTaskRelation>(),
+                relations: new Map<string, RelationGraphNode>(),
                 warnings: new Map<string, Array<string>>(),
                 isImporting: false,
                 isInvalidFormat: true

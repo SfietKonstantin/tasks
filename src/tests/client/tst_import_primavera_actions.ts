@@ -26,7 +26,7 @@ import {
 import * as files from "../../client/common/actions/files"
 import { parseTasks, parseRelations } from "../../client/imports/primavera/imports"
 import { Project, TaskRelation, TaskLocation } from "../../common/types"
-import { ApiInputTask } from "../../common/apitypes"
+import { ApiInputTask, ApiInputDelay } from "../../common/apitypes"
 import { FakeResponse } from "./fakeresponse"
 import { FakeFile } from "./fakefile"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
@@ -211,7 +211,14 @@ describe("Primavera actions", () => {
                     duration: 30,
                     startDate: new Date(2016, 9, 1),
                     endDate: new Date(2016, 10, 1)
-                }),
+                })
+                tasks.set("delay", {
+                    identifier: "delay",
+                    name: "Delay",
+                    duration: 0,
+                    startDate: new Date(2016, 9, 1),
+                    endDate: null
+                })
                 tasks.set("milestone1", {
                     identifier: "milestone1",
                     name: "Milestone 1",
@@ -219,7 +226,8 @@ describe("Primavera actions", () => {
                     startDate: null,
                     endDate: new Date(2016, 10, 1)
                 })
-
+                let delays = new Set<string>()
+                delays.add("delay")
                 const filteredTasks: Array<ApiInputTask> = [
                     {
                         identifier: "task1",
@@ -234,7 +242,15 @@ describe("Primavera actions", () => {
                         description: "",
                         estimatedStartDate: new Date(2016, 10, 1).toISOString(),
                         estimatedDuration: 0
-                    },
+                    }
+                ]
+                const filteredDelays: Array<ApiInputDelay> = [
+                    {
+                        identifier: "delay",
+                        name: "Delay",
+                        description: "",
+                        date: new Date(2016, 9, 1).toISOString()
+                    }
                 ]
                 const relationsArray: Array<PrimaveraTaskRelation> = [
                     {
@@ -256,10 +272,11 @@ describe("Primavera actions", () => {
                 const expected: OverviewFilterAction = {
                     type: OVERVIEW_FILTER,
                     tasks: filteredTasks,
+                    delays: filteredDelays,
                     relations: filteredRelations,
                     warnings: new Map<string, Array<string>>()
                 }
-                chai.expect(filterForOverview(tasks, relations)).to.deep.equal(expected)
+                chai.expect(filterForOverview(tasks, delays, relations)).to.deep.equal(expected)
             })
             it("Should create OVERVIEW_SUBMIT_REQUEST", () => {
                 const expected: Action = {

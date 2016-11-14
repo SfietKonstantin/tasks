@@ -6,7 +6,7 @@ describe("Errors processing", () => {
     it("Should process valid JSON", (done) => {
         const response = new FakeResponse(true, { test: "value" })
         processError(response).then((result: any) => {
-            chai.expect(result).to.deep.equal( { test: "value" })
+            chai.expect(result).to.deep.equal({ test: "value" })
             done()
         }).catch((error) => {
             done(error)

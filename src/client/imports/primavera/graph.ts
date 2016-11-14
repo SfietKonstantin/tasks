@@ -1,6 +1,12 @@
 import * as maputils from "../../../common/maputils"
 import { PrimaveraTask, PrimaveraTaskRelation } from "./types"
 
+export interface RelationGraphNode {
+    identifier: string
+    parents: Map<string, PrimaveraTaskRelation>
+    children: Map<string, PrimaveraTaskRelation>
+}
+
 export interface GraphDiff {
     added: Array<PrimaveraTaskRelation>
     removed: Array<[string, string]>
@@ -34,7 +40,7 @@ export class RelationGraph {
     applyDiff(graphDiff: GraphDiff) {
         graphDiff.removed.forEach((entry: [string, string]) => {
             maputils.get(this.nodes, entry[0]).children.delete(entry[1])
-            maputils.get(this.nodes, entry[1]).parents.delete(entry[1])
+            maputils.get(this.nodes, entry[1]).parents.delete(entry[0])
         })
         graphDiff.added.forEach((entry: PrimaveraTaskRelation) => {
             maputils.get(this.nodes, entry.previous).children.set(entry.next, entry)
@@ -43,7 +49,7 @@ export class RelationGraph {
     }
     createSelectionDiff(selection: Set<string>, tasks: Map<string, PrimaveraTask>): SelectionDiffResults {
         let results: SelectionDiffResults = {
-            diffs: new Array<GraphDiff>(),
+            diffs: [],
             warnings: new Map<string, Array<string>>()
         }
 
@@ -73,15 +79,42 @@ export class RelationGraph {
         }
 
         const task = maputils.get(tasks, identifier)
-        if (task.startDate != null && task.endDate != null) {
-            // TODO: do something about "standard tasks"
-            return
-        }
-
         const node = maputils.get(this.nodes, identifier)
+
+        if (task.startDate != null && task.endDate != null) {
+            // The selected node is a task. Modelling a delay
+            // by a task (is questionnable and) means that
+            // the delay happens at the end of the task
+            //
+            // Any task having an FF relation, with the
+            // selected task should be taken. However, tasks
+            // not having an FF relation will be filtered out.
+            this.createNodeDiffWithFilter(node, selection, tasks, (relation: PrimaveraTaskRelation) => {
+                if (relation.type !== "FF") {
+                    if (!selection.has(relation.previous)) {
+                        maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
+                                                "Non FF relation will be lost")
+                    }
+                    return false
+                }
+                return true
+            }, diffs, warnings)
+        } else {
+            // Since the selected node is a milestone, any relation from parent to
+            // the node can be considered as *S, so we don't filter the relation between
+            // parent to node.
+            this.createNodeDiffWithFilter(node, selection, tasks, (relation: PrimaveraTaskRelation) => {
+                return true
+            }, diffs, warnings)
+        }
+    }
+    private createNodeDiffWithFilter(node: RelationGraphNode, selection: Set<string>, tasks: Map<string, PrimaveraTask>,
+                                     parentRelationsFilter: (relation: PrimaveraTaskRelation) => boolean,
+                                     diffs: Array<GraphDiff>, warnings: Map<string, Array<string>>) {
+        const identifier = node.identifier
         let diff: GraphDiff = {
-            added: new Array<PrimaveraTaskRelation>(),
-            removed: new Array<[string, string]>()
+            added: [],
+            removed: []
         }
         Array.from(node.parents.keys(), (parent: string) => {
             diff.removed.push([parent, identifier])
@@ -90,45 +123,36 @@ export class RelationGraph {
             diff.removed.push([identifier, child])
         })
 
-        // Since the selected node is a milestone, any relation from parent to
-        // the node can be considered as *S, so we don't filter the relation between
-        // parent to node.
-        //
-        // However, we filter relations from node to children as we want those relations
-        // to be of type *S
-        node.parents.forEach((parentToNodeRelation: PrimaveraTaskRelation) => {
-            if (selection.has(parentToNodeRelation.previous)) {
-                maputils.addToMapOfList(warnings, parentToNodeRelation.previous + " - " + parentToNodeRelation.next,
-                                            "Relation between " + identifier + " and another delay will be lost")
+        const filteredParentRelations = Array.from(node.parents.values()).filter(parentRelationsFilter)
+        filteredParentRelations.forEach((parentRelation: PrimaveraTaskRelation) => {
+            if (selection.has(parentRelation.previous)) {
+                maputils.addToMapOfList(warnings, parentRelation.previous + " - " + parentRelation.next,
+                                        "Relation between " + identifier + " and another delay will be lost")
                 return
             }
-            node.children.forEach((nodeToChildRelation: PrimaveraTaskRelation) => {
-                if (selection.has(nodeToChildRelation.next)) {
-                    maputils.addToMapOfList(warnings, parentToNodeRelation.previous + " - " + parentToNodeRelation.next,
+            node.children.forEach((childRelation: PrimaveraTaskRelation) => {
+                if (selection.has(childRelation.next)) {
+                    maputils.addToMapOfList(warnings, parentRelation.previous + " - " + parentRelation.next,
                                             "Relation between " + identifier + " and another delay will be lost")
                     return
                 }
-                if (nodeToChildRelation.type === "FS" || nodeToChildRelation.type === "SS") {
+                // We do not want FF relations: a delay should never condition
+                // the end of another task.
+                if (childRelation.type === "FS" || childRelation.type === "SS") {
                     diff.added.push({
-                        previous: parentToNodeRelation.previous,
-                        next: nodeToChildRelation.next,
-                        type: RelationGraph.matchType(parentToNodeRelation.type, nodeToChildRelation.type),
-                        lag: parentToNodeRelation.lag + nodeToChildRelation.lag
+                        previous: parentRelation.previous,
+                        next: childRelation.next,
+                        type: RelationGraph.matchType(parentRelation.type, childRelation.type),
+                        lag: parentRelation.lag + childRelation.lag
                     })
                 } else {
-                    maputils.addToMapOfList(warnings, nodeToChildRelation.previous + " - " + nodeToChildRelation.next,
-                                            "Unable to handle \"" + nodeToChildRelation.type + "\" when selecting "
+                    maputils.addToMapOfList(warnings, childRelation.previous + " - " + childRelation.next,
+                                            "Unable to handle \"" + childRelation.type + "\" when selecting "
                                             + identifier + " as a delay")
                 }
             })
         })
+
         diffs.push(diff)
     }
-}
-
-
-export interface RelationGraphNode {
-    identifier: string
-    parents: Map<string, PrimaveraTaskRelation>
-    children: Map<string, PrimaveraTaskRelation>
 }

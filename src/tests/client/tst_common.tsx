@@ -210,7 +210,7 @@ describe("Common components", () => {
             chai.expect(formControls).to.length(1)
             formControls.at(0).simulate("input", { target: { value: "Test" } })
 
-            chai.expect(component.state("textFilter")).to.deep.equal("Test")
+            chai.expect(component.state("textFilter")).to.equal("Test")
         })
         it("Should handle blur", () => {
             class TestTaskList extends TaskList<number> {}

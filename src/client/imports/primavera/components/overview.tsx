@@ -7,7 +7,7 @@ import { WarningsButton } from "./warningsbutton"
 import { defineStage, defineMaxStage } from "../actions/stages"
 import { submit } from "../actions/overview"
 import { Project, TaskRelation } from "../../../../common/types"
-import { ApiInputTask } from "../../../../common/apitypes"
+import { ApiInputTask, ApiInputDelay } from "../../../../common/apitypes"
 import * as maputils from "../../../../common/maputils"
 
 interface OverviewProperties {
@@ -16,6 +16,7 @@ interface OverviewProperties {
     totalTasks: number
     project: Project
     tasks: Array<ApiInputTask>
+    delays: Array<ApiInputDelay>
     totalRelations: number
     relations: Array<TaskRelation>
     warnings: Map<string, Array<string>>
@@ -27,6 +28,7 @@ interface OverviewProperties {
 export class Overview extends React.Component<OverviewProperties, {}> {
     render() {
         const tasksLength = this.props.tasks.length
+        const delaysLength = this.props.delays.length
         const relationsLength = this.props.relations.length
         let warningsButton: JSX.Element | null = null
         let totalWarnings = maputils.lengthOfMapOfList(this.props.warnings)
@@ -43,7 +45,7 @@ export class Overview extends React.Component<OverviewProperties, {}> {
                            maxStage={this.props.maxStage} title="5. Overview"
                            warnings={totalWarnings}
                            onCurrent={this.props.onCurrentStage.bind(this)}>
-            <p><Badge>{tasksLength}</Badge> of the {this.props.totalTasks} tasks will be imported</p>
+            <p><Badge>{tasksLength}</Badge> tasks and <Badge>{delaysLength}</Badge> delays of the {this.props.totalTasks} tasks will be imported</p>
             <p><Badge>{relationsLength}</Badge> of the {this.props.totalRelations} relations will be imported</p>
             <ButtonGroup>
                 <Button bsStyle={this.getButtonStyle()} disabled={!canImport} onClick={this.handleSubmit.bind(this)}>
@@ -89,6 +91,7 @@ export const mapStateToProps = (state: State) => {
         project: state.project,
         totalTasks: state.tasks.length,
         tasks: state.overview.tasks,
+        delays: state.overview.delays,
         totalRelations: state.relations.length,
         relations: state.overview.relations,
         warnings: state.overview.warnings,

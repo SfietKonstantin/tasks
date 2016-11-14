@@ -32,9 +32,9 @@ const initialState: DelaysState = {
         milestoneFilterMode: MilestoneFilterMode.NoFilter,
         text: ""
     },
-    tasks: new Array<PrimaveraTask>(),
+    tasks: [],
     selection: new Set<string>(),
-    diffs: new Array<GraphDiff>(),
+    diffs: [],
     warnings: new Map<string, Array<string>>()
 }
 

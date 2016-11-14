@@ -25,7 +25,8 @@ interface DelaysSelectorProperties {
     onSelectionChanged: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>,
                          identifier: string, selected: boolean) => void
     onCurrentStage: () => void
-    onNextStage: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>) => void
+    onNextStage: (tasks: Map<string, PrimaveraTask>, delays: Set<string>,
+                  relations: Map<string, RelationGraphNode>) => void
 }
 
 class PrimaveraTaskList extends TaskList<PrimaveraTask> {}
@@ -59,7 +60,7 @@ export class DelaysSelector extends React.Component<DelaysSelectorProperties, {}
     private createTaskElement(task: PrimaveraTask): JSX.Element {
         return <ListGroupItem>
             <Checkbox inline onClick={this.handleSelectionChanged.bind(this, task.identifier)}
-                      selected={this.props.selection.has(task.identifier)}>
+                      checked={this.props.selection.has(task.identifier)}>
                 {task.name} <span className="text-muted">#{task.identifier}</span>
             </Checkbox>
         </ListGroupItem>
@@ -72,7 +73,7 @@ export class DelaysSelector extends React.Component<DelaysSelectorProperties, {}
         this.props.onSelectionChanged(this.props.tasks, this.props.relations, identifier, input.checked)
     }
     private handleNext(e: React.MouseEvent) {
-        this.props.onNextStage(this.props.tasks, this.props.relations)
+        this.props.onNextStage(this.props.tasks, this.props.selection, this.props.relations)
     }
 }
 
@@ -101,10 +102,11 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
         onCurrentStage: () => {
             dispatch(defineStage(Stage.Delays))
         },
-        onNextStage: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>) => {
+        onNextStage: (tasks: Map<string, PrimaveraTask>, delays: Set<string>,
+                      relations: Map<string, RelationGraphNode>) => {
             dispatch(defineStage(Stage.Overview))
             dispatch(defineMaxStage(Stage.Overview))
-            dispatch(filterForOverview(tasks, relations))
+            dispatch(filterForOverview(tasks, delays, relations))
         }
     }
 }

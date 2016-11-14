@@ -6,6 +6,7 @@ import { FileSelector } from "../../client/imports/primavera/components/filesele
 import { FakeFile } from "./fakefile"
 import { Stage } from "../../client/imports/primavera/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
+import { expectMapEqual } from "./expectutils"
 
 describe("Primavera import FileSelector", () => {
     beforeEach(() => {
@@ -192,7 +193,7 @@ describe("Primavera import FileSelector", () => {
                                                        onNextStage={onNextStage}
                                                        onDismissInvalidFormat={onDismissInvalidFormat} />)
         const button = component.find("WarningsButton")
-        chai.expect(button.prop("warnings")).to.deep.equal(warnings)
+        expectMapEqual(button.prop("warnings"), warnings)
     })
     it("Should render the error alert correctly", () => {
         const warnings = new Map<string, Array<string>>()
@@ -215,7 +216,7 @@ describe("Primavera import FileSelector", () => {
                                                        onNextStage={onNextStage}
                                                        onDismissInvalidFormat={onDismissInvalidFormat} />)
         const alert = component.find("Alert")
-        chai.expect(alert.children().text()).to.deep.equal("Invalid file format")
+        chai.expect(alert.children().text()).to.equal("Invalid file format")
 
         alert.simulate("dismiss")
 

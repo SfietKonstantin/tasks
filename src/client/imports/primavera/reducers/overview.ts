@@ -2,7 +2,7 @@ import { Action } from "redux"
 import { OverviewState, SubmitState } from "../types"
 import { ErrorAction } from "../../../common/actions/errors"
 import { TaskRelation } from "../../../../common/types"
-import { ApiInputTask } from "../../../../common/apitypes"
+import { ApiInputTask, ApiInputDelay } from "../../../../common/apitypes"
 import {
     OverviewFilterAction,
     OVERVIEW_FILTER,
@@ -12,8 +12,9 @@ import {
 } from "../actions/overview"
 
 const initialState: OverviewState = {
-    tasks: new Array<ApiInputTask>(),
-    relations: Array<TaskRelation>(),
+    tasks: [],
+    delays: [],
+    relations: [],
     warnings: new Map<string, Array<string>>(),
     errors: new Map<string, Array<string>>(),
     submitState: SubmitState.Idle
@@ -25,6 +26,7 @@ export const overviewReducer = (state: OverviewState = initialState, action: Act
             const overviewAction = action as OverviewFilterAction
             return Object.assign({}, state, {
                 tasks: overviewAction.tasks,
+                delays: overviewAction.delays,
                 relations: overviewAction.relations,
                 warnings: overviewAction.warnings
             })

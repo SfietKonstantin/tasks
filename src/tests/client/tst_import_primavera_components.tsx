@@ -22,6 +22,7 @@ import { Project, TaskRelation, TaskLocation } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { FakeFile } from "./fakefile"
 import { makeRelations } from "./primaverahelper"
+import { expectMapEqual } from "./expectutils"
 
 describe("Primavera components", () => {
     let sandbox: Sinon.SinonSandbox
@@ -72,7 +73,7 @@ describe("Primavera components", () => {
             chai.expect(component.prop("maxStage")).to.equal(Stage.Relations)
             chai.expect(component.prop("buttonText")).to.equal("Imported 2 tasks")
             chai.expect(component.prop("itemCount")).to.equal(2)
-            chai.expect(component.prop("warnings")).to.deep.equal(warnings)
+            expectMapEqual(component.prop("warnings"), warnings)
             chai.expect(component.prop("isImporting")).to.equal(false)
             chai.expect(component.prop("isInvalidFormat")).to.equal(false)
 
@@ -194,7 +195,7 @@ describe("Primavera components", () => {
             chai.expect(component.prop("maxStage")).to.equal(Stage.Relations)
             chai.expect(component.prop("buttonText")).to.equal("Imported 1 relations")
             chai.expect(component.prop("itemCount")).to.equal(1)
-            chai.expect(component.prop("warnings")).to.deep.equal(warnings)
+            expectMapEqual(component.prop("warnings"), warnings)
             chai.expect(component.prop("isImporting")).to.equal(false)
             chai.expect(component.prop("isInvalidFormat")).to.equal(false)
 

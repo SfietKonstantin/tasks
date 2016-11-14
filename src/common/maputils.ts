@@ -10,7 +10,7 @@ export const get = <K, V>(map: Map<K, V>, key: K): V => {
 
 export const addToMapOfList = <K, V>(map: Map<K, Array<V>>, key: K, value: V): void => {
     if (!map.has(key)) {
-        map.set(key, new Array<V>())
+        map.set(key, [])
     }
     (map.get(key) as Array<V>).push(value)
 }

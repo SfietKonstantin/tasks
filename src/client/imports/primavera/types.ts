@@ -1,5 +1,5 @@
 import { Project, TaskRelation } from "../../../common/types"
-import { ApiInputTask } from "../../../common/apitypes"
+import { ApiInputTask, ApiInputDelay } from "../../../common/apitypes"
 import { RelationGraphNode, GraphDiff } from "./graph"
 import { TaskListFilters } from "../../common/tasklistfilter"
 
@@ -79,6 +79,7 @@ export enum SubmitState {
 
 export interface OverviewState {
     tasks: Array<ApiInputTask>
+    delays: Array<ApiInputDelay>
     relations: Array<TaskRelation>
     warnings: Map<string, Array<string>>
     errors: Map<string, Array<string>>

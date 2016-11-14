@@ -1,7 +1,7 @@
 import { PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./types"
 import { RelationGraph, RelationGraphNode } from "./graph"
 import { InvalidFormatError } from "../../common/actions/files"
-import { ApiInputTask } from "../../../common/apitypes"
+import { ApiInputTask, ApiInputDelay } from "../../../common/apitypes"
 import { TaskRelation, TaskLocation } from "../../../common/types"
 import * as dateutils from "../../../common/dateutils"
 import * as maputils from "../../../common/maputils"
@@ -180,23 +180,9 @@ export const parseRelations = (content: string): RelationsParseResults => {
     return { length, relations: graph.nodes, warnings }
 }
 
-export const filterTasks = (tasks: Map<string, PrimaveraTask>): Array<ApiInputTask> => {
+export const mapTasks = (tasks: Map<string, PrimaveraTask>, delays: Set<string>): Array<ApiInputTask> => {
     const filtered = Array.from(tasks.values()).filter((task: PrimaveraTask) => {
-        // Invalid duration
-        if (Number.isNaN(task.duration)) {
-            return false
-        }
-
-        // No date
-        if (task.startDate == null && task.endDate == null) {
-            return false
-        }
-
-        // Milestone with duration
-        if ((task.startDate == null || task.endDate == null) && task.duration !== 0) {
-            return false
-        }
-        return true
+        return !delays.has(task.identifier)
     })
     return filtered.map((task: PrimaveraTask) => {
         let date = task.startDate
@@ -217,6 +203,27 @@ export const filterTasks = (tasks: Map<string, PrimaveraTask>): Array<ApiInputTa
             description: "",
             estimatedStartDate,
             estimatedDuration
+        }
+        return returned
+    })
+}
+
+export const mapDelays = (tasks: Map<string, PrimaveraTask>, delays: Set<string>): Array<ApiInputDelay> => {
+    const filtered = Array.from(tasks.values()).filter((task: PrimaveraTask) => {
+        return delays.has(task.identifier)
+    })
+    return filtered.map((task: PrimaveraTask) => {
+        let date = task.startDate
+        if (task.startDate == null) {
+            date = task.endDate
+        }
+        const convertedDate = (date as Date).toISOString()
+
+        const returned: ApiInputDelay = {
+            identifier: task.identifier,
+            name: task.name,
+            description: "",
+            date: convertedDate
         }
         return returned
     })

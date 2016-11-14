@@ -52,13 +52,14 @@ export const render = () => {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             },
-            tasks: new Array<PrimaveraTask>(),
+            tasks: [],
             selection: new Set<string>(),
-            diffs: new Array<GraphDiff>(),
+            diffs: [],
             warnings: new Map<string, Array<string>>()
         },
         overview: {
             tasks: [],
+            delays: [],
             relations: [],
             warnings: new Map<string, Array<string>>(),
             errors: new Map<string, Array<string>>(),

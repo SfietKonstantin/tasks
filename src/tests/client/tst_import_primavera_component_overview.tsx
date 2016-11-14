@@ -6,8 +6,9 @@ import { Overview } from "../../client/imports/primavera/components/overview"
 import { FakeFile } from "./fakefile"
 import { Stage, SubmitState } from "../../client/imports/primavera/types"
 import { Project, TaskRelation, TaskLocation } from "../../common/types"
-import { ApiInputTask } from "../../common/apitypes"
+import { ApiInputTask, ApiInputDelay } from "../../common/apitypes"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
+import { expectMapEqual } from "./expectutils"
 
 describe("Primavera import Overview", () => {
     beforeEach(() => {
@@ -38,6 +39,14 @@ describe("Primavera import Overview", () => {
                 estimatedDuration: 0
             }
         ]
+        const delays: Array<ApiInputDelay> = [
+            {
+                identifier: "delay",
+                name: "Delay",
+                description: "",
+                date: new Date(2016, 9, 1).toISOString()
+            }
+        ]
         const relations: Array<TaskRelation> = [
             {
                 previous: "task1",
@@ -56,6 +65,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={tasks}
+                                                   delays={delays}
                                                    totalRelations={234}
                                                    relations={relations}
                                                    warnings={warnings}
@@ -69,9 +79,11 @@ describe("Primavera import Overview", () => {
 
         const tasksComponents = component.childAt(0)
         chai.expect(tasksComponents.childAt(0).children().text()).to.equal("2")
-        chai.expect(tasksComponents.childAt(1).text()).to.equal(" of the ")
-        chai.expect(tasksComponents.childAt(2).text()).to.equal("123")
-        chai.expect(tasksComponents.childAt(3).text()).to.equal(" tasks will be imported")
+        chai.expect(tasksComponents.childAt(1).text()).to.equal(" tasks and ")
+        chai.expect(tasksComponents.childAt(2).children().text()).to.equal("1")
+        chai.expect(tasksComponents.childAt(3).text()).to.equal(" delays of the ")
+        chai.expect(tasksComponents.childAt(4).text()).to.equal("123")
+        chai.expect(tasksComponents.childAt(5).text()).to.equal(" tasks will be imported")
 
         const relationsComponents = component.childAt(1)
         chai.expect(relationsComponents.childAt(0).children().text()).to.equal("1")
@@ -105,6 +117,14 @@ describe("Primavera import Overview", () => {
                 estimatedDuration: 0
             }
         ]
+        const delays: Array<ApiInputDelay> = [
+            {
+                identifier: "delay",
+                name: "Delay",
+                description: "",
+                date: new Date(2016, 9, 1).toISOString()
+            }
+        ]
         const relations: Array<TaskRelation> = [
             {
                 previous: "task1",
@@ -123,6 +143,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={tasks}
+                                                   delays={delays}
                                                    totalRelations={234}
                                                    relations={relations}
                                                    warnings={warnings}
@@ -151,6 +172,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={[]}
+                                                   delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
@@ -159,7 +181,7 @@ describe("Primavera import Overview", () => {
                                                    onSubmit={onSubmit} />)
 
         const warningButton = component.find("WarningsButton")
-        chai.expect(warningButton.prop("warnings")).to.deep.equal(warnings)
+        expectMapEqual(warningButton.prop("warnings"), warnings)
     })
     it("Should render the warning button 2", () => {
         const project: Project = {
@@ -175,6 +197,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={[]}
+                                                   delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
@@ -199,6 +222,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={[]}
+                                                   delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
@@ -223,6 +247,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={[]}
+                                                   delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
@@ -247,6 +272,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={[]}
+                                                   delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
@@ -279,6 +305,14 @@ describe("Primavera import Overview", () => {
                 estimatedDuration: 0
             }
         ]
+        const delays: Array<ApiInputDelay> = [
+            {
+                identifier: "delay",
+                name: "Delay",
+                description: "",
+                date: new Date(2016, 9, 1).toISOString()
+            }
+        ]
         const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
@@ -287,6 +321,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={tasks}
+                                                   delays={delays}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
@@ -319,6 +354,14 @@ describe("Primavera import Overview", () => {
                 estimatedDuration: 0
             }
         ]
+        const delays: Array<ApiInputDelay> = [
+            {
+                identifier: "delay",
+                name: "Delay",
+                description: "",
+                date: new Date(2016, 9, 1).toISOString()
+            }
+        ]
         const relations: Array<TaskRelation> = [
             {
                 previous: "task1",
@@ -335,6 +378,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={tasks}
+                                                   delays={delays}
                                                    totalRelations={234}
                                                    relations={relations}
                                                    warnings={warnings}
@@ -367,6 +411,14 @@ describe("Primavera import Overview", () => {
                 estimatedDuration: 0
             }
         ]
+        const delays: Array<ApiInputDelay> = [
+            {
+                identifier: "delay",
+                name: "Delay",
+                description: "",
+                date: new Date(2016, 9, 1).toISOString()
+            }
+        ]
         const relations: Array<TaskRelation> = [
             {
                 previous: "task1",
@@ -383,6 +435,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={tasks}
+                                                   delays={delays}
                                                    totalRelations={234}
                                                    relations={relations}
                                                    warnings={warnings}
@@ -407,6 +460,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={[]}
+                                                   delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
@@ -432,6 +486,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={[]}
+                                                   delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
@@ -457,6 +512,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={[]}
+                                                   delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
@@ -482,6 +538,7 @@ describe("Primavera import Overview", () => {
                                                    totalTasks={123}
                                                    project={project}
                                                    tasks={[]}
+                                                   delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
                                                    warnings={warnings}
