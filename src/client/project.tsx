@@ -3,11 +3,10 @@ import * as ReactDOM from "react-dom"
 import * as Redux from "redux"
 import * as ReduxThunk from "redux-thunk"
 import { Provider } from "react-redux"
-import { State, TaskFilters } from "./project/types"
+import { State } from "./project/types"
 import { mainReducer } from "./project/reducers/main"
 import { Main } from "./project/containers/main"
-import { MilestoneFilterMode } from "./common/tasklistfilter"
-import { ApiTask } from "../common/apitypes"
+import { project, tasks } from "./project/states"
 
 interface RootProperties {
     store: Redux.Store<State>
@@ -22,38 +21,21 @@ class Root extends React.Component<RootProperties, {}> {
 }
 
 export const render = (projectIdentifier: string) => {
-    let filters: TaskFilters = {
-        notStartedChecked: true,
-        inProgressChecked: true,
-        doneChecked: false,
-        filters: {
-            milestoneFilterMode: MilestoneFilterMode.NoFilter,
-            text: ""
-        }
+    let initialState: State = {
+        projectIdentifier,
+        project,
+        tasks
     }
-
     try {
         const filterJson = localStorage.getItem(projectIdentifier)
         if (filterJson != null) {
-            filters = Object.assign(filters, JSON.parse(filterJson))
+            initialState.tasks.filters = Object.assign(initialState.tasks.filters,
+                                                       JSON.parse(filterJson))
         }
     }
     catch (error) {}
+    initialState.tasks.today = new Date()
 
-    const initialState: State = {
-        projectIdentifier,
-        project: {
-            isFetching: false,
-            project: null
-        },
-        tasks: {
-            isFetching: false,
-            tasks: [],
-            filters,
-            today: new Date(),
-            filteredTasks: []
-        }
-    }
     const store = Redux.createStore(
         mainReducer, initialState,
         Redux.applyMiddleware(ReduxThunk.default)

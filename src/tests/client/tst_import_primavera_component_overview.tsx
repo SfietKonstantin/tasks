@@ -5,10 +5,10 @@ import * as sinon from "sinon"
 import { Overview } from "../../client/imports/primavera/components/overview"
 import { FakeFile } from "./fakefile"
 import { Stage, SubmitState } from "../../client/imports/primavera/types"
-import { Project, TaskRelation, TaskLocation } from "../../common/types"
-import { ApiInputTask, ApiInputDelay } from "../../common/apitypes"
+import { Project } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { expectMapEqual } from "./expectutils"
+import { warnings, noWarnings, project, emptyProject, inputTasks1, inputDelays1, inputRelations1 } from "./testdata"
 
 describe("Primavera import Overview", () => {
     beforeEach(() => {
@@ -18,56 +18,16 @@ describe("Primavera import Overview", () => {
         clearFakeGlobal()
     })
     it("Should render the component correctly", () => {
-        const project: Project = {
-            identifier: "identifier",
-            name: "Project",
-            description: "Description"
-        }
-        const tasks: Array<ApiInputTask> = [
-            {
-                identifier: "task1",
-                name: "Task 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 9, 1).toISOString(),
-                estimatedDuration: 30
-            },
-            {
-                identifier: "milestone1",
-                name: "Milestone 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 10, 1).toISOString(),
-                estimatedDuration: 0
-            }
-        ]
-        const delays: Array<ApiInputDelay> = [
-            {
-                identifier: "delay",
-                name: "Delay",
-                description: "",
-                date: new Date(2016, 9, 1).toISOString()
-            }
-        ]
-        const relations: Array<TaskRelation> = [
-            {
-                previous: "task1",
-                previousLocation: TaskLocation.Beginning,
-                next: "milestone1",
-                lag: 3
-            }
-        ]
-        const warnings = new Map<string, Array<string>>()
-        warnings.set("task1", ["Warning 1", "Warning 2"])
-        warnings.set("task2", ["Warning 3"])
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
                                                    project={project}
-                                                   tasks={tasks}
-                                                   delays={delays}
+                                                   tasks={inputTasks1}
+                                                   delays={inputDelays1}
                                                    totalRelations={234}
-                                                   relations={relations}
+                                                   relations={inputRelations1}
                                                    warnings={warnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -96,56 +56,16 @@ describe("Primavera import Overview", () => {
         chai.expect(onCurrentStage.calledWithExactly()).to.true
     })
     it("Should react to submit", () => {
-        const project: Project = {
-            identifier: "identifier",
-            name: "Project",
-            description: "Description"
-        }
-        const tasks: Array<ApiInputTask> = [
-            {
-                identifier: "task1",
-                name: "Task 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 9, 1).toISOString(),
-                estimatedDuration: 30
-            },
-            {
-                identifier: "milestone1",
-                name: "Milestone 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 10, 1).toISOString(),
-                estimatedDuration: 0
-            }
-        ]
-        const delays: Array<ApiInputDelay> = [
-            {
-                identifier: "delay",
-                name: "Delay",
-                description: "",
-                date: new Date(2016, 9, 1).toISOString()
-            }
-        ]
-        const relations: Array<TaskRelation> = [
-            {
-                previous: "task1",
-                previousLocation: TaskLocation.Beginning,
-                next: "milestone1",
-                lag: 3
-            }
-        ]
-        const warnings = new Map<string, Array<string>>()
-        warnings.set("task1", ["Warning 1", "Warning 2"])
-        warnings.set("task2", ["Warning 3"])
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
                                                    project={project}
-                                                   tasks={tasks}
-                                                   delays={delays}
+                                                   tasks={inputTasks1}
+                                                   delays={inputDelays1}
                                                    totalRelations={234}
-                                                   relations={relations}
+                                                   relations={inputRelations1}
                                                    warnings={warnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -154,7 +74,7 @@ describe("Primavera import Overview", () => {
         const submitButton = component.find("Button")
         submitButton.simulate("click")
         chai.expect(onSubmit.calledOnce).to.true
-        chai.expect(onSubmit.calledWithExactly(project, tasks, relations)).to.true
+        chai.expect(onSubmit.calledWithExactly(project, inputTasks1, inputRelations1)).to.true
     })
     it("Should render the warning button 1", () => {
         const project: Project = {
@@ -162,9 +82,6 @@ describe("Primavera import Overview", () => {
             name: "Project",
             description: "Description"
         }
-        const warnings = new Map<string, Array<string>>()
-        warnings.set("task1", ["Warning 1", "Warning 2"])
-        warnings.set("task2", ["Warning 3"])
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
@@ -184,12 +101,6 @@ describe("Primavera import Overview", () => {
         expectMapEqual(warningButton.prop("warnings"), warnings)
     })
     it("Should render the warning button 2", () => {
-        const project: Project = {
-            identifier: "identifier",
-            name: "Project",
-            description: "Description"
-        }
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
@@ -200,7 +111,7 @@ describe("Primavera import Overview", () => {
                                                    delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
-                                                   warnings={warnings}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -209,23 +120,22 @@ describe("Primavera import Overview", () => {
         chai.expect(warningButton).to.length(0)
     })
     it("Should render button state 1", () => {
-        const project: Project = {
+        const intermediateProject: Project = {
             identifier: "",
             name: "",
             description: ""
         }
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
-                                                   project={project}
+                                                   project={intermediateProject}
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
-                                                   warnings={warnings}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -234,23 +144,22 @@ describe("Primavera import Overview", () => {
         chai.expect(submitButton.prop("disabled")).to.true
     })
     it("Should render button state 2", () => {
-        const project: Project = {
+        const intermediateProject: Project = {
             identifier: "identifier",
             name: "",
             description: ""
         }
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
-                                                   project={project}
+                                                   project={intermediateProject}
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
-                                                   warnings={warnings}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -259,12 +168,6 @@ describe("Primavera import Overview", () => {
         chai.expect(submitButton.prop("disabled")).to.true
     })
     it("Should render button state 3", () => {
-        const project: Project = {
-            identifier: "identifier",
-            name: "Project",
-            description: ""
-        }
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
@@ -275,7 +178,7 @@ describe("Primavera import Overview", () => {
                                                    delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
-                                                   warnings={warnings}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -284,47 +187,17 @@ describe("Primavera import Overview", () => {
         chai.expect(submitButton.prop("disabled")).to.true
     })
     it("Should render button state 4", () => {
-        const project: Project = {
-            identifier: "identifier",
-            name: "Project",
-            description: ""
-        }
-        const tasks: Array<ApiInputTask> = [
-            {
-                identifier: "task1",
-                name: "Task 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 9, 1).toISOString(),
-                estimatedDuration: 30
-            },
-            {
-                identifier: "milestone1",
-                name: "Milestone 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 10, 1).toISOString(),
-                estimatedDuration: 0
-            }
-        ]
-        const delays: Array<ApiInputDelay> = [
-            {
-                identifier: "delay",
-                name: "Delay",
-                description: "",
-                date: new Date(2016, 9, 1).toISOString()
-            }
-        ]
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
                                                    project={project}
-                                                   tasks={tasks}
-                                                   delays={delays}
+                                                   tasks={inputTasks1}
+                                                   delays={inputDelays1}
                                                    totalRelations={234}
                                                    relations={[]}
-                                                   warnings={warnings}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -333,55 +206,17 @@ describe("Primavera import Overview", () => {
         chai.expect(submitButton.prop("disabled")).to.true
     })
     it("Should render button state 5", () => {
-        const project: Project = {
-            identifier: "identifier",
-            name: "Project",
-            description: "Description"
-        }
-        const tasks: Array<ApiInputTask> = [
-            {
-                identifier: "task1",
-                name: "Task 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 9, 1).toISOString(),
-                estimatedDuration: 30
-            },
-            {
-                identifier: "milestone1",
-                name: "Milestone 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 10, 1).toISOString(),
-                estimatedDuration: 0
-            }
-        ]
-        const delays: Array<ApiInputDelay> = [
-            {
-                identifier: "delay",
-                name: "Delay",
-                description: "",
-                date: new Date(2016, 9, 1).toISOString()
-            }
-        ]
-        const relations: Array<TaskRelation> = [
-            {
-                previous: "task1",
-                previousLocation: TaskLocation.Beginning,
-                next: "milestone1",
-                lag: 3
-            }
-        ]
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
                                                    project={project}
-                                                   tasks={tasks}
-                                                   delays={delays}
+                                                   tasks={inputTasks1}
+                                                   delays={inputDelays1}
                                                    totalRelations={234}
-                                                   relations={relations}
-                                                   warnings={warnings}
+                                                   relations={inputRelations1}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Submitted}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -390,55 +225,17 @@ describe("Primavera import Overview", () => {
         chai.expect(submitButton.prop("disabled")).to.true
     })
     it("Should render button state 6", () => {
-        const project: Project = {
-            identifier: "identifier",
-            name: "Project",
-            description: "Description"
-        }
-        const tasks: Array<ApiInputTask> = [
-            {
-                identifier: "task1",
-                name: "Task 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 9, 1).toISOString(),
-                estimatedDuration: 30
-            },
-            {
-                identifier: "milestone1",
-                name: "Milestone 1",
-                description: "",
-                estimatedStartDate: new Date(2016, 10, 1).toISOString(),
-                estimatedDuration: 0
-            }
-        ]
-        const delays: Array<ApiInputDelay> = [
-            {
-                identifier: "delay",
-                name: "Delay",
-                description: "",
-                date: new Date(2016, 9, 1).toISOString()
-            }
-        ]
-        const relations: Array<TaskRelation> = [
-            {
-                previous: "task1",
-                previousLocation: TaskLocation.Beginning,
-                next: "milestone1",
-                lag: 3
-            }
-        ]
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
                                                    project={project}
-                                                   tasks={tasks}
-                                                   delays={delays}
+                                                   tasks={inputTasks1}
+                                                   delays={inputDelays1}
                                                    totalRelations={234}
-                                                   relations={relations}
-                                                   warnings={warnings}
+                                                   relations={inputRelations1}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -447,23 +244,17 @@ describe("Primavera import Overview", () => {
         chai.expect(submitButton.prop("disabled")).to.false
     })
     it("Should render button based on submitting state 1", () => {
-        const project: Project = {
-            identifier: "",
-            name: "",
-            description: ""
-        }
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
-                                                   project={project}
+                                                   project={emptyProject}
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
-                                                   warnings={warnings}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -473,23 +264,17 @@ describe("Primavera import Overview", () => {
         chai.expect(submitButton.children().text()).to.equal("Import")
     })
     it("Should render button based on submitting state 2", () => {
-        const project: Project = {
-            identifier: "",
-            name: "",
-            description: ""
-        }
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
-                                                   project={project}
+                                                   project={emptyProject}
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
-                                                   warnings={warnings}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Submitting}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -499,23 +284,17 @@ describe("Primavera import Overview", () => {
         chai.expect(submitButton.children().text()).to.equal("Importing")
     })
     it("Should render button based on submitting state 3", () => {
-        const project: Project = {
-            identifier: "",
-            name: "",
-            description: ""
-        }
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
-                                                   project={project}
+                                                   project={emptyProject}
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
-                                                   warnings={warnings}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.Submitted}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)
@@ -525,23 +304,17 @@ describe("Primavera import Overview", () => {
         chai.expect(submitButton.children().text()).to.equal("Import successful")
     })
     it("Should render button based on submitting state 4", () => {
-        const project: Project = {
-            identifier: "",
-            name: "",
-            description: ""
-        }
-        const warnings = new Map<string, Array<string>>()
         const onCurrentStage = sinon.spy()
         const onSubmit = sinon.spy()
         const component = enzyme.shallow(<Overview stage={Stage.Tasks}
                                                    maxStage={Stage.Relations}
                                                    totalTasks={123}
-                                                   project={project}
+                                                   project={emptyProject}
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
                                                    relations={[]}
-                                                   warnings={warnings}
+                                                   warnings={noWarnings}
                                                    submitState={SubmitState.SubmitError}
                                                    onCurrentStage={onCurrentStage}
                                                    onSubmit={onSubmit} />)

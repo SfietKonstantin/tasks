@@ -3,13 +3,10 @@ import * as React from "react"
 import * as enzyme from "enzyme"
 import * as sinon from "sinon"
 import { WarningsButton } from "../../client/imports/primavera/components/warningsbutton"
-import { Stage } from "../../client/imports/primavera/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
+import { warnings } from "./testdata"
 
 describe("Primavera import WarningsButton", () => {
-    const warnings = new Map<string, Array<string>>()
-    warnings.set("task1", ["Warning 1", "Warning 2"])
-    warnings.set("task2", ["Warning 3"])
     beforeEach(() => {
         addFakeGlobal()
     })

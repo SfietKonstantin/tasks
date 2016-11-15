@@ -2,7 +2,7 @@ import * as chai from "chai"
 import * as sinon from "sinon"
 import { Action } from "redux"
 import { ErrorAction } from "../../client/common/actions/errors"
-import { Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
+import { Stage } from "../../client/imports/primavera/types"
 import { StageAction, STAGE_DEFINE, defineStage } from "../../client/imports/primavera/actions/stages"
 import {
     ProjectAction, PROJECT_DEFINE, defineProject
@@ -31,6 +31,11 @@ import { FakeResponse } from "./fakeresponse"
 import { FakeFile } from "./fakefile"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { makeRelations } from "./primaverahelper"
+import {
+    warnings, noWarnings, project, apiTasks, primaveraTasks1, primaveraRelations1,
+    selectedDelays1, inputTasks1, inputDelays1, inputRelations1
+} from "./testdata"
+import { expectMapEqual } from "./expectutils"
 
 describe("Primavera actions", () => {
     let sandbox: Sinon.SinonSandbox
@@ -67,6 +72,13 @@ describe("Primavera actions", () => {
         it("Should create STAGE_DEFINE 4", () => {
             const expected: StageAction = {
                 type: STAGE_DEFINE,
+                stage: Stage.Delays
+            }
+            chai.expect(defineStage(Stage.Delays)).to.deep.equal(expected)
+        })
+        it("Should create STAGE_DEFINE 5", () => {
+            const expected: StageAction = {
+                type: STAGE_DEFINE,
                 stage: Stage.Overview
             }
             chai.expect(defineStage(Stage.Overview)).to.deep.equal(expected)
@@ -94,31 +106,19 @@ describe("Primavera actions", () => {
                 chai.expect(beginTasksImport()).to.deep.equal(expected)
             })
             it("Should create TASKS_IMPORT_END", () => {
-                let tasks: Map<string, PrimaveraTask> = new Map<string, PrimaveraTask>()
-                tasks.set("task1", {
-                    identifier: "task1",
-                    name: "Task 1",
-                    duration: 30,
-                    startDate: new Date(2016, 9, 1),
-                    endDate: new Date(2016, 10, 1)
-                }),
-                tasks.set("milestone1", {
-                    identifier: "milestone1",
-                    name: "Milestone 1",
-                    duration: 0,
-                    startDate: null,
-                    endDate: new Date(2016, 10, 1)
-                })
-                const warnings = new Map<string, Array<string>>()
-                warnings.set("task1", ["Warning 1", "Warning 2"])
-                warnings.set("task2", ["Warning 3"])
                 const expected: TasksAction = {
                     length: 123,
                     type: TASKS_IMPORT_END,
-                    tasks,
+                    tasks: primaveraTasks1,
                     warnings
                 }
-                chai.expect(endTasksImport({length: 123, tasks, warnings})).to.deep.equal(expected)
+                const results = endTasksImport({
+                    length: 123,
+                    tasks: primaveraTasks1,
+                    warnings
+                })
+                chai.expect(results).to.deep.equal(expected)
+                expectMapEqual(results.tasks, primaveraTasks1)
             })
             it("Should create TASKS_IMPORT_INVALID_FORMAT", () => {
                 const expected: ErrorAction = {
@@ -155,25 +155,16 @@ describe("Primavera actions", () => {
                 chai.expect(beginRelationsImport()).to.deep.equal(expected)
             })
             it("Should create RELATIONS_IMPORT_END", () => {
-                const relationsArray: Array<PrimaveraTaskRelation> = [
-                    {
-                        previous: "task1",
-                        next: "milestone1",
-                        type: "FF",
-                        lag: 3
-                    }
-                ]
-                const relations = makeRelations(relationsArray)
-                const warnings = new Map<string, Array<string>>()
-                warnings.set("task1", ["Warning 1", "Warning 2"])
-                warnings.set("task2", ["Warning 3"])
+                const relations = makeRelations(primaveraRelations1)
                 const expected: RelationsAction = {
                     length: 123,
                     type: RELATIONS_IMPORT_END,
                     relations,
                     warnings
                 }
-                chai.expect(endRelationsImport({length: 123, relations, warnings})).to.deep.equal(expected)
+                const results = endRelationsImport({length: 123, relations, warnings})
+                chai.expect(results).to.deep.equal(expected)
+                chai.expect(results.relations).to.deep.equal(relations)
             })
             it("Should create RELATIONS_IMPORT_INVALID_FORMAT", () => {
                 const expected: ErrorAction = {
@@ -204,79 +195,16 @@ describe("Primavera actions", () => {
     describe("Overview", () => {
         describe("Synchronous", () => {
             it("Should create OVERVIEW_FILTER", () => {
-                let tasks: Map<string, PrimaveraTask> = new Map<string, PrimaveraTask>()
-                tasks.set("task1", {
-                    identifier: "task1",
-                    name: "Task 1",
-                    duration: 30,
-                    startDate: new Date(2016, 9, 1),
-                    endDate: new Date(2016, 10, 1)
-                })
-                tasks.set("delay", {
-                    identifier: "delay",
-                    name: "Delay",
-                    duration: 0,
-                    startDate: new Date(2016, 9, 1),
-                    endDate: null
-                })
-                tasks.set("milestone1", {
-                    identifier: "milestone1",
-                    name: "Milestone 1",
-                    duration: 0,
-                    startDate: null,
-                    endDate: new Date(2016, 10, 1)
-                })
-                let delays = new Set<string>()
-                delays.add("delay")
-                const filteredTasks: Array<ApiInputTask> = [
-                    {
-                        identifier: "task1",
-                        name: "Task 1",
-                        description: "",
-                        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
-                        estimatedDuration: 31
-                    },
-                    {
-                        identifier: "milestone1",
-                        name: "Milestone 1",
-                        description: "",
-                        estimatedStartDate: new Date(2016, 10, 1).toISOString(),
-                        estimatedDuration: 0
-                    }
-                ]
-                const filteredDelays: Array<ApiInputDelay> = [
-                    {
-                        identifier: "delay",
-                        name: "Delay",
-                        description: "",
-                        date: new Date(2016, 9, 1).toISOString()
-                    }
-                ]
-                const relationsArray: Array<PrimaveraTaskRelation> = [
-                    {
-                        previous: "task1",
-                        next: "milestone1",
-                        type: "FS",
-                        lag: 3
-                    }
-                ]
-                const relations = makeRelations(relationsArray)
-                const filteredRelations: Array<TaskRelation> = [
-                    {
-                        previous: "task1",
-                        next: "milestone1",
-                        previousLocation: TaskLocation.End,
-                        lag: 3
-                    }
-                ]
+                const relations = makeRelations(primaveraRelations1)
                 const expected: OverviewFilterAction = {
                     type: OVERVIEW_FILTER,
-                    tasks: filteredTasks,
-                    delays: filteredDelays,
-                    relations: filteredRelations,
-                    warnings: new Map<string, Array<string>>()
+                    tasks: inputTasks1,
+                    delays: inputDelays1,
+                    relations: inputRelations1,
+                    warnings: noWarnings
                 }
-                chai.expect(filterForOverview(tasks, delays, relations)).to.deep.equal(expected)
+                const results = filterForOverview(primaveraTasks1, selectedDelays1, relations)
+                chai.expect(results).to.deep.equal(expected)
             })
             it("Should create OVERVIEW_SUBMIT_REQUEST", () => {
                 const expected: Action = {
@@ -315,40 +243,11 @@ describe("Primavera actions", () => {
             })
             it("Should submit", (done) => {
                 // Mock
-                const project: Project = {
-                    identifier: "identifier",
-                    name: "Name",
-                    description: "Description"
-                }
-                const tasks: Array<ApiInputTask> = [
-                    {
-                        identifier: "task1",
-                        name: "Task 1",
-                        description: "",
-                        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
-                        estimatedDuration: 31
-                    },
-                    {
-                        identifier: "milestone1",
-                        name: "Milestone 1",
-                        description: "",
-                        estimatedStartDate: new Date(2016, 10, 1).toISOString(),
-                        estimatedDuration: 0
-                    },
-                ]
-                const relations: Array<TaskRelation> = [
-                    {
-                        previous: "task1",
-                        next: "milestone1",
-                        previousLocation: TaskLocation.End,
-                        lag: 3
-                    }
-                ]
                 const response = new FakeResponse(true, {})
                 fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
-                submit(project, tasks, relations)(dispatch).then(() => {
+                submit(project, inputTasks1, inputRelations1)(dispatch).then(() => {
                     const expected: Action = {
                         type: OVERVIEW_SUBMIT_RECEIVE
                     }
@@ -372,46 +271,17 @@ describe("Primavera actions", () => {
                 chai.expect(body).to.haveOwnProperty("project")
                 chai.expect(body.project).to.deep.equal(project)
                 chai.expect(body).to.haveOwnProperty("tasks")
-                chai.expect(body.tasks).to.deep.equal(tasks)
+                chai.expect(body.tasks).to.deep.equal(inputTasks1)
                 chai.expect(body).to.haveOwnProperty("relations")
-                chai.expect(body.relations).to.deep.equal(relations)
+                chai.expect(body.relations).to.deep.equal(inputRelations1)
             })
             it("Should react to error from server", (done) => {
                 // Mock
-                const project: Project = {
-                    identifier: "identifier",
-                    name: "Name",
-                    description: "Description"
-                }
-                const tasks: Array<ApiInputTask> = [
-                    {
-                        identifier: "task1",
-                        name: "Task 1",
-                        description: "",
-                        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
-                        estimatedDuration: 31
-                    },
-                    {
-                        identifier: "milestone1",
-                        name: "Milestone 1",
-                        description: "",
-                        estimatedStartDate: new Date(2016, 10, 1).toISOString(),
-                        estimatedDuration: 0
-                    },
-                ]
-                const relations: Array<TaskRelation> = [
-                    {
-                        previous: "task1",
-                        next: "milestone1",
-                        previousLocation: TaskLocation.End,
-                        lag: 3
-                    }
-                ]
                 const response = new FakeResponse(false, {error: "Error message"})
                 fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
-                submit(project, tasks, relations)(dispatch).then(() => {
+                submit(project, inputTasks1, inputRelations1)(dispatch).then(() => {
                     const expected: ErrorAction = {
                         type: OVERVIEW_SUBMIT_RECEIVE_FAILURE,
                         message: "Error message"

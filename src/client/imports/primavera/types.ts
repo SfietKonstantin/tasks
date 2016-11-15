@@ -82,6 +82,5 @@ export interface OverviewState {
     delays: Array<ApiInputDelay>
     relations: Array<TaskRelation>
     warnings: Map<string, Array<string>>
-    errors: Map<string, Array<string>>
     submitState: SubmitState
 }

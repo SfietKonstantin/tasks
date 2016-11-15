@@ -6,6 +6,7 @@ import {
     TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE,
     TASKS_FILTER_DISPLAY
 } from "../actions/tasks"
+import { tasks } from "../states"
 import * as dateutils from "../../../common/dateutils"
 import * as latinize from "latinize"
 
@@ -47,23 +48,7 @@ const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | 
     })
 }
 
-const initialState: TasksState = {
-    isFetching: false,
-    tasks: [],
-    filters: {
-        notStartedChecked: false,
-        inProgressChecked: false,
-        doneChecked: false,
-        filters: {
-            milestoneFilterMode: MilestoneFilterMode.NoFilter,
-            text: ""
-        }
-    },
-    today: null,
-    filteredTasks: Array<ApiTask>()
-}
-
-export const tasksReducer = (state: TasksState = initialState, action: Action): TasksState => {
+export const tasksReducer = (state: TasksState = tasks, action: Action): TasksState => {
     switch (action.type) {
         case TASKS_REQUEST:
             return Object.assign({}, state, { isFetching: true })

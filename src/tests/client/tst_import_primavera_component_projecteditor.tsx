@@ -8,6 +8,7 @@ import { defineStage, defineMaxStage } from "../../client/imports/primavera/acti
 import { Stage } from "../../client/imports/primavera/types"
 import { Project } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
+import { emptyProject } from "./testdata"
 
 describe("Primavera import ProjectEditor", () => {
     beforeEach(() => {
@@ -114,15 +115,10 @@ describe("Primavera import ProjectEditor", () => {
     })
     it("Should handle next button", () => {
         const stage = Stage.Project
-        const project: Project = {
-            identifier: "",
-            name: "",
-            description: ""
-        }
         const onProjectChanged = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
-        const component = enzyme.shallow(<ProjectEditor stage={stage} project={project}
+        const component = enzyme.shallow(<ProjectEditor stage={stage} project={emptyProject}
                                                         onProjectChanged={onProjectChanged}
                                                         onCurrentStage={onCurrentStage}
                                                         onNextStage={onNextStage} />)
@@ -135,15 +131,10 @@ describe("Primavera import ProjectEditor", () => {
     })
     it("Should handle current", () => {
         const stage = Stage.Tasks
-        const project: Project = {
-            identifier: "",
-            name: "",
-            description: ""
-        }
         const onProjectChanged = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
-        const component = enzyme.shallow(<ProjectEditor stage={stage} project={project}
+        const component = enzyme.shallow(<ProjectEditor stage={stage} project={emptyProject}
                                                         onProjectChanged={onProjectChanged}
                                                         onCurrentStage={onCurrentStage}
                                                         onNextStage={onNextStage} />)

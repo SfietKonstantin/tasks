@@ -16,6 +16,7 @@ import { Project } from "../../common/types"
 import { ApiTask } from "../../common/apitypes"
 import { FakeResponse } from "./fakeresponse"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
+import { project } from "./testdata"
 
 describe("Project actions", () => {
     describe("Project", () => {
@@ -35,11 +36,6 @@ describe("Project actions", () => {
         })
         it("Should GET a project", (done) => {
             // Mock
-            const project: Project = {
-                identifier: "identifier",
-                name: "Name",
-                description: "Description"
-            }
             const response = new FakeResponse(true, project)
             fetchMock.once().returns(Promise.resolve(response))
 

@@ -14,7 +14,6 @@ describe("Common components", () => {
     let component: Header
     beforeEach(() => {
         addFakeGlobal()
-
     })
     afterEach(() => {
         clearFakeGlobal()

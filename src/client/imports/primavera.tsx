@@ -3,12 +3,10 @@ import * as ReactDOM from "react-dom"
 import * as Redux from "redux"
 import * as ReduxThunk from "redux-thunk"
 import { Provider } from "react-redux"
-import { State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation, SubmitState } from "./primavera/types"
-import { RelationGraphNode, GraphDiff } from "./primavera/graph"
+import { State } from "./primavera/types"
 import { mainReducer } from "./primavera/reducers/main"
 import { Main } from "./primavera/components/main"
-import { Project } from "../../common/types"
-import { MilestoneFilterMode } from "../common/tasklistfilter"
+import { stage, project, tasks, relations, delays, overview } from "./primavera/states"
 
 interface RootProperties {
     store: Redux.Store<State>
@@ -24,47 +22,12 @@ class Root extends React.Component<RootProperties, {}> {
 
 export const render = () => {
     const initialState: State = {
-        stage: {
-            current: Stage.Project,
-            max: Stage.Project
-        },
-        project: {
-            identifier: "",
-            name: "",
-            description: ""
-        },
-        tasks: {
-            length: 0,
-            tasks: new Map<string, PrimaveraTask>(),
-            warnings: new Map<string, Array<string>>(),
-            isImporting: false,
-            isInvalidFormat: false
-        },
-        relations: {
-            length: 0,
-            relations: new Map<string, RelationGraphNode>(),
-            warnings: new Map<string, Array<string>>(),
-            isImporting: false,
-            isInvalidFormat: false
-        },
-        delays: {
-            filters: {
-                milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
-            },
-            tasks: [],
-            selection: new Set<string>(),
-            diffs: [],
-            warnings: new Map<string, Array<string>>()
-        },
-        overview: {
-            tasks: [],
-            delays: [],
-            relations: [],
-            warnings: new Map<string, Array<string>>(),
-            errors: new Map<string, Array<string>>(),
-            submitState: SubmitState.Idle
-        }
+        stage,
+        project,
+        tasks,
+        relations,
+        delays,
+        overview
     }
     const store = Redux.createStore(
         mainReducer, initialState,

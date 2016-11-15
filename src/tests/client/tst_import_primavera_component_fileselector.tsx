@@ -7,6 +7,7 @@ import { FakeFile } from "./fakefile"
 import { Stage } from "../../client/imports/primavera/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { expectMapEqual } from "./expectutils"
+import { warnings, noWarnings } from "./testdata"
 
 describe("Primavera import FileSelector", () => {
     beforeEach(() => {
@@ -16,9 +17,6 @@ describe("Primavera import FileSelector", () => {
         clearFakeGlobal()
     })
     it("Should render the component correctly", () => {
-        const warnings = new Map<string, Array<string>>()
-        warnings.set("task1", ["Warning 1", "Warning 2"])
-        warnings.set("task2", ["Warning 3"])
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
@@ -51,7 +49,6 @@ describe("Primavera import FileSelector", () => {
         chai.expect(cols.at(0).children().text()).to.equal("Form label")
     })
     it("Should render the buttons correctly 1", () => {
-        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
@@ -63,7 +60,7 @@ describe("Primavera import FileSelector", () => {
                                                        formLabel="Form label"
                                                        buttonText="Button text"
                                                        itemCount={0}
-                                                       warnings={warnings}
+                                                       warnings={noWarnings}
                                                        isImporting={false}
                                                        isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
@@ -81,7 +78,6 @@ describe("Primavera import FileSelector", () => {
         chai.expect(button.prop("disabled")).to.true
     })
     it("Should render the buttons correctly 2", () => {
-        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
@@ -93,7 +89,7 @@ describe("Primavera import FileSelector", () => {
                                                        formLabel="Form label"
                                                        buttonText="Button text"
                                                        itemCount={123}
-                                                       warnings={warnings}
+                                                       warnings={noWarnings}
                                                        isImporting={false}
                                                        isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
@@ -111,7 +107,6 @@ describe("Primavera import FileSelector", () => {
         chai.expect(button.prop("disabled")).to.false
     })
     it("Should render the buttons correctly 3", () => {
-        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
@@ -123,7 +118,7 @@ describe("Primavera import FileSelector", () => {
                                                        formLabel="Form label"
                                                        buttonText="Button text"
                                                        itemCount={0}
-                                                       warnings={warnings}
+                                                       warnings={noWarnings}
                                                        isImporting={true}
                                                        isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
@@ -141,7 +136,6 @@ describe("Primavera import FileSelector", () => {
         chai.expect(button.prop("disabled")).to.true
     })
     it("Should render the buttons correctly 4", () => {
-        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
@@ -153,7 +147,7 @@ describe("Primavera import FileSelector", () => {
                                                        formLabel="Form label"
                                                        buttonText="Button text"
                                                        itemCount={123}
-                                                       warnings={warnings}
+                                                       warnings={noWarnings}
                                                        isImporting={true}
                                                        isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
@@ -171,9 +165,6 @@ describe("Primavera import FileSelector", () => {
         chai.expect(button.prop("disabled")).to.true
     })
     it("Should render the warning button correctly", () => {
-        const warnings = new Map<string, Array<string>>()
-        warnings.set("task1", ["Warning 1", "Warning 2"])
-        warnings.set("task2", ["Warning 3"])
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
@@ -196,7 +187,6 @@ describe("Primavera import FileSelector", () => {
         expectMapEqual(button.prop("warnings"), warnings)
     })
     it("Should render the error alert correctly", () => {
-        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
@@ -208,7 +198,7 @@ describe("Primavera import FileSelector", () => {
                                                        formLabel="Form label"
                                                        buttonText="Button text"
                                                        itemCount={0}
-                                                       warnings={warnings}
+                                                       warnings={noWarnings}
                                                        isImporting={true}
                                                        isInvalidFormat={true}
                                                        onFileSelected={onFileSelected}
@@ -224,7 +214,6 @@ describe("Primavera import FileSelector", () => {
         chai.expect(onDismissInvalidFormat.calledWithExactly()).to.true
     })
     it("Should react to file selection", () => {
-        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
@@ -236,7 +225,7 @@ describe("Primavera import FileSelector", () => {
                                                        formLabel="Form label"
                                                        buttonText="Button text"
                                                        itemCount={0}
-                                                       warnings={warnings}
+                                                       warnings={noWarnings}
                                                        isImporting={false}
                                                        isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}
@@ -285,7 +274,6 @@ describe("Primavera import FileSelector", () => {
         chai.expect(onFileSelected.calledWithExactly(fakeFile)).to.true
     })
     it("Should react to next", () => {
-        const warnings = new Map<string, Array<string>>()
         const onFileSelected = sinon.spy()
         const onCurrentStage = sinon.spy()
         const onNextStage = sinon.spy()
@@ -297,7 +285,7 @@ describe("Primavera import FileSelector", () => {
                                                        formLabel="Form label"
                                                        buttonText="Button text"
                                                        itemCount={0}
-                                                       warnings={warnings}
+                                                       warnings={noWarnings}
                                                        isImporting={false}
                                                        isInvalidFormat={false}
                                                        onFileSelected={onFileSelected}

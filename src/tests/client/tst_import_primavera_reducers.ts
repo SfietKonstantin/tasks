@@ -20,7 +20,7 @@ import {
 } from "../../client/imports/primavera/actions/overview"
 import * as imports from "../../client/imports/primavera/imports"
 import {
-    State, Stage, PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation, SubmitState
+    State, Stage, SubmitState
 } from "../../client/imports/primavera/types"
 import { RelationGraph, RelationGraphNode, GraphDiff } from "../../client/imports/primavera/graph"
 import * as projectEditor from "../../client/imports/primavera/components/projecteditor"
@@ -30,98 +30,16 @@ import * as delaysSelector from "../../client/imports/primavera/components/delay
 import * as overview from "../../client/imports/primavera/components/overview"
 import { TasksParseResults, RelationsParseResults } from "../../client/imports/primavera/imports"
 import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklistfilter"
-import { Project, TaskRelation, TaskLocation } from "../../common/types"
-import { ApiInputTask, ApiInputDelay } from "../../common/apitypes"
+import * as states from "../../client/imports/primavera/states"
 import { FakeFile, FakeFileReader } from "./fakefile"
 import { FakeResponse } from "./fakeresponse"
 import { makeRelations } from "./primaverahelper"
 import { expectMapEqual, expectSetEqual } from "./expectutils"
-
-const project: Project = {
-    identifier: "identifier",
-    name: "Name",
-    description: "Description"
-}
-
-let tasks: Map<string, PrimaveraTask> = new Map<string, PrimaveraTask>()
-tasks.set("task1", {
-    identifier: "task1",
-    name: "Task 1",
-    duration: 15,
-    startDate: new Date(2016, 8, 1),
-    endDate: new Date(2016, 8, 16)
-})
-tasks.set("task2", {
-    identifier: "task2",
-    name: "Task 2",
-    duration: 30,
-    startDate: new Date(2016, 8, 15),
-    endDate: new Date(2016, 9, 15)
-})
-tasks.set("task3", {
-    identifier: "task3",
-    name: "Task 3",
-    duration: 31,
-    startDate: new Date(2016, 9, 15),
-    endDate: new Date(2016, 10, 15)
-})
-tasks.set("milestone1", {
-    identifier: "milestone1",
-    name: "Milestone 1",
-    duration: 0,
-    startDate: null,
-    endDate: new Date(2016, 8, 14)
-})
-tasks.set("milestone2", {
-    identifier: "milestone2",
-    name: "Milestone 2",
-    duration: 0,
-    startDate: null,
-    endDate: new Date(2016, 9, 14)
-})
-
-let selected = new Set<string>()
-selected.add("task1")
-selected.add("milestone1")
-
-const filteredTasks: Array<ApiInputTask> = [
-    {
-        identifier: "task2",
-        name: "Task 2",
-        description: "",
-        estimatedStartDate: new Date(2016, 8, 15).toISOString(),
-        estimatedDuration: 30
-    },
-    {
-        identifier: "task3",
-        name: "Task 3",
-        description: "",
-        estimatedStartDate: new Date(2016, 9, 15).toISOString(),
-        estimatedDuration: 31
-    },
-    {
-        identifier: "milestone2",
-        name: "Milestone 2",
-        description: "",
-        estimatedStartDate: new Date(2016, 9, 14).toISOString(),
-        estimatedDuration: 0
-    }
-]
-
-const filteredDelays: Array<ApiInputDelay> = [
-    {
-        identifier: "task1",
-        name: "Task 1",
-        description: "",
-        date: new Date(2016, 8, 1).toISOString()
-    },
-    {
-        identifier: "milestone1",
-        name: "Milestone 1",
-        description: "",
-        date: new Date(2016, 8, 14).toISOString()
-    }
-]
+import {
+    cloneObject, cloneArray, cloneMap, cloneSet, mapToArray,
+    warnings, noWarnings, project, primaveraTasks2, selectedDelays2,
+    inputTasks2, inputDelays2, inputRelations2
+} from "./testdata"
 
 let graph = new RelationGraph()
 graph.addRelation({
@@ -131,15 +49,6 @@ graph.addRelation({
     lag: 3
 })
 const relations = graph.nodes
-
-const filteredRelations: Array<TaskRelation> = [
-    {
-        previous: "task1",
-        next: "milestone1",
-        previousLocation: TaskLocation.End,
-        lag: 3
-    }
-]
 
 const graphDiff: Array<GraphDiff> = [
     {
@@ -152,14 +61,6 @@ const graphDiff: Array<GraphDiff> = [
     }
 ]
 
-const warnings = new Map<string, Array<string>>()
-warnings.set("task1", ["Warning 1", "Warning 2"])
-warnings.set("task2", ["Warning 3"])
-
-const errors = new Map<string, Array<string>>()
-warnings.set("task1", ["Error 1", "Error 2"])
-warnings.set("task2", ["Error 3"])
-
 describe("Primavera reducers", () => {
     let dispatch: Sinon.SinonSpy
     let initialState1: State
@@ -168,65 +69,30 @@ describe("Primavera reducers", () => {
     beforeEach(() => {
         dispatch = sinon.spy()
         initialState1 = {
-            stage: {
-                current: Stage.Project,
-                max: Stage.Project
-            },
-            project: {
-                identifier: "",
-                name: "",
-                description: ""
-            },
-            tasks: {
-                length: 0,
-                tasks: new Map<string, PrimaveraTask>(),
-                warnings: new Map<string, Array<string>>(),
-                isImporting: false,
-                isInvalidFormat: false,
-            },
-            relations: {
-                length: 0,
-                relations: new Map<string, RelationGraphNode>(),
-                warnings: new Map<string, Array<string>>(),
-                isImporting: false,
-                isInvalidFormat: false
-            },
-            delays: {
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                },
-                tasks: [],
-                selection: new Set<string>(),
-                diffs: [],
-                warnings: new Map<string, Array<string>>()
-            },
-            overview: {
-                tasks: [],
-                delays: [],
-                relations: [],
-                warnings: new Map<string, Array<string>>(),
-                errors: new Map<string, Array<string>>(),
-                submitState: SubmitState.Idle
-            }
+            stage: cloneObject(states.stage),
+            project: cloneObject(states.project),
+            tasks: cloneObject(states.tasks),
+            relations: cloneObject(states.relations),
+            delays: cloneObject(states.delays),
+            overview: cloneObject(states.overview)
         }
         initialState2 = {
             stage: {
                 current: Stage.Overview,
                 max: Stage.Overview
             },
-            project: Object.assign({}, project),
+            project: cloneObject(project),
             tasks: {
                 length: 123,
-                tasks: new Map<string, PrimaveraTask>(tasks),
-                warnings: new Map<string, Array<string>>(warnings),
+                tasks: cloneMap(primaveraTasks2),
+                warnings: cloneMap(warnings),
                 isImporting: true,
                 isInvalidFormat: true,
             },
             relations: {
                 length: 123,
-                relations: new Map<string, RelationGraphNode>(relations),
-                warnings: new Map<string, Array<string>>(warnings),
+                relations: cloneMap(relations),
+                warnings: cloneMap(warnings),
                 isImporting: true,
                 isInvalidFormat: true
             },
@@ -235,17 +101,16 @@ describe("Primavera reducers", () => {
                     milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
                     text: "test"
                 },
-                tasks: Array.from(tasks.values()),
-                selection: new Set<string>(selected),
-                diffs: graphDiff.slice(0),
-                warnings: new Map<string, Array<string>>(warnings)
+                tasks: mapToArray(primaveraTasks2),
+                selection: cloneSet(selectedDelays2),
+                diffs: cloneArray(graphDiff),
+                warnings: cloneMap(warnings)
             },
             overview: {
-                tasks: filteredTasks.slice(0),
-                delays: filteredDelays.slice(0),
-                relations: filteredRelations.slice(0),
-                warnings: new Map<string, Array<string>>(warnings),
-                errors: new Map<string, Array<string>>(errors),
+                tasks: cloneArray(inputTasks2),
+                delays: cloneArray(inputDelays2),
+                relations: cloneArray(inputRelations2),
+                warnings: cloneMap(warnings),
                 submitState: SubmitState.Submitted
             }
         }
@@ -290,14 +155,14 @@ describe("Primavera reducers", () => {
             const checkState = (initialState: State) => {
                 const results: TasksParseResults = {
                     length: 123,
-                    tasks: new Map<string, PrimaveraTask>(tasks),
-                    warnings: new Map<string, Array<string>>(warnings)
+                    tasks: cloneMap(primaveraTasks2),
+                    warnings: cloneMap(warnings)
                 }
                 const state = main.mainReducer(initialState, endTasksImport(results))
                 chai.expect(state.tasks.isImporting).to.false
                 chai.expect(state.tasks.isInvalidFormat).to.false
                 chai.expect(state.tasks.length).to.equal(123)
-                expectMapEqual(state.tasks.tasks, tasks)
+                expectMapEqual(state.tasks.tasks, primaveraTasks2)
                 expectMapEqual(state.tasks.warnings, warnings)
             }
             checkState(initialState1)
@@ -337,8 +202,8 @@ describe("Primavera reducers", () => {
             const checkState = (initialState: State) => {
                 const results: RelationsParseResults = {
                     length: 123,
-                    relations: new Map<string, RelationGraphNode>(relations),
-                    warnings: new Map<string, Array<string>>(warnings)
+                    relations: cloneMap(relations),
+                    warnings: cloneMap(warnings)
                 }
                 const state = main.mainReducer(initialState, endRelationsImport(results))
                 chai.expect(state.relations.isImporting).to.false
@@ -377,13 +242,13 @@ describe("Primavera reducers", () => {
                     milestoneFilterMode: MilestoneFilterMode.NoFilter,
                     text: ""
                 }
-                const state = main.mainReducer(initialState, defineDelayFilters(tasks, filters))
+                const state = main.mainReducer(initialState, defineDelayFilters(primaveraTasks2, filters))
                 chai.expect(state.delays.tasks).to.deep.equal([
-                    tasks.get("milestone1"),
-                    tasks.get("milestone2"),
-                    tasks.get("task1"),
-                    tasks.get("task2"),
-                    tasks.get("task3"),
+                    primaveraTasks2.get("milestone1"),
+                    primaveraTasks2.get("milestone2"),
+                    primaveraTasks2.get("task1"),
+                    primaveraTasks2.get("task2"),
+                    primaveraTasks2.get("task3"),
                 ])
                 chai.expect(state.delays.filters).to.deep.equal(filters)
             }
@@ -396,11 +261,11 @@ describe("Primavera reducers", () => {
                     milestoneFilterMode: MilestoneFilterMode.TasksOnly,
                     text: ""
                 }
-                const state = main.mainReducer(initialState, defineDelayFilters(tasks, filters))
+                const state = main.mainReducer(initialState, defineDelayFilters(primaveraTasks2, filters))
                 chai.expect(state.delays.tasks).to.deep.equal([
-                    tasks.get("task1"),
-                    tasks.get("task2"),
-                    tasks.get("task3")
+                    primaveraTasks2.get("task1"),
+                    primaveraTasks2.get("task2"),
+                    primaveraTasks2.get("task3")
                 ])
                 chai.expect(state.delays.filters).to.deep.equal(filters)
             }
@@ -413,10 +278,10 @@ describe("Primavera reducers", () => {
                     milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
                     text: ""
                 }
-                const state = main.mainReducer(initialState, defineDelayFilters(tasks, filters))
+                const state = main.mainReducer(initialState, defineDelayFilters(primaveraTasks2, filters))
                 chai.expect(state.delays.tasks).to.deep.equal([
-                    tasks.get("milestone1"),
-                    tasks.get("milestone2")
+                    primaveraTasks2.get("milestone1"),
+                    primaveraTasks2.get("milestone2")
                 ])
                 chai.expect(state.delays.filters).to.deep.equal(filters)
             }
@@ -429,10 +294,10 @@ describe("Primavera reducers", () => {
                     milestoneFilterMode: MilestoneFilterMode.NoFilter,
                     text: "1"
                 }
-                const state = main.mainReducer(initialState, defineDelayFilters(tasks, filters))
+                const state = main.mainReducer(initialState, defineDelayFilters(primaveraTasks2, filters))
                 chai.expect(state.delays.tasks).to.deep.equal([
-                    tasks.get("milestone1"),
-                    tasks.get("task1")
+                    primaveraTasks2.get("milestone1"),
+                    primaveraTasks2.get("task1")
                 ])
                 chai.expect(state.delays.filters).to.deep.equal(filters)
             }
@@ -448,7 +313,7 @@ describe("Primavera reducers", () => {
                     ]
                 }
             ]
-            const state = main.mainReducer(initialState1, defineDelaySelection(tasks, relations, "milestone1", true))
+            const state = main.mainReducer(initialState1, defineDelaySelection(primaveraTasks2, relations, "milestone1", true))
             expectSetEqual(state.delays.selection, ["milestone1"])
             chai.expect(state.delays.diffs).to.deep.equal(expectedDiffs)
             chai.expect(state.delays.warnings.size).to.equal(0)
@@ -468,13 +333,13 @@ describe("Primavera reducers", () => {
                     ]
                 }
             ]
-            const state = main.mainReducer(initialState2, defineDelaySelection(tasks, relations, "milestone1", true))
+            const state = main.mainReducer(initialState2, defineDelaySelection(primaveraTasks2, relations, "milestone1", true))
             expectSetEqual(state.delays.selection, ["task1", "milestone1"])
             chai.expect(state.delays.diffs).to.deep.equal(expectedDiffs)
             chai.expect(state.delays.warnings.size).to.equal(1)
         })
         it("Should reduce DELAY_SELECTION_DEFINE 3", () => {
-            const state = main.mainReducer(initialState1, defineDelaySelection(tasks, relations, "milestone1", false))
+            const state = main.mainReducer(initialState1, defineDelaySelection(primaveraTasks2, relations, "milestone1", false))
             chai.expect(state.delays.selection.size).to.equal(0)
             chai.expect(state.delays.diffs).to.empty
             chai.expect(state.delays.warnings.size).to.equal(0)
@@ -488,7 +353,7 @@ describe("Primavera reducers", () => {
                     ]
                 }
             ]
-            const state = main.mainReducer(initialState2, defineDelaySelection(tasks, relations, "milestone1", false))
+            const state = main.mainReducer(initialState2, defineDelaySelection(primaveraTasks2, relations, "milestone1", false))
             expectSetEqual(state.delays.selection, ["task1"])
             chai.expect(state.delays.diffs).to.deep.equal(expectedDiffs)
             chai.expect(state.delays.warnings.size).to.equal(0)
@@ -497,10 +362,10 @@ describe("Primavera reducers", () => {
     describe("Overview reducers", () => {
         it("Should reduce OVERVIEW_FILTER", () => {
             const checkState = (initialState: State) => {
-                const state = main.mainReducer(initialState, filterForOverview(tasks, selected, relations))
-                chai.expect(state.overview.tasks).to.deep.equal(filteredTasks)
-                chai.expect(state.overview.delays).to.deep.equal(filteredDelays)
-                chai.expect(state.overview.relations).to.deep.equal(filteredRelations)
+                const state = main.mainReducer(initialState, filterForOverview(primaveraTasks2, selectedDelays2, relations))
+                chai.expect(state.overview.tasks).to.deep.equal(inputTasks2)
+                chai.expect(state.overview.delays).to.deep.equal(inputDelays2)
+                chai.expect(state.overview.relations).to.deep.equal(inputRelations2)
                 chai.expect(state.overview.warnings.size).to.equal(0)
             }
             checkState(initialState1)
