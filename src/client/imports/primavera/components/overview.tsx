@@ -45,8 +45,16 @@ export class Overview extends React.Component<OverviewProperties, {}> {
                            maxStage={this.props.maxStage} title="5. Overview"
                            warnings={totalWarnings}
                            onCurrent={this.props.onCurrentStage.bind(this)}>
-            <p><Badge>{tasksLength}</Badge> tasks and <Badge>{delaysLength}</Badge> delays of the {this.props.totalTasks} tasks will be imported</p>
-            <p><Badge>{relationsLength}</Badge> of the {this.props.totalRelations} relations will be imported</p>
+            <p>
+                <Badge>{tasksLength}</Badge>
+                <span> tasks and </span>
+                <Badge>{delaysLength}</Badge>
+                <span> delays of the {this.props.totalTasks} tasks will be imported</span>
+            </p>
+            <p>
+                <Badge>{relationsLength}</Badge>
+                <span> of the {this.props.totalRelations} relations will be imported</span>
+            </p>
             <ButtonGroup>
                 <Button bsStyle={this.getButtonStyle()} disabled={!canImport} onClick={this.handleSubmit.bind(this)}>
                     {this.getButtonText()}

@@ -41,15 +41,11 @@ describe("Primavera import Overview", () => {
         chai.expect(tasksComponents.childAt(0).children().text()).to.equal("2")
         chai.expect(tasksComponents.childAt(1).text()).to.equal(" tasks and ")
         chai.expect(tasksComponents.childAt(2).children().text()).to.equal("1")
-        chai.expect(tasksComponents.childAt(3).text()).to.equal(" delays of the ")
-        chai.expect(tasksComponents.childAt(4).text()).to.equal("123")
-        chai.expect(tasksComponents.childAt(5).text()).to.equal(" tasks will be imported")
+        chai.expect(tasksComponents.childAt(3).text()).to.equal(" delays of the 123 tasks will be imported")
 
         const relationsComponents = component.childAt(1)
         chai.expect(relationsComponents.childAt(0).children().text()).to.equal("1")
-        chai.expect(relationsComponents.childAt(1).text()).to.equal(" of the ")
-        chai.expect(relationsComponents.childAt(2).text()).to.equal("234")
-        chai.expect(relationsComponents.childAt(3).text()).to.equal(" relations will be imported")
+        chai.expect(relationsComponents.childAt(1).text()).to.equal(" of the 234 relations will be imported")
 
         component.simulate("current")
         chai.expect(onCurrentStage.calledOnce).to.true

@@ -10,7 +10,14 @@ export const expectMapEqual = <K, V>(map1: Map<K, V>, map2: Map<K, V>): void => 
     })
 }
 
-export const expectSetEqual = <V>(set: Set<V>, expected: Array<V>): void => {
+export const expectSetEqual = <V>(set: Set<V>, expected: Set<V>): void => {
+    const setArray = Array.from(set)
+    const expectedArray = Array.from(expected)
+    chai.expect(setArray).to.deep.members(expectedArray)
+    chai.expect(expectedArray).to.deep.members(setArray)
+}
+
+export const expectSetEqualToArray = <V>(set: Set<V>, expected: Array<V>): void => {
     const setArray = Array.from(set)
     chai.expect(setArray).to.deep.members(expected)
     chai.expect(expected).to.deep.members(setArray)

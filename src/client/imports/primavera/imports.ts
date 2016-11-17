@@ -213,9 +213,9 @@ export const mapDelays = (tasks: Map<string, PrimaveraTask>, delays: Set<string>
         return delays.has(task.identifier)
     })
     return filtered.map((task: PrimaveraTask) => {
-        let date = task.startDate
-        if (task.startDate == null) {
-            date = task.endDate
+        let date = task.endDate
+        if (task.endDate == null) {
+            date = task.startDate
         }
         const convertedDate = (date as Date).toISOString()
 
