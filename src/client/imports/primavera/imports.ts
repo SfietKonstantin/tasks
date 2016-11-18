@@ -1,8 +1,8 @@
 import { PrimaveraTask, PrimaveraDelay, PrimaveraTaskRelation } from "./types"
-import { RelationGraph, RelationGraphNode } from "./graph"
+import { RelationGraph, RelationGraphNode, GraphDiff } from "./graph"
 import { InvalidFormatError } from "../../common/actions/files"
 import { ApiInputTask, ApiInputDelay } from "../../../common/apitypes"
-import { TaskRelation, TaskLocation } from "../../../common/types"
+import { TaskRelation, TaskLocation, DelayRelation } from "../../../common/types"
 import * as dateutils from "../../../common/dateutils"
 import * as maputils from "../../../common/maputils"
 
@@ -230,31 +230,63 @@ export const mapDelays = (tasks: Map<string, PrimaveraTask>, delays: Set<string>
 }
 
 export interface FilterRelationsResults {
-    relations: Array<TaskRelation>
+    taskRelations: Array<TaskRelation>
+    delayRelations: Array<DelayRelation>
     warnings: Map<string, Array<string>>
 }
 
 export const filterRelations = (tasks: Map<string, PrimaveraTask>,
+                                selection: Set<string>,
                                 relations: Map<string, RelationGraphNode>): FilterRelationsResults => {
+    const graph = RelationGraph.fromNodes(relations)
+    const selectionDiff = graph.createSelectionDiff(selection, tasks)
     let warnings = new Map<string, Array<string>>()
-    let filtered = new Array<PrimaveraTaskRelation>()
-    Array.from(relations.values(), (node: RelationGraphNode) => {
+
+    // Create delay relations
+    let delayRelations = new Array<DelayRelation>()
+    selectionDiff.diffs.forEach((diff: GraphDiff) => {
+        diff.removed.forEach((pair: [string, string]) => {
+            const node = maputils.get(graph.nodes, pair[0])
+            const relation = maputils.get(node.children, pair[1])
+
+            if (selection.has(relation.next)) {
+                const returned: DelayRelation = {
+                    task: relation.previous,
+                    delay: relation.next,
+                    lag: relation.lag
+                }
+                delayRelations.push(returned)
+            }
+        })
+    })
+
+    // Apply diff on graph
+    selectionDiff.diffs.forEach((diff: GraphDiff) => {
+        graph.applyDiff(diff)
+    })
+
+    // Filter for task relations
+    let filteredTaskRelations = new Array<PrimaveraTaskRelation>()
+    Array.from(graph.nodes.values(), (node: RelationGraphNode) => {
         Array.from(node.children.values(), (relation: PrimaveraTaskRelation) => {
             if (!tasks.has(relation.previous) || !tasks.has(relation.next)) {
                 maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
                                         "No corresponding tasks")
                 return
             }
+
             if (relation.type === "FF") {
                 maputils.addToMapOfList(warnings, relation.previous + " - " + relation.next,
-                                        "FF relation is not supported")
+                                    "FF relation is not supported")
                 return
             }
-            filtered.push(relation)
+
+            filteredTaskRelations.push(relation)
         })
     })
 
-    const mappedRelations = filtered.map((relation: PrimaveraTaskRelation) => {
+    // Map
+    const taskRelations = filteredTaskRelations.map((relation: PrimaveraTaskRelation) => {
         let previousLocation = TaskLocation.End
         if (relation.type === "SS") {
             previousLocation = TaskLocation.Beginning
@@ -269,5 +301,5 @@ export const filterRelations = (tasks: Map<string, PrimaveraTask>,
         return returned
     })
 
-    return { relations: mappedRelations, warnings }
+    return { taskRelations, delayRelations, warnings }
 }

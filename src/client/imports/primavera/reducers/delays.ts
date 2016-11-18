@@ -4,6 +4,7 @@ import {
 } from "../actions/delays"
 import { DelaysState, PrimaveraTask } from "../types"
 import { GraphDiff, RelationGraph } from "../graph"
+import { delays } from "../states"
 import {
     MilestoneFilterMode, TaskListFilters, TaskListFilterInterface, filterTaskList
 } from "../../../common/tasklistfilter"
@@ -27,18 +28,7 @@ const filterTasks = (tasks: Array<PrimaveraTask>, filters: TaskListFilters): Arr
     })
 }
 
-const initialState: DelaysState = {
-    filters: {
-        milestoneFilterMode: MilestoneFilterMode.NoFilter,
-        text: ""
-    },
-    tasks: [],
-    selection: new Set<string>(),
-    diffs: [],
-    warnings: new Map<string, Array<string>>()
-}
-
-export const delaysReducer = (state: DelaysState = initialState, action: Action): DelaysState => {
+export const delaysReducer = (state: DelaysState = delays, action: Action): DelaysState => {
     switch (action.type) {
         case DELAY_FILTERS_DEFINE:
             const filtersAction = action as DelayFiltersAction

@@ -1,6 +1,7 @@
 import { Action } from "redux"
 import { RelationsState, PrimaveraTaskRelation } from "../types"
 import { RelationGraphNode } from "../graph"
+import { relations } from "../states"
 import {
     RelationsAction,
     RELATIONS_IMPORT_BEGIN,
@@ -9,15 +10,7 @@ import {
     RELATIONS_DISMISS_INVALID_FORMAT,
 } from "../actions/relations"
 
-const initialState: RelationsState = {
-    length: 0,
-    relations: new Map<string, RelationGraphNode>(),
-    warnings: new Map<string, Array<string>>(),
-    isImporting: false,
-    isInvalidFormat: false
-}
-
-export const relationsReducer = (state: RelationsState = initialState, action: Action): RelationsState => {
+export const relationsReducer = (state: RelationsState = relations, action: Action): RelationsState => {
     switch (action.type) {
         case RELATIONS_IMPORT_BEGIN:
             return Object.assign({}, state, {

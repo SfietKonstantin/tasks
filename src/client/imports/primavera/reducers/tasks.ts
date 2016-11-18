@@ -1,5 +1,6 @@
 import { Action } from "redux"
 import { TasksState, PrimaveraTask, PrimaveraDelay } from "../types"
+import { tasks } from "../states"
 import {
     TasksAction,
     TASKS_IMPORT_BEGIN,
@@ -8,15 +9,7 @@ import {
     TASKS_DISMISS_INVALID_FORMAT
 } from "../actions/tasks"
 
-const initialState: TasksState = {
-    length: 0,
-    tasks: new Map<string, PrimaveraTask>(),
-    warnings: new Map<string, Array<string>>(),
-    isImporting: false,
-    isInvalidFormat: false
-}
-
-export const tasksReducer = (state: TasksState = initialState, action: Action): TasksState => {
+export const tasksReducer = (state: TasksState = tasks, action: Action): TasksState => {
     switch (action.type) {
         case TASKS_IMPORT_BEGIN:
             return Object.assign({}, state, {

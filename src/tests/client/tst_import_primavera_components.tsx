@@ -22,7 +22,7 @@ import { makeRelations } from "./primaverahelper"
 import { expectMapEqual } from "./expectutils"
 import {
     warnings, noWarnings, primaveraTasks1, emptyPrimaveraTasks, primaveraRelations1,
-    taskListFilters, project, inputTasks1, inputRelations1
+    taskListFilters, project, inputTasks1, inputDelays1, inputTaskRelations1, inputDelayRelations1
 } from "./testdata"
 
 describe("Primavera components", () => {
@@ -148,8 +148,8 @@ describe("Primavera components", () => {
             chai.expect(component.prop("displayStage")).to.equal(Stage.Relations)
             chai.expect(component.prop("currentStage")).to.equal(Stage.Overview)
             chai.expect(component.prop("maxStage")).to.equal(Stage.Relations)
-            chai.expect(component.prop("buttonText")).to.equal("Imported 1 relations")
-            chai.expect(component.prop("itemCount")).to.equal(1)
+            chai.expect(component.prop("buttonText")).to.equal("Imported 3 relations")
+            chai.expect(component.prop("itemCount")).to.equal(3)
             expectMapEqual(component.prop("warnings"), warnings)
             chai.expect(component.prop("isImporting")).to.equal(false)
             chai.expect(component.prop("isInvalidFormat")).to.equal(false)
@@ -236,8 +236,9 @@ describe("Primavera components", () => {
             let dispatch = sinon.spy()
             const mapped = overview.mapDispatchToProps(dispatch)
 
-            mapped.onSubmit(project, inputTasks1, inputRelations1)
-            dispatch.calledWithExactly(submit(project, inputTasks1, inputRelations1))
+            mapped.onSubmit(project, inputTasks1, inputDelays1, inputTaskRelations1, inputDelayRelations1)
+            dispatch.calledWithExactly(submit(project, inputTasks1, inputDelays1,
+                                              inputTaskRelations1, inputDelayRelations1))
         })
     })
     describe("Main", () => {

@@ -298,7 +298,7 @@ describe("Primavera import", () => {
         })
     })
     describe("Filter relations", () => {
-        it("Should filter invalid relations", () => {
+        it("Should filter invalid task relations", () => {
             const tasks: Map<string, PrimaveraTask> = new Map<string, PrimaveraTask>()
             tasks.set("task1", {
                 identifier: "task1",
@@ -374,8 +374,8 @@ describe("Primavera import", () => {
                     lag: 5
                 }
             ]
-            const results = filterRelations(tasks, makeRelations(relations))
-            chai.expect(results.relations).to.deep.equal(expected)
+            const results = filterRelations(tasks, new Set<string>(), makeRelations(relations))
+            chai.expect(results.taskRelations).to.deep.equal(expected)
             chai.expect(results.warnings.size).to.equal(3)
         })
     })

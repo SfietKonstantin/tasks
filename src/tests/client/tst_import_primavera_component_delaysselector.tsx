@@ -117,7 +117,8 @@ describe("Primavera import DelaySelector", () => {
 
         checkbox4.simulate("click", { target: { checked: true } })
         chai.expect(onSelectionChanged.calledOnce).to.true
-        chai.expect(onSelectionChanged.calledWithExactly(primaveraTasks2, primaveraRelationNodes2, "task4", true)).to.true
+        chai.expect(onSelectionChanged.calledWithExactly(primaveraTasks2, primaveraRelationNodes2,
+                                                         "task4", true)).to.true
 
     })
     it("Should render the warning button 1", () => {

@@ -2,7 +2,7 @@ import { Action, Dispatch } from "redux"
 import { State, PrimaveraTask, PrimaveraTaskRelation } from "../types"
 import { RelationGraphNode } from "../graph"
 import { ErrorAction, processError } from "../../../common/actions/errors"
-import { Project, TaskRelation } from "../../../../common/types"
+import { Project, TaskRelation, DelayRelation } from "../../../../common/types"
 import { ApiInputTask, ApiInputDelay } from "../../../../common/apitypes"
 import { InputError } from "../../../../common/errors"
 import { getDateDiff } from "../../../../common/dateutils"
@@ -17,18 +17,20 @@ export interface OverviewFilterAction extends Action {
     type: string,
     tasks: Array<ApiInputTask>
     delays: Array<ApiInputDelay>
-    relations: Array<TaskRelation>
+    taskRelations: Array<TaskRelation>
+    delayRelations: Array<DelayRelation>
     warnings: Map<string, Array<string>>
 }
 
 export const filterForOverview = (tasks: Map<string, PrimaveraTask>, delays: Set<string>,
                                   relations: Map<string, RelationGraphNode>): OverviewFilterAction => {
-    const relationsResults = filterRelations(tasks, relations)
+    const relationsResults = filterRelations(tasks, delays, relations)
     return {
         type: OVERVIEW_FILTER,
         tasks: mapTasks(tasks, delays),
         delays: mapDelays(tasks, delays),
-        relations: relationsResults.relations,
+        taskRelations: relationsResults.taskRelations,
+        delayRelations: relationsResults.delayRelations,
         warnings: relationsResults.warnings
     }
 }
@@ -52,8 +54,8 @@ export const receiveSubmitFailure = (message: string): ErrorAction => {
     }
 }
 
-export const submit = (project: Project, tasks: Array<ApiInputTask>,
-                       relations: Array<TaskRelation>) => {
+export const submit = (project: Project, tasks: Array<ApiInputTask>, delays: Array<ApiInputDelay>,
+                       taskRelations: Array<TaskRelation>, delayRelations: Array<DelayRelation>) => {
     return (dispatch: Dispatch<State>) => {
         dispatch(requestSubmit())
         const requestInit: RequestInit = {
@@ -65,7 +67,9 @@ export const submit = (project: Project, tasks: Array<ApiInputTask>,
             body: JSON.stringify({
                 project,
                 tasks,
-                relations
+                delays,
+                taskRelations,
+                delayRelations
             })
         }
         return fetch("/api/import", requestInit).then((response: Response) => {

@@ -6,7 +6,7 @@ import { StagePanel } from "./stagepanel"
 import { WarningsButton } from "./warningsbutton"
 import { defineStage, defineMaxStage } from "../actions/stages"
 import { submit } from "../actions/overview"
-import { Project, TaskRelation } from "../../../../common/types"
+import { Project, TaskRelation, DelayRelation } from "../../../../common/types"
 import { ApiInputTask, ApiInputDelay } from "../../../../common/apitypes"
 import * as maputils from "../../../../common/maputils"
 
@@ -18,18 +18,20 @@ interface OverviewProperties {
     tasks: Array<ApiInputTask>
     delays: Array<ApiInputDelay>
     totalRelations: number
-    relations: Array<TaskRelation>
+    taskRelations: Array<TaskRelation>
+    delayRelations: Array<DelayRelation>
     warnings: Map<string, Array<string>>
     submitState: SubmitState
     onCurrentStage: () => void
-    onSubmit: (project: Project, tasks: Array<ApiInputTask>, relations: Array<TaskRelation>) => void
+    onSubmit: (project: Project, tasks: Array<ApiInputTask>, delays: Array<ApiInputDelay>,
+               taskRelations: Array<TaskRelation>, delayRelations: Array<DelayRelation>) => void
 }
 
 export class Overview extends React.Component<OverviewProperties, {}> {
     render() {
         const tasksLength = this.props.tasks.length
         const delaysLength = this.props.delays.length
-        const relationsLength = this.props.relations.length
+        const relationsLength = this.props.taskRelations.length + this.props.delayRelations.length
         let warningsButton: JSX.Element | null = null
         let totalWarnings = maputils.lengthOfMapOfList(this.props.warnings)
         if (totalWarnings > 0) {
@@ -64,7 +66,8 @@ export class Overview extends React.Component<OverviewProperties, {}> {
         </StagePanel>
     }
     private handleSubmit(e: React.MouseEvent) {
-        this.props.onSubmit(this.props.project, this.props.tasks, this.props.relations)
+        this.props.onSubmit(this.props.project, this.props.tasks, this.props.delays,
+                            this.props.taskRelations, this.props.delayRelations)
     }
     private getButtonStyle(): string {
         switch (this.props.submitState) {
@@ -101,7 +104,8 @@ export const mapStateToProps = (state: State) => {
         tasks: state.overview.tasks,
         delays: state.overview.delays,
         totalRelations: state.relations.length,
-        relations: state.overview.relations,
+        taskRelations: state.overview.taskRelations,
+        delayRelations: state.overview.delayRelations,
         warnings: state.overview.warnings,
         submitState: state.overview.submitState,
     }
@@ -112,8 +116,9 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
         onCurrentStage: () => {
             dispatch(defineStage(Stage.Relations))
         },
-        onSubmit: (project: Project, tasks: Array<ApiInputTask>, relations: Array<TaskRelation>) => {
-            dispatch(submit(project, tasks, relations))
+        onSubmit: (project: Project, tasks: Array<ApiInputTask>, delays: Array<ApiInputDelay>,
+                   taskRelations: Array<TaskRelation>, delayRelations: Array<DelayRelation>) => {
+            dispatch(submit(project, tasks, delays, taskRelations, delayRelations))
         },
     }
 }

@@ -33,7 +33,7 @@ import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { makeRelations } from "./primaverahelper"
 import {
     warnings, noWarnings, project, apiTasks, primaveraTasks1, primaveraRelations1,
-    selectedDelays1, inputTasks1, inputDelays1, inputRelations1
+    selectedDelays1, inputTasks1, inputDelays1, inputTaskRelations1, inputDelayRelations1
 } from "./testdata"
 import { expectMapEqual } from "./expectutils"
 
@@ -200,7 +200,8 @@ describe("Primavera actions", () => {
                     type: OVERVIEW_FILTER,
                     tasks: inputTasks1,
                     delays: inputDelays1,
-                    relations: inputRelations1,
+                    taskRelations: inputTaskRelations1,
+                    delayRelations: inputDelayRelations1,
                     warnings: noWarnings
                 }
                 const results = filterForOverview(primaveraTasks1, selectedDelays1, relations)
@@ -247,7 +248,8 @@ describe("Primavera actions", () => {
                 fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
-                submit(project, inputTasks1, inputRelations1)(dispatch).then(() => {
+                submit(project, inputTasks1, inputDelays1,
+                       inputTaskRelations1, inputDelayRelations1)(dispatch).then(() => {
                     const expected: Action = {
                         type: OVERVIEW_SUBMIT_RECEIVE
                     }
@@ -272,8 +274,12 @@ describe("Primavera actions", () => {
                 chai.expect(body.project).to.deep.equal(project)
                 chai.expect(body).to.haveOwnProperty("tasks")
                 chai.expect(body.tasks).to.deep.equal(inputTasks1)
-                chai.expect(body).to.haveOwnProperty("relations")
-                chai.expect(body.relations).to.deep.equal(inputRelations1)
+                chai.expect(body).to.haveOwnProperty("delays")
+                chai.expect(body.delays).to.deep.equal(inputDelays1)
+                chai.expect(body).to.haveOwnProperty("taskRelations")
+                chai.expect(body.taskRelations).to.deep.equal(inputTaskRelations1)
+                chai.expect(body).to.haveOwnProperty("delayRelations")
+                chai.expect(body.delayRelations).to.deep.equal(inputDelayRelations1)
             })
             it("Should react to error from server", (done) => {
                 // Mock
@@ -281,7 +287,8 @@ describe("Primavera actions", () => {
                 fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
-                submit(project, inputTasks1, inputRelations1)(dispatch).then(() => {
+                submit(project, inputTasks1, inputDelays1,
+                       inputTaskRelations1, inputDelayRelations1)(dispatch).then(() => {
                     const expected: ErrorAction = {
                         type: OVERVIEW_SUBMIT_RECEIVE_FAILURE,
                         message: "Error message"

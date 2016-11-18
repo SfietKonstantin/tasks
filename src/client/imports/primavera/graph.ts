@@ -24,7 +24,14 @@ export class RelationGraph {
     }
     static fromNodes(nodes: Map<string, RelationGraphNode>): RelationGraph {
         let returned = new RelationGraph()
-        returned.nodes = nodes
+        returned.nodes = new Map<string, RelationGraphNode>()
+        Array.from(nodes.entries(), (entry: [string, RelationGraphNode]) => {
+            returned.nodes.set(entry[0], {
+                identifier: entry[1].identifier,
+                parents: new Map<string, PrimaveraTaskRelation>(entry[1].parents),
+                children: new Map<string, PrimaveraTaskRelation>(entry[1].children)
+            })
+        })
         return returned
     }
     addRelation(relation: PrimaveraTaskRelation) {

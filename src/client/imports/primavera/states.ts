@@ -46,7 +46,8 @@ export const delays: DelaysState = {
 export const overview: OverviewState = {
     tasks: [],
     delays: [],
-    relations: [],
+    taskRelations: [],
+    delayRelations: [],
     warnings: new Map<string, Array<string>>(),
     submitState: SubmitState.Idle
 }

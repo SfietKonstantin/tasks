@@ -176,7 +176,7 @@ export class Api {
             return this.sendTask(projectIdentifier, taskIdentifier)
         })
     }
-    import(project: any, tasks: any, relations: any): Promise<void> {
+    import(project: any, tasks: any, taskRelations: any): Promise<void> {
         return Promise.resolve().then(() => {
             const inputProject = createProject(project)
             if (!(tasks instanceof Array)) {
@@ -185,20 +185,20 @@ export class Api {
             const inputTasks = tasks.map((task) => {
                 return createTask(task)
             })
-            if (!(relations instanceof Array)) {
-                throw new InputError("relations must be an array, not " + relations)
+            if (!(taskRelations instanceof Array)) {
+                throw new InputError("taskRelations must be an array, not " + taskRelations)
             }
-            const inputRelations = relations.map((relation) => {
+            const inputTaskRelations = taskRelations.map((relation) => {
                 return createRelation(relation)
             })
 
-            findCyclicDependency(inputTasks, inputRelations)
+            findCyclicDependency(inputTasks, inputTaskRelations)
 
             return this.graph.addProject(project).then((projectNode: IProjectNode) => {
                 return Promise.all(inputTasks.map((task: Task) => {
                     return projectNode.addTask(task)
                 })).then(() => {
-                    return Promise.all(inputRelations.map((relation: TaskRelation) => {
+                    return Promise.all(inputTaskRelations.map((relation: TaskRelation) => {
                         return projectNode.addRelation(relation)
                     }))
                 })

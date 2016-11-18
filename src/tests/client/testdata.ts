@@ -1,4 +1,4 @@
-import { Project, TaskRelation, TaskLocation } from "../../common/types"
+import { Project, TaskRelation, DelayRelation, TaskLocation } from "../../common/types"
 import { ApiTask, ApiInputTask, ApiInputDelay } from "../../common/apitypes"
 import { PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import { RelationGraph } from "../../client/imports/primavera/graph"
@@ -175,6 +175,18 @@ export const primaveraRelations1: Array<PrimaveraTaskRelation> = [
         next: "milestone1",
         type: "FS",
         lag: 3
+    },
+    {
+        previous: "task1",
+        next: "delay",
+        type: "FS",
+        lag: 0
+    },
+    {
+        previous: "milestone11",
+        next: "delay",
+        type: "FS",
+        lag: 5
     }
 ]
 
@@ -259,7 +271,7 @@ export const inputDelays2: Array<ApiInputDelay> = [
     }
 ]
 
-export const inputRelations1: Array<TaskRelation> = [
+export const inputTaskRelations1: Array<TaskRelation> = [
     {
         previous: "task1",
         next: "milestone1",
@@ -268,24 +280,39 @@ export const inputRelations1: Array<TaskRelation> = [
     }
 ]
 
-export const inputRelations2: Array<TaskRelation> = [
+export const inputTaskRelations2: Array<TaskRelation> = [
     {
         previous: "task1",
-        next: "milestone1",
-        previousLocation: TaskLocation.End,
-        lag: 1
-    },
-    {
-        previous: "milestone1",
         next: "task2",
         previousLocation: TaskLocation.End,
-        lag: 9
+        lag: 10
     },
     {
         previous: "milestone2",
         next: "task4",
         previousLocation: TaskLocation.End,
         lag: 3
+    }
+]
+
+export const inputDelayRelations1: Array<DelayRelation> = [
+    {
+        task: "task1",
+        delay: "delay",
+        lag: 0
+    },
+    {
+        task: "milestone11",
+        delay: "delay",
+        lag: 5
+    }
+]
+
+export const inputDelayRelations2: Array<DelayRelation> = [
+    {
+        task: "task1",
+        delay: "milestone1",
+        lag: 1
     }
 ]
 

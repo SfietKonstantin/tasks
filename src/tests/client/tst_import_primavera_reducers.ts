@@ -39,7 +39,7 @@ import {
     cloneObject, cloneArray, cloneMap, cloneSet, mapToArray,
     warnings, noWarnings, project, primaveraTasks2,
     primaveraRelationNodes2, selectedDelays2,
-    inputTasks2, inputDelays2, inputRelations2
+    inputTasks2, inputDelays2, inputTaskRelations2, inputDelayRelations2
 } from "./testdata"
 
 const graphDiff: Array<GraphDiff> = [
@@ -101,7 +101,8 @@ describe("Primavera reducers", () => {
             overview: {
                 tasks: cloneArray(inputTasks2),
                 delays: cloneArray(inputDelays2),
-                relations: cloneArray(inputRelations2),
+                taskRelations: cloneArray(inputTaskRelations2),
+                delayRelations: cloneArray(inputDelayRelations2),
                 warnings: cloneMap(warnings),
                 submitState: SubmitState.Submitted
             }
@@ -366,7 +367,8 @@ describe("Primavera reducers", () => {
                 const state = main.mainReducer(initialState, action)
                 chai.expect(state.overview.tasks).to.deep.equal(inputTasks2)
                 chai.expect(state.overview.delays).to.deep.equal(inputDelays2)
-                chai.expect(state.overview.relations).to.deep.equal(inputRelations2)
+                chai.expect(state.overview.taskRelations).to.deep.equal(inputTaskRelations2)
+                chai.expect(state.overview.delayRelations).to.deep.equal(inputDelayRelations2)
                 chai.expect(state.overview.warnings.size).to.equal(0)
             }
             checkState(initialState1)
@@ -464,7 +466,8 @@ describe("Primavera reducers", () => {
                     chai.expect(mapped.tasks).to.deep.equal(initialState.overview.tasks)
                     chai.expect(mapped.delays).to.deep.equal(initialState.overview.delays)
                     chai.expect(mapped.totalRelations).to.equal(initialState.relations.length)
-                    chai.expect(mapped.relations).to.deep.equal(initialState.overview.relations)
+                    chai.expect(mapped.taskRelations).to.deep.equal(initialState.overview.taskRelations)
+                    chai.expect(mapped.delayRelations).to.deep.equal(initialState.overview.delayRelations)
                     expectMapEqual(mapped.warnings, initialState.overview.warnings)
                     chai.expect(mapped.submitState).to.equal(initialState.overview.submitState)
                 }

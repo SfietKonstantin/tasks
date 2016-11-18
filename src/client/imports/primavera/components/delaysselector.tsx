@@ -58,7 +58,7 @@ export class DelaysSelector extends React.Component<DelaysSelectorProperties, {}
         </StagePanel>
     }
     private createTaskElement(task: PrimaveraTask): JSX.Element {
-        return <ListGroupItem>
+        return <ListGroupItem key={task.identifier}>
             <Checkbox inline onClick={this.handleSelectionChanged.bind(this, task.identifier)}
                       checked={this.props.selection.has(task.identifier)}>
                 {task.name} <span className="text-muted">#{task.identifier}</span>

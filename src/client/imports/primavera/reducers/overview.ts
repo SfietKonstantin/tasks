@@ -1,5 +1,6 @@
 import { Action } from "redux"
 import { OverviewState, SubmitState } from "../types"
+import { overview } from "../states"
 import { ErrorAction } from "../../../common/actions/errors"
 import { TaskRelation } from "../../../../common/types"
 import { ApiInputTask, ApiInputDelay } from "../../../../common/apitypes"
@@ -11,22 +12,15 @@ import {
     OVERVIEW_SUBMIT_RECEIVE_FAILURE
 } from "../actions/overview"
 
-const initialState: OverviewState = {
-    tasks: [],
-    delays: [],
-    relations: [],
-    warnings: new Map<string, Array<string>>(),
-    submitState: SubmitState.Idle
-}
-
-export const overviewReducer = (state: OverviewState = initialState, action: Action): OverviewState => {
+export const overviewReducer = (state: OverviewState = overview, action: Action): OverviewState => {
     switch (action.type) {
         case OVERVIEW_FILTER:
             const overviewAction = action as OverviewFilterAction
             return Object.assign({}, state, {
                 tasks: overviewAction.tasks,
                 delays: overviewAction.delays,
-                relations: overviewAction.relations,
+                taskRelations: overviewAction.taskRelations,
+                delayRelations: overviewAction.delayRelations,
                 warnings: overviewAction.warnings
             })
         case OVERVIEW_SUBMIT_REQUEST:

@@ -8,7 +8,10 @@ import { Stage, SubmitState } from "../../client/imports/primavera/types"
 import { Project } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { expectMapEqual } from "./expectutils"
-import { warnings, noWarnings, project, emptyProject, inputTasks1, inputDelays1, inputRelations1 } from "./testdata"
+import {
+    warnings, noWarnings, project, emptyProject,
+    inputTasks1, inputDelays1, inputTaskRelations1, inputDelayRelations1
+} from "./testdata"
 
 describe("Primavera import Overview", () => {
     beforeEach(() => {
@@ -27,7 +30,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={inputTasks1}
                                                    delays={inputDelays1}
                                                    totalRelations={234}
-                                                   relations={inputRelations1}
+                                                   taskRelations={inputTaskRelations1}
+                                                   delayRelations={inputDelayRelations1}
                                                    warnings={warnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -44,7 +48,7 @@ describe("Primavera import Overview", () => {
         chai.expect(tasksComponents.childAt(3).text()).to.equal(" delays of the 123 tasks will be imported")
 
         const relationsComponents = component.childAt(1)
-        chai.expect(relationsComponents.childAt(0).children().text()).to.equal("1")
+        chai.expect(relationsComponents.childAt(0).children().text()).to.equal("3")
         chai.expect(relationsComponents.childAt(1).text()).to.equal(" of the 234 relations will be imported")
 
         component.simulate("current")
@@ -61,7 +65,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={inputTasks1}
                                                    delays={inputDelays1}
                                                    totalRelations={234}
-                                                   relations={inputRelations1}
+                                                   taskRelations={inputTaskRelations1}
+                                                   delayRelations={inputDelayRelations1}
                                                    warnings={warnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -70,7 +75,8 @@ describe("Primavera import Overview", () => {
         const submitButton = component.find("Button")
         submitButton.simulate("click")
         chai.expect(onSubmit.calledOnce).to.true
-        chai.expect(onSubmit.calledWithExactly(project, inputTasks1, inputRelations1)).to.true
+        chai.expect(onSubmit.calledWithExactly(project, inputTasks1, inputDelays1,
+                                               inputTaskRelations1, inputDelayRelations1)).to.true
     })
     it("Should render the warning button 1", () => {
         const project: Project = {
@@ -87,7 +93,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={warnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -106,7 +113,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -130,7 +138,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -154,7 +163,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -173,7 +183,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -192,7 +203,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={inputTasks1}
                                                    delays={inputDelays1}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -211,7 +223,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={inputTasks1}
                                                    delays={inputDelays1}
                                                    totalRelations={234}
-                                                   relations={inputRelations1}
+                                                   taskRelations={inputTaskRelations1}
+                                                   delayRelations={inputDelayRelations1}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Submitted}
                                                    onCurrentStage={onCurrentStage}
@@ -230,7 +243,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={inputTasks1}
                                                    delays={inputDelays1}
                                                    totalRelations={234}
-                                                   relations={inputRelations1}
+                                                   taskRelations={inputTaskRelations1}
+                                                   delayRelations={inputDelayRelations1}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -249,7 +263,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Idle}
                                                    onCurrentStage={onCurrentStage}
@@ -269,7 +284,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Submitting}
                                                    onCurrentStage={onCurrentStage}
@@ -289,7 +305,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.Submitted}
                                                    onCurrentStage={onCurrentStage}
@@ -309,7 +326,8 @@ describe("Primavera import Overview", () => {
                                                    tasks={[]}
                                                    delays={[]}
                                                    totalRelations={234}
-                                                   relations={[]}
+                                                   taskRelations={[]}
+                                                   delayRelations={[]}
                                                    warnings={noWarnings}
                                                    submitState={SubmitState.SubmitError}
                                                    onCurrentStage={onCurrentStage}

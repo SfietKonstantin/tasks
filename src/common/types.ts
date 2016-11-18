@@ -46,6 +46,6 @@ export interface Delay extends Identifiable {
 
 export interface DelayRelation {
     task: string
-    relation: string
+    delay: string
     lag: number
 }

@@ -114,7 +114,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -149,12 +149,12 @@ describe("API", () => {
                 projectNodeMock.expects("addTask").once().withExactArgs(createTask(task))
                                .returns(Promise.resolve(taskNode))
             })
-            relations.map((relation: TaskRelation) => {
+            taskRelations.map((relation: TaskRelation) => {
                 projectNodeMock.expects("addRelation").once().withExactArgs(createRelation(relation))
                                .returns(Promise.resolve())
             })
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done()
             }).catch((error) => {
                 done(error)
@@ -201,7 +201,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -231,7 +231,7 @@ describe("API", () => {
             mock.expects("addProject").once().withExactArgs(project)
                 .returns(Promise.reject(new ExistsError("Some error")))
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -282,7 +282,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -312,7 +312,7 @@ describe("API", () => {
             mock.expects("addProject").once().withExactArgs(project)
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -363,7 +363,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -393,7 +393,7 @@ describe("API", () => {
             mock.expects("addProject").once().withExactArgs(project)
                 .returns(Promise.reject(new FakeError("Some error")))
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
@@ -443,7 +443,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -477,7 +477,7 @@ describe("API", () => {
                                .returns(Promise.reject(new ExistsError("Some error")))
             })
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -528,7 +528,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -562,7 +562,7 @@ describe("API", () => {
                                .returns(Promise.reject(new InternalError("Some error")))
             })
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -613,7 +613,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -647,7 +647,7 @@ describe("API", () => {
                                .returns(Promise.reject(new FakeError("Some error")))
             })
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
@@ -697,7 +697,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -732,12 +732,12 @@ describe("API", () => {
                 projectNodeMock.expects("addTask").once().withExactArgs(createTask(task))
                                .returns(Promise.resolve(taskNode))
             })
-            relations.map((relation: TaskRelation) => {
+            taskRelations.map((relation: TaskRelation) => {
                 projectNodeMock.expects("addRelation").once().withExactArgs(createRelation(relation))
                                .returns(Promise.reject(new NotFoundError("Some error")))
             })
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -788,7 +788,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -823,12 +823,12 @@ describe("API", () => {
                 projectNodeMock.expects("addTask").once().withExactArgs(createTask(task))
                                .returns(Promise.resolve(taskNode))
             })
-            relations.map((relation: TaskRelation) => {
+            taskRelations.map((relation: TaskRelation) => {
                 projectNodeMock.expects("addRelation").once().withExactArgs(createRelation(relation))
                                .returns(Promise.reject(new InternalError("Some error")))
             })
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -879,7 +879,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -914,12 +914,12 @@ describe("API", () => {
                 projectNodeMock.expects("addTask").once().withExactArgs(createTask(task))
                                .returns(Promise.resolve(taskNode))
             })
-            relations.map((relation: TaskRelation) => {
+            taskRelations.map((relation: TaskRelation) => {
                 projectNodeMock.expects("addRelation").once().withExactArgs(createRelation(relation))
                                .returns(Promise.reject(new FakeError("Some error")))
             })
 
-            api.import(project, tasks, relations).then(() => {
+            api.import(project, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
@@ -963,7 +963,7 @@ describe("API", () => {
                     estimatedDuration: 30
                 }
             ]
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -989,7 +989,7 @@ describe("API", () => {
                     lag: 10
                 }
             ]
-            api.import({ test: "test" }, tasks, relations).then(() => {
+            api.import({ test: "test" }, tasks, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -1009,7 +1009,7 @@ describe("API", () => {
                 name: "Project",
                 description: "Description"
             }
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -1035,7 +1035,7 @@ describe("API", () => {
                     lag: 10
                 }
             ]
-            api.import(project, { test: "test" }, relations).then(() => {
+            api.import(project, { test: "test" }, taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
@@ -1055,7 +1055,7 @@ describe("API", () => {
                 name: "Project",
                 description: "Description"
             }
-            const relations: Array<TaskRelation> = [
+            const taskRelations: Array<TaskRelation> = [
                 {
                     previous: "root",
                     previousLocation: TaskLocation.End,
@@ -1081,7 +1081,7 @@ describe("API", () => {
                     lag: 10
                 }
             ]
-            api.import(project, [{ test: "test" }], relations).then(() => {
+            api.import(project, [{ test: "test" }], taskRelations).then(() => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
