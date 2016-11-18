@@ -38,7 +38,6 @@ describe("Primavera import", () => {
             const expected: PrimaveraTask = {
                 identifier: "id",
                 name: "Task",
-                duration: 25,
                 startDate: new Date(2016, 1, 1),
                 endDate: new Date(2016, 1, 26)
             }
@@ -53,32 +52,11 @@ describe("Primavera import", () => {
             chai.expect(results.tasks.size).to.equal(0)
             chai.expect(results.warnings.size).to.equal(0)
         })
-        it("Should not import invalid task with invalid duration", () => {
-            const tasks = "header\nsecond_line\nid\t\t\t\tTask\tabcde\t\t1/02/2016 12:34:56\t26/02/2016 12:34:56"
-            const results = parseTasks(tasks)
-            chai.expect(results).to.length(1)
-            chai.expect(results.tasks.size).to.equal(0)
-            chai.expect(results.warnings.size).to.equal(1)
-        })
         it("Should not import invalid task with invalid start date and end date", () => {
             const tasks = "header\nsecond_line\nid\t\t\t\tTask\t25\t\tabcde\tabcde"
             const results = parseTasks(tasks)
             chai.expect(results).to.length(1)
             chai.expect(results.tasks.size).to.equal(0)
-            chai.expect(results.warnings.size).to.equal(1)
-        })
-        it("Should emit different duration warnings", () => {
-            const tasks = "header\nsecond_line\nid\t\t\t\tTask\t30\t\t1/02/2016 12:34:56\t26/02/2016 12:34:56"
-            const results = parseTasks(tasks)
-            const expected: PrimaveraTask = {
-                identifier: "id",
-                name: "Task",
-                duration: 30,
-                startDate: new Date(2016, 1, 1),
-                endDate: new Date(2016, 1, 26)
-            }
-            chai.expect(results).to.length(1)
-            chai.expect(results.tasks.get("id")).to.deep.equal(expected)
             chai.expect(results.warnings.size).to.equal(1)
         })
         it("Should emit duplicated warnings", () => {
@@ -89,7 +67,6 @@ describe("Primavera import", () => {
             const expected: PrimaveraTask = {
                 identifier: "id",
                 name: "Task 1",
-                duration: 25,
                 startDate: new Date(2016, 1, 1),
                 endDate: new Date(2016, 1, 26)
             }
@@ -103,7 +80,6 @@ describe("Primavera import", () => {
             const expected: PrimaveraTask = {
                 identifier: "id",
                 name: "Task",
-                duration: 0,
                 startDate: new Date(2016, 1, 1),
                 endDate: null
             }
@@ -117,41 +93,12 @@ describe("Primavera import", () => {
             const expected: PrimaveraTask = {
                 identifier: "id",
                 name: "Task",
-                duration: 0,
                 startDate: null,
                 endDate: new Date(2016, 1, 26)
             }
             chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
             chai.expect(results.warnings.size).to.equal(0)
-        })
-        it("Should emit milestone with duration warning 1", () => {
-            const tasks = "header\nsecond_line\nid\t\t\t\tTask\t25\t\t1/02/2016 12:34:56\t"
-            const results = parseTasks(tasks)
-            const expected: PrimaveraTask = {
-                identifier: "id",
-                name: "Task",
-                duration: 0,
-                startDate: new Date(2016, 1, 1),
-                endDate: null
-            }
-            chai.expect(results).to.length(1)
-            chai.expect(results.tasks.get("id")).to.deep.equal(expected)
-            chai.expect(results.warnings.size).to.equal(1)
-        })
-        it("Should emit milestone with duration warning 2", () => {
-            const tasks = "header\nsecond_line\nid\t\t\t\tTask\t25\t\t\t26/02/2016 12:34:56"
-            const results = parseTasks(tasks)
-            const expected: PrimaveraTask = {
-                identifier: "id",
-                name: "Task",
-                duration: 0,
-                startDate: null,
-                endDate: new Date(2016, 1, 26)
-            }
-            chai.expect(results).to.length(1)
-            chai.expect(results.tasks.get("id")).to.deep.equal(expected)
-            chai.expect(results.warnings.size).to.equal(1)
         })
     })
     describe("Relations", () => {
@@ -267,14 +214,12 @@ describe("Primavera import", () => {
             input.set("task1", {
                 identifier: "task1",
                 name: "Task 1",
-                duration: 20,
                 startDate: new Date(2016, 9, 1),
                 endDate: new Date(2016, 9, 16)
             })
             input.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
-                duration: 0,
                 startDate: new Date(2016, 9, 1),
                 endDate: null
             })
@@ -303,28 +248,24 @@ describe("Primavera import", () => {
             tasks.set("task1", {
                 identifier: "task1",
                 name: "Task 1",
-                duration: 20,
                 startDate: new Date(2016, 9, 1),
                 endDate: new Date(2016, 9, 16)
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
-                duration: 20,
                 startDate: new Date(2016, 9, 1),
                 endDate: new Date(2016, 9, 16)
             })
             tasks.set("task3", {
                 identifier: "task3",
                 name: "Task 3",
-                duration: 20,
                 startDate: new Date(2016, 9, 1),
                 endDate: new Date(2016, 9, 16)
             })
             tasks.set("task4", {
                 identifier: "task4",
                 name: "Task 4",
-                duration: 20,
                 startDate: new Date(2016, 9, 1),
                 endDate: new Date(2016, 9, 16)
             })

@@ -42,7 +42,6 @@ export const parseTasks = (content: string): TasksParseResults => {
 
         const identifier = splittedLine[0]
         const name = splittedLine[4]
-        let duration = +splittedLine[5]
         const startDate = convertDate(splittedLine[7])
         const endDate = convertDate(splittedLine[8])
 
@@ -51,27 +50,9 @@ export const parseTasks = (content: string): TasksParseResults => {
             return
         }
 
-        if (Number.isNaN(duration)) {
-            maputils.addToMapOfList(warnings, identifier, "Task do not have a valid duration")
-            return
-        }
-
         if (startDate == null && endDate == null) {
             maputils.addToMapOfList(warnings, identifier, "Task do not have valid dates")
             return
-        } else {
-            if (duration > 0 && startDate != null && endDate != null) {
-                const computedDuration = dateutils.getDateDiff(startDate, endDate)
-                if (duration !== computedDuration) {
-                    maputils.addToMapOfList(warnings, identifier, "Duration do not match with the computed duration")
-                }
-            }
-            if (startDate == null || endDate == null) {
-                if (duration > 0) {
-                    duration = 0
-                    maputils.addToMapOfList(warnings, identifier, "A milestone cannot have a duration")
-                }
-            }
         }
 
         if (tasks.has(identifier)) {
@@ -84,7 +65,6 @@ export const parseTasks = (content: string): TasksParseResults => {
             name,
             startDate,
             endDate,
-            duration
         })
     })
 

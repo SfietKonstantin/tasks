@@ -11,42 +11,36 @@ describe("Primavera graph", () => {
             tasks.set("task11", {
                 identifier: "task11",
                 name: "Task 1-1",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task12", {
                 identifier: "task12",
                 name: "Task 1-2",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task13", {
                 identifier: "task13",
                 name: "Task 1-3",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("milestone", {
                 identifier: "milestone",
                 name: "Milestone",
-                duration: 0,
                 startDate: null,
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task21", {
                 identifier: "task21",
                 name: "Task 2-1",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
             tasks.set("task22", {
                 identifier: "task21",
                 name: "Task 2-2",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
@@ -139,28 +133,24 @@ describe("Primavera graph", () => {
             tasks.set("task11", {
                 identifier: "task11",
                 name: "Task 1-1",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("delay", {
                 identifier: "delay",
                 name: "Task delay",
-                duration: 10,
                 startDate: new Date(2016, 8, 6),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task21", {
                 identifier: "task21",
                 name: "Task 2-1",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
             tasks.set("task22", {
                 identifier: "task21",
                 name: "Task 2-2",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
@@ -215,28 +205,24 @@ describe("Primavera graph", () => {
             tasks.set("task1", {
                 identifier: "task1",
                 name: "Task 1",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("milestone1", {
                 identifier: "milestone1",
                 name: "Milestone 1",
-                duration: 0,
                 startDate: null,
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("milestone2", {
                 identifier: "milestone2",
                 name: "Milestone 2",
-                duration: 0,
                 startDate: new Date(2016, 8, 16),
                 endDate: null
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
@@ -284,21 +270,18 @@ describe("Primavera graph", () => {
             tasks.set("task1", {
                 identifier: "task1",
                 name: "Task 1",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("milestone", {
                 identifier: "milestone",
                 name: "Milestone",
-                duration: 0,
                 startDate: null,
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
@@ -324,21 +307,18 @@ describe("Primavera graph", () => {
             tasks.set("task1", {
                 identifier: "task1",
                 name: "Task 1",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("milestone", {
                 identifier: "milestone",
                 name: "Milestone",
-                duration: 0,
                 startDate: null,
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
@@ -373,21 +353,18 @@ describe("Primavera graph", () => {
             tasks.set("task1", {
                 identifier: "task1",
                 name: "Task 1",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("delay", {
                 identifier: "delay",
                 name: "Task as delay",
-                duration: 10,
                 startDate: new Date(2016, 8, 6),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
@@ -422,21 +399,18 @@ describe("Primavera graph", () => {
             tasks.set("task1", {
                 identifier: "task1",
                 name: "Task 1",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("delay", {
                 identifier: "delay",
                 name: "Task as delay",
-                duration: 10,
                 startDate: new Date(2016, 8, 6),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
@@ -479,42 +453,36 @@ describe("Primavera graph", () => {
             tasks.set("task11", {
                 identifier: "task11",
                 name: "Task 1-1",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task12", {
                 identifier: "task12",
                 name: "Task 1-2",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task13", {
                 identifier: "task13",
                 name: "Task 1-3",
-                duration: 15,
                 startDate: new Date(2016, 8, 1),
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("milestone", {
                 identifier: "milestone",
                 name: "Milestone",
-                duration: 0,
                 startDate: null,
                 endDate: new Date(2016, 8, 16)
             })
             tasks.set("task21", {
                 identifier: "task21",
                 name: "Task 2-1",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })
             tasks.set("task22", {
                 identifier: "task21",
                 name: "Task 2-2",
-                duration: 10,
                 startDate: new Date(2016, 8, 16),
                 endDate: new Date(2016, 8, 26)
             })

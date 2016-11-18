@@ -28,7 +28,6 @@ export interface State {
 export interface PrimaveraTask {
     identifier: string
     name: string
-    duration: number
     startDate: Date | null
     endDate: Date | null
 }

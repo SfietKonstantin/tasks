@@ -95,21 +95,18 @@ export let primaveraTasks1 = new Map<string, PrimaveraTask>()
 primaveraTasks1.set("task1", {
     identifier: "task1",
     name: "Task 1",
-    duration: 30,
     startDate: new Date(2016, 9, 1),
     endDate: new Date(2016, 10, 1)
 })
 primaveraTasks1.set("delay", {
     identifier: "delay",
     name: "Delay",
-    duration: 0,
     startDate: new Date(2016, 9, 1),
     endDate: null
 })
 primaveraTasks1.set("milestone1", {
     identifier: "milestone1",
     name: "Milestone 1",
-    duration: 0,
     startDate: null,
     endDate: new Date(2016, 10, 1)
 })
@@ -118,42 +115,36 @@ export let primaveraTasks2: Map<string, PrimaveraTask> = new Map<string, Primave
 primaveraTasks2.set("task1", {
     identifier: "task1",
     name: "Task 1",
-    duration: 15,
     startDate: new Date(2016, 8, 1),
     endDate: new Date(2016, 8, 16)
 })
 primaveraTasks2.set("task2", {
     identifier: "task2",
     name: "Task 2",
-    duration: 30,
     startDate: new Date(2016, 8, 25),
     endDate: new Date(2016, 9, 25)
 })
 primaveraTasks2.set("task3", {
     identifier: "task3",
     name: "Task 3",
-    duration: 31,
     startDate: new Date(2016, 9, 15),
     endDate: new Date(2016, 10, 15)
 })
 primaveraTasks2.set("task4", {
     identifier: "task4",
     name: "Task 4",
-    duration: 5,
     startDate: new Date(2016, 11, 5),
     endDate: new Date(2016, 11, 10)
 })
 primaveraTasks2.set("milestone1", {
     identifier: "milestone1",
     name: "Milestone 1",
-    duration: 0,
     startDate: null,
     endDate: new Date(2016, 8, 17)
 })
 primaveraTasks2.set("milestone2", {
     identifier: "milestone2",
     name: "Milestone 2",
-    duration: 0,
     startDate: null,
     endDate: new Date(2016, 11, 2)
 })
