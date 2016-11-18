@@ -1,6 +1,8 @@
-import { Project, Task, TaskRelation, TaskResults, TaskLocation, Modifier } from "../../../common/types"
+import {
+    Project, Task, TaskRelation, TaskResults, TaskLocation, Modifier, Delay, DelayRelation
+} from "../../../common/types"
 import { ExistsError, NotFoundError } from "../../../common/errors"
-import { GraphError, ITaskNode, IProjectNode, IGraph } from "./types"
+import { GraphError, ITaskNode, IDelayNode, IProjectNode, IGraph } from "./types"
 import { IDataProvider } from "../data/idataprovider"
 import * as dateutils from "../../../common/dateutils"
 import * as maputils from "../../../common/maputils"
@@ -12,6 +14,7 @@ export class TaskNode implements ITaskNode {
     duration: number
     children: Array<ITaskNode>
     parents: Array<ITaskNode>
+    delays: Array<IDelayNode>
     modifiers: Array<Modifier>
     private dataProvider: IDataProvider
     private estimatedStartDate: Date
@@ -31,6 +34,7 @@ export class TaskNode implements ITaskNode {
         this.duration = duration
         this.children = []
         this.parents = []
+        this.delays = []
         this.modifiers = []
         this.childrenRelations = new Map<string, TaskRelation>()
         this.parentsRelations = new Map<string, TaskRelation>()
@@ -55,6 +59,12 @@ export class TaskNode implements ITaskNode {
         node.parents.push(this)
         node.parentsRelations.set(this.taskIdentifier, relation)
         return this.computeChildren(new Set<ITaskNode>())
+    }
+    addDelay(node: DelayNode, relation: DelayRelation) {
+        this.delays.push(node)
+        node.relations.set(this.taskIdentifier, relation)
+        node.tasks.push(this)
+        return this.computeDelays()
     }
     getEndDate(): Date {
         return dateutils.addDays(this.startDate, this.duration)
@@ -132,6 +142,9 @@ export class TaskNode implements ITaskNode {
                     startDate: this.startDate,
                     duration: this.duration
                 })
+            }).then(() => {
+                // Compute delays
+                this.computeDelays()
             })
         }).then(() => {
             markedNodes.delete(this)
@@ -142,18 +155,53 @@ export class TaskNode implements ITaskNode {
             return child.markAndCompute(new Set<ITaskNode>(markedNodes))
         }))
     }
+    private computeDelays() {
+        this.delays.forEach((delay: IDelayNode) => {
+            (delay as DelayNode).compute()
+        })
+    }
+}
+
+export class DelayNode implements IDelayNode {
+    parent: IProjectNode
+    delayIdentifier: string
+    margin: number
+    tasks: Array<ITaskNode>
+    relations: Map<string, DelayRelation>
+    private dataProvider: IDataProvider
+    private date: Date
+    constructor(dataProvider: IDataProvider,
+                parent: IProjectNode, delayIdentifier: string, date: Date) {
+        this.dataProvider = dataProvider
+        this.parent = parent
+        this.delayIdentifier = delayIdentifier
+        this.margin = 0
+        this.date = date
+        this.tasks = []
+        this.relations = new Map<string, DelayRelation>()
+    }
+    compute() {
+        const margins = this.tasks.map((node: ITaskNode) => {
+            const relation = maputils.get(this.relations, node.taskIdentifier)
+            const diff = dateutils.getDateDiff(dateutils.addDays(node.startDate, node.duration), this.date)
+            return diff - relation.lag
+        })
+        this.margin = Math.min(...margins)
+    }
 }
 
 export class ProjectNode implements IProjectNode {
     parent: IGraph
     projectIdentifier: string
     nodes: Map<string, ITaskNode>
+    delays: Map<string, IDelayNode>
     private dataProvider: IDataProvider
     constructor(dataProvider: IDataProvider, parent: IGraph, projectIdentifier: string) {
         this.dataProvider = dataProvider
         this.parent = parent
         this.projectIdentifier = projectIdentifier
         this.nodes = new Map<string, ITaskNode>()
+        this.delays = new Map<string, IDelayNode>()
     }
     load(): Promise<void> {
         return this.dataProvider.getProjectTasks(this.projectIdentifier).then((tasks: Array<Task>) => {
@@ -165,25 +213,43 @@ export class ProjectNode implements IProjectNode {
                                               results.startDate, results.duration)
                     this.nodes.set(task.identifier, node)
                 })
-            })).then(() => {
-                return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
-                    return this.dataProvider.getTaskModifiers(this.projectIdentifier, node.taskIdentifier)
-                               .then((modifiers: Array<Modifier>) => {
-                        node.modifiers = modifiers
-                    })
-                }))
-            }).then(() => {
-                return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
-                    return this.dataProvider.getTaskRelations(this.projectIdentifier, node.taskIdentifier)
-                               .then((taskRelations: Array<TaskRelation>) => {
-                        taskRelations.forEach((taskRelation: TaskRelation) => {
-                            const child = maputils.get(this.nodes, taskRelation.next) as TaskNode
-                            let taskNode = node as TaskNode
-                            taskNode.addChild(child, taskRelation)
-                        })
-                    })
-                }))
+            }))
+        }).then(() => {
+            return this.dataProvider.getProjectDelays(this.projectIdentifier).then((delays: Array<Delay>) => {
+                delays.forEach((delay: Delay) => {
+                    const node = new DelayNode(this.dataProvider, this, delay.identifier, delay.date)
+                    this.delays.set(delay.identifier, node)
+                })
             })
+        }).then(() => {
+            return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
+                return this.dataProvider.getTaskModifiers(this.projectIdentifier, node.taskIdentifier)
+                            .then((modifiers: Array<Modifier>) => {
+                    node.modifiers = modifiers
+                })
+            }))
+        }).then(() => {
+            return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
+                return this.dataProvider.getTaskRelations(this.projectIdentifier, node.taskIdentifier)
+                            .then((taskRelations: Array<TaskRelation>) => {
+                    taskRelations.forEach((taskRelation: TaskRelation) => {
+                        const child = maputils.get(this.nodes, taskRelation.next) as TaskNode
+                        let taskNode = node as TaskNode
+                        taskNode.addChild(child, taskRelation)
+                    })
+                })
+            }))
+        }).then(() => {
+            return Promise.all(Array.from(this.delays.values(), (node: IDelayNode) => {
+                return this.dataProvider.getDelayRelations(this.projectIdentifier, node.delayIdentifier)
+                           .then((delayRelations: Array<DelayRelation>) => {
+                    delayRelations.forEach((delayRelation: DelayRelation) => {
+                        const task = maputils.get(this.nodes, delayRelation.task) as TaskNode
+                        let delayNode = node as DelayNode
+                        task.addDelay(delayNode, delayRelation)
+                    })
+                })
+            }))
         })
     }
     addTask(task: Task): Promise<ITaskNode> {
@@ -204,7 +270,17 @@ export class ProjectNode implements IProjectNode {
             return node
         })
     }
-    addRelation(relation: TaskRelation): Promise<void> {
+    addDelay(delay: Delay): Promise<IDelayNode> {
+        if (this.delays.has(delay.identifier)) {
+            return Promise.reject(new ExistsError("Delay \"" + delay.identifier + "\" is already present in project"))
+        }
+        return this.dataProvider.addDelay(this.projectIdentifier, delay).then(() => {
+            const node = new DelayNode(this.dataProvider, this, delay.identifier, delay.date)
+            this.delays.set(delay.identifier, node)
+            return node
+        })
+    }
+    addTaskRelation(relation: TaskRelation): Promise<void> {
         if (!this.nodes.has(relation.previous)) {
             return Promise.reject(new NotFoundError("Task \"" + relation.previous + "\" is not present in project"))
         }
@@ -216,6 +292,20 @@ export class ProjectNode implements IProjectNode {
             const child = maputils.get(this.nodes, relation.next) as TaskNode
             let taskNode = maputils.get(this.nodes, relation.previous) as TaskNode
             return taskNode.addChild(child, relation)
+        })
+    }
+    addDelayRelation(relation: DelayRelation): Promise<void> {
+        if (!this.nodes.has(relation.task)) {
+            return Promise.reject(new NotFoundError("Task \"" + relation.task + "\" is not present in project"))
+        }
+        if (!this.delays.has(relation.delay)) {
+            return Promise.reject(new NotFoundError("Delay \"" + relation.delay + "\" is not present in project"))
+        }
+
+        return this.dataProvider.addDelayRelation(this.projectIdentifier, relation).then(() => {
+            const delay = maputils.get(this.delays, relation.delay) as DelayNode
+            let taskNode = maputils.get(this.nodes, relation.task) as TaskNode
+            return taskNode.addDelay(delay, relation)
         })
     }
 }

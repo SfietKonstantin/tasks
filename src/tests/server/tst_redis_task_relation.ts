@@ -342,6 +342,57 @@ describe("Redis", () => {
                 done(error)
             })
         })
+        it("Should delete task relation", (done) => {
+            client.delAsync("task:project:task1:relation:task2").then((result) => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on corrupted task", (done) => {
+            db.getTaskRelations("project", "task1").then(() => {
+                done(new Error("getTaskRelations should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(CorruptedError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should restore task relation", (done) => {
+            db.addTaskRelation("project", {
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                lag: 12
+            }).then(() => {
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get task relations", (done) => {
+            db.getTaskRelations("project", "task1").then((taskRelations: Array<TaskRelation>) => {
+                const expected: Array<TaskRelation> = [
+                    {
+                        previous: "task1",
+                        previousLocation: TaskLocation.End,
+                        next: "task2",
+                        lag: 12
+                    },
+                    {
+                        previous: "task1",
+                        previousLocation: TaskLocation.Beginning,
+                        next: "task3",
+                        lag: 23
+                    }
+                ]
+                chai.expect(taskRelations).to.deep.equal(expected)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
         it("Should corrupt task properties", (done) => {
             client.setAsync("task:project:task1:relations", "test").then((result) => {
                 done()

@@ -1,7 +1,7 @@
 import { IDataProvider, CorruptedError, InternalError, isKnownError } from "./idataprovider"
 import {
     Identifiable, Project, Task, TaskRelation, TaskResults,
-    Modifier, TaskLocation, Delay
+    Modifier, TaskLocation, Delay, DelayRelation
 } from "../../../common/types"
 import { ExistsError, NotFoundError } from "../../../common/errors"
 import * as redis from "redis"
@@ -63,9 +63,18 @@ const modifierKey = (projectIdentifier: string, modifierId: number, property: st
     return "modifier:" + projectIdentifier + ":" + modifierId + ":" + property
 }
 
-const delayRootKey = (projectIdentifier: string, taskIdentifier: string) => {
-    return "delay:" + projectIdentifier + ":" + taskIdentifier
+const delayRootKey = (projectIdentifier: string, delayIdentifier: string) => {
+    return "delay:" + projectIdentifier + ":" + delayIdentifier
 }
+
+const delayKey = (projectIdentifier: string, delayIdentifier: string, property: string) => {
+    return "delay:" + projectIdentifier + ":" + delayIdentifier + ":" + property
+}
+
+const delayRelationKey = (projectIdentifier: string, delay: string, task: string) => {
+    return "delay:" + projectIdentifier + ":" + delay + ":relation:" + task
+}
+
 
 const fromTaskLocation = (location: TaskLocation): string => {
     switch (location) {
@@ -198,6 +207,9 @@ class RedisTaskRelation {
                 client: redis.RedisClient): Promise<TaskRelation> {
         return client.hgetallAsync(taskRelationKey(projectIdentifier, previous, next))
                      .then((result: any) => {
+            if (result == null) {
+                throw new CorruptedError("TaskRelation " + previous + "-" + next + " is null")
+            }
             if (!result.hasOwnProperty("previousLocation")) {
                 throw new CorruptedError("TaskRelation " + previous + "-" + next
                                                          + " do not have property previousLocation")
@@ -309,6 +321,41 @@ class RedisDelay {
                 date: new Date(+result["date"]),
             }
             return delay
+        })
+    }
+}
+
+class RedisDelayRelation {
+    lag: number
+
+    constructor(delayRelation: DelayRelation) {
+        this.lag = delayRelation.lag
+    }
+
+    static save(projectIdentifier: string, relation: DelayRelation, client: redis.RedisClient): Promise<void> {
+        const redisDelayRelation = new RedisDelayRelation(relation)
+        return client.hmsetAsync(delayRelationKey(projectIdentifier, relation.delay, relation.task),
+                                 redisDelayRelation).then(() => {
+            return client.saddAsync(delayKey(projectIdentifier, relation.delay, "relations"), relation.task)
+        })
+    }
+
+    static load(projectIdentifier: string, delay: string, task: string,
+                client: redis.RedisClient): Promise<TaskRelation> {
+        return client.hgetallAsync(delayRelationKey(projectIdentifier, delay, task))
+                     .then((result: any) => {
+            if (result == null) {
+                throw new CorruptedError("DelayRelation " + delay + "-" + task + " is null")
+            }
+            if (!result.hasOwnProperty("lag")) {
+                throw new CorruptedError("DelayRelation " + delay + "-" + task + " do not have property lag")
+            }
+            const relation: DelayRelation = {
+                delay,
+                task,
+                lag: +(result["lag"] as string)
+            }
+            return relation
         })
     }
 }
@@ -513,6 +560,26 @@ export class RedisDataProvider implements IDataProvider {
             return this.notHasDelay(projectIdentifier, delay.identifier)
         }).then(() => {
             return RedisDelay.save(projectIdentifier, delay, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
+        })
+    }
+    addDelayRelation(projectIdentifier: string, relation: DelayRelation): Promise<void> {
+        return this.hasDelay(projectIdentifier, relation.delay).then(() => {
+            return this.hasTask(projectIdentifier, relation.task)
+        }).then(() => {
+            return RedisDelayRelation.save(projectIdentifier, relation, this.client)
+        }).catch((error: Error) => {
+            wrapUnknownErrors(error)
+        })
+    }
+    getDelayRelations(projectIdentifier: string, delayIdentifier: string): Promise<Array<DelayRelation>> {
+        return this.hasDelay(projectIdentifier, delayIdentifier).then(() => {
+            return this.client.smembersAsync(delayKey(projectIdentifier, delayIdentifier, "relations"))
+        }).then((identifiers: Array<string>) => {
+            return Promise.all(identifiers.sort().map((taskIndentifier: string): Promise<DelayRelation> => {
+                return RedisDelayRelation.load(projectIdentifier, delayIdentifier, taskIndentifier, this.client)
+            }))
         }).catch((error: Error) => {
             wrapUnknownErrors(error)
         })

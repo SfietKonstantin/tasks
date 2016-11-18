@@ -76,7 +76,7 @@ const fillTaskRelations = (projectNode: IProjectNode): Promise<void> => {
         }
     ]
     return Promise.all(relations.map((relation: TaskRelation) => {
-        projectNode.addRelation(relation)
+        projectNode.addTaskRelation(relation)
     }))
 }
 

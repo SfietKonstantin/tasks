@@ -74,6 +74,8 @@ describe("API", () => {
 
             api.addModifier("project", "task", modifier).then((task: ApiProjectTaskModifiers) => {
                 chai.expect(task).to.deep.equal(expected)
+                mock.verify()
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -111,6 +113,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -148,6 +151,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -185,6 +189,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -221,6 +226,7 @@ describe("API", () => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -260,6 +266,8 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -299,6 +307,8 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -337,6 +347,8 @@ describe("API", () => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
+                mock.verify()
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -377,6 +389,8 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -417,6 +431,8 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
+                taskNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)

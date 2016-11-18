@@ -142,7 +142,7 @@ describe("Primavera actions", () => {
                 mock.calledWithExactly(fakeFile, parseTasks, beginTasksImport, endTasksImport,
                                        tasksImportInvalidFormat)
                 importTasks(fakeFile)
-                chai.expect(mock.calledOnce).to.true
+                mock.verify()
             })
         })
     })
@@ -188,7 +188,7 @@ describe("Primavera actions", () => {
                 mock.calledWithExactly(fakeFile, parseRelations, beginRelationsImport, endRelationsImport,
                                        relationsImportInvalidFormat)
                 importRelations(fakeFile)
-                chai.expect(mock.calledOnce).to.true
+                mock.verify()
             })
         })
     })

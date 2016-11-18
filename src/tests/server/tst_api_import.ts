@@ -68,6 +68,8 @@ describe("API", () => {
             })
 
             api.import(project, tasks, []).then(() => {
+                mock.verify()
+                projectNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -150,11 +152,13 @@ describe("API", () => {
                                .returns(Promise.resolve(taskNode))
             })
             taskRelations.map((relation: TaskRelation) => {
-                projectNodeMock.expects("addRelation").once().withExactArgs(createRelation(relation))
+                projectNodeMock.expects("addTaskRelation").once().withExactArgs(createRelation(relation))
                                .returns(Promise.resolve())
             })
 
             api.import(project, tasks, taskRelations).then(() => {
+                mock.verify()
+                projectNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -236,6 +240,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -317,6 +322,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -397,6 +403,7 @@ describe("API", () => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -482,6 +489,8 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
+                projectNodeMock.verify()
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -567,6 +576,8 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
+                projectNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -651,6 +662,8 @@ describe("API", () => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
+                mock.verify()
+                projectNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -733,7 +746,7 @@ describe("API", () => {
                                .returns(Promise.resolve(taskNode))
             })
             taskRelations.map((relation: TaskRelation) => {
-                projectNodeMock.expects("addRelation").once().withExactArgs(createRelation(relation))
+                projectNodeMock.expects("addTaskRelation").once().withExactArgs(createRelation(relation))
                                .returns(Promise.reject(new NotFoundError("Some error")))
             })
 
@@ -742,6 +755,8 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
+                mock.verify()
+                projectNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -824,7 +839,7 @@ describe("API", () => {
                                .returns(Promise.resolve(taskNode))
             })
             taskRelations.map((relation: TaskRelation) => {
-                projectNodeMock.expects("addRelation").once().withExactArgs(createRelation(relation))
+                projectNodeMock.expects("addTaskRelation").once().withExactArgs(createRelation(relation))
                                .returns(Promise.reject(new InternalError("Some error")))
             })
 
@@ -833,6 +848,8 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
+                projectNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -915,7 +932,7 @@ describe("API", () => {
                                .returns(Promise.resolve(taskNode))
             })
             taskRelations.map((relation: TaskRelation) => {
-                projectNodeMock.expects("addRelation").once().withExactArgs(createRelation(relation))
+                projectNodeMock.expects("addTaskRelation").once().withExactArgs(createRelation(relation))
                                .returns(Promise.reject(new FakeError("Some error")))
             })
 
@@ -923,6 +940,8 @@ describe("API", () => {
                 done(new Error("import should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
+                mock.verify()
+                projectNodeMock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -1137,6 +1156,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -1188,6 +1208,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)

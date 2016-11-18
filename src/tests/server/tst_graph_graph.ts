@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, Task, TaskResults, TaskRelation, Modifier, TaskLocation } from "../../common/types"
+import { Project, Task, TaskResults, TaskRelation, Modifier, TaskLocation, Delay, DelayRelation } from "../../common/types"
 import { ExistsError } from "../../common/errors"
 import { FakeDataProvider } from "./fakedataprovider"
 import { Graph, ProjectNode } from "../../server/core/graph/graph"
@@ -54,6 +54,20 @@ describe("Graph", () => {
                     estimatedDuration: 30
                 }
             ]
+            const delays: Array<Delay> = [
+                {
+                    identifier: "delay1",
+                    name: "Delay 1",
+                    description: "Description 1",
+                    date: new Date(2016, 11, 30)
+                },
+                {
+                    identifier: "delay2",
+                    name: "Delay 2",
+                    description: "Description 2",
+                    date: new Date(2016, 11, 30)
+                }
+            ]
             const otherTasks: Array<Task> = [
                 {
                     identifier: "other1",
@@ -70,6 +84,7 @@ describe("Graph", () => {
                     estimatedDuration: 10
                 }
             ]
+            const otherDelays: Array<Delay> = []
             const results: Array<[string, string, TaskResults]> = [
                 [
                     "project",
@@ -127,6 +142,8 @@ describe("Graph", () => {
                 mock.expects("getTaskResults").once().withExactArgs(result[0], result[1])
                     .returns(Promise.resolve(result[2]))
             })
+            mock.expects("getProjectDelays").once().withExactArgs("project").returns(Promise.resolve(delays))
+            mock.expects("getProjectDelays").once().withExactArgs("other").returns(Promise.resolve(otherDelays))
             const rootModifiers: Array<Modifier> = [
                 {
                     name: "Root modifier",
@@ -201,6 +218,24 @@ describe("Graph", () => {
                 .returns(Promise.resolve(shortRelations))
             mock.expects("getTaskRelations").once().withExactArgs("project", "reducing")
                 .returns(Promise.resolve([]))
+            const delay1relations: Array<DelayRelation> = [
+                {
+                    delay: "delay1",
+                    task: "reducing",
+                    lag: 0
+                }
+            ]
+            const delay2relations: Array<DelayRelation> = [
+                {
+                    delay: "delay2",
+                    task: "reducing",
+                    lag: 5
+                }
+            ]
+            mock.expects("getDelayRelations").once().withExactArgs("project", "delay1")
+                .returns(Promise.resolve(delay1relations))
+            mock.expects("getDelayRelations").once().withExactArgs("project", "delay2")
+                .returns(Promise.resolve(delay2relations))
             mock.expects("getTaskRelations").once().withExactArgs("other", "other1")
                 .returns(Promise.resolve([]))
             mock.expects("getTaskRelations").once().withExactArgs("other", "other2")
@@ -231,6 +266,12 @@ describe("Graph", () => {
                 chai.expect(reducing.startDate).to.deep.equal(new Date(2016, 10, 24))
                 chai.expect(reducing.duration).to.equal(30)
                 chai.expect(reducing.modifiers).to.deep.equal([])
+                const delay1 = maputils.get(project.delays, "delay1")
+                chai.expect(delay1.delayIdentifier).to.equal("delay1")
+                chai.expect(delay1.margin).to.equal(6)
+                const delay2 = maputils.get(project.delays, "delay2")
+                chai.expect(delay2.delayIdentifier).to.equal("delay2")
+                chai.expect(delay2.margin).to.equal(1)
                 const other = maputils.get(node.nodes, "other")
                 const other1 = maputils.get(other.nodes, "other1")
                 chai.expect(other1.taskIdentifier).to.equal("other1")
@@ -242,6 +283,7 @@ describe("Graph", () => {
                 chai.expect(other2.startDate).to.deep.equal(new Date(2016, 2, 1))
                 chai.expect(other2.duration).to.equal(15)
                 chai.expect(other2.modifiers).to.deep.equal([])
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -265,6 +307,7 @@ describe("Graph", () => {
             node.addProject(project).then(() => {
                 const projectNode = maputils.get(node.nodes, "project2")
                 chai.expect(projectNode.projectIdentifier).to.equal("project2")
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -288,6 +331,7 @@ describe("Graph", () => {
                 done(new Error("Input error should be detected"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)

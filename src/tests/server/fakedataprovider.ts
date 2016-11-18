@@ -1,5 +1,5 @@
 import { IDataProvider } from "../../server/core/data/idataprovider"
-import { Project, Task, TaskResults, TaskRelation, Modifier, Delay } from "../../common/types"
+import { Project, Task, TaskResults, TaskRelation, Modifier, Delay, DelayRelation } from "../../common/types"
 
 export class FakeDataProvider implements IDataProvider {
     getAllProjects(): Promise<Array<Project>> {
@@ -65,7 +65,10 @@ export class FakeDataProvider implements IDataProvider {
     addDelay(projectIdentifier: string, delay: Delay): Promise<void> {
         return Promise.reject(new Error("Not mocked"))
     }
-    addDelayTaskRelation(projectIdentifier: string, delayIdentifier: string, taskIdentifier: string): Promise<void> {
+    addDelayRelation(projectIdentifier: string, delay: DelayRelation): Promise<void> {
+        return Promise.reject(new Error("Not mocked"))
+    }
+    getDelayRelations(projectIdentifier: string, delayIdentifier: string): Promise<Array<DelayRelation>> {
         return Promise.reject(new Error("Not mocked"))
     }
 }

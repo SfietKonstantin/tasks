@@ -1,10 +1,10 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, Task, TaskResults, TaskRelation, Modifier, TaskLocation } from "../../common/types"
+import { Project, Task, TaskResults, TaskRelation, Modifier, TaskLocation, Delay, DelayRelation } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
 import { FakeDataProvider } from "./fakedataprovider"
 import { FakeGraph } from "./fakegraph"
-import { Graph, ProjectNode, TaskNode } from "../../server/core/graph/graph"
+import { Graph, ProjectNode, TaskNode, DelayNode } from "../../server/core/graph/graph"
 import * as maputils from "../../common/maputils"
 
 describe("Graph", () => {
@@ -44,6 +44,20 @@ describe("Graph", () => {
                     estimatedDuration: 30
                 }
             ]
+            const delays: Array<Delay> = [
+                {
+                    identifier: "delay1",
+                    name: "Delay 1",
+                    description: "Description 1",
+                    date: new Date(2016, 11, 30)
+                },
+                {
+                    identifier: "delay2",
+                    name: "Delay 2",
+                    description: "Description 2",
+                    date: new Date(2016, 11, 30)
+                }
+            ]
             const results: Array<[string, TaskResults]> = [
                 [
                     "root",
@@ -79,6 +93,7 @@ describe("Graph", () => {
                 mock.expects("getTaskResults").once().withExactArgs("project", result[0])
                     .returns(Promise.resolve(result[1]))
             })
+            mock.expects("getProjectDelays").once().returns(Promise.resolve(delays))
             const rootModifiers: Array<Modifier> = [
                 {
                     name: "Root modifier",
@@ -148,7 +163,24 @@ describe("Graph", () => {
                 .returns(Promise.resolve(shortRelations))
             mock.expects("getTaskRelations").once().withExactArgs("project", "reducing")
                 .returns(Promise.resolve([]))
-
+            const delay1relations: Array<DelayRelation> = [
+                {
+                    delay: "delay1",
+                    task: "reducing",
+                    lag: 0
+                }
+            ]
+            const delay2relations: Array<DelayRelation> = [
+                {
+                    delay: "delay2",
+                    task: "reducing",
+                    lag: 5
+                }
+            ]
+            mock.expects("getDelayRelations").once().withExactArgs("project", "delay1")
+                .returns(Promise.resolve(delay1relations))
+            mock.expects("getDelayRelations").once().withExactArgs("project", "delay2")
+                .returns(Promise.resolve(delay2relations))
 
             // Test
             let node = new ProjectNode(dataProvider, graph, "project")
@@ -173,6 +205,14 @@ describe("Graph", () => {
                 chai.expect(reducing.startDate).to.deep.equal(new Date(2016, 10, 24))
                 chai.expect(reducing.duration).to.equal(30)
                 chai.expect(reducing.modifiers).to.deep.equal([])
+                const delay1 = maputils.get(node.delays, "delay1")
+                chai.expect(delay1.delayIdentifier).to.equal("delay1")
+                chai.expect(delay1.margin).to.equal(6)
+                const delay2 = maputils.get(node.delays, "delay2")
+                chai.expect(delay2.delayIdentifier).to.equal("delay2")
+                chai.expect(delay2.margin).to.equal(1)
+
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -208,41 +248,7 @@ describe("Graph", () => {
                 chai.expect(taskNode.startDate).to.deep.equal(new Date(2015, 1, 1))
                 chai.expect(taskNode.duration).to.equal(10)
                 chai.expect(taskNode.modifiers).to.deep.equal([])
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should add a task", (done) => {
-            const dataProvider = new FakeDataProvider()
-            const graph = new FakeGraph()
-            let mock = sinon.mock(dataProvider)
-
-            let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
-                                          new Date(2015, 1, 5), 35)
-            node.nodes.set("task1", taskNode)
-            const task: Task = {
-                identifier: "task2",
-                name: "Task 2",
-                description: "Description 2",
-                estimatedStartDate: new Date(2015, 1, 1),
-                estimatedDuration: 10
-            }
-            const taskResults: TaskResults = {
-                startDate: new Date(2015, 1, 1),
-                duration: 10
-            }
-            mock.expects("addTask").once().withExactArgs("project", task).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
-                .returns(Promise.resolve())
-
-            node.addTask(task).then(() => {
-                const taskNode = maputils.get(node.nodes, "task2")
-                chai.expect(taskNode.taskIdentifier).to.equal("task2")
-                chai.expect(taskNode.startDate).to.deep.equal(new Date(2015, 1, 1))
-                chai.expect(taskNode.duration).to.equal(10)
-                chai.expect(taskNode.modifiers).to.deep.equal([])
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -269,12 +275,13 @@ describe("Graph", () => {
                 done(new Error("Input error should be detected"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
-        it("Should add a relation 1", (done) => {
+        it("Should add a task relation 1", (done) => {
             const dataProvider = new FakeDataProvider()
             const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
@@ -301,17 +308,18 @@ describe("Graph", () => {
             mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
                 .returns(Promise.resolve())
 
-            node.addRelation(relation).then(() => {
+            node.addTaskRelation(relation).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
                 chai.expect(taskNode.taskIdentifier).to.equal("task2")
                 chai.expect(taskNode.startDate).to.deep.equal(new Date(2015, 2, 3))
                 chai.expect(taskNode.duration).to.equal(10)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
-        it("Should add a relation 2", (done) => {
+        it("Should add a task relation 2", (done) => {
             const dataProvider = new FakeDataProvider()
             const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
@@ -338,17 +346,18 @@ describe("Graph", () => {
             mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
                 .returns(Promise.resolve())
 
-            node.addRelation(relation).then(() => {
+            node.addTaskRelation(relation).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
                 chai.expect(taskNode.taskIdentifier).to.equal("task2")
                 chai.expect(taskNode.startDate).to.deep.equal(new Date(2015, 2, 8))
                 chai.expect(taskNode.duration).to.equal(10)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
-        it("Should add a relation 3", (done) => {
+        it("Should add a task relation 3", (done) => {
             const dataProvider = new FakeDataProvider()
             const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
@@ -367,19 +376,14 @@ describe("Graph", () => {
                 next: "task2",
                 lag: 0
             }
-            const taskResults: TaskResults = {
-                startDate: new Date(2015, 1, 1),
-                duration: 10
-            }
             mock.expects("addTaskRelation").once().withExactArgs("project", relation).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
-                .returns(Promise.resolve())
 
-            node.addRelation(relation).then(() => {
+            node.addTaskRelation(relation).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
                 chai.expect(taskNode.taskIdentifier).to.equal("task2")
                 chai.expect(taskNode.startDate).to.deep.equal(new Date(2015, 1, 1))
                 chai.expect(taskNode.duration).to.equal(10)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -404,10 +408,11 @@ describe("Graph", () => {
                 next: "task2",
                 lag: 0
             }
-            node.addRelation(relation).then(() => {
+            node.addTaskRelation(relation).then(() => {
                 done(new Error("Input error should be detected"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -432,7 +437,169 @@ describe("Graph", () => {
                 next: "task3",
                 lag: 0
             }
-            node.addRelation(relation).then(() => {
+            node.addTaskRelation(relation).then(() => {
+                done(new Error("Input error should be detected"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should add a delay", (done) => {
+            const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            let mock = sinon.mock(dataProvider)
+
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const delayNode = new DelayNode(dataProvider, node, "delay1", new Date(2015, 2, 1))
+            node.delays.set("delay1", delayNode)
+            const delay: Delay = {
+                identifier: "delay2",
+                name: "Delay 2",
+                description: "Description 2",
+                date: new Date(2015, 1, 1)
+            }
+            mock.expects("addDelay").once().withExactArgs("project", delay).returns(Promise.resolve())
+
+            node.addDelay(delay).then(() => {
+                const delayNode = maputils.get(node.delays, "delay2")
+                chai.expect(delayNode.delayIdentifier).to.equal("delay2")
+                chai.expect(delayNode.margin).to.equal(0)
+                mock.verify()
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should throw error when adding existing node", (done) => {
+            const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            let mock = sinon.mock(dataProvider)
+
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const delayNode = new DelayNode(dataProvider, node, "delay1", new Date(2015, 2, 1))
+            node.delays.set("delay1", delayNode)
+            const delay: Delay = {
+                identifier: "delay1",
+                name: "Delay 1",
+                description: "Description 1",
+                date: new Date(2015, 1, 1)
+            }
+
+            node.addDelay(delay).then(() => {
+                done(new Error("Input error should be detected"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(ExistsError)
+                mock.verify()
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should add a delay relation 1", (done) => {
+            const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            let mock = sinon.mock(dataProvider)
+
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31,
+                                          new Date(2015, 2, 1), 31)
+            node.nodes.set("task", taskNode)
+            const delayNode = new DelayNode(dataProvider, node, "delay", new Date(2015, 3, 11))
+            node.delays.set("delay", delayNode)
+
+            const relation: DelayRelation = {
+                delay: "delay",
+                task: "task",
+                lag: 0
+            }
+            mock.expects("addDelayRelation").once().withExactArgs("project", relation).returns(Promise.resolve())
+
+            node.addDelayRelation(relation).then(() => {
+                const delayNode = maputils.get(node.delays, "delay")
+                chai.expect(delayNode.delayIdentifier).to.equal("delay")
+                chai.expect(delayNode.margin).to.equal(10)
+                mock.verify()
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should add a delay relation 2", (done) => {
+            const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            let mock = sinon.mock(dataProvider)
+
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31,
+                                          new Date(2015, 2, 1), 31)
+            node.nodes.set("task", taskNode)
+            const delayNode = new DelayNode(dataProvider, node, "delay", new Date(2015, 3, 11))
+            node.delays.set("delay", delayNode)
+
+            const relation: DelayRelation = {
+                delay: "delay",
+                task: "task",
+                lag: 5
+            }
+            mock.expects("addDelayRelation").once().withExactArgs("project", relation).returns(Promise.resolve())
+
+            node.addDelayRelation(relation).then(() => {
+                const delayNode = maputils.get(node.delays, "delay")
+                chai.expect(delayNode.delayIdentifier).to.equal("delay")
+                chai.expect(delayNode.margin).to.equal(5)
+                mock.verify()
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should throw error when adding relation with invalid delay node", (done) => {
+            const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            let mock = sinon.mock(dataProvider)
+
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31,
+                                          new Date(2015, 2, 1), 31)
+            node.nodes.set("task", taskNode)
+            const delayNode = new DelayNode(dataProvider, node, "delay", new Date(2015, 3, 11))
+            node.delays.set("delay", delayNode)
+
+            const relation: DelayRelation = {
+                delay: "delay2",
+                task: "task",
+                lag: 0
+            }
+            node.addDelayRelation(relation).then(() => {
+                done(new Error("Input error should be detected"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                mock.verify()
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should throw error when adding relation with invalid task node", (done) => {
+            const dataProvider = new FakeDataProvider()
+            const graph = new FakeGraph()
+            let mock = sinon.mock(dataProvider)
+
+            let node = new ProjectNode(dataProvider, graph, "project")
+            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31,
+                                          new Date(2015, 2, 1), 31)
+            node.nodes.set("task", taskNode)
+            const delayNode = new DelayNode(dataProvider, node, "delay", new Date(2015, 3, 11))
+            node.delays.set("delay", delayNode)
+
+            const relation: DelayRelation = {
+                delay: "delay",
+                task: "task2",
+                lag: 0
+            }
+            node.addDelayRelation(relation).then(() => {
                 done(new Error("Input error should be detected"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)

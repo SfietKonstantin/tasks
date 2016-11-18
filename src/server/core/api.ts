@@ -199,7 +199,7 @@ export class Api {
                     return projectNode.addTask(task)
                 })).then(() => {
                     return Promise.all(inputTaskRelations.map((relation: TaskRelation) => {
-                        return projectNode.addRelation(relation)
+                        return projectNode.addTaskRelation(relation)
                     }))
                 })
             })

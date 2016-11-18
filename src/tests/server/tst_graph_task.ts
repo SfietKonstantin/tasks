@@ -1,10 +1,10 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, Task, TaskResults, Modifier, TaskLocation } from "../../common/types"
+import { Project, Task, TaskResults, Modifier, TaskLocation, DelayRelation } from "../../common/types"
 import { FakeDataProvider } from "./fakedataprovider"
 import { FakeGraph, FakeProjectNode } from "./fakegraph"
 import { GraphError } from "../../server/core/graph/types"
-import { Graph, ProjectNode, TaskNode } from "../../server/core/graph/graph"
+import { Graph, ProjectNode, TaskNode, DelayNode } from "../../server/core/graph/graph"
 import * as maputils from "../../common/maputils"
 
 describe("Graph", () => {
@@ -15,6 +15,7 @@ describe("Graph", () => {
             const projectNode = new FakeProjectNode(graph, "project")
             const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
                                       new Date(2015, 2, 1), 20)
+
             node.compute().then(() => {
                 done()
             }).catch((error) => {
@@ -36,7 +37,16 @@ describe("Graph", () => {
             // Test
             const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
                                       new Date(2015, 2, 5), 25)
+            const delayNode = new DelayNode(dataProvider, projectNode, "delay", new Date(2015, 3, 10))
+            const relation: DelayRelation = {
+                delay: "delay",
+                task: "task",
+                lag: 0
+            }
+            node.addDelay(delayNode, relation)
+            chai.expect(delayNode.margin).to.equal(11)
             node.compute().then(() => {
+                chai.expect(delayNode.margin).to.equal(20)
                 done()
             }).catch((error) => {
                 done(error)

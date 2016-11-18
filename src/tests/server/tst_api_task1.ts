@@ -67,6 +67,7 @@ describe("API", () => {
 
             api.getProjectTasks("project").then((tasks: Array<ApiTask>) => {
                 chai.expect(tasks).to.deep.equal(expected)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -85,6 +86,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -103,6 +105,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -121,6 +124,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -155,6 +159,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -191,6 +196,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -223,6 +229,7 @@ describe("API", () => {
                 done(new Error("getProjectTasks should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -278,6 +285,7 @@ describe("API", () => {
 
             api.getTask("project", "task").then((task: ApiProjectTaskModifiers) => {
                 chai.expect(task).to.deep.equal(expected)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -296,6 +304,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -314,6 +323,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -340,6 +350,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -366,6 +377,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -396,6 +408,7 @@ describe("API", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -474,6 +487,7 @@ describe("API", () => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
+                mock.verify()
                 done()
             }).catch((error) => {
                 done(error)
