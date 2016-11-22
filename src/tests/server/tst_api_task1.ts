@@ -273,13 +273,12 @@ describe("API", () => {
             ]
             let projectNode = maputils.get(graph.nodes, "project")
             let taskNode = new TaskNode(dataProvider, projectNode, task.identifier,
-                                        task.estimatedStartDate, task.estimatedDuration,
-                                        new Date(2016, 2, 5), 17)
+                                        task.estimatedStartDate, task.estimatedDuration)
             taskNode.modifiers = modifiers
             projectNode.nodes.set("task", taskNode)
             const expected: ApiProjectTaskModifiers = {
                 project,
-                task: createApiTask(task, new Date(2016, 2, 5), 17),
+                task: createApiTask(task, new Date(2016, 2, 1), 15),
                 modifiers
             }
 

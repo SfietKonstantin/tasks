@@ -2,20 +2,20 @@ import * as jsdom from "jsdom"
 
 class FakeLocalStorage {
     getItem(key: string): string | null {
-        throw new Error("Not mocked")
+        throw new Error("FakeLocalStorage: getItem is not mocked")
     }
     setItem(key: string, data: string): void {
-        throw new Error("Not mocked")
+        throw new Error("FakeLocalStorage: setItem is not mocked")
     }
 }
 
 export const addFakeGlobal = () => {
     global.FileReader = () => {
-        throw new Error("Not mocked")
+        throw new Error("FakeGlobal: FileReader is not mocked")
     }
 
     global.fetch = (url: RequestInfo, init?: RequestInit): Promise<Response> => {
-        throw new Error("Not mocked")
+        throw new Error("FakeGlobal: fetch is not mocked")
     }
     global.localStorage = new FakeLocalStorage()
 

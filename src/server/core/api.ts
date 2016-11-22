@@ -1,6 +1,6 @@
 import * as winston from "winston"
 import {
-    Project, Task, TaskResults, TaskRelation, Modifier, Delay, DelayRelation
+    Project, Task, TaskRelation, Modifier, Delay, DelayRelation
 } from "../../common/types"
 import { IDataProvider, isKnownError } from "../core/data/idataprovider"
 import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"

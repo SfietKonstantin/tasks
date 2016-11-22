@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
 import {
-    Project, Task, TaskResults, TaskRelation, Modifier, TaskLocation,
+    Project, Task, TaskRelation, Modifier, TaskLocation,
     Delay, DelayRelation
 } from "../../common/types"
 import { ExistsError } from "../../common/errors"
@@ -88,63 +88,9 @@ describe("Graph", () => {
                 }
             ]
             const otherDelays: Array<Delay> = []
-            const results: Array<[string, string, TaskResults]> = [
-                [
-                    "project",
-                    "root",
-                    {
-                        startDate: new Date(2016, 7, 15),
-                        duration: 36
-                    }
-                ],
-                [
-                    "project",
-                    "long",
-                    {
-                        startDate: new Date(2016, 8, 20),
-                        duration: 60
-                    }
-                ],
-                [
-                    "project",
-                    "short",
-                    {
-                        startDate: new Date(2016, 8, 20),
-                        duration: 65
-                    }
-                ],
-                [
-                    "project",
-                    "reducing",
-                    {
-                        startDate: new Date(2016, 10, 24),
-                        duration: 30
-                    }
-                ],
-                [
-                    "other",
-                    "other1",
-                    {
-                        startDate: new Date(2016, 2, 1),
-                        duration: 31
-                    }
-                ],
-                [
-                    "other",
-                    "other2",
-                    {
-                        startDate: new Date(2016, 2, 1),
-                        duration: 15
-                    }
-                ]
-            ]
             mock.expects("getAllProjects").once().returns(Promise.resolve(projects))
             mock.expects("getProjectTasks").once().withExactArgs("project").returns(Promise.resolve(tasks))
             mock.expects("getProjectTasks").once().withExactArgs("other").returns(Promise.resolve(otherTasks))
-            results.forEach((result: [string, string, TaskResults]) => {
-                mock.expects("getTaskResults").once().withExactArgs(result[0], result[1])
-                    .returns(Promise.resolve(result[2]))
-            })
             mock.expects("getProjectDelays").once().withExactArgs("project").returns(Promise.resolve(delays))
             mock.expects("getProjectDelays").once().withExactArgs("other").returns(Promise.resolve(otherDelays))
             const rootModifiers: Array<Modifier> = [
@@ -284,7 +230,7 @@ describe("Graph", () => {
                 const other2 = maputils.get(other.nodes, "other2")
                 chai.expect(other2.taskIdentifier).to.equal("other2")
                 chai.expect(other2.startDate).to.deep.equal(new Date(2016, 2, 1))
-                chai.expect(other2.duration).to.equal(15)
+                chai.expect(other2.duration).to.equal(10)
                 chai.expect(other2.modifiers).to.deep.equal([])
                 mock.verify()
                 done()

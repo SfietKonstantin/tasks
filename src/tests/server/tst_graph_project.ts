@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
 import {
-    Project, Task, TaskResults, TaskRelation, Modifier, TaskLocation,
+    Project, Task, TaskRelation, Modifier, TaskLocation,
     Delay, DelayRelation
 } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
@@ -61,41 +61,7 @@ describe("Graph", () => {
                     date: new Date(2016, 11, 30)
                 }
             ]
-            const results: Array<[string, TaskResults]> = [
-                [
-                    "root",
-                    {
-                        startDate: new Date(2016, 7, 15),
-                        duration: 36
-                    },
-                ],
-                [
-                    "long",
-                    {
-                        startDate: new Date(2016, 8, 20),
-                        duration: 60
-                    }
-                ],
-                [
-                    "short",
-                    {
-                        startDate: new Date(2016, 8, 20),
-                        duration: 65
-                    }
-                ],
-                [
-                    "reducing",
-                    {
-                        startDate: new Date(2016, 10, 24),
-                        duration: 30
-                    }
-                ]
-            ]
             mock.expects("getProjectTasks").once().returns(Promise.resolve(tasks))
-            results.forEach((result: [string, TaskResults]) => {
-                mock.expects("getTaskResults").once().withExactArgs("project", result[0])
-                    .returns(Promise.resolve(result[1]))
-            })
             mock.expects("getProjectDelays").once().returns(Promise.resolve(delays))
             const rootModifiers: Array<Modifier> = [
                 {
@@ -227,8 +193,7 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
-                                          new Date(2015, 1, 5), 35)
+            const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode)
             const task: Task = {
                 identifier: "task2",
@@ -237,13 +202,7 @@ describe("Graph", () => {
                 estimatedStartDate: new Date(2015, 1, 1),
                 estimatedDuration: 10
             }
-            const taskResults: TaskResults = {
-                startDate: new Date(2015, 1, 1),
-                duration: 10
-            }
             mock.expects("addTask").once().withExactArgs("project", task).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
-                .returns(Promise.resolve())
 
             node.addTask(task).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
@@ -263,8 +222,7 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
-                                          new Date(2015, 1, 5), 35)
+            const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode)
             const task: Task = {
                 identifier: "task1",
@@ -290,11 +248,9 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
-                                           new Date(2015, 1, 1), 30)
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode1)
-            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
-                                           new Date(2015, 1, 1), 10)
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10)
             node.nodes.set("task2", taskNode2)
 
             const relation: TaskRelation = {
@@ -303,12 +259,7 @@ describe("Graph", () => {
                 next: "task2",
                 lag: 0
             }
-            const taskResults: TaskResults = {
-                startDate: new Date(2015, 2, 3),
-                duration: 10
-            }
             mock.expects("addTaskRelation").once().withExactArgs("project", relation).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
                 .returns(Promise.resolve())
 
             node.addTaskRelation(relation).then(() => {
@@ -328,11 +279,9 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
-                                           new Date(2015, 1, 1), 30)
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode1)
-            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
-                                           new Date(2015, 1, 1), 10)
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10)
             node.nodes.set("task2", taskNode2)
 
             const relation: TaskRelation = {
@@ -341,13 +290,7 @@ describe("Graph", () => {
                 next: "task2",
                 lag: 5
             }
-            const taskResults: TaskResults = {
-                startDate: new Date(2015, 2, 8),
-                duration: 10
-            }
             mock.expects("addTaskRelation").once().withExactArgs("project", relation).returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", taskResults)
-                .returns(Promise.resolve())
 
             node.addTaskRelation(relation).then(() => {
                 const taskNode = maputils.get(node.nodes, "task2")
@@ -366,11 +309,9 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
-                                           new Date(2015, 1, 1), 30)
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode1)
-            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
-                                           new Date(2015, 1, 1), 10)
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10)
             node.nodes.set("task2", taskNode2)
 
             const relation: TaskRelation = {
@@ -398,11 +339,9 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
-                                           new Date(2015, 1, 1), 30)
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode1)
-            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
-                                           new Date(2015, 1, 1), 10)
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10)
             node.nodes.set("task2", taskNode2)
 
             const relation: TaskRelation = {
@@ -427,11 +366,9 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30,
-                                           new Date(2015, 1, 1), 30)
+            const taskNode1 = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode1)
-            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10,
-                                           new Date(2015, 1, 1), 10)
+            const taskNode2 = new TaskNode(dataProvider, node, "task2", new Date(2015, 1, 1), 10)
             node.nodes.set("task2", taskNode2)
 
             const relation: TaskRelation = {
@@ -506,8 +443,7 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31,
-                                          new Date(2015, 2, 1), 31)
+            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31)
             node.nodes.set("task", taskNode)
             const delayNode = new DelayNode(dataProvider, node, "delay", new Date(2015, 3, 11))
             node.delays.set("delay", delayNode)
@@ -535,8 +471,7 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31,
-                                          new Date(2015, 2, 1), 31)
+            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31)
             node.nodes.set("task", taskNode)
             const delayNode = new DelayNode(dataProvider, node, "delay", new Date(2015, 3, 11))
             node.delays.set("delay", delayNode)
@@ -564,8 +499,7 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31,
-                                          new Date(2015, 2, 1), 31)
+            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31)
             node.nodes.set("task", taskNode)
             const delayNode = new DelayNode(dataProvider, node, "delay", new Date(2015, 3, 11))
             node.delays.set("delay", delayNode)
@@ -591,8 +525,7 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
 
             let node = new ProjectNode(dataProvider, graph, "project")
-            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31,
-                                          new Date(2015, 2, 1), 31)
+            const taskNode = new TaskNode(dataProvider, node, "task", new Date(2015, 2, 1), 31)
             node.nodes.set("task", taskNode)
             const delayNode = new DelayNode(dataProvider, node, "delay", new Date(2015, 3, 11))
             node.delays.set("delay", delayNode)

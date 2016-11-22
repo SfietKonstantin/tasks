@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, Task, TaskResults, Modifier, TaskLocation, DelayRelation } from "../../common/types"
+import { Project, Task, Modifier, TaskLocation, DelayRelation } from "../../common/types"
 import { FakeDataProvider } from "./fakedataprovider"
 import { FakeGraph, FakeProjectNode } from "./fakegraph"
 import { GraphError } from "../../server/core/graph/types"
@@ -13,40 +13,9 @@ describe("Graph", () => {
             const dataProvider = new FakeDataProvider()
             const graph = new FakeGraph()
             const projectNode = new FakeProjectNode(graph, "project")
-            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
-                                      new Date(2015, 2, 1), 20)
+            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20)
 
             node.compute().then(() => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should compute the correct results", (done) => {
-            // Mock
-            const dataProvider = new FakeDataProvider()
-            const graph = new FakeGraph()
-            const projectNode = new FakeProjectNode(graph, "project")
-            let mock = sinon.mock(dataProvider)
-            const arg: TaskResults = {
-                startDate: new Date(2015, 2, 1),
-                duration: 20
-            }
-            mock.expects("setTaskResults").once().withExactArgs("project", "task", arg).returns(Promise.resolve())
-
-            // Test
-            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
-                                      new Date(2015, 2, 5), 25)
-            const delayNode = new DelayNode(dataProvider, projectNode, "delay", new Date(2015, 3, 10))
-            const relation: DelayRelation = {
-                delay: "delay",
-                task: "task",
-                lag: 0
-            }
-            node.addDelay(delayNode, relation)
-            chai.expect(delayNode.margin).to.equal(11)
-            node.compute().then(() => {
-                chai.expect(delayNode.margin).to.equal(20)
                 done()
             }).catch((error) => {
                 done(error)
@@ -56,8 +25,7 @@ describe("Graph", () => {
             const dataProvider = new FakeDataProvider()
             const graph = new FakeGraph()
             const projectNode = new FakeProjectNode(graph, "project")
-            const node = new TaskNode(dataProvider, projectNode, "task", new Date(NaN), 20,
-                                      new Date(2015, 2, 1), 20)
+            const node = new TaskNode(dataProvider, projectNode, "task", new Date(NaN), 20)
             node.compute().then(() => {
                 done(new Error("Input error should be detected"))
             }).catch((error) => {
@@ -73,15 +41,18 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
             const graph = new FakeGraph()
             const projectNode = new FakeProjectNode(graph, "project")
-            const arg: TaskResults = {
-                startDate: new Date(2015, 2, 1),
-                duration: 23
-            }
-            mock.expects("setTaskResults").once().withExactArgs("project", "task", arg).returns(Promise.resolve())
 
             // Test
-            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
-                                      new Date(2015, 2, 1), 20)
+            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20)
+            const delayNode = new DelayNode(dataProvider, projectNode, "delay", new Date(2015, 3, 10))
+            const relation: DelayRelation = {
+                delay: "delay",
+                task: "task",
+                lag: 0
+            }
+            node.addDelay(delayNode, relation)
+            chai.expect(delayNode.margin).to.equal(20)
+
             node.modifiers = [
                 {
                     name: "Modifier 1",
@@ -98,6 +69,7 @@ describe("Graph", () => {
             ]
 
             node.compute().then(() => {
+                chai.expect(delayNode.margin).to.equal(17)
                 done()
             }).catch((error) => {
                 done(error)
@@ -109,15 +81,18 @@ describe("Graph", () => {
             let mock = sinon.mock(dataProvider)
             const graph = new FakeGraph()
             const projectNode = new FakeProjectNode(graph, "project")
-            const arg: TaskResults = {
-                startDate: new Date(2015, 2, 4),
-                duration: 20
-            }
-            mock.expects("setTaskResults").once().withExactArgs("project", "task", arg).returns(Promise.resolve())
 
             // Test
-            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20,
-                                      new Date(2015, 2, 1), 20)
+            const node = new TaskNode(dataProvider, projectNode, "task", new Date(2015, 2, 1), 20)
+            const delayNode = new DelayNode(dataProvider, projectNode, "delay", new Date(2015, 3, 10))
+            const relation: DelayRelation = {
+                delay: "delay",
+                task: "task",
+                lag: 0
+            }
+            node.addDelay(delayNode, relation)
+            chai.expect(delayNode.margin).to.equal(20)
+
             node.modifiers = [
                 {
                     name: "Modifier 1",
@@ -134,6 +109,7 @@ describe("Graph", () => {
             ]
 
             node.compute().then(() => {
+                chai.expect(delayNode.margin).to.equal(17)
                 done()
             }).catch((error) => {
                 done(error)
@@ -145,17 +121,10 @@ describe("Graph", () => {
             const graph = new FakeGraph()
             const projectNode = new FakeProjectNode(graph, "project")
             let mock = sinon.mock(dataProvider)
-            const arg: TaskResults = {
-                startDate: new Date(2015, 2, 21),
-                duration: 15
-            }
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", arg).returns(Promise.resolve())
 
             // Test
-            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 20,
-                                       new Date(2015, 2, 1), 20)
-            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 1, 1), 15,
-                                       new Date(2015, 1, 1), 0)
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 20)
+            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 1, 1), 15)
 
             node1.addChild(node2, {
                 previous: "task1",
@@ -181,42 +150,13 @@ describe("Graph", () => {
                 duration: 2,
                 location: TaskLocation.End
             }
-            const results: Array<[string, TaskResults]> = [
-                [
-                    "task2",
-                    {
-                        startDate: new Date(2015, 2, 21),
-                        duration: 15
-                    }
-                ],
-                [
-                    "task1",
-                    {
-                        startDate: new Date(2015, 2, 1),
-                        duration: 22
-                    }
-                ],
-                [
-                    "task2",
-                    {
-                        startDate: new Date(2015, 2, 23),
-                        duration: 15
-                    }
-                ]
-            ]
             mock.expects("addModifier").once().withExactArgs("project", modifier).returns(Promise.resolve(1))
             mock.expects("addModifierForTask").once().withExactArgs("project", 1, "task1")
                 .returns(Promise.resolve())
-            const expectations = results.map((result: [string, TaskResults]) => {
-                return mock.expects("setTaskResults").once().withExactArgs("project", result[0], result[1])
-                           .returns(Promise.resolve())
-            })
 
             // Test
-            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 20,
-                                       new Date(2015, 2, 1), 20)
-            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 1, 1), 15,
-                                       new Date(2015, 1, 1), 0)
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 20)
+            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 1, 1), 15)
 
             node1.addChild(node2, {
                 previous: "task1",
@@ -224,9 +164,6 @@ describe("Graph", () => {
                 next: "task2",
                 lag: 0
             }).then(() => {
-                chai.expect(expectations[0].called).to.true
-                chai.expect(expectations[1].called).to.false
-                chai.expect(expectations[2].called).to.false
                 return node1.addModifier(modifier)
             }).then(() => {
                 chai.expect(node1.startDate).to.deep.equal(new Date(2015, 2, 1))
@@ -250,18 +187,12 @@ describe("Graph", () => {
                 duration: 2,
                 location: TaskLocation.End
             }
-            const results: TaskResults = {
-                startDate: new Date(2015, 2, 3),
-                duration: 0
-            }
             mock.expects("addModifier").once().withExactArgs("project", modifier).returns(Promise.resolve(1))
             mock.expects("addModifierForTask").once().withExactArgs("project", 1, "task1")
                 .returns(Promise.resolve())
-            mock.expects("setTaskResults").once().withExactArgs("project", "task1", results).returns(Promise.resolve())
 
             // Test
-            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 0,
-                                       new Date(2015, 2, 1), 0)
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 0)
 
             node1.addModifier(modifier).then(() => {
                 chai.expect(node1.startDate).to.deep.equal(new Date(2015, 2, 3))
@@ -277,17 +208,10 @@ describe("Graph", () => {
             const graph = new FakeGraph()
             const projectNode = new FakeProjectNode(graph, "project")
             let mock = sinon.mock(dataProvider)
-            const arg: TaskResults = {
-                startDate: new Date(2015, 2, 21),
-                duration: 15
-            }
-            mock.expects("setTaskResults").once().withExactArgs("project", "task2", arg).returns(Promise.resolve())
 
             // Test
-            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 20,
-                                       new Date(2015, 2, 1), 20)
-            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 1, 1), 15,
-                                       new Date(2015, 1, 1), 0)
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 20)
+            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 1, 1), 15)
 
             node1.addChild(node2, {
                 previous: "task1",
@@ -316,21 +240,12 @@ describe("Graph", () => {
             const graph = new FakeGraph()
             const projectNode = new FakeProjectNode(graph, "project")
             let mock = sinon.mock(dataProvider)
-            const arg: TaskResults = {
-                startDate: new Date(2015, 2, 1),
-                duration: 0
-            }
-            mock.expects("setTaskResults").withExactArgs("project", "task2", arg).returns(Promise.resolve())
 
             // Test
-            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 0,
-                                       new Date(2015, 2, 1), 0)
-            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 2, 1), 0,
-                                       new Date(2015, 2, 1), 0)
-            const node3 = new TaskNode(dataProvider, projectNode, "task3", new Date(2015, 2, 1), 0,
-                                       new Date(2015, 2, 1), 0)
-            const node4 = new TaskNode(dataProvider, projectNode, "task4", new Date(2015, 2, 1), 0,
-                                       new Date(2015, 2, 1), 0)
+            const node1 = new TaskNode(dataProvider, projectNode, "task1", new Date(2015, 2, 1), 0)
+            const node2 = new TaskNode(dataProvider, projectNode, "task2", new Date(2015, 2, 1), 0)
+            const node3 = new TaskNode(dataProvider, projectNode, "task3", new Date(2015, 2, 1), 0)
+            const node4 = new TaskNode(dataProvider, projectNode, "task4", new Date(2015, 2, 1), 0)
 
             node1.addChild(node2, {
                 previous: "task1",

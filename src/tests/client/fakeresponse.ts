@@ -18,16 +18,16 @@ export class FakeResponse implements Response {
         this.shouldThrow = shouldThrow
     }
     clone(): Response {
-        throw new Error("Not mocked")
+        throw new Error("FakeResponse: clone is not mocked")
     }
     arrayBuffer(): Promise<ArrayBuffer> {
-        throw new Error("Not mocked")
+        throw new Error("FakeResponse: arrayBuffer is not mocked")
     }
     blob(): Promise<Blob> {
-        throw new Error("Not mocked")
+        throw new Error("FakeResponse: blob is not mocked")
     }
     formData(): Promise<FormData> {
-        throw new Error("Not mocked")
+        throw new Error("FakeResponse: formData is not mocked")
     }
     json(): Promise<any> {
         if (this.shouldThrow) {
@@ -37,6 +37,6 @@ export class FakeResponse implements Response {
         }
     }
     text(): Promise<string> {
-        throw new Error("Not mocked")
+        throw new Error("FakeResponse: text is not mocked")
     }
 }

@@ -9,19 +9,19 @@ export class FakeFile implements File {
         this.fileReader = fileReader
     }
     msClose(): void {
-        throw new Error("Not mocked")
+        throw new Error("FakeFile: msClose is not mocked")
     }
     msDetachStream(): any {
-        throw new Error("Not mocked")
+        throw new Error("FakeFile: msDetachStream is not mocked")
     }
     slice(start?: number, end?: number, contentType?: string): Blob {
-        throw new Error("Not mocked")
+        throw new Error("FakeFile: slice is not mocked")
     }
     onload() {
         if (this.fileReader) {
             this.fileReader.onload(null)
         } else {
-            throw new Error("Not mocked")
+            throw new Error("FakeFile: onLoad is not mocked")
         }
     }
 }
@@ -33,7 +33,7 @@ export class FakeFileReader {
         this.result = result
     }
     readAsText(blob: Blob, encoding?: string): void {
-        throw new Error("Not mocked")
+        throw new Error("FakeFile: readAsText is not mocked")
     }
 
 }

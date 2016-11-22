@@ -1,4 +1,4 @@
-import { Project, Task, TaskRelation, TaskResults, Modifier, Delay, DelayRelation } from "../../../common/types"
+import { Project, Task, TaskRelation, Modifier, Delay, DelayRelation } from "../../../common/types"
 
 export class GraphError extends Error implements Error {
     constructor(message: string) {

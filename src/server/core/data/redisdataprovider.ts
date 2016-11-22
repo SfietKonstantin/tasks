@@ -1,6 +1,6 @@
 import { IDataProvider, CorruptedError, InternalError, isKnownError } from "./idataprovider"
 import {
-    Identifiable, Project, Task, TaskRelation, TaskResults,
+    Identifiable, Project, Task, TaskRelation,
     Modifier, TaskLocation, Delay, DelayRelation
 } from "../../../common/types"
 import { ExistsError, NotFoundError } from "../../../common/errors"
@@ -455,39 +455,6 @@ export class RedisDataProvider implements IDataProvider {
             return Promise.all(identifiers.sort().map((childIndentifier: string): Promise<TaskRelation> => {
                 return RedisTaskRelation.load(projectIdentifier, taskIdentifier, childIndentifier, this.client)
             }))
-        }).catch((error: Error) => {
-            wrapUnknownErrors(error)
-        })
-    }
-    getTaskResults(projectIdentifier: string, taskIdentifier: string): Promise<TaskResults> {
-        return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
-            return this.client.mgetAsync(taskKey(projectIdentifier, taskIdentifier, "startDate"),
-                                         taskKey(projectIdentifier, taskIdentifier, "duration"))
-        }).then((results: Array<string>) => {
-            if (!results[0]) {
-                throw new CorruptedError("Task " + taskIdentifier + " do not have property startDate")
-            }
-            if (!results[1]) {
-                throw new CorruptedError("Task " + taskIdentifier + " do not have property duration")
-            }
-            const taskResults: TaskResults = {
-                startDate: new Date(+results[0]),
-                duration: +results[1]
-            }
-            return taskResults
-        }).catch((error: Error) => {
-            wrapUnknownErrors(error)
-        })
-    }
-    setTaskResults(projectIdentifier: string, taskIdentifier: string, taskResults: TaskResults): Promise<void> {
-        return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
-            const set = [
-                taskKey(projectIdentifier, taskIdentifier, "duration"),
-                +taskResults.duration,
-                taskKey(projectIdentifier, taskIdentifier, "startDate"),
-                +taskResults.startDate.getTime()
-            ]
-            return this.client.msetAsync(set)
         }).catch((error: Error) => {
             wrapUnknownErrors(error)
         })

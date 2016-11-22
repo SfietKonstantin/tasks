@@ -1,5 +1,5 @@
 import { ITaskNode, IDelayNode, IProjectNode, IGraph } from "../../server/core/graph/types"
-import { Project, Task, TaskResults, TaskRelation, Modifier, Delay, DelayRelation } from "../../common/types"
+import { Project, Task, TaskRelation, Modifier, Delay, DelayRelation } from "../../common/types"
 
 export class FakeTaskNode implements ITaskNode {
     parent: IProjectNode
@@ -20,7 +20,7 @@ export class FakeTaskNode implements ITaskNode {
         this.modifiers = []
     }
     addModifier(modifier: Modifier): Promise<Modifier> {
-        return Promise.reject(new Error("Not mocked"))
+        return Promise.reject(new Error("FakeTaskNode: addModifier is not mocked"))
     }
 }
 
@@ -48,16 +48,16 @@ export class FakeProjectNode implements IProjectNode {
         this.nodes = new Map<string, ITaskNode>()
     }
     addTask(task: Task): Promise<ITaskNode> {
-        return Promise.reject(new Error("Not mocked"))
+        return Promise.reject(new Error("FakeProjectNode: addTask is not mocked"))
     }
     addDelay(delay: Delay): Promise<IDelayNode> {
-        return Promise.reject(new Error("Not mocked"))
+        return Promise.reject(new Error("FakeProjectNode: addDelay is not mocked"))
     }
     addTaskRelation(relation: TaskRelation): Promise<void> {
-        return Promise.reject(new Error("Not mocked"))
+        return Promise.reject(new Error("FakeProjectNode: addTaskRelation is not mocked"))
     }
     addDelayRelation(relation: DelayRelation): Promise<void> {
-        return Promise.reject(new Error("Not mocked"))
+        return Promise.reject(new Error("FakeProjectNode: addDelayRelation is not mocked"))
     }
 }
 
@@ -67,6 +67,6 @@ export class FakeGraph implements IGraph {
         this.nodes = new Map<string, IProjectNode>()
     }
     addProject(project: Project): Promise<IProjectNode> {
-        return Promise.reject(new Error("Not mocked"))
+        return Promise.reject(new Error("FakeGraph: addProject is not mocked"))
     }
 }
