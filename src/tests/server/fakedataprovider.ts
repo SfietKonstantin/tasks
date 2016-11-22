@@ -1,5 +1,5 @@
 import { IDataProvider } from "../../server/core/data/idataprovider"
-import { Project, Task, TaskRelation, Modifier, Delay, DelayRelation } from "../../common/types"
+import { Project, TaskDefinition, TaskRelation, Modifier, Delay, DelayRelation } from "../../common/types"
 
 export class FakeDataProvider implements IDataProvider {
     getAllProjects(): Promise<Array<Project>> {
@@ -14,13 +14,13 @@ export class FakeDataProvider implements IDataProvider {
     hasTask(projectIdentifier: string, taskIdentifier: string): Promise<void> {
         return Promise.reject(new Error("FakeDataProvider: hasTask is not mocked"))
     }
-    getTask(projectIdentifier: string, taskIdentifier: string): Promise<Task> {
+    getTask(projectIdentifier: string, taskIdentifier: string): Promise<TaskDefinition> {
         return Promise.reject(new Error("FakeDataProvider: getTask is not mocked"))
     }
-    getProjectTasks(projectIdentifier: string): Promise<Array<Task>> {
+    getProjectTasks(projectIdentifier: string): Promise<Array<TaskDefinition>> {
         return Promise.reject(new Error("FakeDataProvider: getProjectTasks is not mocked"))
     }
-    addTask(projectIdentifier: string, task: Task): Promise<void> {
+    addTask(projectIdentifier: string, task: TaskDefinition): Promise<void> {
         return Promise.reject(new Error("FakeDataProvider: addTask is not mocked"))
     }
     isTaskImportant(projectIdentifier: string, taskIdentifier: string): Promise<boolean> {

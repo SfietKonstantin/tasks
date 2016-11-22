@@ -5,14 +5,14 @@ import { State } from "../types"
 import { fetchTask } from "../actions/task"
 import { Header } from "../components/header"
 import { Overview } from "../components/overview"
-import { Project, Task, TaskResults, Modifier } from "../../../common/types"
+import { Project, TaskDefinition, TaskResults, Modifier } from "../../../common/types"
 import * as apitypes from "../../../common/apitypes"
 
 interface MainProperties {
     projectIdentifier: string
     taskIdentifier: string
     project: Project
-    task: Task,
+    task: TaskDefinition,
     taskResults: TaskResults
     dispatch: Dispatch<State>
 }

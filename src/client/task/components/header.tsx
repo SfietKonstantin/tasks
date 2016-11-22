@@ -4,11 +4,11 @@ import { TabBar } from "../../common/components/tabs"
 import * as CommonHeader from "../../common/components/header"
 import { HeaderTools } from "./headertools"
 import { Breadcrumb } from "./breadcrumb"
-import { Project, Task, Modifier } from "../../../common/types"
+import { Project, TaskDefinition, Modifier } from "../../../common/types"
 
 interface HeaderProperties {
     project: Project
-    task: Task
+    task: TaskDefinition
     tabChangedCallback: (index: number) => void
 }
 

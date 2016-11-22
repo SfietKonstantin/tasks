@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Task, TaskRelation, TaskLocation } from "../../common/types"
+import { Project, TaskDefinition, TaskRelation, TaskLocation } from "../../common/types"
 import { NotFoundError } from "../../common/errors"
 import { CorruptedError, InternalError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
@@ -34,14 +34,14 @@ describe("Redis", () => {
             }
 
             db.addProject(project).then(() => {
-                const task1: Task = {
+                const task1: TaskDefinition = {
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
-                const task2: Task = {
+                const task2: TaskDefinition = {
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -169,21 +169,21 @@ describe("Redis", () => {
             }
 
             db.addProject(project).then(() => {
-                const task1: Task = {
+                const task1: TaskDefinition = {
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
-                const task2: Task = {
+                const task2: TaskDefinition = {
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
                     estimatedStartDate: new Date(2016, 9, 15),
                     estimatedDuration: 15
                 }
-                const task3: Task = {
+                const task3: TaskDefinition = {
                     identifier: "task3",
                     name: "Task 3",
                     description: "Description 3",

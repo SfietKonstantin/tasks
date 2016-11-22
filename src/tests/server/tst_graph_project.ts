@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
 import {
-    Project, Task, TaskRelation, Modifier, TaskLocation,
+    Project, TaskDefinition, TaskRelation, Modifier, TaskLocation,
     Delay, DelayRelation
 } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
@@ -17,7 +17,7 @@ describe("Graph", () => {
             const dataProvider = new FakeDataProvider()
             const graph = new FakeGraph()
             let mock = sinon.mock(dataProvider)
-            const tasks: Array<Task> = [
+            const tasks: Array<TaskDefinition> = [
                 {
                     identifier: "root",
                     name: "Root task",
@@ -195,7 +195,7 @@ describe("Graph", () => {
             let node = new ProjectNode(dataProvider, graph, "project")
             const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode)
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task2",
                 name: "Task 2",
                 description: "Description 2",
@@ -224,7 +224,7 @@ describe("Graph", () => {
             let node = new ProjectNode(dataProvider, graph, "project")
             const taskNode = new TaskNode(dataProvider, node, "task1", new Date(2015, 1, 1), 30)
             node.nodes.set("task1", taskNode)
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task1",
                 name: "Task 1",
                 description: "Description 1",

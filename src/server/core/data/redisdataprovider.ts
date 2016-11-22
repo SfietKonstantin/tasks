@@ -1,6 +1,6 @@
 import { IDataProvider, CorruptedError, InternalError, isKnownError } from "./idataprovider"
 import {
-    Identifiable, Project, Task, TaskRelation,
+    Identifiable, Project, TaskDefinition, TaskRelation,
     Modifier, TaskLocation, Delay, DelayRelation
 } from "../../../common/types"
 import { ExistsError, NotFoundError } from "../../../common/errors"
@@ -137,11 +137,11 @@ class RedisTask {
     name: string
     description: string
 
-    constructor(task: Task) {
+    constructor(task: TaskDefinition) {
         this.name = task.name
         this.description = task.description
     }
-    static save(projectIdentifier: string, task: Task, client: redis.RedisClient): Promise<void> {
+    static save(projectIdentifier: string, task: TaskDefinition, client: redis.RedisClient): Promise<void> {
         const redisTask = new RedisTask(task)
         const taskIdentifier = task.identifier
         return client.hmsetAsync(taskRootKey(projectIdentifier, taskIdentifier), redisTask).then(() => {
@@ -153,7 +153,7 @@ class RedisTask {
             return client.saddAsync(projectKey(projectIdentifier, "tasks"), taskIdentifier)
         })
     }
-    static load(projectIdentifier: string, taskIdentifier: string, client: redis.RedisClient): Promise<Task> {
+    static load(projectIdentifier: string, taskIdentifier: string, client: redis.RedisClient): Promise<TaskDefinition> {
         return client.hgetallAsync(taskRootKey(projectIdentifier, taskIdentifier)).then((result: any) => {
             if (!result.hasOwnProperty("name")) {
                 throw new CorruptedError("Task " + taskIdentifier + " do not have property name")
@@ -173,7 +173,7 @@ class RedisTask {
                     throw new CorruptedError("Task " + taskIdentifier + " do not have property estimatedDuration")
                 }
 
-                const task: Task = {
+                const task: TaskDefinition = {
                     identifier: taskIdentifier,
                     name,
                     description,
@@ -390,27 +390,27 @@ export class RedisDataProvider implements IDataProvider {
             wrapUnknownErrors(error)
         })
     }
-    getTask(projectIdentifier: string, taskIdentifier: string): Promise<Task> {
+    getTask(projectIdentifier: string, taskIdentifier: string): Promise<TaskDefinition> {
         return this.hasTask(projectIdentifier, taskIdentifier).then(() => {
             return RedisTask.load(projectIdentifier, taskIdentifier, this.client)
         }).catch((error: Error) => {
             wrapUnknownErrors(error)
         })
     }
-    getProjectTasks(projectIdentifier: string): Promise<Array<Task>> {
+    getProjectTasks(projectIdentifier: string): Promise<Array<TaskDefinition>> {
         return this.hasProject(projectIdentifier).then(() => {
             return this.client.smembersAsync(projectKey(projectIdentifier, "tasks"))
         }).then((taskIdentifiers: Array<string>) => {
             return this.getTasks(projectIdentifier, taskIdentifiers.sort())
-        }).then((tasks: Array<Task | null>) => {
-            return tasks.filter((value: Task | null) => {
+        }).then((tasks: Array<TaskDefinition | null>) => {
+            return tasks.filter((value: TaskDefinition | null) => {
                 return value != null
             })
         }).catch((error: Error) => {
             wrapUnknownErrors(error)
         })
     }
-    addTask(projectIdentifier: string, task: Task): Promise<void> {
+    addTask(projectIdentifier: string, task: TaskDefinition): Promise<void> {
         return this.hasProject(projectIdentifier).then(() => {
             return this.notHasTask(projectIdentifier, task.identifier)
         }).then(() => {
@@ -626,8 +626,8 @@ export class RedisDataProvider implements IDataProvider {
             })
         })
     }
-    private getTasks(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<Task | null>> {
-        return Promise.all(taskIdentifiers.map((taskIdentifier: string): Promise<Task | null> => {
+    private getTasks(projectIdentifier: string, taskIdentifiers: Array<string>): Promise<Array<TaskDefinition | null>> {
+        return Promise.all(taskIdentifiers.map((taskIdentifier: string): Promise<TaskDefinition | null> => {
             return this.getTask(projectIdentifier, taskIdentifier).catch((error) => {
                 return null
             })

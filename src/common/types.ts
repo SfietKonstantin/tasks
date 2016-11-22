@@ -7,7 +7,7 @@ export interface Project extends Identifiable {
     description: string
 }
 
-export interface Task extends Identifiable {
+export interface TaskDefinition extends Identifiable {
     name: string
     description: string
     estimatedStartDate: Date

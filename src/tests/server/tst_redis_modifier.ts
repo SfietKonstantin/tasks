@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Task, Modifier, TaskLocation } from "../../common/types"
+import { Project, TaskDefinition, Modifier, TaskLocation } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
 import { CorruptedError, InternalError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
@@ -255,7 +255,7 @@ describe("Redis", () => {
             }
 
             db.addProject(project).then(() => {
-                const task: Task = {
+                const task: TaskDefinition = {
                     identifier: "task",
                     name: "Task",
                     description: "Description",
@@ -501,7 +501,7 @@ describe("Redis", () => {
             }
 
             db.addProject(project).then(() => {
-                const task: Task = {
+                const task: TaskDefinition = {
                     identifier: "task",
                     name: "Task",
                     description: "Description",

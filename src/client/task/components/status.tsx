@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Row, Col, Panel, ProgressBar, Label } from "react-bootstrap"
-import { Task, TaskResults } from "../../../common/types"
+import { TaskDefinition, TaskResults } from "../../../common/types"
 import * as dateutils from "../../../common/dateutils"
 
 interface StateIndicatorProperties {
@@ -38,7 +38,7 @@ export class StatusTime extends React.Component<StatusTimeProperties, {}> {
 }
 
 interface StatusProperties {
-    task: Task
+    task: TaskDefinition
     taskResults: TaskResults
 }
 

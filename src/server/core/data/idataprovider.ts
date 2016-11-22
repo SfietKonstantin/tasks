@@ -1,4 +1,4 @@
-import { Project, Task, TaskRelation, Modifier, Delay, DelayRelation } from "../../../common/types"
+import { Project, TaskDefinition, TaskRelation, Modifier, Delay, DelayRelation } from "../../../common/types"
 import { ExistsError, NotFoundError } from "../../../common/errors"
 
 export class InternalError extends Error implements Error {
@@ -25,9 +25,9 @@ export interface IDataProvider {
     getProject(projectIdentifier: string): Promise<Project>
     addProject(project: Project): Promise<void>
 
-    getTask(projectIdentifier: string, taskIdentifier: string): Promise<Task>
-    getProjectTasks(projectIdentifier: string): Promise<Array<Task>>
-    addTask(projectIdentifier: string, task: Task): Promise<void>
+    getTask(projectIdentifier: string, taskIdentifier: string): Promise<TaskDefinition>
+    getProjectTasks(projectIdentifier: string): Promise<Array<TaskDefinition>>
+    addTask(projectIdentifier: string, task: TaskDefinition): Promise<void>
     isTaskImportant(projectIdentifier: string, taskIdentifier: string): Promise<boolean>
     setTaskImportant(projectIdentifier: string, taskIdentifier: string, important: boolean): Promise<void>
 

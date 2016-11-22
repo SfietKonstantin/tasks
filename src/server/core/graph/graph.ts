@@ -1,5 +1,5 @@
 import {
-    Project, Task, TaskRelation, TaskLocation, Modifier, Delay, DelayRelation
+    Project, TaskDefinition, TaskRelation, TaskLocation, Modifier, Delay, DelayRelation
 } from "../../../common/types"
 import { ExistsError, NotFoundError } from "../../../common/errors"
 import { GraphError, ITaskNode, IDelayNode, IProjectNode, IGraph } from "./types"
@@ -206,8 +206,8 @@ export class ProjectNode implements IProjectNode {
         this.delays = new Map<string, IDelayNode>()
     }
     load(): Promise<void> {
-        return this.dataProvider.getProjectTasks(this.projectIdentifier).then((tasks: Array<Task>) => {
-            return Promise.all(tasks.map((task: Task) => {
+        return this.dataProvider.getProjectTasks(this.projectIdentifier).then((tasks: Array<TaskDefinition>) => {
+            return Promise.all(tasks.map((task: TaskDefinition) => {
                 const node = new TaskNode(this.dataProvider, this, task.identifier,
                                           task.estimatedStartDate, task.estimatedDuration)
                 this.nodes.set(task.identifier, node)
@@ -254,7 +254,7 @@ export class ProjectNode implements IProjectNode {
             }))
         })
     }
-    addTask(task: Task): Promise<ITaskNode> {
+    addTask(task: TaskDefinition): Promise<ITaskNode> {
         if (this.nodes.has(task.identifier)) {
             return Promise.reject(new ExistsError("Task \"" + task.identifier + "\" is already present in project"))
         }

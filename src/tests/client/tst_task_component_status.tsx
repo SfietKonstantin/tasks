@@ -3,7 +3,7 @@ import * as React from "react"
 import * as enzyme from "enzyme"
 import * as sinon from "sinon"
 import { Status, StatusStateIndicator, StatusTime } from "../../client/task/components/status"
-import { Task, TaskResults } from "../../common/types"
+import { TaskDefinition, TaskResults } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Task components", () => {
@@ -82,7 +82,7 @@ describe("Task components", () => {
             chai.expect(times.prop("todayDiff")).to.equal(startDays)
         }
         it("Should create Status for not started and on time task", () => {
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "",
@@ -100,7 +100,7 @@ describe("Task components", () => {
                       "success", "On time", "Ending the 21/4/2016", "In 46 days")
         })
         it("Should create Status for not started and ending late task", () => {
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "",
@@ -118,7 +118,7 @@ describe("Task components", () => {
                       "warning", "Late 5 days", "Ending the 26/4/2016", "In 51 days")
         })
         it("Should create Status for not started and starting late task", () => {
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "",
@@ -136,7 +136,7 @@ describe("Task components", () => {
                       "success", "On time", "Ending the 21/4/2016", "In 46 days")
         })
         it("Should create Status for in progress and on time task", () => {
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "",

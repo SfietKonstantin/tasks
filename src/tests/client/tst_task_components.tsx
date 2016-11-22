@@ -2,7 +2,7 @@ import * as chai from "chai"
 import * as React from "react"
 import * as enzyme from "enzyme"
 import { Breadcrumb } from "../../client/task/components/breadcrumb"
-import { Project, Task } from "../../common/types"
+import { Project, TaskDefinition } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Task components", () => {
@@ -19,7 +19,7 @@ describe("Task components", () => {
                 name: "Project",
                 description: ""
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "",
@@ -40,7 +40,7 @@ describe("Task components", () => {
                 name: "Project",
                 description: ""
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task with a very very very very very long name and this name continues",
                 description: "",

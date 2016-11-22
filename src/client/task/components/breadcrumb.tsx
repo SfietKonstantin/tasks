@@ -1,9 +1,9 @@
 import * as React from "react"
-import { Project, Task } from "../../../common/types"
+import { Project, TaskDefinition } from "../../../common/types"
 
 interface BreadcrumbProperties {
     project: Project
-    task: Task
+    task: TaskDefinition
 }
 
 export class Breadcrumb extends React.Component<BreadcrumbProperties, {}> {

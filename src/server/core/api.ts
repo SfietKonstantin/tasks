@@ -1,6 +1,6 @@
 import * as winston from "winston"
 import {
-    Project, Task, TaskRelation, Modifier, Delay, DelayRelation
+    Project, TaskDefinition, TaskRelation, Modifier, Delay, DelayRelation
 } from "../../common/types"
 import { IDataProvider, isKnownError } from "../core/data/idataprovider"
 import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"
@@ -71,10 +71,10 @@ export class Api {
             const error = new RequestError(404, "Project \"" + projectIdentifier + "\" not found")
             return Promise.reject(error)
         }
-        return this.dataProvider.getProjectTasks(projectIdentifier).then((tasks: Array<Task>) => {
-            tasks = tasks.filter((value: Task) => { return !!value })
+        return this.dataProvider.getProjectTasks(projectIdentifier).then((tasks: Array<TaskDefinition>) => {
+            tasks = tasks.filter((value: TaskDefinition) => { return !!value })
             const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
-            const returned: Array<ApiTask> = tasks.map((task: Task) => {
+            const returned: Array<ApiTask> = tasks.map((task: TaskDefinition) => {
                 let taskNode = maputils.get(projectNode.nodes, task.identifier)
                 return createApiTask(task, taskNode.startDate, taskNode.duration)
             })
@@ -211,7 +211,7 @@ export class Api {
             findCyclicDependency(inputTasks, inputTaskRelations)
 
             return this.graph.addProject(project).then((projectNode: IProjectNode) => {
-                return Promise.all(inputTasks.map((task: Task) => {
+                return Promise.all(inputTasks.map((task: TaskDefinition) => {
                     return projectNode.addTask(task)
                 })).then(() => {
                     return Promise.all(inputTaskRelations.map((relation: TaskRelation) => {
@@ -243,7 +243,7 @@ export class Api {
         })
     }
     private sendTask(projectIdentifier: string, taskIdentifier: string): Promise<ApiProjectTaskModifiers> {
-        return this.dataProvider.getTask(projectIdentifier, taskIdentifier).then((task: Task) => {
+        return this.dataProvider.getTask(projectIdentifier, taskIdentifier).then((task: TaskDefinition) => {
             return this.dataProvider.getProject(projectIdentifier).then((project: Project) => {
                 const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
                 let taskNode = maputils.get(projectNode.nodes, taskIdentifier)

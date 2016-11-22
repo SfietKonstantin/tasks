@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Task } from "../../common/types"
+import { Project, TaskDefinition } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
 import { CorruptedError, InternalError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
@@ -34,14 +34,14 @@ describe("Redis", () => {
             }
 
             db.addProject(project).then(() => {
-                const task1: Task = {
+                const task1: TaskDefinition = {
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
-                const task2: Task = {
+                const task2: TaskDefinition = {
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -60,8 +60,8 @@ describe("Redis", () => {
             })
         })
         it("Should get project tasks", (done) => {
-            db.getProjectTasks("project").then((tasks: Array<Task>) => {
-                const expected: Array<Task> = [
+            db.getProjectTasks("project").then((tasks: Array<TaskDefinition>) => {
+                const expected: Array<TaskDefinition> = [
                     {
                         identifier: "task1",
                         name: "Task 1",
@@ -101,8 +101,8 @@ describe("Redis", () => {
             })
         })
         it("Should get non corrupted project tasks", (done) => {
-            db.getProjectTasks("project").then((tasks: Array<Task>) => {
-                const expected: Array<Task> = [
+            db.getProjectTasks("project").then((tasks: Array<TaskDefinition>) => {
+                const expected: Array<TaskDefinition> = [
                     {
                         identifier: "task2",
                         name: "Task 2",
@@ -130,14 +130,14 @@ describe("Redis", () => {
             }
 
             db.addProject(project).then(() => {
-                const task1: Task = {
+                const task1: TaskDefinition = {
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
                     estimatedStartDate: new Date(2016, 9, 1),
                     estimatedDuration: 30
                 }
-                const task2: Task = {
+                const task2: TaskDefinition = {
                     identifier: "task2",
                     name: "Task 2",
                     description: "Description 2",
@@ -156,8 +156,8 @@ describe("Redis", () => {
             })
         })
         it("Should get task", (done) => {
-            db.getTask("project", "task1").then((task: Task) => {
-                const expected: Task = {
+            db.getTask("project", "task1").then((task: TaskDefinition) => {
+                const expected: TaskDefinition = {
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -273,8 +273,8 @@ describe("Redis", () => {
             })
         })
         it("Should get task", (done) => {
-            db.getTask("project", "task1").then((task: Task) => {
-                const expected: Task = {
+            db.getTask("project", "task1").then((task: TaskDefinition) => {
+                const expected: TaskDefinition = {
                     identifier: "task1",
                     name: "Task 1",
                     description: "Description 1",
@@ -323,7 +323,7 @@ describe("Redis", () => {
             })
         })
         it("Should add task", (done) => {
-            const task1: Task = {
+            const task1: TaskDefinition = {
                 identifier: "task1",
                 name: "Task 1",
                 description: "Description 1",
@@ -338,7 +338,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when adding task on invalid project", (done) => {
-            const task2: Task = {
+            const task2: TaskDefinition = {
                 identifier: "task2",
                 name: "Task 2",
                 description: "Description 2",
@@ -356,7 +356,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when adding an existing task", (done) => {
-            const task1_2: Task = {
+            const task1_2: TaskDefinition = {
                 identifier: "task1",
                 name: "Task 2",
                 description: "Description 2",
@@ -381,7 +381,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when adding task", (done) => {
-            const task2: Task = {
+            const task2: TaskDefinition = {
                 identifier: "task2",
                 name: "Task 2",
                 description: "Description 2",

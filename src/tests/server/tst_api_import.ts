@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, Task, TaskRelation, TaskLocation, Delay, DelayRelation } from "../../common/types"
+import { Project, TaskRelation, TaskLocation, Delay, DelayRelation } from "../../common/types"
 import { ExistsError, NotFoundError } from "../../common/errors"
 import {
     ApiInputTask, ApiInputDelay, createTask, createTaskRelation, createDelay, createDelayRelation

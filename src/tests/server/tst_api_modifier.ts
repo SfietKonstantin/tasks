@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, Task, TaskLocation, Modifier } from "../../common/types"
+import { Project, TaskDefinition, TaskLocation, Modifier } from "../../common/types"
 import { NotFoundError } from "../../common/errors"
 import { ApiTask, ApiProjectTaskModifiers, createApiTask } from "../../common/apitypes"
 import { IDataProvider, CorruptedError, InternalError } from "../../server/core/data/idataprovider"
@@ -34,7 +34,7 @@ describe("API", () => {
                 description: "Description"
             }
             mock.expects("getProject").once().withExactArgs("project").returns(Promise.resolve(project))
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -90,7 +90,7 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -127,7 +127,7 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -164,7 +164,7 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -201,7 +201,7 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -238,7 +238,7 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -278,7 +278,7 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -318,7 +318,7 @@ describe("API", () => {
                 duration: 15,
                 location: TaskLocation.End
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -359,7 +359,7 @@ describe("API", () => {
             }
             mock.expects("getProject").once().withExactArgs("project")
                 .returns(Promise.reject(new CorruptedError("Some error")))
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",
@@ -400,7 +400,7 @@ describe("API", () => {
             }
             mock.expects("getProject").once().withExactArgs("project")
                 .returns(Promise.reject(new InternalError("Some error")))
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "task",
                 name: "Task",
                 description: "Description",

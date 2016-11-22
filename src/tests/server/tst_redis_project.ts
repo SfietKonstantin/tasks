@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Task } from "../../common/types"
+import { Project } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
 import { CorruptedError, InternalError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"

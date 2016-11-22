@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
 import {
-    Project, Task, TaskRelation, Modifier, TaskLocation,
+    Project, TaskDefinition, TaskRelation, Modifier, TaskLocation,
     Delay, DelayRelation
 } from "../../common/types"
 import { ExistsError } from "../../common/errors"
@@ -27,7 +27,7 @@ describe("Graph", () => {
                     description: "Other description"
                 }
             ]
-            const tasks: Array<Task> = [
+            const tasks: Array<TaskDefinition> = [
                 {
                     identifier: "root",
                     name: "Root task",
@@ -71,7 +71,7 @@ describe("Graph", () => {
                     date: new Date(2016, 11, 30)
                 }
             ]
-            const otherTasks: Array<Task> = [
+            const otherTasks: Array<TaskDefinition> = [
                 {
                     identifier: "other1",
                     name: "Other task 1",

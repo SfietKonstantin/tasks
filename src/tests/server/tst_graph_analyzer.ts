@@ -1,11 +1,11 @@
 import * as chai from "chai"
 import { findCyclicDependency } from "../../server/core/graph/analyzer"
 import { GraphError } from "../../server/core/graph/types"
-import { Task, TaskRelation, TaskLocation } from "../../common/types"
+import { TaskDefinition, TaskRelation, TaskLocation } from "../../common/types"
 
 describe("Graph analyzer", () => {
     it("Should analyze a simple graph", () => {
-        const tasks: Array<Task> = [
+        const tasks: Array<TaskDefinition> = [
             {
                 identifier: "task1",
                 name: "Task 1",
@@ -24,7 +24,7 @@ describe("Graph analyzer", () => {
         findCyclicDependency(tasks, [])
     })
     it("Should analyze a simple graph with relations", () => {
-        const tasks: Array<Task> = [
+        const tasks: Array<TaskDefinition> = [
             {
                 identifier: "task1",
                 name: "Task 1",
@@ -51,7 +51,7 @@ describe("Graph analyzer", () => {
         findCyclicDependency(tasks, relations)
     })
     it("Should not take invalid relations in account", () => {
-        const tasks: Array<Task> = [
+        const tasks: Array<TaskDefinition> = [
             {
                 identifier: "task1",
                 name: "Task 1",
@@ -90,7 +90,7 @@ describe("Graph analyzer", () => {
         findCyclicDependency(tasks, relations)
     })
     it("Should detect cyclic dependency", () => {
-        const tasks: Array<Task> = [
+        const tasks: Array<TaskDefinition> = [
             {
                 identifier: "task1",
                 name: "Task 1",
@@ -136,7 +136,7 @@ describe("Graph analyzer", () => {
         chai.expect(() => { findCyclicDependency(tasks, relations) }).to.throw(GraphError)
     })
     it("Should not detect diamonds", () => {
-        const tasks: Array<Task> = [
+        const tasks: Array<TaskDefinition> = [
             {
                 identifier: "task1",
                 name: "Task 1",

@@ -1,5 +1,5 @@
 import {
-    Identifiable, Project, Task, TaskResults, TaskRelation, TaskLocation, Modifier,
+    Identifiable, Project, TaskDefinition, TaskResults, TaskRelation, TaskLocation, Modifier,
     Delay, DelayRelation
 } from "./types"
 import { InputError } from "./errors"
@@ -32,7 +32,7 @@ export interface ApiProjectTaskModifiers {
     modifiers: Array<Modifier>
 }
 
-export const createApiTask = (task: Task, startDate: Date, duration: number): ApiTask => {
+export const createApiTask = (task: TaskDefinition, startDate: Date, duration: number): ApiTask => {
     return {
         identifier: task.identifier,
         name: task.name,
@@ -44,7 +44,7 @@ export const createApiTask = (task: Task, startDate: Date, duration: number): Ap
     }
 }
 
-export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task => {
+export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): TaskDefinition => {
     return {
         identifier: apiTask.identifier,
         name: apiTask.name,
@@ -91,7 +91,7 @@ export const createProject = (input: any): Project => {
     }
 }
 
-export const createTask = (input: any): Task => {
+export const createTask = (input: any): TaskDefinition => {
     if (!input.hasOwnProperty("identifier")) {
         throw new InputError("Property \"identifier\" cannot be found")
     }

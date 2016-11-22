@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, Task, Modifier } from "../../common/types"
+import { Project, Modifier } from "../../common/types"
 import { NotFoundError } from "../../common/errors"
 import { ApiTask } from "../../common/apitypes"
 import { IDataProvider, CorruptedError, InternalError } from "../../server/core/data/idataprovider"

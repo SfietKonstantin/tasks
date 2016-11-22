@@ -1,11 +1,11 @@
 import * as React from "react"
 import { Grid, Col } from "react-bootstrap"
-import { Task, TaskResults } from "../../../common/types"
+import { TaskDefinition, TaskResults } from "../../../common/types"
 import { Status } from "./status"
 
 interface OverviewProperties {
     visible: boolean
-    task: Task
+    task: TaskDefinition
     taskResults: TaskResults
 }
 

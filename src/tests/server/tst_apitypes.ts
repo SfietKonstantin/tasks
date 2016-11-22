@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as apitypes from "../../common/apitypes"
-import { Project, Task, TaskRelation, TaskLocation, Delay, DelayRelation } from "../../common/types"
+import { Project, TaskDefinition, TaskRelation, TaskLocation, Delay, DelayRelation } from "../../common/types"
 import { InputError } from "../../common/errors"
 
 describe("API types", () => {
@@ -68,7 +68,7 @@ describe("API types", () => {
                 estimatedStartDate: new Date(2015, 1, 15).toISOString(),
                 estimatedDuration: 123
             }
-            const task: Task = {
+            const task: TaskDefinition = {
                 identifier: "identifier",
                 name: "Name",
                 description: "Description",

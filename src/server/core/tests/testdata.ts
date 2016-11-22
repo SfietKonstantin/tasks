@@ -1,5 +1,5 @@
 import { IDataProvider } from "../data/idataprovider"
-import { Project, Task, TaskRelation, TaskLocation } from "../../../common/types"
+import { Project, TaskDefinition, TaskRelation, TaskLocation } from "../../../common/types"
 import { IGraph, IProjectNode, ITaskNode } from "../graph/types"
 
 const fillProjectsData = (graph: IGraph): Promise<IProjectNode> => {
@@ -12,7 +12,7 @@ const fillProjectsData = (graph: IGraph): Promise<IProjectNode> => {
 }
 
 const fillTasksData = (projectNode: IProjectNode): Promise<void> => {
-    const tasks: Array<Task> = [
+    const tasks: Array<TaskDefinition> = [
         {
             identifier: "root",
             name: "Root task",
@@ -43,7 +43,7 @@ const fillTasksData = (projectNode: IProjectNode): Promise<void> => {
         }
     ]
 
-    return Promise.all(tasks.map((task: Task) => {
+    return Promise.all(tasks.map((task: TaskDefinition) => {
         return projectNode.addTask(task)
     }))
 }

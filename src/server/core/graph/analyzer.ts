@@ -1,5 +1,5 @@
 import * as winston from "winston"
-import { Task, TaskRelation } from "../../../common/types"
+import { TaskDefinition, TaskRelation } from "../../../common/types"
 import { GraphError } from "./types"
 import * as maputils from "../../../common/maputils"
 
@@ -26,9 +26,9 @@ const markAndProcessChildren = (node: Node, marked: Set<string>, nodes: Map<stri
     nodes.delete(node.taskIdentifier)
 }
 
-export const findCyclicDependency = (tasks: Array<Task>, relations: Array<TaskRelation>) => {
+export const findCyclicDependency = (tasks: Array<TaskDefinition>, relations: Array<TaskRelation>) => {
     let nodes = new Map<string, Node>()
-    tasks.forEach((task: Task) => {
+    tasks.forEach((task: TaskDefinition) => {
         nodes.set(task.identifier, {
             taskIdentifier: task.identifier,
             children: []
