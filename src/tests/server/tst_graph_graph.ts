@@ -1,6 +1,9 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, Task, TaskResults, TaskRelation, Modifier, TaskLocation, Delay, DelayRelation } from "../../common/types"
+import {
+    Project, Task, TaskResults, TaskRelation, Modifier, TaskLocation,
+    Delay, DelayRelation
+} from "../../common/types"
 import { ExistsError } from "../../common/errors"
 import { FakeDataProvider } from "./fakedataprovider"
 import { Graph, ProjectNode } from "../../server/core/graph/graph"

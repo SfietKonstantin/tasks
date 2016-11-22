@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as apitypes from "../../common/apitypes"
-import { Project, Task, TaskRelation, TaskLocation } from "../../common/types"
+import { Project, Task, TaskRelation, TaskLocation, Delay, DelayRelation } from "../../common/types"
 import { InputError } from "../../common/errors"
 
 describe("API types", () => {
@@ -61,7 +61,7 @@ describe("API types", () => {
     })
     describe("createTask", () => {
         it("Should create a Task", () => {
-            const apiTask = {
+            const apiTask: apitypes.ApiInputTask = {
                 identifier: "identifier",
                 name: "Name",
                 description: "Description",
@@ -173,7 +173,7 @@ describe("API types", () => {
             chai.expect(() => { apitypes.createTask(apiTask) }).to.throw(InputError)
         })
     })
-    describe("createRelation", () => {
+    describe("createTaskRelation", () => {
         it("Should create a relation 1", () => {
             const relation: TaskRelation = {
                 previous: "task1",
@@ -181,7 +181,7 @@ describe("API types", () => {
                 next: "task2",
                 lag: 3
             }
-            chai.expect(apitypes.createRelation(relation)).to.deep.equal(relation)
+            chai.expect(apitypes.createTaskRelation(relation)).to.deep.equal(relation)
         })
         it("Should create a relation 2", () => {
             const relation: TaskRelation = {
@@ -190,84 +190,225 @@ describe("API types", () => {
                 next: "task2",
                 lag: 3
             }
-            chai.expect(apitypes.createRelation(relation)).to.deep.equal(relation)
+            chai.expect(apitypes.createTaskRelation(relation)).to.deep.equal(relation)
         })
-        it("Should not create a project without previous", () => {
+        it("Should not create a relation without previous", () => {
             const relation = {
                 previousLocation: TaskLocation.Beginning,
                 next: "task2",
                 lag: 3
             }
-            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTaskRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project with wrong previous", () => {
+        it("Should not create a relation with wrong previous", () => {
             const relation = {
                 previous: { test: "test" },
                 previousLocation: TaskLocation.Beginning,
                 next: "task2",
                 lag: 3
             }
-            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTaskRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project without previousLocation", () => {
+        it("Should not create a relation without previousLocation", () => {
             const relation = {
                 previous: "task1",
                 next: "task2",
                 lag: 3
             }
-            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTaskRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project with wrong previousLocation 1", () => {
+        it("Should not create a relation with wrong previousLocation 1", () => {
             const relation = {
                 previous: "task1",
                 previousLocation: { test: "test" },
                 next: "task2",
                 lag: 3
             }
-            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTaskRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project with wrong previousLocation 2", () => {
+        it("Should not create a relation with wrong previousLocation 2", () => {
             const relation = {
                 previous: "task1",
                 previousLocation: 123,
                 next: "task2",
                 lag: 3
             }
-            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTaskRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project without next", () => {
+        it("Should not create a relation without next", () => {
             const relation = {
                 previous: "task1",
                 previousLocation: TaskLocation.Beginning,
                 lag: 3
             }
-            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTaskRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project with wrong next", () => {
+        it("Should not create a relation with wrong next", () => {
             const relation = {
                 previous: "task1",
                 previousLocation: TaskLocation.Beginning,
                 next: { test: "test" },
                 lag: 3
             }
-            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTaskRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project without lag", () => {
+        it("Should not create a relation without lag", () => {
             const relation = {
                 previous: "task1",
                 previousLocation: TaskLocation.Beginning,
                 next: "task2"
             }
-            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTaskRelation(relation) }).to.throw(InputError)
         })
-        it("Should not create a project with wrong lag", () => {
+        it("Should not create a relation with wrong lag", () => {
             const relation = {
                 previous: "task1",
                 previousLocation: TaskLocation.Beginning,
                 next: "task2",
                 lag: { test: "test" }
             }
-            chai.expect(() => { apitypes.createRelation(relation) }).to.throw(InputError)
+            chai.expect(() => { apitypes.createTaskRelation(relation) }).to.throw(InputError)
+        })
+    })
+    describe("createDelay", () => {
+        it("Should create a Delay", () => {
+            const apiDelay = {
+                identifier: "identifier",
+                name: "Name",
+                description: "Description",
+                date: new Date(2015, 1, 15).toISOString()
+            }
+            const delay: Delay = {
+                identifier: "identifier",
+                name: "Name",
+                description: "Description",
+                date: new Date(2015, 1, 15)
+            }
+            chai.expect(apitypes.createDelay(apiDelay)).to.deep.equal(delay)
+        })
+        it("Should not create a delay without identifier", () => {
+            const apiDelay = {
+                name: "Name",
+                description: "Description",
+                date: new Date(2015, 1, 15).toISOString()
+            }
+            chai.expect(() => { apitypes.createDelay(apiDelay) }).to.throw(InputError)
+        })
+        it("Should not create a delay with wrong identifier", () => {
+            const apiDelay = {
+                identifier: { test: "test" },
+                name: "Name",
+                description: "Description",
+                date: new Date(2015, 1, 15).toISOString()
+            }
+            chai.expect(() => { apitypes.createDelay(apiDelay) }).to.throw(InputError)
+        })
+        it("Should not create a delay without name", () => {
+            const apiDelay = {
+                identifier: "identifier",
+                description: "Description",
+                date: new Date(2015, 1, 15).toISOString()
+            }
+            chai.expect(() => { apitypes.createDelay(apiDelay) }).to.throw(InputError)
+        })
+        it("Should not create a delay with wrong name", () => {
+            const apiDelay = {
+                identifier: "identifier",
+                name: { test: "test" },
+                description: "Description",
+                date: new Date(2015, 1, 15).toISOString()
+            }
+            chai.expect(() => { apitypes.createDelay(apiDelay) }).to.throw(InputError)
+        })
+        it("Should not create a delay without description", () => {
+            const apiDelay = {
+                identifier: "identifier",
+                name: "Name",
+                date: new Date(2015, 1, 15).toISOString()
+            }
+            chai.expect(() => { apitypes.createDelay(apiDelay) }).to.throw(InputError)
+        })
+        it("Should not create a delay with wrong description", () => {
+            const apiDelay = {
+                identifier: "identifier",
+                name: "Name",
+                description: { test: "test" },
+                date: new Date(2015, 1, 15).toISOString()
+            }
+            chai.expect(() => { apitypes.createDelay(apiDelay) }).to.throw(InputError)
+        })
+        it("Should not create a delay without estimatedStartDate", () => {
+            const apiDelay = {
+                identifier: "identifier",
+                name: "Name",
+                description: "Description",
+                estimatedDuration: 123
+            }
+            chai.expect(() => { apitypes.createDelay(apiDelay) }).to.throw(InputError)
+        })
+        it("Should not create a delay with wrong estimatedStartDate", () => {
+            const apiDelay = {
+                identifier: "identifier",
+                name: "Name",
+                description: "Description",
+                date: { test: "test" }
+            }
+            chai.expect(() => { apitypes.createDelay(apiDelay) }).to.throw(InputError)
+        })
+    })
+    describe("createDelayRelation", () => {
+        it("Should create a relation", () => {
+            const relation: DelayRelation = {
+                delay: "delay",
+                task: "task",
+                lag: 3
+            }
+            chai.expect(apitypes.createDelayRelation(relation)).to.deep.equal(relation)
+        })
+        it("Should not create a relation without delay", () => {
+            const relation = {
+                task: "task",
+                lag: 3
+            }
+            chai.expect(() => { apitypes.createDelayRelation(relation) }).to.throw(InputError)
+        })
+        it("Should not create a relation with wrong delay", () => {
+            const relation = {
+                delay: { test: "test" },
+                task: "task",
+                lag: 3
+            }
+            chai.expect(() => { apitypes.createDelayRelation(relation) }).to.throw(InputError)
+        })
+        it("Should not create a relation without task", () => {
+            const relation = {
+                delay: "delay",
+                lag: 3
+            }
+            chai.expect(() => { apitypes.createDelayRelation(relation) }).to.throw(InputError)
+        })
+        it("Should not create a relation with wrong task", () => {
+            const relation = {
+                delay: "delay",
+                task: { test: "test" },
+                lag: 3
+            }
+            chai.expect(() => { apitypes.createDelayRelation(relation) }).to.throw(InputError)
+        })
+        it("Should not create a relation without lag", () => {
+            const relation = {
+                delay: "delay",
+                task: "task"
+            }
+            chai.expect(() => { apitypes.createDelayRelation(relation) }).to.throw(InputError)
+        })
+        it("Should not create a relation with wrong lag", () => {
+            const relation = {
+                delay: "delay",
+                task: "task",
+                lag: { test: "test" }
+            }
+            chai.expect(() => { apitypes.createDelayRelation(relation) }).to.throw(InputError)
         })
     })
 })

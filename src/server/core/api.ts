@@ -1,10 +1,13 @@
 import * as winston from "winston"
-import { Project, Task, TaskResults, TaskRelation, Modifier } from "../../common/types"
+import {
+    Project, Task, TaskResults, TaskRelation, Modifier, Delay, DelayRelation
+} from "../../common/types"
 import { IDataProvider, isKnownError } from "../core/data/idataprovider"
 import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"
 import { findCyclicDependency } from "../core/graph/analyzer"
 import {
-    ApiTask, ApiProjectTaskModifiers, createProject, createTask, createApiTask, createRelation
+    ApiTask, ApiProjectTaskModifiers, createProject, createTask, createApiTask, createTaskRelation,
+    createDelay, createDelayRelation
 } from "../../common/apitypes"
 import { NotFoundError, ExistsError, InputError } from "../../common/errors"
 import * as maputils from "../../common/maputils"
@@ -176,7 +179,8 @@ export class Api {
             return this.sendTask(projectIdentifier, taskIdentifier)
         })
     }
-    import(project: any, tasks: any, taskRelations: any): Promise<void> {
+    import(project: any, tasks: any, taskRelations: any,
+           delays: any, delayRelations: any): Promise<void> {
         return Promise.resolve().then(() => {
             const inputProject = createProject(project)
             if (!(tasks instanceof Array)) {
@@ -189,7 +193,19 @@ export class Api {
                 throw new InputError("taskRelations must be an array, not " + taskRelations)
             }
             const inputTaskRelations = taskRelations.map((relation) => {
-                return createRelation(relation)
+                return createTaskRelation(relation)
+            })
+            if (!(delays instanceof Array)) {
+                throw new InputError("delays must be an array, not " + delays)
+            }
+            const inputDelays = delays.map((delays) => {
+                return createDelay(delays)
+            })
+            if (!(delayRelations instanceof Array)) {
+                throw new InputError("delayRelations must be an array, not " + delayRelations)
+            }
+            const inputDelayRelations = delayRelations.map((relation) => {
+                return createDelayRelation(relation)
             })
 
             findCyclicDependency(inputTasks, inputTaskRelations)
@@ -200,6 +216,14 @@ export class Api {
                 })).then(() => {
                     return Promise.all(inputTaskRelations.map((relation: TaskRelation) => {
                         return projectNode.addTaskRelation(relation)
+                    }))
+                }).then(() => {
+                    return Promise.all(inputDelays.map((delay: Delay) => {
+                        return projectNode.addDelay(delay)
+                    }))
+                }).then(() => {
+                    return Promise.all(inputDelayRelations.map((relation: DelayRelation) => {
+                        return projectNode.addDelayRelation(relation)
                     }))
                 })
             })

@@ -24,6 +24,19 @@ export class FakeTaskNode implements ITaskNode {
     }
 }
 
+export class FakeDelayNode implements IDelayNode {
+    parent: IProjectNode
+    delayIdentifier: string
+    margin: number
+    tasks: Array<ITaskNode>
+    constructor(parent: IProjectNode, delayIdentifier: string) {
+        this.parent = parent
+        this.delayIdentifier = delayIdentifier
+        this.margin = 0
+        this.tasks = []
+    }
+}
+
 export class FakeProjectNode implements IProjectNode {
     parent: IGraph
     projectIdentifier: string
