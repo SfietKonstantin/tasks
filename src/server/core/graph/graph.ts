@@ -1,3 +1,4 @@
+import * as winston from "winston"
 import {
     Project, TaskDefinition, TaskRelation, TaskLocation, Modifier, Delay, DelayRelation
 } from "../../../common/types"
@@ -38,16 +39,8 @@ export class TaskNode implements ITaskNode {
         this.childrenRelations = new Map<string, TaskRelation>()
         this.parentsRelations = new Map<string, TaskRelation>()
     }
-    initialCompute(): Promise<void> {
-        return Promise.resolve().then(() => {
-            if (this.parents.length !== 0) {
-                return
-            }
-            return this.compute(true)
-        })
-    }
-    compute(force: boolean = false): Promise<void> {
-        return this.markAndCompute(new Set<ITaskNode>(), force)
+    compute(): Promise<void> {
+        return this.markAndCompute(new Set<ITaskNode>())
     }
     addModifier(modifier: Modifier): Promise<Modifier> {
         const projectIdentifier = this.parent.projectIdentifier
@@ -76,7 +69,7 @@ export class TaskNode implements ITaskNode {
     getEndDate(): Date {
         return dateutils.addDays(this.startDate, this.duration)
     }
-    private markAndCompute(markedNodes: Set<ITaskNode>, force: boolean) {
+    private markAndCompute(markedNodes: Set<ITaskNode>) {
         return Promise.resolve().then(() => {
             if (markedNodes.has(this)) {
                 const markedTasks = Array.from(markedNodes, (node: ITaskNode) => {
@@ -132,7 +125,7 @@ export class TaskNode implements ITaskNode {
 
             // No need to save / compute children if nothing changed
             const newEndDate = this.getEndDate()
-            if (newEndDate.getTime() === currentEndDate.getTime() && !force) {
+            if (newEndDate.getTime() === currentEndDate.getTime()) {
                 return false
             }
             return true
@@ -143,7 +136,7 @@ export class TaskNode implements ITaskNode {
 
             // Try computing children first
             const projectIdentifier = this.parent.projectIdentifier
-            return this.computeChildren(markedNodes, force).then(() => {
+            return this.computeChildren(markedNodes).then(() => {
                 // Then compute delays
                 this.computeDelays()
             }).then(() => {
@@ -152,9 +145,9 @@ export class TaskNode implements ITaskNode {
             markedNodes.delete(this)
         })
     }
-    private computeChildren(markedNodes: Set<ITaskNode>, force: boolean = false): Promise<void> {
+    private computeChildren(markedNodes: Set<ITaskNode>): Promise<void> {
         return Promise.all(this.children.map((child: TaskNode) => {
-            return child.markAndCompute(new Set<ITaskNode>(markedNodes), force)
+            return child.markAndCompute(new Set<ITaskNode>(markedNodes))
         }))
     }
     private computeDelays() {
@@ -206,6 +199,7 @@ export class ProjectNode implements IProjectNode {
         this.delays = new Map<string, IDelayNode>()
     }
     load(): Promise<void> {
+        winston.info("Loading graph for project \"" + this.projectIdentifier + "\"")
         return this.dataProvider.getProjectTasks(this.projectIdentifier).then((tasks: Array<TaskDefinition>) => {
             return Promise.all(tasks.map((task: TaskDefinition) => {
                 const node = new TaskNode(this.dataProvider, this, task.identifier,
@@ -249,9 +243,15 @@ export class ProjectNode implements IProjectNode {
                 })
             }))
         }).then(() => {
+            winston.info("Graph loaded for project \"" + this.projectIdentifier + "\"")
+            winston.info("Tasks: " + this.nodes.size)
+            winston.info("Delays: " + this.delays.size)
+
             return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
-                return (node as TaskNode).initialCompute()
+                return (node as TaskNode).compute()
             }))
+        }).then(() => {
+            winston.info("Graph computed for project \"" + this.projectIdentifier + "\"")
         })
     }
     addTask(task: TaskDefinition): Promise<ITaskNode> {
