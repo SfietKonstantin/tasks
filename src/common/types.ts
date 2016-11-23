@@ -14,7 +14,7 @@ export interface TaskDefinition extends Identifiable {
     estimatedDuration: number
 }
 
-export interface TaskResults {
+export interface Task extends TaskDefinition {
     startDate: Date
     duration: number
 }

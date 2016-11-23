@@ -5,15 +5,14 @@ import { State } from "../types"
 import { fetchTask } from "../actions/task"
 import { Header } from "../components/header"
 import { Overview } from "../components/overview"
-import { Project, TaskDefinition, TaskResults, Modifier } from "../../../common/types"
+import { Project, Task, Modifier } from "../../../common/types"
 import * as apitypes from "../../../common/apitypes"
 
 interface MainProperties {
     projectIdentifier: string
     taskIdentifier: string
     project: Project
-    task: TaskDefinition,
-    taskResults: TaskResults
+    task: Task
     dispatch: Dispatch<State>
 }
 
@@ -33,8 +32,7 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
         if (this.props.project) {
             taskHeader = <Header project={this.props.project} task={this.props.task}
                                  tabChangedCallback={this.handleTabChange.bind(this)} />
-            tab0 = <Overview visible={this.state.tabIndex === 0} task={this.props.task}
-                             taskResults={this.props.taskResults} />
+            tab0 = <Overview visible={this.state.tabIndex === 0} task={this.props.task} />
             // tab1 = <AllTasks visible={this.state.tabIndex==1} />
         }
         return <div>
@@ -57,13 +55,11 @@ const mapStateToProps = (state: State) => {
     const project = state.task.project
     const apiTask = state.task.task
     const task = project && apiTask ? apitypes.createTaskFromApiTask(project, apiTask) : null
-    const taskResults = apiTask ? apitypes.createTaskResultsFromApiTask(apiTask) : null
     return {
         projectIdentifier: state.projectIdentifier,
         taskIdentifier: state.taskIdentifier,
         project: state.task.project,
-        task: task,
-        taskResults: taskResults
+        task: task
     }
 }
 

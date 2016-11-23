@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Row, Col, Panel, ProgressBar, Label } from "react-bootstrap"
-import { TaskDefinition, TaskResults } from "../../../common/types"
+import { Task } from "../../../common/types"
 import * as dateutils from "../../../common/dateutils"
 
 interface StateIndicatorProperties {
@@ -38,8 +38,7 @@ export class StatusTime extends React.Component<StatusTimeProperties, {}> {
 }
 
 interface StatusProperties {
-    task: TaskDefinition
-    taskResults: TaskResults
+    task: Task
 }
 
 export class Status extends React.Component<StatusProperties, {}> {
@@ -78,11 +77,11 @@ export class Status extends React.Component<StatusProperties, {}> {
         </Panel>
     }
     private getDaysBeforeStart() {
-        return dateutils.getDateDiff(new Date(), this.props.taskResults.startDate)
+        return dateutils.getDateDiff(new Date(), this.props.task.startDate)
     }
     private getEndDate() {
-        let returned = new Date(this.props.taskResults.startDate.getTime())
-        returned.setDate(returned.getDate() + this.props.taskResults.duration)
+        let returned = new Date(this.props.task.startDate.getTime())
+        returned.setDate(returned.getDate() + this.props.task.duration)
         return returned
     }
     private getEstimatedEndDate() {
@@ -108,7 +107,7 @@ export class Status extends React.Component<StatusProperties, {}> {
         if (!started) {
             return 0
         } else if (started && !done) {
-            const startTime = this.props.taskResults.startDate.getTime()
+            const startTime = this.props.task.startDate.getTime()
             const endTime = this.getEndDate().getTime()
             const currentTime = (new Date()).getTime()
 
@@ -122,7 +121,7 @@ export class Status extends React.Component<StatusProperties, {}> {
         }
     }
     private getStartState(): [string, string] {
-        const diff = dateutils.getDateDiff(this.props.task.estimatedStartDate, this.props.taskResults.startDate)
+        const diff = dateutils.getDateDiff(this.props.task.estimatedStartDate, this.props.task.startDate)
         if (diff <= 0) {
             return ["success", "On time"]
         } else {
@@ -130,7 +129,7 @@ export class Status extends React.Component<StatusProperties, {}> {
         }
     }
     private getStartDateLabel(started: boolean, milestone: boolean): string {
-        const startDateLabel = dateutils.getDateLabel(this.props.taskResults.startDate)
+        const startDateLabel = dateutils.getDateLabel(this.props.task.startDate)
         if (started) {
             return milestone ? "Reached the " + startDateLabel : "Started the " + startDateLabel
         } else {
@@ -138,7 +137,7 @@ export class Status extends React.Component<StatusProperties, {}> {
         }
     }
     private getStartTodayDiff(): string {
-        const diff = dateutils.getDateDiff(new Date(), this.props.taskResults.startDate)
+        const diff = dateutils.getDateDiff(new Date(), this.props.task.startDate)
         if (diff > 0) {
             return "In " + diff + " days"
         } else if (diff < 0) {

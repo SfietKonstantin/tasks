@@ -1,5 +1,5 @@
 import {
-    Identifiable, Project, TaskDefinition, TaskResults, TaskRelation, TaskLocation, Modifier,
+    Identifiable, Project, TaskDefinition, Task, TaskRelation, TaskLocation, Modifier,
     Delay, DelayRelation
 } from "./types"
 import { InputError } from "./errors"
@@ -44,18 +44,13 @@ export const createApiTask = (task: TaskDefinition, startDate: Date, duration: n
     }
 }
 
-export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): TaskDefinition => {
+export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task => {
     return {
         identifier: apiTask.identifier,
         name: apiTask.name,
         description: apiTask.description,
         estimatedStartDate: new Date(apiTask.estimatedStartDate),
-        estimatedDuration: apiTask.estimatedDuration
-    }
-}
-
-export const createTaskResultsFromApiTask = (apiTask: ApiTask): TaskResults => {
-    return {
+        estimatedDuration: apiTask.estimatedDuration,
         startDate: new Date(apiTask.startDate),
         duration: apiTask.duration
     }

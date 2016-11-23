@@ -3,7 +3,7 @@ import * as React from "react"
 import * as enzyme from "enzyme"
 import * as sinon from "sinon"
 import { Status, StatusStateIndicator, StatusTime } from "../../client/task/components/status"
-import { TaskDefinition, TaskResults } from "../../common/types"
+import { Task } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Task components", () => {
@@ -82,72 +82,64 @@ describe("Task components", () => {
             chai.expect(times.prop("todayDiff")).to.equal(startDays)
         }
         it("Should create Status for not started and on time task", () => {
-            const task: TaskDefinition = {
+            const task: Task = {
                 identifier: "task",
                 name: "Task",
                 description: "",
                 estimatedStartDate: new Date(2016, 3, 1),
-                estimatedDuration: 20
-            }
-            const taskResults: TaskResults = {
+                estimatedDuration: 20,
                 startDate: new Date(2016, 3, 1),
                 duration: 20
             }
-            const component = enzyme.shallow(<Status task={task} taskResults={taskResults} />)
+            const component = enzyme.shallow(<Status task={task} />)
             checkState(component, "time", "Not started", 0)
             checkTask(component,
                       "success", "On time", "Starting the 1/4/2016", "In 26 days",
                       "success", "On time", "Ending the 21/4/2016", "In 46 days")
         })
         it("Should create Status for not started and ending late task", () => {
-            const task: TaskDefinition = {
+            const task: Task = {
                 identifier: "task",
                 name: "Task",
                 description: "",
                 estimatedStartDate: new Date(2016, 3, 1),
-                estimatedDuration: 20
-            }
-            const taskResults: TaskResults = {
+                estimatedDuration: 20,
                 startDate: new Date(2016, 3, 1),
                 duration: 25
             }
-            const component = enzyme.shallow(<Status task={task} taskResults={taskResults} />)
+            const component = enzyme.shallow(<Status task={task} />)
             checkState(component, "time", "Not started", 0)
             checkTask(component,
                       "success", "On time", "Starting the 1/4/2016", "In 26 days",
                       "warning", "Late 5 days", "Ending the 26/4/2016", "In 51 days")
         })
         it("Should create Status for not started and starting late task", () => {
-            const task: TaskDefinition = {
+            const task: Task = {
                 identifier: "task",
                 name: "Task",
                 description: "",
                 estimatedStartDate: new Date(2016, 3, 1),
-                estimatedDuration: 20
-            }
-            const taskResults: TaskResults = {
+                estimatedDuration: 20,
                 startDate: new Date(2016, 3, 6),
                 duration: 15
             }
-            const component = enzyme.shallow(<Status task={task} taskResults={taskResults} />)
+            const component = enzyme.shallow(<Status task={task} />)
             checkState(component, "time", "Not started", 0)
             checkTask(component,
                       "warning", "Late 5 days", "Starting the 6/4/2016", "In 31 days",
                       "success", "On time", "Ending the 21/4/2016", "In 46 days")
         })
         it("Should create Status for in progress and on time task", () => {
-            const task: TaskDefinition = {
+            const task: Task = {
                 identifier: "task",
                 name: "Task",
                 description: "",
                 estimatedStartDate: new Date(2016, 2, 1),
-                estimatedDuration: 20
-            }
-            const taskResults: TaskResults = {
+                estimatedDuration: 20,
                 startDate: new Date(2016, 2, 1),
                 duration: 20
             }
-            const component = enzyme.shallow(<Status task={task} taskResults={taskResults} />)
+            const component = enzyme.shallow(<Status task={task} />)
             checkState(component, "plane", "In progress", 25)
             checkTask(component,
                       "success", "On time", "Started the 1/3/2016", "5 days ago",

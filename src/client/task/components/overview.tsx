@@ -1,12 +1,11 @@
 import * as React from "react"
 import { Grid, Col } from "react-bootstrap"
-import { TaskDefinition, TaskResults } from "../../../common/types"
+import { Task } from "../../../common/types"
 import { Status } from "./status"
 
 interface OverviewProperties {
     visible: boolean
-    task: TaskDefinition
-    taskResults: TaskResults
+    task: Task
 }
 
 export class Overview extends React.Component<OverviewProperties, {}> {
@@ -14,7 +13,7 @@ export class Overview extends React.Component<OverviewProperties, {}> {
         return <Grid className={this.props.visible ? "" : "hidden"}>
             <Col id="main" xs={12} md={10}>
                 <h2 className="title-h2">Overview</h2>
-                <Status task={this.props.task} taskResults={this.props.taskResults} />
+                <Status task={this.props.task} />
             </Col>
             <Col id="sidebar" xs={3} md={2}>
                 <h2 className="title-h2">Tags</h2>
