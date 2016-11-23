@@ -27,11 +27,13 @@ export class FakeTaskNode implements ITaskNode {
 export class FakeDelayNode implements IDelayNode {
     parent: IProjectNode
     delayIdentifier: string
+    initialMargin: number
     margin: number
     tasks: Array<ITaskNode>
     constructor(parent: IProjectNode, delayIdentifier: string) {
         this.parent = parent
         this.delayIdentifier = delayIdentifier
+        this.initialMargin = 0
         this.margin = 0
         this.tasks = []
     }

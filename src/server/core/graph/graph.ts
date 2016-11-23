@@ -17,9 +17,9 @@ export class TaskNode implements ITaskNode {
     parents: Array<ITaskNode>
     delays: Array<IDelayNode>
     modifiers: Array<Modifier>
+    estimatedStartDate: Date
+    estimatedDuration: number
     private dataProvider: IDataProvider
-    private estimatedStartDate: Date
-    private estimatedDuration: number
     private childrenRelations: Map<string, TaskRelation>
     private parentsRelations: Map<string, TaskRelation>
     constructor(dataProvider: IDataProvider,
@@ -160,6 +160,7 @@ export class TaskNode implements ITaskNode {
 export class DelayNode implements IDelayNode {
     parent: IProjectNode
     delayIdentifier: string
+    initialMargin: number
     margin: number
     tasks: Array<ITaskNode>
     relations: Map<string, DelayRelation>
@@ -170,12 +171,21 @@ export class DelayNode implements IDelayNode {
         this.dataProvider = dataProvider
         this.parent = parent
         this.delayIdentifier = delayIdentifier
+        this.initialMargin = 0
         this.margin = 0
         this.date = date
         this.tasks = []
         this.relations = new Map<string, DelayRelation>()
     }
     compute() {
+        const initialMargins = this.tasks.map((node: TaskNode) => {
+            const relation = maputils.get(this.relations, node.taskIdentifier)
+            const diff = dateutils.getDateDiff(dateutils.addDays(node.estimatedStartDate,
+                                                                 node.estimatedDuration),
+                                               this.date)
+            return diff - relation.lag
+        })
+        this.initialMargin = Math.min(...initialMargins)
         const margins = this.tasks.map((node: ITaskNode) => {
             const relation = maputils.get(this.relations, node.taskIdentifier)
             const diff = dateutils.getDateDiff(dateutils.addDays(node.startDate, node.duration), this.date)

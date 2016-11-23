@@ -1,7 +1,7 @@
 import * as express from "express"
 import { Api, RequestError } from "../core/api"
 import { Project, Modifier } from "../../common/types"
-import { ApiTask, ApiProjectTaskModifiers } from "../../common/apitypes"
+import { ApiTask, ApiTaskResults } from "../../common/apitypes"
 import { IDataProvider } from "../core/data/idataprovider"
 import { IGraph } from "../core/graph/types"
 import * as testdata from "../core/tests/testdata"
@@ -51,7 +51,7 @@ export class ApiRoutes {
     getTask(req: express.Request, res: express.Response) {
         const projectIdentifier = req.params.projectIdentifier
         const taskIdentifier = req.params.taskIdentifier
-        this.api.getTask(projectIdentifier, taskIdentifier).then((task: ApiProjectTaskModifiers) => {
+        this.api.getTask(projectIdentifier, taskIdentifier).then((task: ApiTaskResults) => {
             res.json(task)
         }).catch((error) => {
             if (error instanceof RequestError) {
@@ -104,7 +104,7 @@ export class ApiRoutes {
         const projectIdentifier = req.body.projectIdentifier
         const taskIdentifier = req.body.taskIdentifier
         const modifier = req.body.modifier
-        this.api.addModifier(projectIdentifier, taskIdentifier, modifier).then((task: ApiProjectTaskModifiers) => {
+        this.api.addModifier(projectIdentifier, taskIdentifier, modifier).then((task: ApiTaskResults) => {
             res.json(task)
         }).catch((error) => {
             if (error instanceof RequestError) {

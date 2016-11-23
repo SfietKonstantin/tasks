@@ -176,9 +176,11 @@ describe("Graph", () => {
                 chai.expect(reducing.modifiers).to.deep.equal([])
                 const delay1 = maputils.get(node.delays, "delay1")
                 chai.expect(delay1.delayIdentifier).to.equal("delay1")
+                chai.expect(delay1.initialMargin).to.equal(14)
                 chai.expect(delay1.margin).to.equal(6)
                 const delay2 = maputils.get(node.delays, "delay2")
                 chai.expect(delay2.delayIdentifier).to.equal("delay2")
+                chai.expect(delay2.initialMargin).to.equal(9)
                 chai.expect(delay2.margin).to.equal(1)
 
                 mock.verify()
@@ -405,6 +407,7 @@ describe("Graph", () => {
             node.addDelay(delay).then(() => {
                 const delayNode = maputils.get(node.delays, "delay2")
                 chai.expect(delayNode.delayIdentifier).to.equal("delay2")
+                chai.expect(delayNode.initialMargin).to.equal(0)
                 chai.expect(delayNode.margin).to.equal(0)
                 mock.verify()
                 done()
@@ -458,6 +461,7 @@ describe("Graph", () => {
             node.addDelayRelation(relation).then(() => {
                 const delayNode = maputils.get(node.delays, "delay")
                 chai.expect(delayNode.delayIdentifier).to.equal("delay")
+                chai.expect(delayNode.initialMargin).to.equal(10)
                 chai.expect(delayNode.margin).to.equal(10)
                 mock.verify()
                 done()
@@ -486,6 +490,7 @@ describe("Graph", () => {
             node.addDelayRelation(relation).then(() => {
                 const delayNode = maputils.get(node.delays, "delay")
                 chai.expect(delayNode.delayIdentifier).to.equal("delay")
+                chai.expect(delayNode.initialMargin).to.equal(5)
                 chai.expect(delayNode.margin).to.equal(5)
                 mock.verify()
                 done()

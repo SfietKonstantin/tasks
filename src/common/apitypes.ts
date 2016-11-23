@@ -26,10 +26,19 @@ export interface ApiTask extends Identifiable {
     duration: number
 }
 
-export interface ApiProjectTaskModifiers {
+export interface ApiDelay extends Identifiable {
+    name: string
+    description: string
+    date: string
+    initialMargin: number
+    margin: number
+}
+
+export interface ApiTaskResults {
     project: Project
     task: ApiTask
     modifiers: Array<Modifier>
+    delays: Array<ApiDelay>
 }
 
 export const createApiTask = (task: TaskDefinition, startDate: Date, duration: number): ApiTask => {
@@ -53,6 +62,17 @@ export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task 
         estimatedDuration: apiTask.estimatedDuration,
         startDate: new Date(apiTask.startDate),
         duration: apiTask.duration
+    }
+}
+
+export const createApiDelay = (delay: Delay, initialMargin: number, margin: number): ApiDelay => {
+    return {
+        identifier: delay.identifier,
+        name: delay.name,
+        description: delay.description,
+        date: delay.date.toISOString(),
+        initialMargin,
+        margin
     }
 }
 

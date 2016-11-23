@@ -51,6 +51,7 @@ describe("Graph", () => {
                 lag: 0
             }
             node.addDelay(delayNode, relation)
+            chai.expect(delayNode.initialMargin).to.equal(20)
             chai.expect(delayNode.margin).to.equal(20)
 
             node.modifiers = [
@@ -69,6 +70,7 @@ describe("Graph", () => {
             ]
 
             node.compute().then(() => {
+                chai.expect(delayNode.initialMargin).to.equal(20)
                 chai.expect(delayNode.margin).to.equal(17)
                 done()
             }).catch((error) => {
@@ -91,6 +93,7 @@ describe("Graph", () => {
                 lag: 0
             }
             node.addDelay(delayNode, relation)
+            chai.expect(delayNode.initialMargin).to.equal(20)
             chai.expect(delayNode.margin).to.equal(20)
 
             node.modifiers = [
@@ -109,6 +112,7 @@ describe("Graph", () => {
             ]
 
             node.compute().then(() => {
+                chai.expect(delayNode.initialMargin).to.equal(20)
                 chai.expect(delayNode.margin).to.equal(17)
                 done()
             }).catch((error) => {

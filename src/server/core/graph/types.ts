@@ -21,6 +21,7 @@ export interface ITaskNode {
 export interface IDelayNode {
     parent: IProjectNode
     delayIdentifier: string
+    initialMargin: number
     margin: number
     tasks: Array<ITaskNode>
 }

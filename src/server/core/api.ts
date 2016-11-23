@@ -3,11 +3,11 @@ import {
     Project, TaskDefinition, TaskRelation, Modifier, Delay, DelayRelation
 } from "../../common/types"
 import { IDataProvider, isKnownError } from "../core/data/idataprovider"
-import { IGraph, IProjectNode, ITaskNode, GraphError } from "../core/graph/types"
+import { IGraph, IProjectNode, ITaskNode, IDelayNode, GraphError } from "../core/graph/types"
 import { findCyclicDependency } from "../core/graph/analyzer"
 import {
-    ApiTask, ApiProjectTaskModifiers, createProject, createTask, createApiTask, createTaskRelation,
-    createDelay, createDelayRelation
+    ApiTask, ApiTaskResults, createProject, createTask, createApiTask, createApiDelay,
+    createTaskRelation, createDelay, createDelayRelation
 } from "../../common/apitypes"
 import { NotFoundError, ExistsError, InputError } from "../../common/errors"
 import * as maputils from "../../common/maputils"
@@ -91,7 +91,7 @@ export class Api {
             }
         })
     }
-    getTask(projectIdentifier: any, taskIdentifier: any): Promise<ApiProjectTaskModifiers> {
+    getTask(projectIdentifier: any, taskIdentifier: any): Promise<ApiTaskResults> {
         if (typeof projectIdentifier !== "string") {
             winston.error("projectIdentifier must be a string, not " + projectIdentifier)
             const error = new RequestError(404, "Project \"" + projectIdentifier + "\" not found")
@@ -152,7 +152,7 @@ export class Api {
             }
         })
     }
-    addModifier(projectIdentifier: any, taskIdentifier: any, modifier: any): Promise<ApiProjectTaskModifiers> {
+    addModifier(projectIdentifier: any, taskIdentifier: any, modifier: any): Promise<ApiTaskResults> {
         if (typeof projectIdentifier !== "string") {
             winston.error("projectIdentifier must be a string, not " + projectIdentifier)
             const error = new RequestError(404, "Project \"" + projectIdentifier + "\" not found")
@@ -242,18 +242,38 @@ export class Api {
             }
         })
     }
-    private sendTask(projectIdentifier: string, taskIdentifier: string): Promise<ApiProjectTaskModifiers> {
+    private static collectDelays(taskNode: ITaskNode, delays: Set<IDelayNode>) {
+        taskNode.delays.forEach((delay: IDelayNode) => {
+            delays.add(delay)
+        })
+
+        taskNode.children.forEach((child: ITaskNode) => {
+            Api.collectDelays(child, delays)
+        })
+    }
+    private sendTask(projectIdentifier: string, taskIdentifier: string): Promise<ApiTaskResults> {
         return this.dataProvider.getTask(projectIdentifier, taskIdentifier).then((task: TaskDefinition) => {
             return this.dataProvider.getProject(projectIdentifier).then((project: Project) => {
                 const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
                 let taskNode = maputils.get(projectNode.nodes, taskIdentifier)
+                let delays = new Set<IDelayNode>()
+                Api.collectDelays(taskNode, delays)
 
-                const returned: ApiProjectTaskModifiers = {
-                    project: project,
-                    task: createApiTask(task, taskNode.startDate, taskNode.duration),
-                    modifiers: taskNode.modifiers
-                }
-                return returned
+                return Promise.all(Array.from(delays, (node: IDelayNode) => {
+                    return this.dataProvider.getDelay(projectIdentifier, node.delayIdentifier)
+                })).then((delays: Array<Delay>) => {
+                    const apiDelays = delays.map((delay: Delay) => {
+                        const node = maputils.get(projectNode.delays, delay.identifier)
+                        return createApiDelay(delay, node.initialMargin, node.margin)
+                    })
+                    const returned: ApiTaskResults = {
+                        project: project,
+                        task: createApiTask(task, taskNode.startDate, taskNode.duration),
+                        modifiers: taskNode.modifiers,
+                        delays: apiDelays
+                    }
+                    return returned
+                })
             })
         }).catch((error: Error) => {
             if (error instanceof NotFoundError) {

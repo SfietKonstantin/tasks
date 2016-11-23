@@ -1,11 +1,11 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, TaskDefinition, TaskLocation, Modifier } from "../../common/types"
+import { Project, TaskDefinition, TaskLocation, Modifier, Delay } from "../../common/types"
 import { NotFoundError } from "../../common/errors"
-import { ApiTask, ApiProjectTaskModifiers, createApiTask } from "../../common/apitypes"
+import { ApiTask, ApiTaskResults, createApiTask, createApiDelay } from "../../common/apitypes"
 import { IDataProvider, CorruptedError, InternalError } from "../../server/core/data/idataprovider"
 import { Api, RequestError } from "../../server/core/api"
-import { ProjectNode, TaskNode } from "../../server/core/graph/graph"
+import { ProjectNode, TaskNode, DelayNode } from "../../server/core/graph/graph"
 import { FakeDataProvider } from "./fakedataprovider"
 import { FakeGraph, FakeProjectNode, FakeTaskNode } from "./fakegraph"
 import { FakeError } from "./fakeerror"
@@ -237,7 +237,7 @@ describe("API", () => {
         })
     })
     describe("getTask", () => {
-        it("Should get task", (done) => {
+        it("Should get task 1", (done) => {
             let dataProvider = new FakeDataProvider()
             let graph = new FakeGraph()
             let api = new Api(dataProvider, graph)
@@ -256,6 +256,13 @@ describe("API", () => {
                 estimatedDuration: 15
             }
             mock.expects("getTask").once().withExactArgs("project", "task").returns(Promise.resolve(task))
+            const delay: Delay = {
+                identifier: "delay",
+                name: "Delay",
+                description: "Description",
+                date: new Date(2016, 2, 20)
+            }
+            mock.expects("getDelay").once().withExactArgs("project", "delay").returns(Promise.resolve(delay))
             graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
             const modifiers: Array<Modifier> = [
                 {
@@ -274,15 +281,96 @@ describe("API", () => {
             let projectNode = maputils.get(graph.nodes, "project")
             let taskNode = new TaskNode(dataProvider, projectNode, task.identifier,
                                         task.estimatedStartDate, task.estimatedDuration)
+            const delayNode = new DelayNode(dataProvider, projectNode, "delay", new Date(2016, 2, 20))
             taskNode.modifiers = modifiers
             projectNode.nodes.set("task", taskNode)
-            const expected: ApiProjectTaskModifiers = {
+            projectNode.delays.set("delay", delayNode)
+
+            taskNode.addDelay(delayNode, {
+                delay: "delay",
+                task: "task",
+                lag: 0
+            })
+
+            const expected: ApiTaskResults = {
                 project,
                 task: createApiTask(task, new Date(2016, 2, 1), 15),
-                modifiers
+                modifiers,
+                delays: [createApiDelay(delay, 4, 4)]
             }
 
-            api.getTask("project", "task").then((task: ApiProjectTaskModifiers) => {
+            api.getTask("project", "task").then((task: ApiTaskResults) => {
+                chai.expect(task).to.deep.equal(expected)
+                mock.verify()
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get task 2", (done) => {
+            let dataProvider = new FakeDataProvider()
+            let graph = new FakeGraph()
+            let api = new Api(dataProvider, graph)
+            let mock = sinon.mock(dataProvider)
+            const project: Project = {
+                identifier: "project",
+                name: "Project",
+                description: "Description"
+            }
+            mock.expects("getProject").once().withExactArgs("project").returns(Promise.resolve(project))
+            const task1: TaskDefinition = {
+                identifier: "task1",
+                name: "Task 1",
+                description: "Description 1",
+                estimatedStartDate: new Date(2016, 2, 1),
+                estimatedDuration: 15
+            }
+            const task2: TaskDefinition = {
+                identifier: "task2",
+                name: "Task 2",
+                description: "Description 2",
+                estimatedStartDate: new Date(2016, 2, 16),
+                estimatedDuration: 0
+            }
+            mock.expects("getTask").once().withExactArgs("project", "task1").returns(Promise.resolve(task1))
+            const delay: Delay = {
+                identifier: "delay",
+                name: "Delay",
+                description: "Description",
+                date: new Date(2016, 2, 20)
+            }
+            mock.expects("getDelay").once().withExactArgs("project", "delay").returns(Promise.resolve(delay))
+            graph.nodes.set("project", new ProjectNode(dataProvider, graph, "project"))
+            let projectNode = maputils.get(graph.nodes, "project")
+            let task1Node = new TaskNode(dataProvider, projectNode, task1.identifier,
+                                         task1.estimatedStartDate, task1.estimatedDuration)
+            let task2Node = new TaskNode(dataProvider, projectNode, task2.identifier,
+                                         task2.estimatedStartDate, task2.estimatedDuration)
+            const delayNode = new DelayNode(dataProvider, projectNode, "delay", new Date(2016, 2, 20))
+            projectNode.nodes.set("task1", task1Node)
+            projectNode.nodes.set("task2", task2Node)
+            projectNode.delays.set("delay", delayNode)
+
+            task1Node.addChild(task2Node, {
+                previous: "task1",
+                previousLocation: TaskLocation.End,
+                next: "task2",
+                lag: 0
+            })
+            task2Node.addDelay(delayNode, {
+                delay: "delay",
+                task: "task2",
+                lag: 0
+            })
+
+            const expected: ApiTaskResults = {
+                project,
+                task: createApiTask(task1, new Date(2016, 2, 1), 15),
+                modifiers: [],
+                delays: [createApiDelay(delay, 4, 4)]
+            }
+
+            api.getTask("project", "task1").then((task: ApiTaskResults) => {
                 chai.expect(task).to.deep.equal(expected)
                 mock.verify()
                 done()
