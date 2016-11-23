@@ -1,7 +1,7 @@
 import { IDataProvider, CorruptedError, InternalError, isKnownError } from "./idataprovider"
 import {
     Identifiable, Project, TaskDefinition, TaskRelation,
-    Modifier, TaskLocation, Delay, DelayRelation
+    Modifier, TaskLocation, DelayDefinition, DelayRelation
 } from "../../../common/types"
 import { ExistsError, NotFoundError } from "../../../common/errors"
 import * as redis from "redis"
@@ -288,33 +288,34 @@ class RedisDelay {
     description: string
     date: number
 
-    constructor(delay: Delay) {
+    constructor(delay: DelayDefinition) {
         this.name = delay.name
         this.description = delay.description
         this.date = delay.date.getTime()
     }
-    static save(projectIdentifier: string, delay: Delay, client: redis.RedisClient): Promise<void> {
+    static save(projectIdentifier: string, delay: DelayDefinition, client: redis.RedisClient): Promise<void> {
         const redisDelay = new RedisDelay(delay)
         const delayIdentifier = delay.identifier
         return client.hmsetAsync(delayRootKey(projectIdentifier, delayIdentifier), redisDelay).then(() => {
             return client.saddAsync(projectKey(projectIdentifier, "delays"), delayIdentifier)
         })
     }
-    static load(projectIdentifier: string, delayIdentifier: string, client: redis.RedisClient): Promise<Delay> {
+    static load(projectIdentifier: string, delayIdentifier: string,
+                client: redis.RedisClient): Promise<DelayDefinition> {
         return client.hgetallAsync(delayRootKey(projectIdentifier, delayIdentifier)).then((result: any) => {
             if (!result.hasOwnProperty("name")) {
-                throw new CorruptedError("Delay " + delayIdentifier + " do not have property name")
+                throw new CorruptedError("DelayDefinition " + delayIdentifier + " do not have property name")
             }
             if (!result.hasOwnProperty("description")) {
-                throw new CorruptedError("Delay " + delayIdentifier + " do not have property description")
+                throw new CorruptedError("DelayDefinition " + delayIdentifier + " do not have property description")
             }
             if (!result.hasOwnProperty("date")) {
-                throw new CorruptedError("Delay " + delayIdentifier + " do not have property date")
+                throw new CorruptedError("DelayDefinition " + delayIdentifier + " do not have property date")
             }
             const name: string = result["name"]
             const description: string = result["description"]
 
-            const delay: Delay = {
+            const delay: DelayDefinition = {
                 identifier: delayIdentifier,
                 name,
                 description,
@@ -502,27 +503,27 @@ export class RedisDataProvider implements IDataProvider {
             wrapUnknownErrors(error)
         })
     }
-    getDelay(projectIdentifier: string, delayIdentifier: string): Promise<Delay> {
+    getDelay(projectIdentifier: string, delayIdentifier: string): Promise<DelayDefinition> {
         return this.hasDelay(projectIdentifier, delayIdentifier).then(() => {
             return RedisDelay.load(projectIdentifier, delayIdentifier, this.client)
         }).catch((error: Error) => {
             wrapUnknownErrors(error)
         })
     }
-    getProjectDelays(projectIdentifier: string): Promise<Array<Delay>> {
+    getProjectDelays(projectIdentifier: string): Promise<Array<DelayDefinition>> {
         return this.hasProject(projectIdentifier).then(() => {
             return this.client.smembersAsync(projectKey(projectIdentifier, "delays"))
         }).then((delayIdentifiers: Array<string>) => {
             return this.getDelays(projectIdentifier, delayIdentifiers.sort())
-        }).then((delays: Array<Delay | null>) => {
-            return delays.filter((value: Delay | null) => {
+        }).then((delays: Array<DelayDefinition | null>) => {
+            return delays.filter((value: DelayDefinition | null) => {
                 return value != null
             })
         }).catch((error: Error) => {
             wrapUnknownErrors(error)
         })
     }
-    addDelay(projectIdentifier: string, delay: Delay): Promise<void> {
+    addDelay(projectIdentifier: string, delay: DelayDefinition): Promise<void> {
         return this.hasProject(projectIdentifier).then(() => {
             return this.notHasDelay(projectIdentifier, delay.identifier)
         }).then(() => {
@@ -640,8 +641,9 @@ export class RedisDataProvider implements IDataProvider {
             })
         }))
     }
-    private getDelays(projectIdentifier: string, delayIdentifiers: Array<string>): Promise<Array<Delay | null>> {
-        return Promise.all(delayIdentifiers.map((delayIdentifier): Promise<Delay | null> => {
+    private getDelays(projectIdentifier: string,
+                      delayIdentifiers: Array<string>): Promise<Array<DelayDefinition | null>> {
+        return Promise.all(delayIdentifiers.map((delayIdentifier): Promise<DelayDefinition | null> => {
             return this.getDelay(projectIdentifier, delayIdentifier).catch((error) => {
                 return null
             })

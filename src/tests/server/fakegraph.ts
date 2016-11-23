@@ -1,5 +1,5 @@
 import { ITaskNode, IDelayNode, IProjectNode, IGraph } from "../../server/core/graph/types"
-import { Project, TaskDefinition, TaskRelation, Modifier, Delay, DelayRelation } from "../../common/types"
+import { Project, TaskDefinition, TaskRelation, Modifier, DelayDefinition, DelayRelation } from "../../common/types"
 
 export class FakeTaskNode implements ITaskNode {
     parent: IProjectNode
@@ -52,7 +52,7 @@ export class FakeProjectNode implements IProjectNode {
     addTask(task: TaskDefinition): Promise<ITaskNode> {
         return Promise.reject(new Error("FakeProjectNode: addTask is not mocked"))
     }
-    addDelay(delay: Delay): Promise<IDelayNode> {
+    addDelay(delay: DelayDefinition): Promise<IDelayNode> {
         return Promise.reject(new Error("FakeProjectNode: addDelay is not mocked"))
     }
     addTaskRelation(relation: TaskRelation): Promise<void> {

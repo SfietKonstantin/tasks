@@ -1,6 +1,6 @@
 import {
     Identifiable, Project, TaskDefinition, Task, TaskRelation, TaskLocation, Modifier,
-    Delay, DelayRelation
+    DelayDefinition, DelayRelation
 } from "./types"
 import { InputError } from "./errors"
 
@@ -65,7 +65,7 @@ export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task 
     }
 }
 
-export const createApiDelay = (delay: Delay, initialMargin: number, margin: number): ApiDelay => {
+export const createApiDelay = (delay: DelayDefinition, initialMargin: number, margin: number): ApiDelay => {
     return {
         identifier: delay.identifier,
         name: delay.name,
@@ -200,7 +200,7 @@ export const createTaskRelation = (input: any): TaskRelation => {
     }
 }
 
-export const createDelay = (input: any): Delay => {
+export const createDelay = (input: any): DelayDefinition => {
     if (!input.hasOwnProperty("identifier")) {
         throw new InputError("Property \"identifier\" cannot be found")
     }

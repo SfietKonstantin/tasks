@@ -38,7 +38,7 @@ export interface Modifier {
     location: TaskLocation
 }
 
-export interface Delay extends Identifiable {
+export interface DelayDefinition extends Identifiable {
     name: string
     description: string
     date: Date

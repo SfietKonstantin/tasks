@@ -1,6 +1,6 @@
 import * as winston from "winston"
 import {
-    Project, TaskDefinition, TaskRelation, TaskLocation, Modifier, Delay, DelayRelation
+    Project, TaskDefinition, TaskRelation, TaskLocation, Modifier, DelayDefinition, DelayRelation
 } from "../../../common/types"
 import { ExistsError, NotFoundError } from "../../../common/errors"
 import { GraphError, ITaskNode, IDelayNode, IProjectNode, IGraph } from "./types"
@@ -217,8 +217,8 @@ export class ProjectNode implements IProjectNode {
                 this.nodes.set(task.identifier, node)
             }))
         }).then(() => {
-            return this.dataProvider.getProjectDelays(this.projectIdentifier).then((delays: Array<Delay>) => {
-                delays.forEach((delay: Delay) => {
+            return this.dataProvider.getProjectDelays(this.projectIdentifier).then((delays: Array<DelayDefinition>) => {
+                delays.forEach((delay: DelayDefinition) => {
                     const node = new DelayNode(this.dataProvider, this, delay.identifier, delay.date)
                     this.delays.set(delay.identifier, node)
                 })
@@ -275,7 +275,7 @@ export class ProjectNode implements IProjectNode {
             return node
         })
     }
-    addDelay(delay: Delay): Promise<IDelayNode> {
+    addDelay(delay: DelayDefinition): Promise<IDelayNode> {
         if (this.delays.has(delay.identifier)) {
             return Promise.reject(new ExistsError("Delay \"" + delay.identifier + "\" is already present in project"))
         }

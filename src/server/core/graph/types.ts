@@ -1,4 +1,4 @@
-import { Project, TaskDefinition, TaskRelation, Modifier, Delay, DelayRelation } from "../../../common/types"
+import { Project, TaskDefinition, TaskRelation, Modifier, DelayDefinition, DelayRelation } from "../../../common/types"
 
 export class GraphError extends Error implements Error {
     constructor(message: string) {
@@ -32,7 +32,7 @@ export interface IProjectNode {
     nodes: Map<string, ITaskNode>
     delays: Map<string, IDelayNode>
     addTask(task: TaskDefinition): Promise<ITaskNode>
-    addDelay(delay: Delay): Promise<IDelayNode>
+    addDelay(delay: DelayDefinition): Promise<IDelayNode>
     addTaskRelation(relation: TaskRelation): Promise<void>
     addDelayRelation(relation: DelayRelation): Promise<void>
 }

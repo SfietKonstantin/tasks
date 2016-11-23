@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
-import { Project, TaskDefinition, TaskLocation, Modifier, Delay } from "../../common/types"
+import { Project, TaskDefinition, TaskLocation, Modifier, DelayDefinition } from "../../common/types"
 import { NotFoundError } from "../../common/errors"
 import { ApiTask, ApiTaskResults, createApiTask, createApiDelay } from "../../common/apitypes"
 import { IDataProvider, CorruptedError, InternalError } from "../../server/core/data/idataprovider"
@@ -256,7 +256,7 @@ describe("API", () => {
                 estimatedDuration: 15
             }
             mock.expects("getTask").once().withExactArgs("project", "task").returns(Promise.resolve(task))
-            const delay: Delay = {
+            const delay: DelayDefinition = {
                 identifier: "delay",
                 name: "Delay",
                 description: "Description",
@@ -333,7 +333,7 @@ describe("API", () => {
                 estimatedDuration: 0
             }
             mock.expects("getTask").once().withExactArgs("project", "task1").returns(Promise.resolve(task1))
-            const delay: Delay = {
+            const delay: DelayDefinition = {
                 identifier: "delay",
                 name: "Delay",
                 description: "Description",

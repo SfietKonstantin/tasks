@@ -2,7 +2,7 @@ import * as chai from "chai"
 import * as sinon from "sinon"
 import {
     Project, TaskDefinition, TaskRelation, Modifier, TaskLocation,
-    Delay, DelayRelation
+    DelayDefinition, DelayRelation
 } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
 import { FakeDataProvider } from "./fakedataprovider"
@@ -47,7 +47,7 @@ describe("Graph", () => {
                     estimatedDuration: 30
                 }
             ]
-            const delays: Array<Delay> = [
+            const delays: Array<DelayDefinition> = [
                 {
                     identifier: "delay1",
                     name: "Delay 1",
@@ -396,7 +396,7 @@ describe("Graph", () => {
             let node = new ProjectNode(dataProvider, graph, "project")
             const delayNode = new DelayNode(dataProvider, node, "delay1", new Date(2015, 2, 1))
             node.delays.set("delay1", delayNode)
-            const delay: Delay = {
+            const delay: DelayDefinition = {
                 identifier: "delay2",
                 name: "Delay 2",
                 description: "Description 2",
@@ -423,7 +423,7 @@ describe("Graph", () => {
             let node = new ProjectNode(dataProvider, graph, "project")
             const delayNode = new DelayNode(dataProvider, node, "delay1", new Date(2015, 2, 1))
             node.delays.set("delay1", delayNode)
-            const delay: Delay = {
+            const delay: DelayDefinition = {
                 identifier: "delay1",
                 name: "Delay 1",
                 description: "Description 1",

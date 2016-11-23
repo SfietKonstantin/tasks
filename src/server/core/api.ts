@@ -1,6 +1,6 @@
 import * as winston from "winston"
 import {
-    Project, TaskDefinition, TaskRelation, Modifier, Delay, DelayRelation
+    Project, TaskDefinition, TaskRelation, Modifier, DelayDefinition, DelayRelation
 } from "../../common/types"
 import { IDataProvider, isKnownError } from "../core/data/idataprovider"
 import { IGraph, IProjectNode, ITaskNode, IDelayNode, GraphError } from "../core/graph/types"
@@ -218,7 +218,7 @@ export class Api {
                         return projectNode.addTaskRelation(relation)
                     }))
                 }).then(() => {
-                    return Promise.all(inputDelays.map((delay: Delay) => {
+                    return Promise.all(inputDelays.map((delay: DelayDefinition) => {
                         return projectNode.addDelay(delay)
                     }))
                 }).then(() => {
@@ -261,8 +261,8 @@ export class Api {
 
                 return Promise.all(Array.from(delays, (node: IDelayNode) => {
                     return this.dataProvider.getDelay(projectIdentifier, node.delayIdentifier)
-                })).then((delays: Array<Delay>) => {
-                    const apiDelays = delays.map((delay: Delay) => {
+                })).then((delays: Array<DelayDefinition>) => {
+                    const apiDelays = delays.map((delay: DelayDefinition) => {
                         const node = maputils.get(projectNode.delays, delay.identifier)
                         return createApiDelay(delay, node.initialMargin, node.margin)
                     })

@@ -2,7 +2,7 @@ import * as chai from "chai"
 import * as sinon from "sinon"
 import {
     Project, TaskDefinition, TaskRelation, Modifier, TaskLocation,
-    Delay, DelayRelation
+    DelayDefinition, DelayRelation
 } from "../../common/types"
 import { ExistsError } from "../../common/errors"
 import { FakeDataProvider } from "./fakedataprovider"
@@ -57,7 +57,7 @@ describe("Graph", () => {
                     estimatedDuration: 30
                 }
             ]
-            const delays: Array<Delay> = [
+            const delays: Array<DelayDefinition> = [
                 {
                     identifier: "delay1",
                     name: "Delay 1",
@@ -87,7 +87,7 @@ describe("Graph", () => {
                     estimatedDuration: 10
                 }
             ]
-            const otherDelays: Array<Delay> = []
+            const otherDelays: Array<DelayDefinition> = []
             mock.expects("getAllProjects").once().returns(Promise.resolve(projects))
             mock.expects("getProjectTasks").once().withExactArgs("project").returns(Promise.resolve(tasks))
             mock.expects("getProjectTasks").once().withExactArgs("other").returns(Promise.resolve(otherTasks))

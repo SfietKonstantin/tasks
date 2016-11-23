@@ -1,7 +1,7 @@
 import { Action, Dispatch } from "redux"
 import { State } from "../types"
 import { Project, Modifier } from "../../../common/types"
-import { ApiProjectTaskModifiers, ApiTask } from "../../../common/apitypes"
+import { ApiTaskResults, ApiTask } from "../../../common/apitypes"
 
 export const TASK_REQUEST = "TASK_REQUEST"
 export const TASK_RECEIVE = "TASK_RECEIVE"
@@ -39,7 +39,7 @@ export const fetchTask = (projectIdentifier: string, taskIdentifier: string) => 
         dispatch(requestTask(projectIdentifier, taskIdentifier))
         return fetch("/api/project/" + projectIdentifier +  "/task/" + taskIdentifier).then((response: Response) => {
             return response.json()
-        }).then((result: ApiProjectTaskModifiers) => {
+        }).then((result: ApiTaskResults) => {
             dispatch(receiveTask(projectIdentifier, taskIdentifier, result.project, result.task))
         })
     }
@@ -79,7 +79,7 @@ export const addModifier = (projectIdentifier: string, taskIdentifier: string, m
         }
         return fetch("/api/modifier", requestInit).then((response: Response) => {
             return response.json()
-        }).then((result: ApiProjectTaskModifiers) => {
+        }).then((result: ApiTaskResults) => {
             dispatch(receiveTask(projectIdentifier, taskIdentifier, result.project, result.task))
         })
     }

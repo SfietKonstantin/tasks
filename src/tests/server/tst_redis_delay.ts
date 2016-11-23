@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import { Project, Delay } from "../../common/types"
+import { Project, DelayDefinition } from "../../common/types"
 import { NotFoundError, ExistsError } from "../../common/errors"
 import { CorruptedError, InternalError } from "../../server/core/data/idataprovider"
 import { RedisDataProvider } from "../../server/core/data/redisdataprovider"
@@ -34,13 +34,13 @@ describe("Redis", () => {
             }
 
             db.addProject(project).then(() => {
-                const delay1: Delay = {
+                const delay1: DelayDefinition = {
                     identifier: "delay1",
                     name: "Delay 1",
                     description: "Description 1",
                     date: new Date(2016, 9, 1)
                 }
-                const delay2: Delay = {
+                const delay2: DelayDefinition = {
                     identifier: "delay2",
                     name: "Delay 2",
                     description: "Description 2",
@@ -58,8 +58,8 @@ describe("Redis", () => {
             })
         })
         it("Should get delay", (done) => {
-            db.getDelay("project", "delay1").then((delay: Delay) => {
-                const expected: Delay = {
+            db.getDelay("project", "delay1").then((delay: DelayDefinition) => {
+                const expected: DelayDefinition = {
                     identifier: "delay1",
                     name: "Delay 1",
                     description: "Description 1",
@@ -147,8 +147,8 @@ describe("Redis", () => {
             })
         })
         it("Should get delay", (done) => {
-            db.getDelay("project", "delay1").then((delay: Delay) => {
-                const expected: Delay = {
+            db.getDelay("project", "delay1").then((delay: DelayDefinition) => {
+                const expected: DelayDefinition = {
                     identifier: "delay1",
                     name: "Delay 1",
                     description: "Description 1",
@@ -190,13 +190,13 @@ describe("Redis", () => {
             }
 
             db.addProject(project).then(() => {
-                const delay1: Delay = {
+                const delay1: DelayDefinition = {
                     identifier: "delay1",
                     name: "Delay 1",
                     description: "Description 1",
                     date: new Date(2016, 9, 1)
                 }
-                const delay2: Delay = {
+                const delay2: DelayDefinition = {
                     identifier: "delay2",
                     name: "Delay 2",
                     description: "Description 2",
@@ -214,8 +214,8 @@ describe("Redis", () => {
             })
         })
         it("Should get project delays", (done) => {
-            db.getProjectDelays("project").then((delays: Array<Delay>) => {
-                const expected: Array<Delay> = [
+            db.getProjectDelays("project").then((delays: Array<DelayDefinition>) => {
+                const expected: Array<DelayDefinition> = [
                     {
                         identifier: "delay1",
                         name: "Delay 1",
@@ -253,8 +253,8 @@ describe("Redis", () => {
             })
         })
         it("Should get non corrupted project delays", (done) => {
-            db.getProjectDelays("project").then((delays: Array<Delay>) => {
-                const expected: Array<Delay> = [
+            db.getProjectDelays("project").then((delays: Array<DelayDefinition>) => {
+                const expected: Array<DelayDefinition> = [
                     {
                         identifier: "delay2",
                         name: "Delay 2",
@@ -287,7 +287,7 @@ describe("Redis", () => {
             })
         })
         it("Should add delay", (done) => {
-            const delay1: Delay = {
+            const delay1: DelayDefinition = {
                 identifier: "delay1",
                 name: "Delay 1",
                 description: "Description 1",
@@ -301,7 +301,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when adding delay on invalid project", (done) => {
-            const delay2: Delay = {
+            const delay2: DelayDefinition = {
                 identifier: "delay2",
                 name: "Delay 2",
                 description: "Description 2",
@@ -318,7 +318,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when adding an existing delay", (done) => {
-            const delay1_2: Delay = {
+            const delay1_2: DelayDefinition = {
                 identifier: "delay1",
                 name: "Delay 2",
                 description: "Description 2",
@@ -342,7 +342,7 @@ describe("Redis", () => {
             })
         })
         it("Should get an exception when adding delay", (done) => {
-            const delay2: Delay = {
+            const delay2: DelayDefinition = {
                 identifier: "delay2",
                 name: "Delay 2",
                 description: "Description 2",
