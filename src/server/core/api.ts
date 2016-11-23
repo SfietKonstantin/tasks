@@ -6,7 +6,7 @@ import { IDataProvider, isKnownError } from "../core/data/idataprovider"
 import { IGraph, IProjectNode, ITaskNode, IDelayNode, GraphError } from "../core/graph/types"
 import { findCyclicDependency } from "../core/graph/analyzer"
 import {
-    ApiTask, ApiTaskResults, createProject, createTask, createApiTask, createApiDelay,
+    ApiTask, ApiTaskResults, ApiDelay, createProject, createTask, createApiTask, createApiDelay,
     createTaskRelation, createDelay, createDelayRelation
 } from "../../common/apitypes"
 import { NotFoundError, ExistsError, InputError } from "../../common/errors"
@@ -72,11 +72,35 @@ export class Api {
             return Promise.reject(error)
         }
         return this.dataProvider.getProjectTasks(projectIdentifier).then((tasks: Array<TaskDefinition>) => {
-            tasks = tasks.filter((value: TaskDefinition) => { return !!value })
             const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
             const returned: Array<ApiTask> = tasks.map((task: TaskDefinition) => {
                 let taskNode = maputils.get(projectNode.nodes, task.identifier)
                 return createApiTask(task, taskNode.startDate, taskNode.duration)
+            })
+            return returned
+        }).catch((error: Error) => {
+            if (error instanceof NotFoundError) {
+                winston.debug(error.message)
+                throw new RequestError(404, "Project \"" + projectIdentifier + "\" not found")
+            } else if (isApiKnownError(error)) {
+                winston.error(error.message)
+                throw new RequestError(500, "Internal error")
+            } else {
+                throw error
+            }
+        })
+    }
+    getProjectDelays(projectIdentifier: any): Promise<Array<ApiDelay>> {
+        if (typeof projectIdentifier !== "string") {
+            winston.error("projectIdentifier must be a string, not " + projectIdentifier)
+            const error = new RequestError(404, "Project \"" + projectIdentifier + "\" not found")
+            return Promise.reject(error)
+        }
+        return this.dataProvider.getProjectDelays(projectIdentifier).then((delays: Array<DelayDefinition>) => {
+            const projectNode = maputils.get(this.graph.nodes, projectIdentifier)
+            const returned: Array<ApiDelay> = delays.map((delay: DelayDefinition) => {
+                let delayNode = maputils.get(projectNode.delays, delay.identifier)
+                return createApiDelay(delay, delayNode.initialMargin, delayNode.margin)
             })
             return returned
         }).catch((error: Error) => {

@@ -48,6 +48,7 @@ export class FakeProjectNode implements IProjectNode {
         this.parent = parent
         this.projectIdentifier = projectIdentifier
         this.nodes = new Map<string, ITaskNode>()
+        this.delays = new Map<string, IDelayNode>()
     }
     addTask(task: TaskDefinition): Promise<ITaskNode> {
         return Promise.reject(new Error("FakeProjectNode: addTask is not mocked"))
