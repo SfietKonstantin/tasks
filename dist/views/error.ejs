@@ -2,14 +2,10 @@
 
 <div class="jumbotron">
     <div class="container">
-        <h1>Not found</h1>
-        <p>Moreover, the 404 page is also under construction :(</p>
+        <h1>Error <%= status %>: <%= error %></h1>
+        <p>Please check if the URL you entered is correct. If this error persists, please contact your support.</p>
     </div>
 </div>
-
-<p><%= message %></p>
-<p><%= error %></p>
-
 
 <%- include('footer') -%>
 

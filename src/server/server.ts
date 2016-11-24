@@ -62,7 +62,7 @@ export class Server {
         this.app.get("/demo/data", this.api.getDemoData.bind(this.api))
 
         this.app.use(this.errorHandler)
-        this.registerErrorHandlers()
+        this.app.use(this.defaultErrorHandler)
     }
 
     public start(port: number) {
@@ -88,29 +88,12 @@ export class Server {
         const error = new RequestError(404, "Not found")
         next(error)
     }
-
-    private registerErrorHandlers() {
-        if (this.app.get("env") === "development") {
-            this.app.use(this.devErrorHandler)
-        }
-        this.app.use(this.defaultErrorHandler)
-    }
-
-    private devErrorHandler(error: RequestError, req: express.Request, res: express.Response,
-                            next: express.NextFunction) {
-        res.status(error.status || 500)
-        res.render("error", {
-            message: error.message,
-            error: error
-        })
-    }
-
     private defaultErrorHandler(error: RequestError, req: express.Request, res: express.Response,
                                 next: express.NextFunction) {
         res.status(error.status || 500)
         res.render("error", {
-            message: error.message,
-            error: {}
+            status: error.status,
+            error: error.message
         })
     }
 
