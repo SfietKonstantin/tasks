@@ -6,12 +6,14 @@ import { fetchProject } from "../actions/project"
 import { Header } from "../components/header"
 import { Overview } from "../components/overview"
 import { AllTasks } from "../components/alltasks"
+import { StatusIndicator, Status } from "../../common/components/statusindicator"
 import { Project } from "../../../common/types"
 
 interface MainProperties {
     projectIdentifier: string
+    isFetching: boolean
     project: Project | null
-    dispatch: Dispatch<State>
+    onFetchProject: (projectIdentifier: string) => void
 }
 
 interface MainState {
@@ -24,23 +26,26 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
         this.state = { tabIndex: 0 }
     }
     render() {
-        let taskHeader: JSX.Element | null = null
-        let tab0: JSX.Element | null = null
-        let tab1: JSX.Element | null = null
         if (this.props.project) {
-            taskHeader = <Header project={this.props.project}
-                                        onTabChanged={this.handleTabChange.bind(this)} />
-            tab0 = <Overview visible={this.state.tabIndex === 0} />
-            tab1 = <AllTasks visible={this.state.tabIndex === 1} />
+            return <div>
+                <Header project={this.props.project} onTabChanged={this.handleTabChange.bind(this)} />
+                <Overview visible={this.state.tabIndex === 0} />
+                <AllTasks visible={this.state.tabIndex === 1} />
+            </div>
+        } else {
+            return this.createStatusIndicator()
         }
-        return <div>
-            {taskHeader}
-            {tab0}
-            {tab1}
-        </div>
     }
     componentDidMount() {
-        this.props.dispatch(fetchProject(this.props.projectIdentifier))
+        this.props.onFetchProject(this.props.projectIdentifier)
+    }
+    private createStatusIndicator() {
+        if (!this.props.isFetching) {
+            const message = "Cannot load project #" + this.props.projectIdentifier
+            return <StatusIndicator status={Status.Error} message={message}/>
+        } else {
+            return <StatusIndicator status={Status.Loading} />
+        }
     }
     private handleTabChange(index: number) {
         if (this.state.tabIndex !== index) {
@@ -49,11 +54,20 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
     }
 }
 
-const mapStateToProps = (state: State) => {
+export const mapStateToProps = (state: State) => {
     return {
         projectIdentifier: state.projectIdentifier,
+        isFetching: state.project.isFetching,
         project: state.project.project
     }
 }
 
-export const Main = ReactRedux.connect(mapStateToProps)(UnconnectedMain)
+export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
+    return {
+        onFetchProject: (projectIdentifier: string) => {
+            dispatch(fetchProject(projectIdentifier))
+        }
+    }
+}
+
+export const Main = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(UnconnectedMain)

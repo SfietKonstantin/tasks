@@ -114,7 +114,7 @@ export const mapStateToProps = (state: State) => {
 export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
         onCurrentStage: () => {
-            dispatch(defineStage(Stage.Relations))
+            dispatch(defineStage(Stage.Overview))
         },
         onSubmit: (project: Project, tasks: Array<ApiInputTask>, delays: Array<ApiInputDelay>,
                    taskRelations: Array<TaskRelation>, delayRelations: Array<DelayRelation>) => {

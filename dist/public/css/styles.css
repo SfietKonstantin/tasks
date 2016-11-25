@@ -57,6 +57,13 @@
     margin-bottom: 15px;
 }
 
+.common-loading {
+    padding-top: 150px;
+    padding-bottom: 150px;
+    text-align: center;
+    font-size: 35px;
+}
+
 /* Page header */
 .page-header {
     padding-bottom: 0px;
@@ -80,7 +87,7 @@
 /* Task */
 .task-header-tools {
     float: right;
-}   
+}
 
 .task-overview {
     margin-top: 10px;

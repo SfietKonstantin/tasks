@@ -6,6 +6,7 @@ import * as sinon from "sinon"
 import { Header } from "../../client/common/components/header"
 import { TabBar } from "../../client/common/components/tabs"
 import { TaskListFiltersToolbar } from "../../client/common/components/tasklistfilterstoolbar"
+import { Status, StatusIndicator } from "../../client/common/components/statusindicator"
 import { TaskList } from "../../client/common/components/tasklist"
 import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklistfilter"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
@@ -192,6 +193,22 @@ describe("Common components", () => {
             const p = component.find("p")
             chai.expect(p).to.length(3)
         })
+        it("Should create an empty ItemList", () => {
+            class TestTaskList extends TaskList<number> {}
+
+            const createElement = sinon.stub()
+            const onFiltersChanged = sinon.spy()
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
+            const component = enzyme.shallow(<TestTaskList tasks={[]}
+                                                           createElement={createElement}
+                                                           filters={filters}
+                                                           onFiltersChanged={onFiltersChanged} />)
+            const statusIndicator = component.find("StatusIndicator")
+            chai.expect(statusIndicator).to.length(1)
+        })
         it("Should handle text changed", () => {
             class TestTaskList extends TaskList<number> {}
 
@@ -252,6 +269,47 @@ describe("Common components", () => {
             formControls.at(0).simulate("submit")
             chai.expect(onFiltersChanged.calledOnce)
             chai.expect(onFiltersChanged.calledWithExactly("Test"))
+        })
+    })
+    describe("StatusIndicator", () => {
+        it("Should get the correct status 1", () => {
+            const component = enzyme.shallow(<StatusIndicator status={Status.Error} />)
+            const span = component.find("span")
+            chai.expect(span).to.length(1)
+            chai.expect(span.hasClass("glyphicon")).to.true
+            chai.expect(span.hasClass("glyphicon-remove")).to.true
+        })
+        it("Should get the correct status 2", () => {
+            const component = enzyme.shallow(<StatusIndicator status={Status.Loading} />)
+            const span = component.find("span")
+            chai.expect(span).to.length(1)
+            chai.expect(span.hasClass("glyphicon")).to.true
+            chai.expect(span.hasClass("glyphicon-hourglass")).to.true
+        })
+        it("Should get the correct status 3", () => {
+            const component = enzyme.shallow(<StatusIndicator status={Status.Info} />)
+            const span = component.find("span")
+            chai.expect(span).to.length(1)
+            chai.expect(span.hasClass("glyphicon")).to.true
+            chai.expect(span.hasClass("glyphicon-info-sign")).to.true
+        })
+        it("Should get the correct status 4", () => {
+            const component = enzyme.shallow(<StatusIndicator status={123} />)
+            const span = component.find("span")
+            chai.expect(span).to.length(1)
+            chai.expect(span.hasClass("glyphicon")).to.false
+        })
+        it("Should get the correct message 1", () => {
+            const component = enzyme.shallow(<StatusIndicator status={Status.Info}
+                                                              message="Test message" />)
+            const p = component.find("p")
+            chai.expect(p).to.length(1)
+            chai.expect(p.text()).to.equal("Test message")
+        })
+        it("Should get the correct message 2", () => {
+            const component = enzyme.shallow(<StatusIndicator status={Status.Info} />)
+            const p = component.find("p")
+            chai.expect(p).to.length(0)
         })
     })
 })

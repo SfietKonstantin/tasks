@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom"
 import { Row, Col, ListGroup, FormGroup, FormControl } from "react-bootstrap"
 import { TaskListFiltersToolbar } from "./tasklistfilterstoolbar"
 import { TaskListFilters } from "../tasklistfilter"
+import { StatusIndicator, Status } from "../../common/components/statusindicator"
 
 interface TaskListProperties<T> {
     tasks: Array<T>
@@ -26,6 +27,7 @@ export class TaskList<T> extends React.Component<TaskListProperties<T>, TaskList
         const content: Array<JSX.Element> = this.props.tasks.map((task: T) => {
             return this.props.createElement(task)
         })
+        const emptyIndicator = this.createEmptyIndicator()
         return <div className="tab-table">
             <Row>
                 <Col xs={12} sm={6}>
@@ -49,8 +51,16 @@ export class TaskList<T> extends React.Component<TaskListProperties<T>, TaskList
                 <ListGroup fill hover>
                     {content}
                 </ListGroup>
+                {emptyIndicator}
             </div>
         </div>
+    }
+    private createEmptyIndicator(): JSX.Element | null {
+        if (this.props.tasks.length > 0) {
+            return null
+        }
+
+        return <StatusIndicator status={Status.Info} message="Nothing to show" />
     }
     private handleTextChange(e: React.FormEvent) {
         const input = e.target as HTMLInputElement

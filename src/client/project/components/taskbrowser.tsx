@@ -13,7 +13,7 @@ interface TaskBrowserProperties {
     tasks: Array<ApiTask>
     filters: TaskFilters
     onFiltersChanged: (projectIdentifier: string, filters: TaskFilters) => void
-    dispatch: Dispatch<State>
+    onFetchTasks: (projectIdentifier: string) => void
 }
 
 class ApiTaskList extends TaskList<ApiTask> {}
@@ -28,11 +28,11 @@ export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
         </ApiTaskList>
     }
     componentDidMount() {
-        this.props.dispatch(fetchTasks(this.props.projectIdentifier))
+        this.props.onFetchTasks(this.props.projectIdentifier)
     }
     private createTaskElement(task: ApiTask): JSX.Element {
         const taskLink = "/project/" + this.props.projectIdentifier + "/task/" + task.identifier
-        return <ListGroupItem href={taskLink}>
+        return <ListGroupItem href={taskLink} key={task.identifier}>
             {task.name} <span className="text-muted">#{task.identifier}</span>
         </ListGroupItem>
     }
@@ -54,6 +54,8 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
         onFiltersChanged: (projectIdentifier: string, taskFilters: TaskFilters) => {
             dispatch(filterTasks(projectIdentifier, taskFilters))
         },
-        dispatch
+        onFetchTasks: (projectIdentifier: string) => {
+            dispatch(fetchTasks(projectIdentifier))
+        }
     }
 }

@@ -12,8 +12,8 @@ import { Main } from "../../client/imports/primavera/components/main"
 import * as relationsActions from "../../client/imports/primavera/actions/relations"
 import { filterForOverview } from "../../client/imports/primavera/actions/overview"
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
+import * as overviewActions from "../../client/imports/primavera/actions/overview"
 import { defineDelayFilters } from "../../client/imports/primavera/actions/delays"
-import { submit } from "../../client/imports/primavera/actions/overview"
 import { Stage, PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import * as connectedcomponents from "../../client/imports/primavera/connectedcomponents"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
@@ -230,15 +230,18 @@ describe("Primavera components", () => {
             const mapped = overview.mapDispatchToProps(dispatch)
 
             mapped.onCurrentStage()
-            dispatch.calledWithExactly(defineStage(Stage.Overview))
+            chai.expect(dispatch.calledWithExactly(defineStage(Stage.Overview))).to.true
         })
         it("Should map the onSubmit callback", () => {
+            const mockedOverview = sinon.mock(overviewActions)
+            mockedOverview.expects("submit").once().calledWithExactly(project, inputTasks1, inputDelays1,
+                                                                      inputTaskRelations1, inputDelayRelations1)
+
             let dispatch = sinon.spy()
             const mapped = overview.mapDispatchToProps(dispatch)
 
             mapped.onSubmit(project, inputTasks1, inputDelays1, inputTaskRelations1, inputDelayRelations1)
-            dispatch.calledWithExactly(submit(project, inputTasks1, inputDelays1,
-                                              inputTaskRelations1, inputDelayRelations1))
+            mockedOverview.verify()
         })
     })
     describe("Main", () => {

@@ -3,6 +3,7 @@ import * as sinon from "sinon"
 import * as main from "../../client/project/reducers/main"
 import { requestProject, receiveProject, receiveFailureProject } from "../../client/project/actions/project"
 import { requestTasks, receiveTasks, receiveFailureTasks, filterTasks } from "../../client/project/actions/tasks"
+import * as taskBrowser from "../../client/project/components/taskbrowser"
 import {
     State, ProjectState, TaskFilters, TasksState
 } from "../../client/project/types"
@@ -248,6 +249,20 @@ describe("Project reducers", () => {
             }
             checkState(initialState1)
             checkState(initialState2)
+        })
+    })
+    describe("Components", () => {
+        describe("TaskBrowser", () => {
+            it("Should map the states", () => {
+                const checkMapped = (initialState: State) => {
+                    const mapped = taskBrowser.mapStateToProps(initialState)
+                    chai.expect(mapped.projectIdentifier).to.deep.equal(initialState.projectIdentifier)
+                    chai.expect(mapped.tasks).to.deep.equal(initialState.tasks.tasks)
+                    chai.expect(mapped.filters).to.deep.equal(initialState.tasks.filters)
+                }
+                checkMapped(initialState1)
+                checkMapped(initialState2)
+            })
         })
     })
 })
