@@ -37,9 +37,9 @@ describe("Project components", () => {
             name: "Task 3",
             description: "Description 3",
             estimatedStartDate: new Date(2016, 10, 1).toISOString(),
-            estimatedDuration: 25,
+            estimatedDuration: 0,
             startDate: new Date(2016, 10, 1).toISOString(),
-            duration: 25
+            duration: 0
         }
     ]
     const filters: TaskFilters = {
@@ -70,17 +70,19 @@ describe("Project components", () => {
             const listGroup = taskListComponent.find(ListGroup)
             chai.expect(listGroup.children()).to.length(3)
 
-            const checkboxes = listGroup.find(ListGroupItem)
-            const item1 = checkboxes.at(0)
-            chai.expect(item1.childAt(0).text()).to.equal("Task 1")
+            const items = listGroup.find(ListGroupItem)
+            const item1 = items.at(0)
+            chai.expect(item1.childAt(1).childAt(0).text()).to.equal("Task 1")
             chai.expect(item1.childAt(2).childAt(1).text()).to.equal("task1")
             chai.expect(item1.prop("href")).to.equal("/project/project/task/task1")
-            const item2 = checkboxes.at(1)
-            chai.expect(item2.childAt(0).text()).to.equal("Task 2")
+            const item2 = items.at(1)
+            chai.expect(item2.childAt(1).childAt(0).text()).to.equal("Task 2")
             chai.expect(item2.childAt(2).childAt(1).text()).to.equal("task2")
             chai.expect(item2.prop("href")).to.equal("/project/project/task/task2")
-            const item3 = checkboxes.at(2)
-            chai.expect(item3.childAt(0).text()).to.equal("Task 3")
+            const item3 = items.at(2)
+            chai.expect(item3.childAt(0).childAt(0).hasClass("glyphicon")).to.true
+            chai.expect(item3.childAt(0).childAt(0).hasClass("glyphicon-flag")).to.true
+            chai.expect(item3.childAt(1).childAt(0).text()).to.equal("Task 3")
             chai.expect(item3.childAt(2).childAt(1).text()).to.equal("task3")
             chai.expect(item3.prop("href")).to.equal("/project/project/task/task3")
         })

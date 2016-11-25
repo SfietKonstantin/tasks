@@ -64,6 +64,12 @@
     font-size: 35px;
 }
 
+.common-task-indicator {
+    float: left;
+    width: 25px;
+    display: inline-block;
+}
+
 /* Page header */
 .page-header {
     padding-bottom: 0px;

@@ -32,9 +32,18 @@ export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
     }
     private createTaskElement(task: ApiTask): JSX.Element {
         const taskLink = "/project/" + this.props.projectIdentifier + "/task/" + task.identifier
+        const milestoneIndicator = TaskBrowser.createMilestoneIndicator(task)
         return <ListGroupItem href={taskLink} key={task.identifier}>
-            {task.name} <span className="text-muted">#{task.identifier}</span>
+            <span className="common-task-indicator">{milestoneIndicator}</span>
+            <span>{task.name} </span>
+            <span className="text-muted">#{task.identifier}</span>
         </ListGroupItem>
+    }
+    private static createMilestoneIndicator(task: ApiTask): JSX.Element | null {
+        if (task.estimatedDuration != 0) {
+            return null
+        }
+        return <span className="glyphicon glyphicon-flag"></span>
     }
     private handleFiltersChanged(filters: TaskListFilters) {
         this.props.onFiltersChanged(this.props.projectIdentifier, Object.assign(this.props.filters, {filters}))
