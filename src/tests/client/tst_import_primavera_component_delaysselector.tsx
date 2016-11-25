@@ -7,7 +7,7 @@ import { DelaysSelector, mapDispatchToProps } from "../../client/imports/primave
 import { FakeFile } from "./fakefile"
 import { Stage, SubmitState } from "../../client/imports/primavera/types"
 import { Project } from "../../common/types"
-import { MilestoneFilterMode, TaskListFilters } from "../../client/common/tasklistfilter"
+import { MilestoneFilterMode, TaskListFilters } from "../../client/common/tasklistfilters"
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
 import { defineDelayFilters, defineDelaySelection } from "../../client/imports/primavera/actions/delays"
 import { filterForOverview } from "../../client/imports/primavera/actions/overview"

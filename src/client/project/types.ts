@@ -1,6 +1,6 @@
 import { Project } from "../../common/types"
 import { ApiTask } from "../../common/apitypes"
-import { TaskListFilters } from "../common/tasklistfilter"
+import { TaskListFilters } from "../common/tasklistfilters"
 
 export interface State {
     projectIdentifier: string
@@ -13,11 +13,10 @@ export interface ProjectState {
     project: Project | null
 }
 
-export interface TaskFilters {
+export interface TaskFilters extends TaskListFilters {
     notStartedChecked: boolean
     inProgressChecked: boolean
     doneChecked: boolean
-    filters: TaskListFilters
 }
 
 export interface TasksState {

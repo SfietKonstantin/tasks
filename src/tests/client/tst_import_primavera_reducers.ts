@@ -29,7 +29,7 @@ import * as relationsSelector from "../../client/imports/primavera/components/re
 import * as delaysSelector from "../../client/imports/primavera/components/delaysselector"
 import * as overview from "../../client/imports/primavera/components/overview"
 import { TasksParseResults, RelationsParseResults } from "../../client/imports/primavera/imports"
-import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklistfilter"
+import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklistfilters"
 import * as states from "../../client/imports/primavera/states"
 import { FakeFile, FakeFileReader } from "./fakefile"
 import { FakeResponse } from "./fakeresponse"

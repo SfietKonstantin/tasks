@@ -11,7 +11,7 @@ export const PROJECT_RECEIVE_FAILURE = "PROJECT_RECEIVE_FAILURE"
 export interface ProjectAction extends Action {
     type: string,
     projectIdentifier: string
-    project: Project
+    project: Project | null
 }
 
 export const requestProject = (projectIdentifier: string): Action => {

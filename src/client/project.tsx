@@ -7,6 +7,7 @@ import { State } from "./project/types"
 import { mainReducer } from "./project/reducers/main"
 import { Main } from "./project/containers/main"
 import { project, tasks } from "./project/states"
+import { assign } from "./common/assign"
 
 interface RootProperties {
     store: Redux.Store<State>
@@ -29,8 +30,10 @@ export const render = (projectIdentifier: string) => {
     try {
         const filterJson = localStorage.getItem(projectIdentifier)
         if (filterJson != null) {
-            initialState.tasks.filters = Object.assign(initialState.tasks.filters,
-                                                       JSON.parse(filterJson))
+            const filter = JSON.parse(filterJson)
+            initialState.tasks.filters.notStartedChecked = filter.notStartedChecked
+            initialState.tasks.filters.inProgressChecked = filter.inProgressChecked
+            initialState.tasks.filters.doneChecked = filter.doneChecked
         }
     }
     catch (error) {}

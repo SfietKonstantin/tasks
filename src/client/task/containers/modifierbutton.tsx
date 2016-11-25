@@ -4,6 +4,7 @@ import { Dispatch } from "redux"
 import * as ReactRedux from "react-redux"
 import { State } from "../types"
 import { addModifier } from "../actions/task"
+import { assign } from "../../common/assign"
 import { Modifier, TaskLocation } from "../../../common/types"
 
 interface ModifierButtonProperties {
@@ -107,7 +108,7 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
         })
     }
     private close() {
-        this.setState(Object.assign(this.state, { show: false }))
+        this.setState(assign(this.state, { show: false }))
     }
     private isButtonEnabled() {
         return this.state.name.length > 0 && this.state.duration !== Number.NaN && this.state.duration !== 0
@@ -120,24 +121,24 @@ export class UnconnectedModifierButton extends React.Component<ModifierButtonPro
     }
     private handleNameInput(e: React.FormEvent) {
         const input = e.target as HTMLInputElement
-        this.setState(Object.assign(this.state, { name: input.value }))
+        this.setState(assign(this.state, { name: input.value }))
     }
     private handleDurationInput(e: React.FormEvent) {
         const input = e.target as HTMLInputElement
         const duration = +input.value
         this.state.duration = duration
-        this.setState(Object.assign(this.state, { duration }))
+        this.setState(assign(this.state, { duration }))
 
     }
     private handleDescriptionInput(e: React.FormEvent) {
         const input = e.target as HTMLInputElement
-        this.setState(Object.assign(this.state, { description: input.value }))
+        this.setState(assign(this.state, { description: input.value }))
     }
     private handleBeginningRadio(e: React.MouseEvent) {
-        this.setState(Object.assign(this.state, { location: TaskLocation.Beginning }))
+        this.setState(assign(this.state, { location: TaskLocation.Beginning }))
     }
     private handleEndRadio(e: React.MouseEvent) {
-        this.setState(Object.assign(this.state, { location: TaskLocation.End }))
+        this.setState(assign(this.state, { location: TaskLocation.End }))
     }
     private handleSave(e: React.MouseEvent) {
         const modifier: Modifier = {

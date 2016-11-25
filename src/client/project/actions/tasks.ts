@@ -48,13 +48,16 @@ export const fetchTasks = (projectIdentifier: string) => {
 export interface TaskFiltersAction extends Action {
     type: string,
     filters: TaskFilters
-    today: Date
+    today: Date | null
 }
 
 export const filterTasks = (projectIdentifier: string, filters: TaskFilters): TaskFiltersAction => {
     try {
-        let savedFilter = Object.assign({}, filters)
-        delete savedFilter.filters
+        let savedFilter = {
+            notStartedChecked: filters.notStartedChecked,
+            inProgressChecked: filters.inProgressChecked,
+            doneChecked: filters.doneChecked,
+        }
         localStorage.setItem(projectIdentifier, JSON.stringify(savedFilter))
     } catch (error) {}
     return {

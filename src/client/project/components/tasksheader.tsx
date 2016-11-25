@@ -1,6 +1,7 @@
 import * as React from "react"
 import { ButtonGroup, Button } from "react-bootstrap"
 import { TaskFilters } from "../types"
+import { assign } from "../../common/assign"
 
 interface TasksHeaderProperties {
     filters: TaskFilters
@@ -32,15 +33,15 @@ export class TasksHeader extends React.Component<TasksHeaderProperties, {}> {
     }
     private handleNotStartedClicked(e: React.MouseEvent) {
         const notStartedChecked = !this.props.filters.notStartedChecked
-        this.props.onFiltersChanged(Object.assign(this.props.filters, {notStartedChecked}))
+        this.props.onFiltersChanged(assign(this.props.filters, {notStartedChecked}))
     }
     private handleInProgress(e: React.MouseEvent) {
         const inProgressChecked = !this.props.filters.inProgressChecked
-        this.props.onFiltersChanged(Object.assign(this.props.filters, {inProgressChecked}))
+        this.props.onFiltersChanged(assign(this.props.filters, {inProgressChecked}))
     }
     private handleDoneClicked(e: React.MouseEvent) {
         const doneChecked = !this.props.filters.doneChecked
-        this.props.onFiltersChanged(Object.assign(this.props.filters, {doneChecked}))
+        this.props.onFiltersChanged(assign(this.props.filters, {doneChecked}))
     }
 }
 

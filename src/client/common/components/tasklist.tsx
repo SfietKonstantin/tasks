@@ -2,8 +2,9 @@ import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { Row, Col, ListGroup, FormGroup, FormControl } from "react-bootstrap"
 import { TaskListFiltersToolbar } from "./tasklistfilterstoolbar"
-import { TaskListFilters } from "../tasklistfilter"
+import { TaskListFilters } from "../tasklistfilters"
 import { StatusIndicator, Status } from "../../common/components/statusindicator"
+import { assign } from "../../common/assign"
 
 interface TaskListProperties<T> {
     tasks: Array<T>
@@ -75,6 +76,6 @@ export class TaskList<T> extends React.Component<TaskListProperties<T>, TaskList
     }
     private handleFiltersChanged() {
         const text = this.state.textFilter
-        this.props.onFiltersChanged(Object.assign(this.props.filters, { text }))
+        this.props.onFiltersChanged(assign(this.props.filters, { text }))
     }
 }

@@ -3,7 +3,7 @@ import {
     PrimaveraTask, SubmitState
 } from "./types"
 import { RelationGraphNode, GraphDiff } from "./graph"
-import { MilestoneFilterMode } from "../../common/tasklistfilter"
+import { MilestoneFilterMode } from "../../common/tasklistfilters"
 import { Project } from "../../../common/types"
 
 export const stage: Stages = {

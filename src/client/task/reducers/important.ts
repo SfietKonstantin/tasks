@@ -1,6 +1,7 @@
 import { ImportantState } from "../types"
 import { Project } from "../../../common/types"
 import { ImportantAction, TASK_IMPORTANT_REQUEST, TASK_IMPORTANT_RECEIVE } from "../actions/important"
+import { copyAssign } from "../../common/assign"
 
 const initialState: ImportantState = {
     isFetching: false,
@@ -10,9 +11,9 @@ const initialState: ImportantState = {
 export const importantReducer = (state: ImportantState = initialState, action: ImportantAction): ImportantState => {
     switch (action.type) {
         case TASK_IMPORTANT_REQUEST:
-            return Object.assign({}, state, { isFetching: true })
+            return copyAssign(state, { isFetching: true })
         case TASK_IMPORTANT_RECEIVE:
-            return Object.assign({}, state, {
+            return copyAssign(state, {
                 isFetching: false,
                 important: action.important
             })

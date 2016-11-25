@@ -7,8 +7,8 @@ import { TaskBrowser, mapDispatchToProps } from "../../client/project/components
 import { TaskFilters } from "../../client/project/types"
 import { filterTasks } from "../../client/project/actions/tasks"
 import * as projectActions from "../../client/project/actions/tasks"
-import { TaskListFilters } from "../../client/common/tasklistfilter"
-import { MilestoneFilterMode } from "../../client/common/tasklistfilter"
+import { TaskListFilters } from "../../client/common/tasklistfilters"
+import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
 import { ApiTask } from "../../common/apitypes"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
@@ -46,10 +46,8 @@ describe("Project components", () => {
         notStartedChecked: false,
         inProgressChecked: true,
         doneChecked: true,
-        filters: {
-            text: "",
-            milestoneFilterMode: MilestoneFilterMode.NoFilter
-        }
+        text: "",
+        milestoneFilterMode: MilestoneFilterMode.NoFilter
     }
     beforeEach(() => {
         addFakeGlobal()
@@ -102,21 +100,13 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: true,
                 doneChecked: true,
-                filters: {
-                    text: "",
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter
-                }
+                text: "",
+                milestoneFilterMode: MilestoneFilterMode.NoFilter
             }
-            const expectedFilters: TaskFilters = {
+            const filters: TaskFilters = {
                 notStartedChecked: false,
                 inProgressChecked: true,
                 doneChecked: true,
-                filters: {
-                    text: "test",
-                    milestoneFilterMode: MilestoneFilterMode.TasksOnly
-                }
-            }
-            const filters: TaskListFilters = {
                 text: "test",
                 milestoneFilterMode: MilestoneFilterMode.TasksOnly
             }
@@ -129,7 +119,7 @@ describe("Project components", () => {
                                                           onFetchTasks={fetchTasks} />)
             component.simulate("filtersChanged", filters)
             chai.expect(onFiltersChanged.calledOnce).to.true
-            chai.expect(onFiltersChanged.calledWithExactly("project", expectedFilters)).to.true
+            chai.expect(onFiltersChanged.calledWithExactly("project", filters)).to.true
         })
     })
     it("Should map the onFiltersChanged callback", () => {

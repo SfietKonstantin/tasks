@@ -3,16 +3,17 @@ import { ProjectState } from "../types"
 import { Project } from "../../../common/types"
 import { ProjectAction, PROJECT_REQUEST, PROJECT_RECEIVE, PROJECT_RECEIVE_FAILURE } from "../actions/project"
 import { project } from "../states"
+import { copyAssign } from "../../common/assign"
 
 export const projectReducer = (state: ProjectState = project, action: Action): ProjectState => {
     switch (action.type) {
         case PROJECT_REQUEST:
-            return Object.assign({}, state, { isFetching: true })
+            return copyAssign(state, { isFetching: true })
         case PROJECT_RECEIVE:
         const projectAction = action as ProjectAction
-            return Object.assign({}, state, { isFetching: false, project: projectAction.project })
+            return copyAssign(state, { isFetching: false, project: projectAction.project })
         case PROJECT_RECEIVE_FAILURE:
-            return Object.assign({}, state, { isFetching: false })
+            return copyAssign(state, { isFetching: false })
         default:
             return state
     }

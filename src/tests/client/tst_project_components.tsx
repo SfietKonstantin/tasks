@@ -10,7 +10,7 @@ import { Overview } from "../../client/project/components/overview"
 import { TasksHeader } from "../../client/project/components/tasksheader"
 import { AllTasks } from "../../client/project/components/alltasks"
 import { TaskFilters } from "../../client/project/types"
-import { MilestoneFilterMode } from "../../client/common/tasklistfilter"
+import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
 import { Project } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
@@ -71,10 +71,8 @@ describe("Project components", () => {
                 notStartedChecked: true,
                 inProgressChecked: false,
                 doneChecked: false,
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -90,10 +88,8 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: true,
                 doneChecked: false,
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -109,10 +105,8 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: true,
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -128,10 +122,8 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: false,
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -143,10 +135,8 @@ describe("Project components", () => {
                 notStartedChecked: true,
                 inProgressChecked: false,
                 doneChecked: false,
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWithExactly(expected)).to.true
@@ -157,10 +147,8 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: false,
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -172,10 +160,8 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: true,
                 doneChecked: false,
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWithExactly(expected)).to.true
@@ -186,10 +172,8 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: false,
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -201,10 +185,8 @@ describe("Project components", () => {
                 notStartedChecked: false,
                 inProgressChecked: false,
                 doneChecked: true,
-                filters: {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWithExactly(expected)).to.true

@@ -7,8 +7,9 @@ import { GraphDiff, RelationGraph } from "../graph"
 import { delays } from "../states"
 import {
     MilestoneFilterMode, TaskListFilters, TaskListFilterInterface, filterTaskList
-} from "../../../common/tasklistfilter"
+} from "../../../common/tasklistfilters"
 import { sortStrings } from "../../../../common/stringutils"
+import { copyAssign } from "../../../common/assign"
 
 const filterTasks = (tasks: Array<PrimaveraTask>, filters: TaskListFilters): Array<PrimaveraTask> => {
     const filterInterface: TaskListFilterInterface<PrimaveraTask> = {
@@ -32,7 +33,7 @@ export const delaysReducer = (state: DelaysState = delays, action: Action): Dela
     switch (action.type) {
         case DELAY_FILTERS_DEFINE:
             const filtersAction = action as DelayFiltersAction
-            return Object.assign({}, state, {
+            return copyAssign(state, {
                 filters: filtersAction.filters,
                 tasks: filterTasks(filtersAction.tasks, filtersAction.filters)
             })
@@ -45,7 +46,7 @@ export const delaysReducer = (state: DelaysState = delays, action: Action): Dela
             }
             const graph = RelationGraph.fromNodes(selectionAction.relations)
             const selectionResults = graph.createSelectionDiff(state.selection, selectionAction.tasks)
-            return Object.assign({}, state, {
+            return copyAssign(state, {
                 selection: state.selection,
                 diffs: selectionResults.diffs,
                 warnings: selectionResults.warnings

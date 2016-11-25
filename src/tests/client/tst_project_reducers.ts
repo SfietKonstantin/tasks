@@ -7,7 +7,7 @@ import * as taskBrowser from "../../client/project/components/taskbrowser"
 import {
     State, ProjectState, TaskFilters, TasksState
 } from "../../client/project/types"
-import { MilestoneFilterMode } from "../../client/common/tasklistfilter"
+import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
 import { Project } from "../../common/types"
 import { ApiTask } from "../../common/apitypes"
 import { FakeResponse } from "./fakeresponse"
@@ -41,10 +41,8 @@ describe("Project reducers", () => {
                     notStartedChecked: true,
                     inProgressChecked: true,
                     doneChecked: true,
-                    filters: {
-                        milestoneFilterMode: MilestoneFilterMode.TasksOnly,
-                        text: "Some filter"
-                    }
+                    milestoneFilterMode: MilestoneFilterMode.TasksOnly,
+                    text: "Some filter"
                 },
                 today: new Date(2016, 9, 1),
                 filteredTasks: cloneArray(apiTasks)
@@ -121,10 +119,8 @@ describe("Project reducers", () => {
                     notStartedChecked: true,
                     inProgressChecked: false,
                     doneChecked: false,
-                    filters: {
-                        milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                        text: ""
-                    }
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
@@ -144,10 +140,8 @@ describe("Project reducers", () => {
                     notStartedChecked: false,
                     inProgressChecked: true,
                     doneChecked: false,
-                    filters: {
-                        milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                        text: ""
-                    }
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
@@ -164,10 +158,8 @@ describe("Project reducers", () => {
                     notStartedChecked: false,
                     inProgressChecked: false,
                     doneChecked: true,
-                    filters: {
-                        milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                        text: ""
-                    }
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
@@ -187,10 +179,8 @@ describe("Project reducers", () => {
                     notStartedChecked: true,
                     inProgressChecked: true,
                     doneChecked: true,
-                    filters: {
-                        milestoneFilterMode: MilestoneFilterMode.TasksOnly,
-                        text: ""
-                    }
+                    milestoneFilterMode: MilestoneFilterMode.TasksOnly,
+                    text: ""
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
@@ -211,10 +201,8 @@ describe("Project reducers", () => {
                     notStartedChecked: true,
                     inProgressChecked: true,
                     doneChecked: true,
-                    filters: {
-                        milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
-                        text: ""
-                    }
+                    milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
+                    text: ""
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
@@ -234,10 +222,8 @@ describe("Project reducers", () => {
                     notStartedChecked: true,
                     inProgressChecked: true,
                     doneChecked: true,
-                    filters: {
-                        milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                        text: "1"
-                    }
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: "1"
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)

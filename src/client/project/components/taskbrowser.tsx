@@ -4,7 +4,8 @@ import { State, TaskFilters } from "../types"
 import { fetchTasks, filterTasks } from "../actions/tasks"
 import { ListGroupItem } from "react-bootstrap"
 import { TaskList } from "../../common/components/tasklist"
-import { TaskListFilters } from "../../common/tasklistfilter"
+import { TaskListFilters } from "../../common/tasklistfilters"
+import { assign } from "../../common/assign"
 import { TasksHeader } from "../components/tasksheader"
 import { ApiTask } from "../../../common/apitypes"
 
@@ -21,8 +22,8 @@ class ApiTaskList extends TaskList<ApiTask> {}
 export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
     render() {
         return <ApiTaskList tasks={this.props.tasks} createElement={this.createTaskElement.bind(this)}
-                            filters={this.props.filters.filters}
-                            onFiltersChanged={this.handleFiltersChanged.bind(this)} >
+                            filters={this.props.filters}
+                            onFiltersChanged={this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)} >
             <TasksHeader filters={this.props.filters}
                          onFiltersChanged={this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)} />
         </ApiTaskList>
@@ -40,13 +41,10 @@ export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
         </ListGroupItem>
     }
     private static createMilestoneIndicator(task: ApiTask): JSX.Element | null {
-        if (task.estimatedDuration != 0) {
+        if (task.estimatedDuration !== 0) {
             return null
         }
         return <span className="glyphicon glyphicon-flag"></span>
-    }
-    private handleFiltersChanged(filters: TaskListFilters) {
-        this.props.onFiltersChanged(this.props.projectIdentifier, Object.assign(this.props.filters, {filters}))
     }
 }
 

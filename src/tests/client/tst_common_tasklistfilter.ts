@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import {
     TaskListFilters, TaskListFilterInterface, MilestoneFilterMode, filterTaskList
-} from "../../client/common/tasklistfilter"
+} from "../../client/common/tasklistfilters"
 import { FakeTask, isMilestone, getIdentifier, getName } from "./faketask"
 
 const tasks: Array<FakeTask> = [

@@ -1,6 +1,7 @@
 import { TaskState } from "../types"
 import { Project } from "../../../common/types"
 import { TaskAction, TASK_REQUEST, TASK_RECEIVE } from "../actions/task"
+import { copyAssign } from "../../common/assign"
 
 const initialState: TaskState = {
     isFetching: false,
@@ -11,12 +12,12 @@ const initialState: TaskState = {
 export const taskReducer = (state: TaskState = initialState, action: TaskAction): TaskState => {
     switch (action.type) {
         case TASK_REQUEST:
-            return Object.assign({}, state, { isFetching: true })
+            return copyAssign(state, { isFetching: true })
         case TASK_RECEIVE:
-            return Object.assign({}, state, {
+            return copyAssign(state, {
                 isFetching: false,
-                project: action.project,
-                task: action.task
+                project: action.project ? action.project : null,
+                task: action.task ? action.task : null
             })
         default:
             return state

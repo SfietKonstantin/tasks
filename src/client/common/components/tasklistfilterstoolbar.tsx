@@ -1,6 +1,7 @@
 import * as React from "react"
 import { ButtonToolbar, ButtonGroup, DropdownButton, MenuItem } from "react-bootstrap"
-import { MilestoneFilterMode, TaskListFilters } from "../tasklistfilter"
+import { MilestoneFilterMode, TaskListFilters } from "../tasklistfilters"
+import { assign } from "../../common/assign"
 
 interface TaskListFilterToolbarProperties {
     filters: TaskListFilters
@@ -37,17 +38,17 @@ export class TaskListFiltersToolbar extends React.Component<TaskListFilterToolba
         }
     }
     private handleNoFilter(e: React.SyntheticEvent) {
-        this.props.onFiltersChanged(Object.assign(this.props.filters, {
+        this.props.onFiltersChanged(assign(this.props.filters, {
             milestoneFilterMode: MilestoneFilterMode.NoFilter
         }))
     }
     private handleTasksOnly(e: React.SyntheticEvent) {
-        this.props.onFiltersChanged(Object.assign(this.props.filters, {
+        this.props.onFiltersChanged(assign(this.props.filters, {
             milestoneFilterMode: MilestoneFilterMode.TasksOnly
         }))
     }
     private handleMilestonesOnly(e: React.SyntheticEvent) {
-        this.props.onFiltersChanged(Object.assign(this.props.filters, {
+        this.props.onFiltersChanged(assign(this.props.filters, {
             milestoneFilterMode: MilestoneFilterMode.MilestonesOnly
         }))
     }

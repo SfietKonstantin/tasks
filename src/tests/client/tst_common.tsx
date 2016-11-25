@@ -8,7 +8,7 @@ import { TabBar } from "../../client/common/components/tabs"
 import { TaskListFiltersToolbar } from "../../client/common/components/tasklistfilterstoolbar"
 import { Status, StatusIndicator } from "../../client/common/components/statusindicator"
 import { TaskList } from "../../client/common/components/tasklist"
-import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklistfilter"
+import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklistfilters"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Common components", () => {

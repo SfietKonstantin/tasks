@@ -11,12 +11,13 @@ import {
     OVERVIEW_SUBMIT_RECEIVE,
     OVERVIEW_SUBMIT_RECEIVE_FAILURE
 } from "../actions/overview"
+import { copyAssign } from "../../../common/assign"
 
 export const overviewReducer = (state: OverviewState = overview, action: Action): OverviewState => {
     switch (action.type) {
         case OVERVIEW_FILTER:
             const overviewAction = action as OverviewFilterAction
-            return Object.assign({}, state, {
+            return copyAssign(state, {
                 tasks: overviewAction.tasks,
                 delays: overviewAction.delays,
                 taskRelations: overviewAction.taskRelations,
@@ -24,15 +25,15 @@ export const overviewReducer = (state: OverviewState = overview, action: Action)
                 warnings: overviewAction.warnings
             })
         case OVERVIEW_SUBMIT_REQUEST:
-            return Object.assign({}, state, {
+            return copyAssign(state, {
                 submitState: SubmitState.Submitting
             })
         case OVERVIEW_SUBMIT_RECEIVE:
-            return Object.assign({}, state, {
+            return copyAssign(state, {
                 submitState: SubmitState.Submitted
             })
         case OVERVIEW_SUBMIT_RECEIVE_FAILURE:
-            return Object.assign({}, state, {
+            return copyAssign(state, {
                 submitState: SubmitState.SubmitError
             })
         default:

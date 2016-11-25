@@ -1,12 +1,13 @@
 import { Action } from "redux"
 import { TasksState, TaskFilters } from "../types"
-import { MilestoneFilterMode, TaskListFilterInterface, filterTaskList } from "../../common/tasklistfilter"
+import { MilestoneFilterMode, TaskListFilterInterface, filterTaskList } from "../../common/tasklistfilters"
 import { ApiTask } from "../../../common/apitypes"
 import {
     TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE,
     TASKS_FILTER_DISPLAY
 } from "../actions/tasks"
 import { tasks } from "../states"
+import { copyAssign } from "../../common/assign"
 import * as dateutils from "../../../common/dateutils"
 import * as latinize from "latinize"
 
@@ -27,7 +28,7 @@ const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | 
         }
     }
 
-    const initialFiltered = filterTaskList(tasks, filters.filters, filterInterface)
+    const initialFiltered = filterTaskList(tasks, filters, filterInterface)
     const todayTime = today.getTime()
     const filtered = initialFiltered.filter((task: ApiTask) => {
         const startDate = new Date(task.startDate).getTime()
@@ -51,7 +52,7 @@ const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | 
 export const tasksReducer = (state: TasksState = tasks, action: Action): TasksState => {
     switch (action.type) {
         case TASKS_REQUEST:
-            return Object.assign({}, state, { isFetching: true })
+            return copyAssign(state, { isFetching: true })
         case TASKS_RECEIVE:
             const tasksAction = action as TasksAction
             const tasks = tasksAction.tasks.sort((first: ApiTask, second: ApiTask): number => {
@@ -59,18 +60,18 @@ export const tasksReducer = (state: TasksState = tasks, action: Action): TasksSt
                 const secondDate = new Date(second.estimatedStartDate).getTime()
                 return firstDate - secondDate
             })
-            return Object.assign({}, state, {
+            return copyAssign(state, {
                 isFetching: false,
                 tasks,
                 filteredTasks: filterTasks(tasks, state.filters, state.today)
             })
         case TASKS_RECEIVE_FAILURE:
-            return Object.assign({}, state, { isFetching: false })
+            return copyAssign(state, { isFetching: false })
         case TASKS_FILTER_DISPLAY:
             const taskFiltersAction = action as TaskFiltersAction
-            return Object.assign({}, state, {
-                filters: taskFiltersAction.filters,
+            return copyAssign(state, {
                 today: taskFiltersAction.today,
+                filters: taskFiltersAction.filters,
                 filteredTasks: filterTasks(state.tasks, taskFiltersAction.filters, taskFiltersAction.today)
             })
         default:

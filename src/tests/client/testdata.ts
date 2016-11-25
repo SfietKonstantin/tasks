@@ -2,7 +2,7 @@ import { Project, TaskRelation, DelayRelation, TaskLocation } from "../../common
 import { ApiTask, ApiInputTask, ApiInputDelay } from "../../common/apitypes"
 import { PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import { RelationGraph } from "../../client/imports/primavera/graph"
-import { MilestoneFilterMode, TaskListFilters } from "../../client/common/tasklistfilter"
+import { MilestoneFilterMode, TaskListFilters } from "../../client/common/tasklistfilters"
 import * as maputils from "../../common/maputils"
 
 export const cloneObject = <T>(object: T): T => {
