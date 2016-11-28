@@ -88,7 +88,7 @@ export class RelationGraph {
         const task = maputils.get(tasks, identifier)
         const node = maputils.get(this.nodes, identifier)
 
-        if (task.startDate != null && task.endDate != null) {
+        if (task.duration !== 0) {
             // The selected node is a task. Modelling a delay
             // by a task (is questionnable and) means that
             // the delay happens at the end of the task

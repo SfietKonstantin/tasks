@@ -55,6 +55,13 @@ export const parseTasks = (content: string): TasksParseResults => {
             return
         }
 
+        const effectiveStartDate: Date = startDate ? startDate : (endDate as Date)
+        let duration = 0
+        if (startDate != null && endDate != null) {
+            duration = dateutils.getDateDiff(startDate, endDate)
+        }
+
+
         if (tasks.has(identifier)) {
             maputils.addToMapOfList(warnings, identifier, "Duplicated task")
             return
@@ -63,8 +70,8 @@ export const parseTasks = (content: string): TasksParseResults => {
         tasks.set(identifier, {
             identifier,
             name,
-            startDate,
-            endDate,
+            startDate: effectiveStartDate,
+            duration
         })
     })
 
@@ -165,16 +172,8 @@ export const mapTasks = (tasks: Map<string, PrimaveraTask>, delays: Set<string>)
         return !delays.has(task.identifier)
     })
     return filtered.map((task: PrimaveraTask) => {
-        let date = task.startDate
-        let estimatedDuration = 0
-        if (task.startDate == null) {
-            date = task.endDate
-        }
-        if (task.startDate != null && task.endDate != null) {
-            estimatedDuration = dateutils.getDateDiff(task.startDate, task.endDate)
-        } else {
-            estimatedDuration = 0
-        }
+        const date = task.startDate
+        const estimatedDuration = task.duration
         const estimatedStartDate = (date as Date).toISOString()
 
         const returned: ApiInputTask = {
@@ -193,10 +192,7 @@ export const mapDelays = (tasks: Map<string, PrimaveraTask>, delays: Set<string>
         return delays.has(task.identifier)
     })
     return filtered.map((task: PrimaveraTask) => {
-        let date = task.endDate
-        if (task.endDate == null) {
-            date = task.startDate
-        }
+        let date = dateutils.addDays(task.startDate, task.duration)
         const convertedDate = (date as Date).toISOString()
 
         const returned: ApiInputDelay = {

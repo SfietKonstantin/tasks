@@ -14,7 +14,7 @@ import { copyAssign } from "../../../common/assign"
 const filterTasks = (tasks: Array<PrimaveraTask>, filters: TaskListFilters): Array<PrimaveraTask> => {
     const filterInterface: TaskListFilterInterface<PrimaveraTask> = {
         isMilestone: (task: PrimaveraTask): boolean => {
-            return task.startDate == null || task.endDate == null
+            return task.duration === 0
         },
         getIdentifier: (task: PrimaveraTask): string => {
             return task.identifier

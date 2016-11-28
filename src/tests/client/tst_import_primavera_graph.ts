@@ -12,37 +12,37 @@ describe("Primavera graph", () => {
                 identifier: "task11",
                 name: "Task 1-1",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("task12", {
                 identifier: "task12",
                 name: "Task 1-2",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("task13", {
                 identifier: "task13",
                 name: "Task 1-3",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("milestone", {
                 identifier: "milestone",
                 name: "Milestone",
-                startDate: null,
-                endDate: new Date(2016, 8, 16)
+                startDate: new Date(2016, 8, 16),
+                duration: 0
             })
             tasks.set("task21", {
                 identifier: "task21",
                 name: "Task 2-1",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             tasks.set("task22", {
                 identifier: "task21",
                 name: "Task 2-2",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             graph.addRelation({
                 previous: "task11",
@@ -134,25 +134,25 @@ describe("Primavera graph", () => {
                 identifier: "task11",
                 name: "Task 1-1",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("delay", {
                 identifier: "delay",
                 name: "Task delay",
                 startDate: new Date(2016, 8, 6),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("task21", {
                 identifier: "task21",
                 name: "Task 2-1",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             tasks.set("task22", {
                 identifier: "task21",
                 name: "Task 2-2",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             graph.addRelation({
                 previous: "task11",
@@ -206,25 +206,25 @@ describe("Primavera graph", () => {
                 identifier: "task1",
                 name: "Task 1",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("milestone1", {
                 identifier: "milestone1",
                 name: "Milestone 1",
-                startDate: null,
-                endDate: new Date(2016, 8, 16)
+                startDate: new Date(2016, 8, 16),
+                duration: 0
             })
             tasks.set("milestone2", {
                 identifier: "milestone2",
                 name: "Milestone 2",
                 startDate: new Date(2016, 8, 16),
-                endDate: null
+                duration: 0
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             graph.addRelation({
                 previous: "task1",
@@ -271,19 +271,19 @@ describe("Primavera graph", () => {
                 identifier: "task1",
                 name: "Task 1",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("milestone", {
                 identifier: "milestone",
                 name: "Milestone",
-                startDate: null,
-                endDate: new Date(2016, 8, 16)
+                startDate: new Date(2016, 8, 16),
+                duration: 0
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             graph.addRelation({
                 previous: "task1",
@@ -308,19 +308,19 @@ describe("Primavera graph", () => {
                 identifier: "task1",
                 name: "Task 1",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("milestone", {
                 identifier: "milestone",
                 name: "Milestone",
-                startDate: null,
-                endDate: new Date(2016, 8, 16)
+                startDate: new Date(2016, 8, 16),
+                duration: 0
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             graph.addRelation({
                 previous: "task1",
@@ -354,19 +354,19 @@ describe("Primavera graph", () => {
                 identifier: "task1",
                 name: "Task 1",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("delay", {
                 identifier: "delay",
                 name: "Task as delay",
                 startDate: new Date(2016, 8, 6),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             graph.addRelation({
                 previous: "task1",
@@ -400,19 +400,19 @@ describe("Primavera graph", () => {
                 identifier: "task1",
                 name: "Task 1",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("delay", {
                 identifier: "delay",
                 name: "Task as delay",
                 startDate: new Date(2016, 8, 6),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             graph.addRelation({
                 previous: "task1",
@@ -454,37 +454,37 @@ describe("Primavera graph", () => {
                 identifier: "task11",
                 name: "Task 1-1",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("task12", {
                 identifier: "task12",
                 name: "Task 1-2",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("task13", {
                 identifier: "task13",
                 name: "Task 1-3",
                 startDate: new Date(2016, 8, 1),
-                endDate: new Date(2016, 8, 16)
+                duration: 15
             })
             tasks.set("milestone", {
                 identifier: "milestone",
                 name: "Milestone",
-                startDate: null,
-                endDate: new Date(2016, 8, 16)
+                startDate: new Date(2016, 8, 16),
+                duration: 0
             })
             tasks.set("task21", {
                 identifier: "task21",
                 name: "Task 2-1",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             tasks.set("task22", {
                 identifier: "task21",
                 name: "Task 2-2",
                 startDate: new Date(2016, 8, 16),
-                endDate: new Date(2016, 8, 26)
+                duration: 10
             })
             graph.addRelation({
                 previous: "task11",

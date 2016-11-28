@@ -39,7 +39,7 @@ describe("Primavera import", () => {
                 identifier: "id",
                 name: "Task",
                 startDate: new Date(2016, 1, 1),
-                endDate: new Date(2016, 1, 26)
+                duration: 25
             }
             chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
@@ -68,7 +68,7 @@ describe("Primavera import", () => {
                 identifier: "id",
                 name: "Task 1",
                 startDate: new Date(2016, 1, 1),
-                endDate: new Date(2016, 1, 26)
+                duration: 25
             }
             chai.expect(results).to.length(2)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
@@ -81,7 +81,7 @@ describe("Primavera import", () => {
                 identifier: "id",
                 name: "Task",
                 startDate: new Date(2016, 1, 1),
-                endDate: null
+                duration: 0
             }
             chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
@@ -93,8 +93,8 @@ describe("Primavera import", () => {
             const expected: PrimaveraTask = {
                 identifier: "id",
                 name: "Task",
-                startDate: null,
-                endDate: new Date(2016, 1, 26)
+                startDate: new Date(2016, 1, 26),
+                duration: 0
             }
             chai.expect(results).to.length(1)
             chai.expect(results.tasks.get("id")).to.deep.equal(expected)
@@ -215,13 +215,13 @@ describe("Primavera import", () => {
                 identifier: "task1",
                 name: "Task 1",
                 startDate: new Date(2016, 9, 1),
-                endDate: new Date(2016, 9, 16)
+                duration: 15
             })
             input.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
                 startDate: new Date(2016, 9, 1),
-                endDate: null
+                duration: 0
             })
             const expected: Array<ApiInputTask> = [
                 {
@@ -249,25 +249,25 @@ describe("Primavera import", () => {
                 identifier: "task1",
                 name: "Task 1",
                 startDate: new Date(2016, 9, 1),
-                endDate: new Date(2016, 9, 16)
+                duration: 15
             })
             tasks.set("task2", {
                 identifier: "task2",
                 name: "Task 2",
                 startDate: new Date(2016, 9, 1),
-                endDate: new Date(2016, 9, 16)
+                duration: 15
             })
             tasks.set("task3", {
                 identifier: "task3",
                 name: "Task 3",
                 startDate: new Date(2016, 9, 1),
-                endDate: new Date(2016, 9, 16)
+                duration: 15
             })
             tasks.set("task4", {
                 identifier: "task4",
                 name: "Task 4",
                 startDate: new Date(2016, 9, 1),
-                endDate: new Date(2016, 9, 16)
+                duration: 15
             })
             const relations: Array<PrimaveraTaskRelation> = [
                 {
