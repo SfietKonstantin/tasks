@@ -54,12 +54,12 @@ class UnconnectedMain extends React.Component<MainProperties, MainState> {
 const mapStateToProps = (state: State) => {
     const project = state.task.project
     const apiTask = state.task.task
-    const task = project && apiTask ? apitypes.createTaskFromApiTask(project, apiTask) : null
+    const task = project && apiTask ? apitypes.createTaskFromApiTask(apiTask) : null
     return {
         projectIdentifier: state.projectIdentifier,
         taskIdentifier: state.taskIdentifier,
-        project: state.task.project,
-        task: task
+        project,
+        task
     }
 }
 

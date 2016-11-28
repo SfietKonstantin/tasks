@@ -9,36 +9,36 @@ import { filterTasks } from "../../client/project/actions/tasks"
 import * as projectActions from "../../client/project/actions/tasks"
 import { TaskListFilters } from "../../client/common/tasklistfilters"
 import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
-import { ApiTask } from "../../common/apitypes"
+import { Task } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Project components", () => {
-    const tasks: Array<ApiTask> = [
+    const tasks: Array<Task> = [
         {
             identifier: "task1",
             name: "Task 1",
             description: "Description 1",
-            estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+            estimatedStartDate: new Date(2016, 9, 1),
             estimatedDuration: 30,
-            startDate: new Date(2016, 9, 1).toISOString(),
+            startDate: new Date(2016, 9, 1),
             duration: 30
         },
         {
             identifier: "task2",
             name: "Task 2",
             description: "Description 2",
-            estimatedStartDate: new Date(2016, 9, 5).toISOString(),
+            estimatedStartDate: new Date(2016, 9, 5),
             estimatedDuration: 15,
-            startDate: new Date(2016, 9, 5).toISOString(),
+            startDate: new Date(2016, 9, 5),
             duration: 15
         },
         {
             identifier: "task3",
             name: "Task 3",
             description: "Description 3",
-            estimatedStartDate: new Date(2016, 10, 1).toISOString(),
+            estimatedStartDate: new Date(2016, 10, 1),
             estimatedDuration: 0,
-            startDate: new Date(2016, 10, 1).toISOString(),
+            startDate: new Date(2016, 10, 1),
             duration: 0
         }
     ]

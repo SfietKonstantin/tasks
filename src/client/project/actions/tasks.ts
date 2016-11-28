@@ -1,7 +1,8 @@
 import { Action, Dispatch } from "redux"
 import { State, TaskFilters } from "../types"
 import { processError } from "../../common/actions/errors"
-import { ApiTask } from "../../../common/apitypes"
+import { ApiTask, createTaskFromApiTask } from "../../../common/apitypes"
+import { Task } from "../../../common/types"
 
 export const TASKS_REQUEST = "TASKS_REQUEST"
 export const TASKS_RECEIVE = "TASKS_RECEIVE"
@@ -10,7 +11,7 @@ export const TASKS_FILTER_DISPLAY = "TASKS_FILTER_DISPLAY"
 
 export interface TasksAction extends Action {
     type: string,
-    tasks: Array<ApiTask>
+    tasks: Array<Task>
 }
 
 export const requestTasks = (): Action => {
@@ -19,7 +20,7 @@ export const requestTasks = (): Action => {
     }
 }
 
-export const receiveTasks = (tasks: Array<ApiTask>): TasksAction => {
+export const receiveTasks = (tasks: Array<Task>): TasksAction => {
     return {
         type: TASKS_RECEIVE,
         tasks
@@ -37,7 +38,10 @@ export const fetchTasks = (projectIdentifier: string) => {
         dispatch(requestTasks())
         return fetch("/api/project/" + projectIdentifier + "/tasks").then((response: Response) => {
             return processError(response)
-        }).then((tasks: Array<ApiTask>) => {
+        }).then((apiTasks: Array<ApiTask>) => {
+            const tasks = apiTasks.map((apiTask: ApiTask) => {
+                return createTaskFromApiTask(apiTask)
+            })
             dispatch(receiveTasks(tasks))
         }).catch(() => {
             dispatch(receiveFailureTasks())

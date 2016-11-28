@@ -6,7 +6,6 @@ import { Provider } from "react-redux"
 import { State } from "./task/types"
 import { mainReducer } from "./task/reducers/main"
 import { Main } from "./task/containers/main"
-import { ApiTask } from "../common/apitypes"
 
 interface RootProperties {
     store: Redux.Store<State>

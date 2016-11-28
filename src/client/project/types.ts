@@ -1,5 +1,5 @@
 import { Project } from "../../common/types"
-import { ApiTask } from "../../common/apitypes"
+import { Task } from "../../common/types"
 import { TaskListFilters } from "../common/tasklistfilters"
 
 export interface State {
@@ -21,8 +21,8 @@ export interface TaskFilters extends TaskListFilters {
 
 export interface TasksState {
     isFetching: boolean
-    tasks: Array<ApiTask>
+    tasks: Array<Task>
     filters: TaskFilters
     today: Date | null
-    filteredTasks: Array<ApiTask>
+    filteredTasks: Array<Task>
 }

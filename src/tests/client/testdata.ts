@@ -1,5 +1,6 @@
 import { Project, TaskRelation, DelayRelation, TaskLocation } from "../../common/types"
-import { ApiTask, ApiInputTask, ApiInputDelay } from "../../common/apitypes"
+import { ApiInputTask, ApiInputDelay } from "../../common/apitypes"
+import { Task } from "../../common/types"
 import { PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import { RelationGraph } from "../../client/imports/primavera/graph"
 import { MilestoneFilterMode, TaskListFilters } from "../../client/common/tasklistfilters"
@@ -43,50 +44,50 @@ warnings.set("task2", ["Warning 3"])
 
 export const noWarnings = new Map<string, Array<string>>()
 
-export const apiTasks: Array<ApiTask> = [
+export const tasks: Array<Task> = [
     {
         identifier: "task1",
         name: "Task 1",
         description: "Description 1",
-        estimatedStartDate: new Date(2016, 8, 1).toISOString(),
+        estimatedStartDate: new Date(2016, 8, 1),
         estimatedDuration: 15,
-        startDate: new Date(2016, 8, 1).toISOString(),
+        startDate: new Date(2016, 8, 1),
         duration: 15
     },
     {
         identifier: "task2",
         name: "Task 2",
         description: "Description 2",
-        estimatedStartDate: new Date(2016, 8, 15).toISOString(),
+        estimatedStartDate: new Date(2016, 8, 15),
         estimatedDuration: 30,
-        startDate: new Date(2016, 8, 15).toISOString(),
+        startDate: new Date(2016, 8, 15),
         duration: 30
     },
     {
         identifier: "task3",
         name: "Task 3",
         description: "Description 3",
-        estimatedStartDate: new Date(2016, 9, 15).toISOString(),
+        estimatedStartDate: new Date(2016, 9, 15),
         estimatedDuration: 30,
-        startDate: new Date(2016, 9, 15).toISOString(),
+        startDate: new Date(2016, 9, 15),
         duration: 30
     },
     {
         identifier: "milestone1",
         name: "Milestone 1",
         description: "Description 4",
-        estimatedStartDate: new Date(2016, 8, 14).toISOString(),
+        estimatedStartDate: new Date(2016, 8, 14),
         estimatedDuration: 0,
-        startDate: new Date(2016, 8, 14).toISOString(),
+        startDate: new Date(2016, 8, 14),
         duration: 0
     },
     {
         identifier: "milestone2",
         name: "Milestone 2",
         description: "Description 5",
-        estimatedStartDate: new Date(2016, 9, 14).toISOString(),
+        estimatedStartDate: new Date(2016, 9, 14),
         estimatedDuration: 0,
-        startDate: new Date(2016, 9, 14).toISOString(),
+        startDate: new Date(2016, 9, 14),
         duration: 0
     }
 ]

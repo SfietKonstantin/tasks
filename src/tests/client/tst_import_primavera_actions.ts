@@ -32,7 +32,7 @@ import { FakeFile } from "./fakefile"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { makeRelations } from "./primaverahelper"
 import {
-    warnings, noWarnings, project, apiTasks, primaveraTasks1, primaveraRelations1,
+    warnings, noWarnings, project, tasks, primaveraTasks1, primaveraRelations1,
     selectedDelays1, inputTasks1, inputDelays1, inputTaskRelations1, inputDelayRelations1
 } from "./testdata"
 import { expectMapEqual } from "./expectutils"

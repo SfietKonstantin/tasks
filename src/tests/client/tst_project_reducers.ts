@@ -8,10 +8,9 @@ import {
     State, ProjectState, TaskFilters, TasksState
 } from "../../client/project/types"
 import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
-import { Project } from "../../common/types"
-import { ApiTask } from "../../common/apitypes"
+import { Project, Task } from "../../common/types"
 import { FakeResponse } from "./fakeresponse"
-import { cloneObject, project, apiTasks, cloneArray } from "./testdata"
+import { cloneObject, project, tasks, cloneArray } from "./testdata"
 import * as states from "../../client/project/states"
 
 describe("Project reducers", () => {
@@ -36,7 +35,7 @@ describe("Project reducers", () => {
             },
             tasks: {
                 isFetching: true,
-                tasks: cloneArray(apiTasks),
+                tasks: cloneArray(tasks),
                 filters: {
                     notStartedChecked: true,
                     inProgressChecked: true,
@@ -45,7 +44,7 @@ describe("Project reducers", () => {
                     text: "Some filter"
                 },
                 today: new Date(2016, 9, 1),
-                filteredTasks: cloneArray(apiTasks)
+                filteredTasks: cloneArray(tasks)
             }
         }
     })
@@ -90,13 +89,13 @@ describe("Project reducers", () => {
         })
         it("Should reduce TASKS_RECEIVE", () => {
             const checkState = (initialState: State) => {
-                const state = main.mainReducer(initialState, receiveTasks(cloneArray(apiTasks)))
-                const expected: Array<ApiTask> = [
-                    apiTasks[0],
-                    apiTasks[3],
-                    apiTasks[1],
-                    apiTasks[4],
-                    apiTasks[2]
+                const state = main.mainReducer(initialState, receiveTasks(cloneArray(tasks)))
+                const expected: Array<Task> = [
+                    tasks[0],
+                    tasks[3],
+                    tasks[1],
+                    tasks[4],
+                    tasks[2]
                 ]
                 chai.expect(state.tasks.isFetching).to.false
                 chai.expect(state.tasks.tasks).to.deep.equal(expected)
@@ -114,7 +113,7 @@ describe("Project reducers", () => {
         })
         it("Should reduce TASKS_FILTER_DISPLAY 1", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.tasks = cloneArray(apiTasks)
+                initialState.tasks.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: true,
                     inProgressChecked: false,
@@ -126,8 +125,8 @@ describe("Project reducers", () => {
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
                 chai.expect(state.tasks.today).to.deep.equal(new Date(2016, 9, 1))
                 chai.expect(state.tasks.filteredTasks).to.deep.equal([
-                    apiTasks[4],
-                    apiTasks[2]
+                    tasks[4],
+                    tasks[2]
                 ])
             }
             checkState(initialState1)
@@ -135,7 +134,7 @@ describe("Project reducers", () => {
         })
         it("Should reduce TASKS_FILTER_DISPLAY 2", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.tasks = cloneArray(apiTasks)
+                initialState.tasks.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: false,
                     inProgressChecked: true,
@@ -146,14 +145,14 @@ describe("Project reducers", () => {
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
                 chai.expect(state.tasks.today).to.deep.equal(new Date(2016, 9, 1))
-                chai.expect(state.tasks.filteredTasks).to.deep.equal([ apiTasks[1] ])
+                chai.expect(state.tasks.filteredTasks).to.deep.equal([ tasks[1] ])
             }
             checkState(initialState1)
             checkState(initialState2)
         })
         it("Should reduce TASKS_FILTER_DISPLAY 3", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.tasks = cloneArray(apiTasks)
+                initialState.tasks.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: false,
                     inProgressChecked: false,
@@ -165,8 +164,8 @@ describe("Project reducers", () => {
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
                 chai.expect(state.tasks.today).to.deep.equal(new Date(2016, 9, 1))
                 chai.expect(state.tasks.filteredTasks).to.deep.equal([
-                    apiTasks[0],
-                    apiTasks[3]
+                    tasks[0],
+                    tasks[3]
                 ])
             }
             checkState(initialState1)
@@ -174,7 +173,7 @@ describe("Project reducers", () => {
         })
         it("Should reduce TASKS_FILTER_DISPLAY 4", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.tasks = cloneArray(apiTasks)
+                initialState.tasks.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: true,
                     inProgressChecked: true,
@@ -186,9 +185,9 @@ describe("Project reducers", () => {
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
                 chai.expect(state.tasks.today).to.deep.equal(new Date(2016, 9, 1))
                 chai.expect(state.tasks.filteredTasks).to.deep.equal([
-                    apiTasks[0],
-                    apiTasks[1],
-                    apiTasks[2]
+                    tasks[0],
+                    tasks[1],
+                    tasks[2]
                 ])
             }
             checkState(initialState1)
@@ -196,7 +195,7 @@ describe("Project reducers", () => {
         })
         it("Should reduce TASKS_FILTER_DISPLAY 5", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.tasks = cloneArray(apiTasks)
+                initialState.tasks.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: true,
                     inProgressChecked: true,
@@ -208,8 +207,8 @@ describe("Project reducers", () => {
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
                 chai.expect(state.tasks.today).to.deep.equal(new Date(2016, 9, 1))
                 chai.expect(state.tasks.filteredTasks).to.deep.equal([
-                    apiTasks[3],
-                    apiTasks[4]
+                    tasks[3],
+                    tasks[4]
                 ])
             }
             checkState(initialState1)
@@ -217,7 +216,7 @@ describe("Project reducers", () => {
         })
         it("Should reduce TASKS_FILTER_DISPLAY 5", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.tasks = cloneArray(apiTasks)
+                initialState.tasks.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: true,
                     inProgressChecked: true,
@@ -229,8 +228,8 @@ describe("Project reducers", () => {
                 chai.expect(state.tasks.filters).to.deep.equal(filters)
                 chai.expect(state.tasks.today).to.deep.equal(new Date(2016, 9, 1))
                 chai.expect(state.tasks.filteredTasks).to.deep.equal([
-                    apiTasks[0],
-                    apiTasks[3]
+                    tasks[0],
+                    tasks[3]
                 ])
             }
             checkState(initialState1)

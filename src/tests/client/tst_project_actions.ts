@@ -13,7 +13,7 @@ import {
 } from "../../client/project/actions/tasks"
 import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
 import { Project } from "../../common/types"
-import { ApiTask } from "../../common/apitypes"
+import { Task } from "../../common/types"
 import { FakeResponse } from "./fakeresponse"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { project } from "./testdata"
@@ -135,23 +135,23 @@ describe("Project actions", () => {
             })
             it("Should GET tasks", (done) => {
                 // Mock
-                const tasks: Array<ApiTask> = [
+                const tasks: Array<Task> = [
                     {
                         identifier: "task1",
                         name: "Task 1",
                         description: "Description 1",
-                        estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+                        estimatedStartDate: new Date(2016, 9, 1),
                         estimatedDuration: 30,
-                        startDate: new Date(2016, 9, 1).toISOString(),
+                        startDate: new Date(2016, 9, 1),
                         duration: 30
                     },
                     {
                         identifier: "task2",
                         name: "Task 2",
                         description: "Description 2",
-                        estimatedStartDate: new Date(2016, 10, 1).toISOString(),
+                        estimatedStartDate: new Date(2016, 10, 1),
                         estimatedDuration: 15,
-                        startDate: new Date(2016, 10, 1).toISOString(),
+                        startDate: new Date(2016, 10, 1),
                         duration: 15
                     }
                 ]

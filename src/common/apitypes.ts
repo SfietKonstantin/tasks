@@ -53,7 +53,7 @@ export const createApiTask = (task: TaskDefinition, startDate: Date, duration: n
     }
 }
 
-export const createTaskFromApiTask = (project: Project, apiTask: ApiTask): Task => {
+export const createTaskFromApiTask = (apiTask: ApiTask): Task => {
     return {
         identifier: apiTask.identifier,
         name: apiTask.name,

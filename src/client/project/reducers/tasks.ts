@@ -1,7 +1,7 @@
 import { Action } from "redux"
 import { TasksState, TaskFilters } from "../types"
 import { MilestoneFilterMode, TaskListFilterInterface, filterTaskList } from "../../common/tasklistfilters"
-import { ApiTask } from "../../../common/apitypes"
+import { Task } from "../../../common/types"
 import {
     TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE,
     TASKS_FILTER_DISPLAY
@@ -11,26 +11,26 @@ import { copyAssign } from "../../common/assign"
 import * as dateutils from "../../../common/dateutils"
 import * as latinize from "latinize"
 
-const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | null): Array<ApiTask> => {
+const filterTasks = (tasks: Array<Task>, filters: TaskFilters, today: Date | null): Array<Task> => {
     if (!today) {
         return []
     }
 
-    const filterInterface: TaskListFilterInterface<ApiTask> = {
-        isMilestone: (task: ApiTask): boolean => {
+    const filterInterface: TaskListFilterInterface<Task> = {
+        isMilestone: (task: Task): boolean => {
             return task.estimatedDuration === 0
         },
-        getIdentifier: (task: ApiTask): string => {
+        getIdentifier: (task: Task): string => {
             return task.identifier
         },
-        getName: (task: ApiTask): string => {
+        getName: (task: Task): string => {
             return task.name
         }
     }
 
     const initialFiltered = filterTaskList(tasks, filters, filterInterface)
     const todayTime = today.getTime()
-    const filtered = initialFiltered.filter((task: ApiTask) => {
+    const filtered = initialFiltered.filter((task: Task) => {
         const startDate = new Date(task.startDate).getTime()
         const endDate = dateutils.addDays(new Date(task.startDate), task.duration).getTime()
         if (filters.notStartedChecked && startDate >= todayTime) {
@@ -44,8 +44,8 @@ const filterTasks = (tasks: Array<ApiTask>, filters: TaskFilters, today: Date | 
         }
         return false
     })
-    return filtered.sort((first: ApiTask, second: ApiTask) => {
-        return new Date(first.estimatedStartDate).getTime() - new Date(second.estimatedStartDate).getTime()
+    return filtered.sort((first: Task, second: Task) => {
+        return first.estimatedStartDate.getTime() - second.estimatedStartDate.getTime()
     })
 }
 
@@ -55,10 +55,8 @@ export const tasksReducer = (state: TasksState = tasks, action: Action): TasksSt
             return copyAssign(state, { isFetching: true })
         case TASKS_RECEIVE:
             const tasksAction = action as TasksAction
-            const tasks = tasksAction.tasks.sort((first: ApiTask, second: ApiTask): number => {
-                const firstDate = new Date(first.estimatedStartDate).getTime()
-                const secondDate = new Date(second.estimatedStartDate).getTime()
-                return firstDate - secondDate
+            const tasks = tasksAction.tasks.sort((first: Task, second: Task): number => {
+                return first.estimatedStartDate.getTime() - second.estimatedStartDate.getTime()
             })
             return copyAssign(state, {
                 isFetching: false,
