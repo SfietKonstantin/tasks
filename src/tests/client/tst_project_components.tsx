@@ -10,7 +10,7 @@ import { Overview } from "../../client/project/components/overview"
 import { TasksHeader } from "../../client/project/components/tasksheader"
 import { AllTasks } from "../../client/project/components/alltasks"
 import { TaskFilters } from "../../client/project/types"
-import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
+import { MilestoneFilterMode } from "../../client/common/tasklist/types"
 import { Project } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 

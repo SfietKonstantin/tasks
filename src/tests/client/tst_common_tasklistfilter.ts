@@ -1,7 +1,6 @@
 import * as chai from "chai"
-import {
-    TaskListFilters, MilestoneFilterMode, filterTaskList
-} from "../../client/common/tasklistfilters"
+import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklist/types"
+import { filterTaskList } from "../../client/common/tasklist/tasklistfilters"
 
 export interface FakeTask {
     identifier: string

@@ -5,9 +5,8 @@ import {
 import { DelaysState, PrimaveraTask } from "../types"
 import { GraphDiff, RelationGraph } from "../graph"
 import { delays } from "../states"
-import {
-    MilestoneFilterMode, TaskListFilters, filterTaskList
-} from "../../../common/tasklistfilters"
+import { MilestoneFilterMode, TaskListFilters } from "../../../common/tasklist/types"
+import { filterTaskList } from "../../../common/tasklist/tasklistfilters"
 import { sortStrings } from "../../../../common/stringutils"
 import { copyAssign } from "../../../common/assign"
 

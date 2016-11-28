@@ -2,9 +2,9 @@ import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { Row, Col, ListGroup, FormGroup, FormControl } from "react-bootstrap"
 import { TaskListFiltersToolbar } from "./tasklistfilterstoolbar"
-import { TaskListFilters, Task } from "../tasklistfilters"
-import { StatusIndicator, Status } from "../../common/components/statusindicator"
-import { assign } from "../../common/assign"
+import { TaskListFilters, Task } from "../types"
+import { StatusIndicator, Status } from "../../../common/components/statusindicator"
+import { assign } from "../../../common/assign"
 
 export interface TaskListProperties<T extends Task, F extends TaskListFilters> {
     tasks: Array<T>

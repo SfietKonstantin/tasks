@@ -1,6 +1,7 @@
 import { Action } from "redux"
 import { TasksState, TaskFilters } from "../types"
-import { MilestoneFilterMode, filterTaskList } from "../../common/tasklistfilters"
+import { MilestoneFilterMode } from "../../common/tasklist/types"
+import { filterTaskList } from "../../common/tasklist/tasklistfilters"
 import { Task } from "../../../common/types"
 import {
     TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE,

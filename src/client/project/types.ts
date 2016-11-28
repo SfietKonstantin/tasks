@@ -1,6 +1,6 @@
 import { Project } from "../../common/types"
 import { Task } from "../../common/types"
-import { TaskListFilters } from "../common/tasklistfilters"
+import { TaskListFilters } from "../common/tasklist/types"
 
 export interface State {
     projectIdentifier: string

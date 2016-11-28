@@ -11,7 +11,7 @@ import {
     TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE,
     TASKS_RECEIVE_FAILURE, TASKS_FILTER_DISPLAY, fetchTasks, filterTasks
 } from "../../client/project/actions/tasks"
-import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
+import { MilestoneFilterMode } from "../../client/common/tasklist/types"
 import { Project } from "../../common/types"
 import { Task } from "../../common/types"
 import { FakeResponse } from "./fakeresponse"

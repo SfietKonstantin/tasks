@@ -1,5 +1,5 @@
 import { ProjectState, TasksState, TaskFilters } from "./types"
-import { MilestoneFilterMode } from "../common/tasklistfilters"
+import { MilestoneFilterMode } from "../common/tasklist/types"
 
 export const project: ProjectState = {
     isFetching: false,

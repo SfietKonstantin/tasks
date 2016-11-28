@@ -1,20 +1,5 @@
 import * as latinize from "latinize"
-
-export enum MilestoneFilterMode {
-    NoFilter,
-    TasksOnly,
-    MilestonesOnly
-}
-export interface TaskListFilters {
-    milestoneFilterMode: MilestoneFilterMode
-    text: string
-}
-
-export interface Task {
-    identifier: string
-    name: string
-    duration: number
-}
+import { Task, TaskListFilters, MilestoneFilterMode } from "./types"
 
 export const filterTaskList = <T extends Task>(tasks: Array<T>, filters: TaskListFilters): Array<T> => {
     return tasks.filter((task: T) => {

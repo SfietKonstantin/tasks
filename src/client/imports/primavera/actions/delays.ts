@@ -1,7 +1,7 @@
 import { Action, Dispatch } from "redux"
 import { State, PrimaveraTask } from "../types"
 import { RelationGraphNode } from "../graph"
-import { TaskListFilters } from "../../../common/tasklistfilters"
+import { TaskListFilters } from "../../../common/tasklist/types"
 
 export const DELAY_FILTERS_DEFINE = "DELAY_FILTERS_DEFINE"
 export const DELAY_SELECTION_DEFINE = "DELAY_SELECTION_DEFINE"

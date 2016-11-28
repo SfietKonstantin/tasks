@@ -5,10 +5,10 @@ import { Nav, NavItem } from "react-bootstrap"
 import * as sinon from "sinon"
 import { Header } from "../../client/common/components/header"
 import { TabBar } from "../../client/common/components/tabs"
-import { TaskListFiltersToolbar } from "../../client/common/components/tasklistfilterstoolbar"
+import { TaskListFiltersToolbar } from "../../client/common/tasklist/components/tasklistfilterstoolbar"
 import { Status, StatusIndicator } from "../../client/common/components/statusindicator"
-import { TaskList, TaskListProperties } from "../../client/common/components/tasklist"
-import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklistfilters"
+import { TaskList, TaskListProperties } from "../../client/common/tasklist/components/tasklist"
+import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklist/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
 describe("Common components", () => {

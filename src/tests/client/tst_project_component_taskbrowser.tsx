@@ -7,8 +7,8 @@ import { TaskBrowser, mapDispatchToProps } from "../../client/project/components
 import { TaskFilters } from "../../client/project/types"
 import { filterTasks } from "../../client/project/actions/tasks"
 import * as projectActions from "../../client/project/actions/tasks"
-import { TaskListFilters } from "../../client/common/tasklistfilters"
-import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
+import { TaskListFilters } from "../../client/common/tasklist/types"
+import { MilestoneFilterMode } from "../../client/common/tasklist/types"
 import { Task } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 

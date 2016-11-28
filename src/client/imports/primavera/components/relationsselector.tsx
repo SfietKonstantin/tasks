@@ -6,7 +6,7 @@ import { FileSelector } from "./fileselector"
 import { defineStage, defineMaxStage } from "../actions/stages"
 import { importRelations, dismissInvalidRelationsFormat } from "../actions/relations"
 import { defineDelayFilters } from "../actions/delays"
-import { MilestoneFilterMode, TaskListFilters } from "../../../common/tasklistfilters"
+import { MilestoneFilterMode, TaskListFilters } from "../../../common/tasklist/types"
 
 interface RelationsSelectorProperties {
     stage: Stage

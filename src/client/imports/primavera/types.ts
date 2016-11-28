@@ -1,7 +1,7 @@
 import { Project, TaskRelation, DelayRelation } from "../../../common/types"
 import { ApiInputTask, ApiInputDelay } from "../../../common/apitypes"
 import { RelationGraphNode, GraphDiff } from "./graph"
-import { TaskListFilters } from "../../common/tasklistfilters"
+import { TaskListFilters } from "../../common/tasklist/types"
 
 export enum Stage {
     Project,

@@ -7,7 +7,7 @@ import * as taskBrowser from "../../client/project/components/taskbrowser"
 import {
     State, ProjectState, TaskFilters, TasksState
 } from "../../client/project/types"
-import { MilestoneFilterMode } from "../../client/common/tasklistfilters"
+import { MilestoneFilterMode } from "../../client/common/tasklist/types"
 import { Project, Task } from "../../common/types"
 import { FakeResponse } from "./fakeresponse"
 import { cloneObject, project, tasks, cloneArray } from "./testdata"
