@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Dispatch } from "redux"
 import { ListGroupItem, ButtonGroup, Button, Label, Checkbox } from "react-bootstrap"
-import { TaskList } from "../../../common/components/tasklist"
+import { TaskList, TaskListProperties } from "../../../common/components/tasklist"
 import { TaskListFilters, MilestoneFilterMode } from "../../../common/tasklistfilters"
 import { State, Stage, PrimaveraTask } from "../types"
 import { RelationGraphNode } from "../graph"
@@ -11,6 +11,29 @@ import { defineStage, defineMaxStage } from "../actions/stages"
 import { defineDelayFilters, defineDelaySelection } from "../actions/delays"
 import { filterForOverview } from "../actions/overview"
 import * as maputils from "../../../../common/maputils"
+
+interface PrimaveraTaskListProperties extends TaskListProperties<PrimaveraTask, TaskListFilters> {
+    selection: Set<string>
+    onSelectionChanged: (identifier: string, selected: boolean) => void
+}
+
+class PrimaveraTaskList extends TaskList<PrimaveraTask, TaskListFilters, PrimaveraTaskListProperties> {
+    constructor(props: PrimaveraTaskListProperties) {
+        super(props)
+    }
+    protected createElement(task: PrimaveraTask): JSX.Element {
+        return <ListGroupItem key={task.identifier}>
+            <Checkbox inline onClick={this.handleSelectionChanged.bind(this, task.identifier)}
+                      checked={this.props.selection.has(task.identifier)}>
+                {task.name} <span className="text-muted">#{task.identifier}</span>
+            </Checkbox>
+        </ListGroupItem>
+    }
+    private handleSelectionChanged(identifier: string, e: React.MouseEvent) {
+        const input = e.target as HTMLInputElement
+        this.props.onSelectionChanged(identifier, input.checked)
+    }
+}
 
 interface DelaysSelectorProperties {
     stage: Stage
@@ -29,8 +52,6 @@ interface DelaysSelectorProperties {
                   relations: Map<string, RelationGraphNode>) => void
 }
 
-class PrimaveraTaskList extends TaskList<PrimaveraTask> {}
-
 export class DelaysSelector extends React.Component<DelaysSelectorProperties, {}> {
     render() {
         let warningsButton: JSX.Element | null = null
@@ -42,8 +63,9 @@ export class DelaysSelector extends React.Component<DelaysSelectorProperties, {}
                            maxStage={this.props.maxStage} title="4. Select delays"
                            warnings={totalWarnings} onCurrent={this.props.onCurrentStage.bind(this)}>
             <PrimaveraTaskList tasks={this.props.filteredTasks}
-                               createElement={this.createTaskElement.bind(this)}
                                filters={this.props.filters}
+                               selection={this.props.selection}
+                               onSelectionChanged={this.handleSelectionChanged.bind(this)}
                                onFiltersChanged={this.handleFiltersChanged.bind(this)} >
                 <span className="import-primavera-delay-indicator">
                     <Label bsStyle="primary">{this.props.selection.size}</Label> delays selected
@@ -57,20 +79,11 @@ export class DelaysSelector extends React.Component<DelaysSelectorProperties, {}
             </PrimaveraTaskList>
         </StagePanel>
     }
-    private createTaskElement(task: PrimaveraTask): JSX.Element {
-        return <ListGroupItem key={task.identifier}>
-            <Checkbox inline onClick={this.handleSelectionChanged.bind(this, task.identifier)}
-                      checked={this.props.selection.has(task.identifier)}>
-                {task.name} <span className="text-muted">#{task.identifier}</span>
-            </Checkbox>
-        </ListGroupItem>
+    private handleSelectionChanged(identifier: string, selected: boolean) {
+        this.props.onSelectionChanged(this.props.tasks, this.props.relations, identifier, selected)
     }
     private handleFiltersChanged(filters: TaskListFilters) {
         this.props.onFiltersChanged(this.props.tasks, filters)
-    }
-    private handleSelectionChanged(identifier: string, e: React.MouseEvent) {
-        const input = e.target as HTMLInputElement
-        this.props.onSelectionChanged(this.props.tasks, this.props.relations, identifier, input.checked)
     }
     private handleNext(e: React.MouseEvent) {
         this.props.onNextStage(this.props.tasks, this.props.selection, this.props.relations)

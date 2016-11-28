@@ -3,37 +3,23 @@ import { Dispatch } from "redux"
 import { State, TaskFilters } from "../types"
 import { fetchTasks, filterTasks } from "../actions/tasks"
 import { ListGroupItem } from "react-bootstrap"
-import { TaskList } from "../../common/components/tasklist"
+import { TaskList, TaskListProperties } from "../../common/components/tasklist"
 import { TaskListFilters } from "../../common/tasklistfilters"
 import { assign } from "../../common/assign"
 import { TasksHeader } from "../components/tasksheader"
 import { Task } from "../../../common/types"
 
-interface TaskBrowserProperties {
+interface ApiTaskListProperties extends TaskListProperties<Task, TaskFilters> {
     projectIdentifier: string
-    tasks: Array<Task>
-    filters: TaskFilters
-    onFiltersChanged: (projectIdentifier: string, filters: TaskFilters) => void
-    onFetchTasks: (projectIdentifier: string) => void
 }
 
-class ApiTaskList extends TaskList<Task> {}
-
-export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
-    render() {
-        return <ApiTaskList tasks={this.props.tasks} createElement={this.createTaskElement.bind(this)}
-                            filters={this.props.filters}
-                            onFiltersChanged={this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)} >
-            <TasksHeader filters={this.props.filters}
-                         onFiltersChanged={this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)} />
-        </ApiTaskList>
+class ApiTaskList extends TaskList<Task, TaskFilters, ApiTaskListProperties> {
+    constructor(props: ApiTaskListProperties) {
+        super(props)
     }
-    componentDidMount() {
-        this.props.onFetchTasks(this.props.projectIdentifier)
-    }
-    private createTaskElement(task: Task): JSX.Element {
+    protected createElement(task: Task): JSX.Element {
         const taskLink = "/project/" + this.props.projectIdentifier + "/task/" + task.identifier
-        const milestoneIndicator = TaskBrowser.createMilestoneIndicator(task)
+        const milestoneIndicator = ApiTaskList.createMilestoneIndicator(task)
         return <ListGroupItem href={taskLink} key={task.identifier}>
             <span className="common-task-indicator">{milestoneIndicator}</span>
             <span>{task.name} </span>
@@ -45,6 +31,28 @@ export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
             return null
         }
         return <span className="glyphicon glyphicon-flag"></span>
+    }
+}
+
+interface TaskBrowserProperties {
+    projectIdentifier: string
+    tasks: Array<Task>
+    filters: TaskFilters
+    onFiltersChanged: (projectIdentifier: string, filters: TaskFilters) => void
+    onFetchTasks: (projectIdentifier: string) => void
+}
+
+export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
+    render() {
+        return <ApiTaskList projectIdentifier={this.props.projectIdentifier} tasks={this.props.tasks}
+                            filters={this.props.filters}
+                            onFiltersChanged={this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)} >
+            <TasksHeader filters={this.props.filters}
+                         onFiltersChanged={this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)} />
+        </ApiTaskList>
+    }
+    componentDidMount() {
+        this.props.onFetchTasks(this.props.projectIdentifier)
     }
 }
 

@@ -1,42 +1,41 @@
 import * as chai from "chai"
 import {
-    TaskListFilters, TaskListFilterInterface, MilestoneFilterMode, filterTaskList
+    TaskListFilters, MilestoneFilterMode, filterTaskList
 } from "../../client/common/tasklistfilters"
-import { FakeTask, isMilestone, getIdentifier, getName } from "./faketask"
+
+export interface FakeTask {
+    identifier: string
+    name: string
+    duration: number
+}
 
 const tasks: Array<FakeTask> = [
     {
         identifier: "task1",
         name: "My first",
-        isMilestone: false
+        duration: 10
     },
     {
         identifier: "task2",
         name: "A second",
-        isMilestone: false
+        duration: 20
     },
     {
         identifier: "task3",
         name: "A third",
-        isMilestone: false
+        duration: 30
     },
     {
         identifier: "milestone1",
         name: "Milestone",
-        isMilestone: true
+        duration: 0
     },
     {
         identifier: "milestone2",
         name: "My milestone",
-        isMilestone: true
+        duration: 0
     }
 ]
-
-const filterInterface: TaskListFilterInterface<FakeTask> = {
-    isMilestone,
-    getIdentifier,
-    getName
-}
 
 describe("Task list filter", () => {
     it("Filter tasks 1", () => {
@@ -44,7 +43,7 @@ describe("Task list filter", () => {
             milestoneFilterMode: MilestoneFilterMode.NoFilter,
             text: ""
         }
-        const result = filterTaskList(tasks, filters, filterInterface)
+        const result = filterTaskList(tasks, filters)
         chai.expect(result).to.deep.equal([ tasks[0], tasks[1], tasks[2], tasks[3], tasks[4] ])
     })
     it("Filter tasks 2", () => {
@@ -52,7 +51,7 @@ describe("Task list filter", () => {
             milestoneFilterMode: MilestoneFilterMode.TasksOnly,
             text: ""
         }
-        const result = filterTaskList(tasks, filters, filterInterface)
+        const result = filterTaskList(tasks, filters)
         chai.expect(result).to.deep.equal([ tasks[0], tasks[1], tasks[2] ])
     })
     it("Filter tasks 3", () => {
@@ -60,7 +59,7 @@ describe("Task list filter", () => {
             milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
             text: ""
         }
-        const result = filterTaskList(tasks, filters, filterInterface)
+        const result = filterTaskList(tasks, filters)
         chai.expect(result).to.deep.equal([ tasks[3], tasks[4] ])
     })
     it("Filter tasks 4", () => {
@@ -68,7 +67,7 @@ describe("Task list filter", () => {
             milestoneFilterMode: MilestoneFilterMode.NoFilter,
             text: "1"
         }
-        const result = filterTaskList(tasks, filters, filterInterface)
+        const result = filterTaskList(tasks, filters)
         chai.expect(result).to.deep.equal([ tasks[0], tasks[3] ])
     })
     it("Filter tasks 5", () => {
@@ -76,7 +75,7 @@ describe("Task list filter", () => {
             milestoneFilterMode: MilestoneFilterMode.NoFilter,
             text: "Ta"
         }
-        const result = filterTaskList(tasks, filters, filterInterface)
+        const result = filterTaskList(tasks, filters)
         chai.expect(result).to.deep.equal([ tasks[0], tasks[1], tasks[2] ])
     })
     it("Filter tasks 6", () => {
@@ -84,7 +83,7 @@ describe("Task list filter", () => {
             milestoneFilterMode: MilestoneFilterMode.NoFilter,
             text: "my"
         }
-        const result = filterTaskList(tasks, filters, filterInterface)
+        const result = filterTaskList(tasks, filters)
         chai.expect(result).to.deep.equal([ tasks[0], tasks[4] ])
     })
 })

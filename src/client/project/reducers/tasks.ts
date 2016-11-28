@@ -1,6 +1,6 @@
 import { Action } from "redux"
 import { TasksState, TaskFilters } from "../types"
-import { MilestoneFilterMode, TaskListFilterInterface, filterTaskList } from "../../common/tasklistfilters"
+import { MilestoneFilterMode, filterTaskList } from "../../common/tasklistfilters"
 import { Task } from "../../../common/types"
 import {
     TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE,
@@ -16,19 +16,7 @@ const filterTasks = (tasks: Array<Task>, filters: TaskFilters, today: Date | nul
         return []
     }
 
-    const filterInterface: TaskListFilterInterface<Task> = {
-        isMilestone: (task: Task): boolean => {
-            return task.estimatedDuration === 0
-        },
-        getIdentifier: (task: Task): string => {
-            return task.identifier
-        },
-        getName: (task: Task): string => {
-            return task.name
-        }
-    }
-
-    const initialFiltered = filterTaskList(tasks, filters, filterInterface)
+    const initialFiltered = filterTaskList(tasks, filters)
     const todayTime = today.getTime()
     const filtered = initialFiltered.filter((task: Task) => {
         const startDate = new Date(task.startDate).getTime()

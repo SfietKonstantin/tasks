@@ -6,25 +6,13 @@ import { DelaysState, PrimaveraTask } from "../types"
 import { GraphDiff, RelationGraph } from "../graph"
 import { delays } from "../states"
 import {
-    MilestoneFilterMode, TaskListFilters, TaskListFilterInterface, filterTaskList
+    MilestoneFilterMode, TaskListFilters, filterTaskList
 } from "../../../common/tasklistfilters"
 import { sortStrings } from "../../../../common/stringutils"
 import { copyAssign } from "../../../common/assign"
 
 const filterTasks = (tasks: Array<PrimaveraTask>, filters: TaskListFilters): Array<PrimaveraTask> => {
-    const filterInterface: TaskListFilterInterface<PrimaveraTask> = {
-        isMilestone: (task: PrimaveraTask): boolean => {
-            return task.duration === 0
-        },
-        getIdentifier: (task: PrimaveraTask): string => {
-            return task.identifier
-        },
-        getName: (task: PrimaveraTask): string => {
-            return task.name
-        }
-    }
-
-    return filterTaskList(tasks, filters, filterInterface).sort((first: PrimaveraTask, second: PrimaveraTask) => {
+    return filterTaskList(tasks, filters).sort((first: PrimaveraTask, second: PrimaveraTask) => {
         return sortStrings(first.identifier, second.identifier)
     })
 }

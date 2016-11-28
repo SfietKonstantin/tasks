@@ -7,7 +7,7 @@ import { Header } from "../../client/common/components/header"
 import { TabBar } from "../../client/common/components/tabs"
 import { TaskListFiltersToolbar } from "../../client/common/components/tasklistfilterstoolbar"
 import { Status, StatusIndicator } from "../../client/common/components/statusindicator"
-import { TaskList } from "../../client/common/components/tasklist"
+import { TaskList, TaskListProperties } from "../../client/common/components/tasklist"
 import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklistfilters"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
@@ -173,53 +173,68 @@ describe("Common components", () => {
             chai.expect(callback.calledWithExactly(expected)).to.true
         })
     })
-    describe("ItemList", () => {
-        it("Should create a ItemList", () => {
-            class TestTaskList extends TaskList<number> {}
-
-            const createElement = sinon.stub()
-            createElement.withArgs(1).returns(<p key="1">test 1</p>)
-            createElement.withArgs(2).returns(<p key="2">test 2</p>)
-            createElement.withArgs(3).returns(<p key="3">test 3</p>)
+    describe("TaskList", () => {
+        interface TestTask {
+            identifier: string
+            name: string
+            duration: number
+        }
+        class TestTaskList extends TaskList<TestTask,
+                                            TaskListFilters,
+                                            TaskListProperties<TestTask, TaskListFilters>
+                                           > {
+            constructor(props: TaskListProperties<TestTask, TaskListFilters>) {
+                super(props)
+            }
+            protected createElement(task: TestTask): JSX.Element {
+                return <p key={task.name}>{task.name}</p>
+            }
+        }
+        it("Should create a TaskList", () => {
+            const tasks: Array<TestTask> = [
+                {
+                    identifier: "task1",
+                    name: "Task 1",
+                    duration: 20
+                },
+                {
+                    identifier: "milestone1",
+                    name: "Milestone 1",
+                    duration: 0
+                }
+            ]
             const onFiltersChanged = sinon.spy()
             const filters: TaskListFilters = {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             }
-            const component = enzyme.mount(<TestTaskList tasks={[1, 2, 3]}
-                                                         createElement={createElement}
+            const component = enzyme.mount(<TestTaskList tasks={tasks}
                                                          filters={filters}
                                                          onFiltersChanged={onFiltersChanged} />)
             const p = component.find("p")
-            chai.expect(p).to.length(3)
+            chai.expect(p).to.length(2)
+            chai.expect(p.at(0).text()).to.equal("Task 1")
+            chai.expect(p.at(1).text()).to.equal("Milestone 1")
         })
         it("Should create an empty ItemList", () => {
-            class TestTaskList extends TaskList<number> {}
-
-            const createElement = sinon.stub()
             const onFiltersChanged = sinon.spy()
             const filters: TaskListFilters = {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             }
             const component = enzyme.shallow(<TestTaskList tasks={[]}
-                                                           createElement={createElement}
                                                            filters={filters}
                                                            onFiltersChanged={onFiltersChanged} />)
             const statusIndicator = component.find("StatusIndicator")
             chai.expect(statusIndicator).to.length(1)
         })
         it("Should handle text changed", () => {
-            class TestTaskList extends TaskList<number> {}
-
-            const createElement = sinon.stub()
             const onFiltersChanged = sinon.spy()
             const filters: TaskListFilters = {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             }
             const component = enzyme.mount(<TestTaskList tasks={[]}
-                                                         createElement={createElement}
                                                          filters={filters}
                                                          onFiltersChanged={onFiltersChanged} />)
             const formControls = component.children().find("FormControl")
@@ -229,8 +244,6 @@ describe("Common components", () => {
             chai.expect(component.state("textFilter")).to.equal("Test")
         })
         it("Should handle blur", () => {
-            class TestTaskList extends TaskList<number> {}
-
             const createElement = sinon.stub()
             const onFiltersChanged = sinon.spy()
             const filters: TaskListFilters = {
@@ -238,7 +251,6 @@ describe("Common components", () => {
                 text: ""
             }
             const component = enzyme.mount(<TestTaskList tasks={[]}
-                                                         createElement={createElement}
                                                          filters={filters}
                                                          onFiltersChanged={onFiltersChanged} />)
             const formControls = component.children().find("FormControl")
@@ -250,8 +262,6 @@ describe("Common components", () => {
             chai.expect(onFiltersChanged.calledWithExactly("Test"))
         })
         it("Should handle submit", () => {
-            class TestTaskList extends TaskList<number> {}
-
             const createElement = sinon.stub()
             const onFiltersChanged = sinon.spy()
             const filters: TaskListFilters = {
@@ -259,7 +269,6 @@ describe("Common components", () => {
                 text: ""
             }
             const component = enzyme.mount(<TestTaskList tasks={[]}
-                                                         createElement={createElement}
                                                          filters={filters}
                                                          onFiltersChanged={onFiltersChanged} />)
             const formControls = component.children().find("FormControl")

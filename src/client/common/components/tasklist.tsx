@@ -2,23 +2,26 @@ import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { Row, Col, ListGroup, FormGroup, FormControl } from "react-bootstrap"
 import { TaskListFiltersToolbar } from "./tasklistfilterstoolbar"
-import { TaskListFilters } from "../tasklistfilters"
+import { TaskListFilters, Task } from "../tasklistfilters"
 import { StatusIndicator, Status } from "../../common/components/statusindicator"
 import { assign } from "../../common/assign"
 
-interface TaskListProperties<T> {
+export interface TaskListProperties<T extends Task, F extends TaskListFilters> {
     tasks: Array<T>
-    createElement: (task: T) => JSX.Element
-    filters: TaskListFilters
-    onFiltersChanged: (filters: TaskListFilters) => void
+    filters: F
+    onFiltersChanged: (filters: F) => void
 }
 
 interface TaskListState {
     textFilter: string
 }
 
-export class TaskList<T> extends React.Component<TaskListProperties<T>, TaskListState> {
-    constructor(props: TaskListProperties<T>) {
+export abstract class TaskList<T extends Task,
+                               F extends TaskListFilters,
+                               Properties extends TaskListProperties<T, F>
+                              >
+                extends React.Component<Properties, TaskListState> {
+    constructor(props: Properties) {
         super(props)
         this.state = {
             textFilter: ""
@@ -26,7 +29,7 @@ export class TaskList<T> extends React.Component<TaskListProperties<T>, TaskList
     }
     render() {
         const content: Array<JSX.Element> = this.props.tasks.map((task: T) => {
-            return this.props.createElement(task)
+            return this.createElement(task)
         })
         const emptyIndicator = this.createEmptyIndicator()
         return <div className="tab-table">
@@ -56,11 +59,11 @@ export class TaskList<T> extends React.Component<TaskListProperties<T>, TaskList
             </div>
         </div>
     }
+    protected abstract createElement(task: T): JSX.Element
     private createEmptyIndicator(): JSX.Element | null {
         if (this.props.tasks.length > 0) {
             return null
         }
-
         return <StatusIndicator status={Status.Info} message="Nothing to show" />
     }
     private handleTextChange(e: React.FormEvent) {

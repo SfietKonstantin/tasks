@@ -9,23 +9,23 @@ export interface TaskListFilters {
     milestoneFilterMode: MilestoneFilterMode
     text: string
 }
-export interface TaskListFilterInterface<T> {
-    isMilestone: (task: T) => boolean
-    getIdentifier: (task: T) => string
-    getName: (task: T) => string
+
+export interface Task {
+    identifier: string
+    name: string
+    duration: number
 }
 
-export const filterTaskList = <T>(tasks: Array<T>, filters: TaskListFilters,
-                                  filterInterface: TaskListFilterInterface<T>): Array<T> => {
+export const filterTaskList = <T extends Task>(tasks: Array<T>, filters: TaskListFilters): Array<T> => {
     return tasks.filter((task: T) => {
         switch (filters.milestoneFilterMode) {
             case MilestoneFilterMode.TasksOnly:
-                if (filterInterface.isMilestone(task)) {
+                if (task.duration === 0) {
                     return false
                 }
                 break
             case MilestoneFilterMode.MilestonesOnly:
-                if (!filterInterface.isMilestone(task)) {
+                if (task.duration !== 0) {
                     return false
                 }
                 break
@@ -34,8 +34,8 @@ export const filterTaskList = <T>(tasks: Array<T>, filters: TaskListFilters,
         }
         if (filters.text.length > 0) {
             const lowerFilter = latinize(filters.text.trim()).toLowerCase()
-            const lowerIdentifier = latinize(filterInterface.getIdentifier(task).trim()).toLowerCase()
-            const lowerName = latinize(filterInterface.getName(task).trim()).toLowerCase()
+            const lowerIdentifier = latinize(task.identifier.trim()).toLowerCase()
+            const lowerName = latinize(task.name.trim()).toLowerCase()
             if (lowerIdentifier.indexOf(lowerFilter) === -1 && lowerName.indexOf(lowerFilter) === -1) {
                 return false
             }
