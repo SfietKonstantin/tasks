@@ -59,8 +59,15 @@ describe("TaskList reducers", () => {
     describe("TaskList reducers", () => {
         it("Should reduce TASKS_UPDATE", () => {
             const checkState = (initialState: State<Task, TaskListFilters>) => {
-                const state = reducers.filtersReducer(initialState, filterTaskList)(initialState, (updateTasks(tasks)))
+                const filters: TaskListFilters = {
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                    text: ""
+                }
+                const action = updateTasks(tasks, filters)
+                const state = reducers.filtersReducer(initialState, filterTaskList)(initialState, action)
                 chai.expect(state.tasks).to.deep.equal(tasks)
+                chai.expect(state.filters).to.deep.equal(filters)
+                chai.expect(state.filteredTasks).to.deep.equal(tasks)
             }
             checkState(initialState1)
             checkState(initialState2)

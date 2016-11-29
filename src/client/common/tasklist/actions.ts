@@ -4,9 +4,10 @@ import { State, Task, TaskListFilters } from "./types"
 export const TASKS_UPDATE = "TASKS_UPDATE"
 export const FILTERS_UPDATE = "FILTERS_UPDATE"
 
-export interface TasksAction<T extends Task> extends Action {
+export interface TasksAction<T extends Task, F extends TaskListFilters> extends Action {
     type: string,
     tasks: Array<T>
+    filters: F
 }
 
 export interface FiltersAction<T extends Task, F extends TaskListFilters> extends Action {
@@ -14,10 +15,13 @@ export interface FiltersAction<T extends Task, F extends TaskListFilters> extend
     filters: F
 }
 
-export const updateTasks = <T extends Task>(tasks: Array<T>): TasksAction<T> => {
+export const updateTasks = <T extends Task,
+                            F extends TaskListFilters
+                           >(tasks: Array<T>, filters: F): TasksAction<T, F> => {
     return {
         type: TASKS_UPDATE,
-        tasks
+        tasks,
+        filters
     }
 }
 

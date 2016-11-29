@@ -16,6 +16,7 @@ import * as overviewActions from "../../client/imports/primavera/actions/overvie
 import { Stage, PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import * as connectedcomponents from "../../client/imports/primavera/connectedcomponents"
 import { updateTasks } from "../../client/common/tasklist/actions"
+import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklist/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { FakeFile } from "./fakefile"
 import { makeRelations } from "./primaverahelper"
@@ -210,11 +211,14 @@ describe("Primavera components", () => {
             const relations = makeRelations(primaveraRelations1)
             let dispatch = sinon.spy()
             const mapped = relationsSelector.mapDispatchToProps(dispatch)
-
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
             mapped.onNextStage(primaveraTasks1, relations)
             chai.expect(dispatch.calledWithExactly(defineStage(Stage.Delays))).to.true
             chai.expect(dispatch.calledWithExactly(defineMaxStage(Stage.Delays))).to.true
-            chai.expect(dispatch.calledWithExactly(updateTasks(Array.from(primaveraTasks1.values())))).to.true
+            chai.expect(dispatch.calledWithExactly(updateTasks(Array.from(primaveraTasks1.values()), filters))).to.true
         })
         it("Should map the onDismissInvalidFormat callback", () => {
             let dispatch = sinon.spy()

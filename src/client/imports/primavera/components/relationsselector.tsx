@@ -72,7 +72,11 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
         onNextStage: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>) => {
             dispatch(defineStage(Stage.Delays))
             dispatch(defineMaxStage(Stage.Delays))
-            dispatch(updateTasks(Array.from(tasks.values())))
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
+            dispatch(updateTasks(Array.from(tasks.values()), filters))
         },
         onDismissInvalidFormat: () => {
             dispatch(dismissInvalidRelationsFormat())
