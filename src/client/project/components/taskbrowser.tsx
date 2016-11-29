@@ -44,7 +44,7 @@ interface TaskBrowserProperties {
 
 export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
     render() {
-        const onFiltersChanged=this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)
+        const onFiltersChanged = this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)
         return <TaskBrowserTaskList projectIdentifier={this.props.projectIdentifier} tasks={this.props.tasks}
                                     filters={this.props.filters} onFiltersChanged={onFiltersChanged} >
             <TasksHeader filters={this.props.filters} onFiltersChanged={onFiltersChanged} />

@@ -35,6 +35,7 @@ export const relations: RelationsState = {
 
 export const delaysFilters: DelaysFiltersState = {
     tasks: [],
+    filteredTasks: [],
     filters: {
         milestoneFilterMode: MilestoneFilterMode.NoFilter,
         text: ""

@@ -4,8 +4,8 @@ import { DelaysState, DelaysSelectionState, DelaysFiltersState, PrimaveraTask } 
 import { GraphDiff, RelationGraph } from "../graph"
 import { delaysFilters, delaysSelection } from "../states"
 import { MilestoneFilterMode, TaskListFilters } from "../../../common/tasklist/types"
-import { filtersReducer } from "../../../common/tasklist/reducers/filters"
-import { filterTaskList } from "../../../common/tasklist/tasklistfilters"
+import { filtersReducer } from "../../../common/tasklist/reducers"
+import { filterTaskList } from "../../../common/tasklist/filters"
 import { sortStrings } from "../../../../common/stringutils"
 import { copyAssign } from "../../../common/assign"
 

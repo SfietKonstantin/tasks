@@ -11,7 +11,7 @@ import { MilestoneFilterMode, TaskListFilters } from "../../client/common/taskli
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
 import { defineDelaySelection } from "../../client/imports/primavera/actions/delays"
 import { filterForOverview } from "../../client/imports/primavera/actions/overview"
-import { updateFilters } from "../../client/common/tasklist/actions/filters"
+import { updateFilters } from "../../client/common/tasklist/actions"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { expectMapEqual } from "./expectutils"
 import {
@@ -69,7 +69,7 @@ describe("Primavera import DelaySelector", () => {
         }
         taskListComponent.simulate("filtersChanged", filters)
         chai.expect(onFiltersChanged.calledOnce).to.true
-        chai.expect(onFiltersChanged.calledWithExactly(primaveraTasks2, filters)).to.true
+        chai.expect(onFiltersChanged.calledWithExactly(filters)).to.true
 
         component.simulate("current")
         chai.expect(onCurrentStage.calledOnce).to.true
@@ -167,8 +167,8 @@ describe("Primavera import DelaySelector", () => {
         let dispatch = sinon.spy()
         const mapped = mapDispatchToProps(dispatch)
 
-        mapped.onFiltersChanged(primaveraTasks2, taskListFilters)
-        dispatch.calledWithExactly(updateFilters(Array.from(primaveraTasks2.values()), taskListFilters))
+        mapped.onFiltersChanged(taskListFilters)
+        dispatch.calledWithExactly(updateFilters(taskListFilters))
     })
     it("Should map the onSelectionChanged callback", () => {
         let dispatch = sinon.spy()

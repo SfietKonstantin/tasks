@@ -15,7 +15,7 @@ import { defineStage, defineMaxStage } from "../../client/imports/primavera/acti
 import * as overviewActions from "../../client/imports/primavera/actions/overview"
 import { Stage, PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import * as connectedcomponents from "../../client/imports/primavera/connectedcomponents"
-import { updateFilters } from "../../client/common/tasklist/actions/filters"
+import { updateTasks } from "../../client/common/tasklist/actions"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { FakeFile } from "./fakefile"
 import { makeRelations } from "./primaverahelper"
@@ -214,8 +214,7 @@ describe("Primavera components", () => {
             mapped.onNextStage(primaveraTasks1, relations)
             chai.expect(dispatch.calledWithExactly(defineStage(Stage.Delays))).to.true
             chai.expect(dispatch.calledWithExactly(defineMaxStage(Stage.Delays))).to.true
-            chai.expect(dispatch.calledWithExactly(updateFilters(Array.from(primaveraTasks1.values()),
-                                                                 taskListFilters))).to.true
+            chai.expect(dispatch.calledWithExactly(updateTasks(Array.from(primaveraTasks1.values())))).to.true
         })
         it("Should map the onDismissInvalidFormat callback", () => {
             let dispatch = sinon.spy()

@@ -28,7 +28,7 @@ import * as delaysSelector from "../../client/imports/primavera/components/delay
 import * as overview from "../../client/imports/primavera/components/overview"
 import { TasksParseResults, RelationsParseResults } from "../../client/imports/primavera/imports"
 import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklist/types"
-import { updateFilters } from "../../client/common/tasklist/actions/filters"
+import { updateFilters } from "../../client/common/tasklist/actions"
 import * as states from "../../client/imports/primavera/states"
 import { FakeFile, FakeFileReader } from "./fakefile"
 import { FakeResponse } from "./fakeresponse"
@@ -94,6 +94,7 @@ describe("Primavera reducers", () => {
                         text: "test"
                     },
                     tasks: mapToArray(primaveraTasks2),
+                    filteredTasks: mapToArray(primaveraTasks2)
                 },
                 selection: {
                     selection: cloneSet(selectedDelays2),
@@ -232,79 +233,24 @@ describe("Primavera reducers", () => {
         })
     })
     describe("Delay reducers", () => {
-        it("Should reduce DELAY_FILTERS_DEFINE 1", () => {
-            const checkState = (initialState: State) => {
-                const filters: TaskListFilters = {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: ""
-                }
-                const tasks = Array.from(primaveraTasks2.values())
-                const state = main.mainReducer(initialState, updateFilters(tasks, filters))
-                chai.expect(state.delays.filters.tasks).to.deep.equal([
-                    primaveraTasks2.get("milestone1"),
-                    primaveraTasks2.get("milestone2"),
-                    primaveraTasks2.get("task1"),
-                    primaveraTasks2.get("task2"),
-                    primaveraTasks2.get("task3"),
-                    primaveraTasks2.get("task4")
-                ])
-                chai.expect(state.delays.filters.filters).to.deep.equal(filters)
+        it("Should reduce FILTERS_UPDATE", () => {
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
             }
-            checkState(initialState1)
-            checkState(initialState2)
-        })
-        it("Should reduce DELAY_FILTERS_DEFINE 2", () => {
-            const checkState = (initialState: State) => {
-                const filters: TaskListFilters = {
-                    milestoneFilterMode: MilestoneFilterMode.TasksOnly,
-                    text: ""
-                }
-                const tasks = Array.from(primaveraTasks2.values())
-                const state = main.mainReducer(initialState, updateFilters(tasks, filters))
-                chai.expect(state.delays.filters.tasks).to.deep.equal([
-                    primaveraTasks2.get("task1"),
-                    primaveraTasks2.get("task2"),
-                    primaveraTasks2.get("task3"),
-                    primaveraTasks2.get("task4")
-                ])
-                chai.expect(state.delays.filters.filters).to.deep.equal(filters)
-            }
-            checkState(initialState1)
-            checkState(initialState2)
-        })
-        it("Should reduce DELAY_FILTERS_DEFINE 3", () => {
-            const checkState = (initialState: State) => {
-                const filters: TaskListFilters = {
-                    milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
-                    text: ""
-                }
-                const tasks = Array.from(primaveraTasks2.values())
-                const state = main.mainReducer(initialState, updateFilters(tasks, filters))
-                chai.expect(state.delays.filters.tasks).to.deep.equal([
-                    primaveraTasks2.get("milestone1"),
-                    primaveraTasks2.get("milestone2")
-                ])
-                chai.expect(state.delays.filters.filters).to.deep.equal(filters)
-            }
-            checkState(initialState1)
-            checkState(initialState2)
-        })
-        it("Should reduce DELAY_FILTERS_DEFINE 4", () => {
-            const checkState = (initialState: State) => {
-                const filters: TaskListFilters = {
-                    milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                    text: "1"
-                }
-                const tasks = Array.from(primaveraTasks2.values())
-                const state = main.mainReducer(initialState, updateFilters(tasks, filters))
-                chai.expect(state.delays.filters.tasks).to.deep.equal([
-                    primaveraTasks2.get("milestone1"),
-                    primaveraTasks2.get("task1")
-                ])
-                chai.expect(state.delays.filters.filters).to.deep.equal(filters)
-            }
-            checkState(initialState1)
-            checkState(initialState2)
+            const state1 = main.mainReducer(initialState1, updateFilters(filters))
+            chai.expect(state1.delays.filters.filteredTasks).to.empty
+            chai.expect(state1.delays.filters.filters).to.deep.equal(filters)
+            const state2 = main.mainReducer(initialState2, updateFilters(filters))
+            chai.expect(state2.delays.filters.filteredTasks).to.deep.equal([
+                primaveraTasks2.get("milestone1"),
+                primaveraTasks2.get("milestone2"),
+                primaveraTasks2.get("task1"),
+                primaveraTasks2.get("task2"),
+                primaveraTasks2.get("task3"),
+                primaveraTasks2.get("task4")
+            ])
+            chai.expect(state2.delays.filters.filters).to.deep.equal(filters)
         })
         it("Should reduce DELAY_SELECTION_DEFINE 1", () => {
             const expectedDiffs: Array<GraphDiff> = [

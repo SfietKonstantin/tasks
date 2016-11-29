@@ -10,7 +10,7 @@ import { WarningsButton } from "./warningsbutton"
 import { defineStage, defineMaxStage } from "../actions/stages"
 import { defineDelaySelection } from "../actions/delays"
 import { filterForOverview } from "../actions/overview"
-import { updateFilters } from "../../../common/tasklist/actions/filters"
+import { updateFilters } from "../../../common/tasklist/actions"
 import * as maputils from "../../../../common/maputils"
 
 interface PrimaveraTaskListProperties extends TaskListProperties<PrimaveraTask, TaskListFilters> {
@@ -45,7 +45,7 @@ interface DelaysSelectorProperties {
     relations: Map<string, RelationGraphNode>
     warnings: Map<string, Array<string>>
     selection: Set<string>
-    onFiltersChanged: (tasks: Map<string, PrimaveraTask>, filters: TaskListFilters) => void
+    onFiltersChanged: (filters: TaskListFilters) => void
     onSelectionChanged: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>,
                          identifier: string, selected: boolean) => void
     onCurrentStage: () => void
@@ -84,7 +84,7 @@ export class DelaysSelector extends React.Component<DelaysSelectorProperties, {}
         this.props.onSelectionChanged(this.props.tasks, this.props.relations, identifier, selected)
     }
     private handleFiltersChanged(filters: TaskListFilters) {
-        this.props.onFiltersChanged(this.props.tasks, filters)
+        this.props.onFiltersChanged(filters)
     }
     private handleNext(e: React.MouseEvent) {
         this.props.onNextStage(this.props.tasks, this.props.selection, this.props.relations)
@@ -106,8 +106,8 @@ export const mapStateToProps = (state: State) => {
 
 export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
-        onFiltersChanged: (tasks: Map<string, PrimaveraTask>, filters: TaskListFilters) => {
-            dispatch(updateFilters(Array.from(tasks.values()), filters))
+        onFiltersChanged: (filters: TaskListFilters) => {
+            dispatch(updateFilters(filters))
         },
         onSelectionChanged: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>,
                              identifier: string, selected: boolean) => {
