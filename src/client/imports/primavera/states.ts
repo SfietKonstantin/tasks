@@ -1,6 +1,6 @@
 import {
-    Stage, Stages, TasksState, RelationsState, DelaysState, OverviewState,
-    PrimaveraTask, SubmitState
+    Stage, Stages, TasksState, RelationsState, DelaysFiltersState, DelaysSelectionState,
+    DelaysState, OverviewState, PrimaveraTask, SubmitState
 } from "./types"
 import { RelationGraphNode, GraphDiff } from "./graph"
 import { MilestoneFilterMode } from "../../common/tasklist/types"
@@ -32,15 +32,24 @@ export const relations: RelationsState = {
     isImporting: false,
     isInvalidFormat: false
 }
-export const delays: DelaysState = {
+
+export const delaysFilters: DelaysFiltersState = {
+    tasks: [],
     filters: {
         milestoneFilterMode: MilestoneFilterMode.NoFilter,
         text: ""
-    },
-    tasks: [],
+    }
+}
+
+export const delaysSelection: DelaysSelectionState = {
     selection: new Set<string>(),
     diffs: [],
     warnings: new Map<string, Array<string>>()
+}
+
+export const delays: DelaysState = {
+    filters: delaysFilters,
+    selection: delaysSelection
 }
 
 export const overview: OverviewState = {

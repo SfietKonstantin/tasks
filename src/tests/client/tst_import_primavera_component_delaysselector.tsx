@@ -9,8 +9,9 @@ import { Stage, SubmitState } from "../../client/imports/primavera/types"
 import { Project } from "../../common/types"
 import { MilestoneFilterMode, TaskListFilters } from "../../client/common/tasklist/types"
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
-import { defineDelayFilters, defineDelaySelection } from "../../client/imports/primavera/actions/delays"
+import { defineDelaySelection } from "../../client/imports/primavera/actions/delays"
 import { filterForOverview } from "../../client/imports/primavera/actions/overview"
+import { updateFilters } from "../../client/common/tasklist/actions/filters"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { expectMapEqual } from "./expectutils"
 import {
@@ -167,7 +168,7 @@ describe("Primavera import DelaySelector", () => {
         const mapped = mapDispatchToProps(dispatch)
 
         mapped.onFiltersChanged(primaveraTasks2, taskListFilters)
-        dispatch.calledWithExactly(defineDelayFilters(primaveraTasks2, taskListFilters))
+        dispatch.calledWithExactly(updateFilters(Array.from(primaveraTasks2.values()), taskListFilters))
     })
     it("Should map the onSelectionChanged callback", () => {
         let dispatch = sinon.spy()

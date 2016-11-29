@@ -5,7 +5,7 @@ import { RelationGraphNode } from "../graph"
 import { FileSelector } from "./fileselector"
 import { defineStage, defineMaxStage } from "../actions/stages"
 import { importRelations, dismissInvalidRelationsFormat } from "../actions/relations"
-import { defineDelayFilters } from "../actions/delays"
+import { updateFilters } from "../../../common/tasklist/actions/filters"
 import { MilestoneFilterMode, TaskListFilters } from "../../../common/tasklist/types"
 
 interface RelationsSelectorProperties {
@@ -76,7 +76,7 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
             }
             dispatch(defineStage(Stage.Delays))
             dispatch(defineMaxStage(Stage.Delays))
-            dispatch(defineDelayFilters(tasks, defaultFilters))
+            dispatch(updateFilters(Array.from(tasks.values()), defaultFilters))
         },
         onDismissInvalidFormat: () => {
             dispatch(dismissInvalidRelationsFormat())

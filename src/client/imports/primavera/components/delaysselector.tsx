@@ -8,8 +8,9 @@ import { RelationGraphNode } from "../graph"
 import { StagePanel } from "./stagepanel"
 import { WarningsButton } from "./warningsbutton"
 import { defineStage, defineMaxStage } from "../actions/stages"
-import { defineDelayFilters, defineDelaySelection } from "../actions/delays"
+import { defineDelaySelection } from "../actions/delays"
 import { filterForOverview } from "../actions/overview"
+import { updateFilters } from "../../../common/tasklist/actions/filters"
 import * as maputils from "../../../../common/maputils"
 
 interface PrimaveraTaskListProperties extends TaskListProperties<PrimaveraTask, TaskListFilters> {
@@ -95,18 +96,18 @@ export const mapStateToProps = (state: State) => {
         stage: state.stage.current,
         maxStage: state.stage.max,
         tasks: state.tasks.tasks,
-        filteredTasks: state.delays.tasks,
-        filters: state.delays.filters,
+        filteredTasks: state.delays.filters.tasks,
+        filters: state.delays.filters.filters,
         relations: state.relations.relations,
-        warnings: state.delays.warnings,
-        selection: state.delays.selection
+        warnings: state.delays.selection.warnings,
+        selection: state.delays.selection.selection
     }
 }
 
 export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
         onFiltersChanged: (tasks: Map<string, PrimaveraTask>, filters: TaskListFilters) => {
-            dispatch(defineDelayFilters(tasks, filters))
+            dispatch(updateFilters(Array.from(tasks.values()), filters))
         },
         onSelectionChanged: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>,
                              identifier: string, selected: boolean) => {

@@ -11,9 +11,7 @@ import {
     beginRelationsImport, endRelationsImport, relationsImportInvalidFormat,
     dismissInvalidRelationsFormat
 } from "../../client/imports/primavera/actions/relations"
-import {
-    defineDelayFilters, defineDelaySelection
-} from "../../client/imports/primavera/actions/delays"
+import { defineDelaySelection } from "../../client/imports/primavera/actions/delays"
 import {
     filterForOverview, requestSubmit, receiveSubmit,
     receiveSubmitFailure
@@ -30,6 +28,7 @@ import * as delaysSelector from "../../client/imports/primavera/components/delay
 import * as overview from "../../client/imports/primavera/components/overview"
 import { TasksParseResults, RelationsParseResults } from "../../client/imports/primavera/imports"
 import { TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklist/types"
+import { updateFilters } from "../../client/common/tasklist/actions/filters"
 import * as states from "../../client/imports/primavera/states"
 import { FakeFile, FakeFileReader } from "./fakefile"
 import { FakeResponse } from "./fakeresponse"
@@ -90,13 +89,17 @@ describe("Primavera reducers", () => {
             },
             delays: {
                 filters: {
-                    milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
-                    text: "test"
+                    filters: {
+                        milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
+                        text: "test"
+                    },
+                    tasks: mapToArray(primaveraTasks2),
                 },
-                tasks: mapToArray(primaveraTasks2),
-                selection: cloneSet(selectedDelays2),
-                diffs: cloneArray(graphDiff),
-                warnings: cloneMap(warnings)
+                selection: {
+                    selection: cloneSet(selectedDelays2),
+                    diffs: cloneArray(graphDiff),
+                    warnings: cloneMap(warnings)
+                }
             },
             overview: {
                 tasks: cloneArray(inputTasks2),
@@ -235,8 +238,9 @@ describe("Primavera reducers", () => {
                     milestoneFilterMode: MilestoneFilterMode.NoFilter,
                     text: ""
                 }
-                const state = main.mainReducer(initialState, defineDelayFilters(primaveraTasks2, filters))
-                chai.expect(state.delays.tasks).to.deep.equal([
+                const tasks = Array.from(primaveraTasks2.values())
+                const state = main.mainReducer(initialState, updateFilters(tasks, filters))
+                chai.expect(state.delays.filters.tasks).to.deep.equal([
                     primaveraTasks2.get("milestone1"),
                     primaveraTasks2.get("milestone2"),
                     primaveraTasks2.get("task1"),
@@ -244,7 +248,7 @@ describe("Primavera reducers", () => {
                     primaveraTasks2.get("task3"),
                     primaveraTasks2.get("task4")
                 ])
-                chai.expect(state.delays.filters).to.deep.equal(filters)
+                chai.expect(state.delays.filters.filters).to.deep.equal(filters)
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -255,14 +259,15 @@ describe("Primavera reducers", () => {
                     milestoneFilterMode: MilestoneFilterMode.TasksOnly,
                     text: ""
                 }
-                const state = main.mainReducer(initialState, defineDelayFilters(primaveraTasks2, filters))
-                chai.expect(state.delays.tasks).to.deep.equal([
+                const tasks = Array.from(primaveraTasks2.values())
+                const state = main.mainReducer(initialState, updateFilters(tasks, filters))
+                chai.expect(state.delays.filters.tasks).to.deep.equal([
                     primaveraTasks2.get("task1"),
                     primaveraTasks2.get("task2"),
                     primaveraTasks2.get("task3"),
                     primaveraTasks2.get("task4")
                 ])
-                chai.expect(state.delays.filters).to.deep.equal(filters)
+                chai.expect(state.delays.filters.filters).to.deep.equal(filters)
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -273,12 +278,13 @@ describe("Primavera reducers", () => {
                     milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
                     text: ""
                 }
-                const state = main.mainReducer(initialState, defineDelayFilters(primaveraTasks2, filters))
-                chai.expect(state.delays.tasks).to.deep.equal([
+                const tasks = Array.from(primaveraTasks2.values())
+                const state = main.mainReducer(initialState, updateFilters(tasks, filters))
+                chai.expect(state.delays.filters.tasks).to.deep.equal([
                     primaveraTasks2.get("milestone1"),
                     primaveraTasks2.get("milestone2")
                 ])
-                chai.expect(state.delays.filters).to.deep.equal(filters)
+                chai.expect(state.delays.filters.filters).to.deep.equal(filters)
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -289,12 +295,13 @@ describe("Primavera reducers", () => {
                     milestoneFilterMode: MilestoneFilterMode.NoFilter,
                     text: "1"
                 }
-                const state = main.mainReducer(initialState, defineDelayFilters(primaveraTasks2, filters))
-                chai.expect(state.delays.tasks).to.deep.equal([
+                const tasks = Array.from(primaveraTasks2.values())
+                const state = main.mainReducer(initialState, updateFilters(tasks, filters))
+                chai.expect(state.delays.filters.tasks).to.deep.equal([
                     primaveraTasks2.get("milestone1"),
                     primaveraTasks2.get("task1")
                 ])
-                chai.expect(state.delays.filters).to.deep.equal(filters)
+                chai.expect(state.delays.filters.filters).to.deep.equal(filters)
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -318,9 +325,9 @@ describe("Primavera reducers", () => {
             ]
             const action = defineDelaySelection(primaveraTasks2, primaveraRelationNodes2, "milestone1", true)
             const state = main.mainReducer(initialState1, action)
-            expectSetEqualToArray(state.delays.selection, ["milestone1"])
-            chai.expect(state.delays.diffs).to.deep.equal(expectedDiffs)
-            chai.expect(state.delays.warnings.size).to.equal(0)
+            expectSetEqualToArray(state.delays.selection.selection, ["milestone1"])
+            chai.expect(state.delays.selection.diffs).to.deep.equal(expectedDiffs)
+            chai.expect(state.delays.selection.warnings.size).to.equal(0)
         })
         it("Should reduce DELAY_SELECTION_DEFINE 2", () => {
             const expectedDiffs: Array<GraphDiff> = [
@@ -341,23 +348,23 @@ describe("Primavera reducers", () => {
             ]
             const action = defineDelaySelection(primaveraTasks2, primaveraRelationNodes2, "milestone1", true)
             const state = main.mainReducer(initialState2, action)
-            expectSetEqualToArray(state.delays.selection, ["task3", "milestone1"])
-            chai.expect(state.delays.diffs).to.deep.equal(expectedDiffs)
-            chai.expect(state.delays.warnings.size).to.equal(0)
+            expectSetEqualToArray(state.delays.selection.selection, ["task3", "milestone1"])
+            chai.expect(state.delays.selection.diffs).to.deep.equal(expectedDiffs)
+            chai.expect(state.delays.selection.warnings.size).to.equal(0)
         })
         it("Should reduce DELAY_SELECTION_DEFINE 3", () => {
             const action = defineDelaySelection(primaveraTasks2, primaveraRelationNodes2, "milestone1", false)
             const state = main.mainReducer(initialState1, action)
-            chai.expect(state.delays.selection.size).to.equal(0)
-            chai.expect(state.delays.diffs).to.empty
-            chai.expect(state.delays.warnings.size).to.equal(0)
+            chai.expect(state.delays.selection.selection.size).to.equal(0)
+            chai.expect(state.delays.selection.diffs).to.empty
+            chai.expect(state.delays.selection.warnings.size).to.equal(0)
         })
         it("Should reduce DELAY_SELECTION_DEFINE 4", () => {
             const action = defineDelaySelection(primaveraTasks2, primaveraRelationNodes2, "milestone1", false)
             const state = main.mainReducer(initialState2, action)
-            expectSetEqualToArray(state.delays.selection, ["task3"])
-            chai.expect(state.delays.diffs).to.empty
-            chai.expect(state.delays.warnings.size).to.equal(0)
+            expectSetEqualToArray(state.delays.selection.selection, ["task3"])
+            chai.expect(state.delays.selection.diffs).to.empty
+            chai.expect(state.delays.selection.warnings.size).to.equal(0)
         })
     })
     describe("Overview reducers", () => {
@@ -445,11 +452,11 @@ describe("Primavera reducers", () => {
                     const mapped = delaysSelector.mapStateToProps(initialState)
                     chai.expect(mapped.stage).to.equal(initialState.stage.current)
                     expectMapEqual(mapped.tasks, initialState.tasks.tasks)
-                    chai.expect(mapped.filteredTasks).to.deep.equal(initialState.delays.tasks)
-                    chai.expect(mapped.filters).to.deep.equal(initialState.delays.filters)
+                    chai.expect(mapped.filteredTasks).to.deep.equal(initialState.delays.filters.tasks)
+                    chai.expect(mapped.filters).to.deep.equal(initialState.delays.filters.filters)
                     expectMapEqual(mapped.relations, initialState.relations.relations)
-                    expectMapEqual(mapped.warnings, initialState.delays.warnings)
-                    expectSetEqual(mapped.selection, initialState.delays.selection)
+                    expectMapEqual(mapped.warnings, initialState.delays.selection.warnings)
+                    expectSetEqual(mapped.selection, initialState.delays.selection.selection)
                 }
                 checkMapped(initialState1)
                 checkMapped(initialState2)

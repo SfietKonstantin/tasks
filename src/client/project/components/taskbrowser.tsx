@@ -9,17 +9,17 @@ import { assign } from "../../common/assign"
 import { TasksHeader } from "../components/tasksheader"
 import { Task } from "../../../common/types"
 
-interface ApiTaskListProperties extends TaskListProperties<Task, TaskFilters> {
+interface TaskBrowserTaskListProperties extends TaskListProperties<Task, TaskFilters> {
     projectIdentifier: string
 }
 
-class ApiTaskList extends TaskList<Task, TaskFilters, ApiTaskListProperties> {
-    constructor(props: ApiTaskListProperties) {
+class TaskBrowserTaskList extends TaskList<Task, TaskFilters, TaskBrowserTaskListProperties> {
+    constructor(props: TaskBrowserTaskListProperties) {
         super(props)
     }
     protected createElement(task: Task): JSX.Element {
         const taskLink = "/project/" + this.props.projectIdentifier + "/task/" + task.identifier
-        const milestoneIndicator = ApiTaskList.createMilestoneIndicator(task)
+        const milestoneIndicator = TaskBrowserTaskList.createMilestoneIndicator(task)
         return <ListGroupItem href={taskLink} key={task.identifier}>
             <span className="common-task-indicator">{milestoneIndicator}</span>
             <span>{task.name} </span>
@@ -44,12 +44,11 @@ interface TaskBrowserProperties {
 
 export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
     render() {
-        return <ApiTaskList projectIdentifier={this.props.projectIdentifier} tasks={this.props.tasks}
-                            filters={this.props.filters}
-                            onFiltersChanged={this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)} >
-            <TasksHeader filters={this.props.filters}
-                         onFiltersChanged={this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)} />
-        </ApiTaskList>
+        const onFiltersChanged=this.props.onFiltersChanged.bind(this, this.props.projectIdentifier)
+        return <TaskBrowserTaskList projectIdentifier={this.props.projectIdentifier} tasks={this.props.tasks}
+                                    filters={this.props.filters} onFiltersChanged={onFiltersChanged} >
+            <TasksHeader filters={this.props.filters} onFiltersChanged={onFiltersChanged} />
+        </TaskBrowserTaskList>
     }
     componentDidMount() {
         this.props.onFetchTasks(this.props.projectIdentifier)

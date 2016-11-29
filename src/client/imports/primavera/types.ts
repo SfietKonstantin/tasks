@@ -1,7 +1,7 @@
 import { Project, TaskRelation, DelayRelation } from "../../../common/types"
 import { ApiInputTask, ApiInputDelay } from "../../../common/apitypes"
 import { RelationGraphNode, GraphDiff } from "./graph"
-import { TaskListFilters } from "../../common/tasklist/types"
+import * as tasklist from "../../common/tasklist/types"
 
 export enum Stage {
     Project,
@@ -61,12 +61,17 @@ export interface RelationsState {
     isInvalidFormat: boolean
 }
 
-export interface DelaysState {
-    filters: TaskListFilters
-    tasks: Array<PrimaveraTask>
+export type DelaysFiltersState = tasklist.State<PrimaveraTask, tasklist.TaskListFilters>
+
+export interface DelaysSelectionState {
     selection: Set<string>
     diffs: Array<GraphDiff>
     warnings: Map<string, Array<string>>
+}
+
+export interface DelaysState {
+    filters: DelaysFiltersState
+    selection: DelaysSelectionState
 }
 
 export enum SubmitState {

@@ -13,3 +13,8 @@ export interface Task {
     name: string
     duration: number
 }
+
+export interface State<T extends Task, F extends TaskListFilters> {
+    filters: F
+    tasks: Array<T>
+}

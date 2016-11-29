@@ -1,11 +1,10 @@
-import { Action } from "redux"
-import {
-    DelayFiltersAction, DELAY_FILTERS_DEFINE, DelaySelectionAction, DELAY_SELECTION_DEFINE
-} from "../actions/delays"
-import { DelaysState, PrimaveraTask } from "../types"
+import { combineReducers, Action } from "redux"
+import { DelaySelectionAction, DELAY_SELECTION_DEFINE } from "../actions/delays"
+import { DelaysState, DelaysSelectionState, DelaysFiltersState, PrimaveraTask } from "../types"
 import { GraphDiff, RelationGraph } from "../graph"
-import { delays } from "../states"
+import { delaysFilters, delaysSelection } from "../states"
 import { MilestoneFilterMode, TaskListFilters } from "../../../common/tasklist/types"
+import { filtersReducer } from "../../../common/tasklist/reducers/filters"
 import { filterTaskList } from "../../../common/tasklist/tasklistfilters"
 import { sortStrings } from "../../../../common/stringutils"
 import { copyAssign } from "../../../common/assign"
@@ -16,14 +15,11 @@ const filterTasks = (tasks: Array<PrimaveraTask>, filters: TaskListFilters): Arr
     })
 }
 
-export const delaysReducer = (state: DelaysState = delays, action: Action): DelaysState => {
+const delaysFiltersReducer = filtersReducer(delaysFilters, filterTasks)
+
+const delaysSelectionReducer = (state: DelaysSelectionState = delaysSelection,
+                                action: Action): DelaysSelectionState => {
     switch (action.type) {
-        case DELAY_FILTERS_DEFINE:
-            const filtersAction = action as DelayFiltersAction
-            return copyAssign(state, {
-                filters: filtersAction.filters,
-                tasks: filterTasks(filtersAction.tasks, filtersAction.filters)
-            })
         case DELAY_SELECTION_DEFINE:
             const selectionAction = action as DelaySelectionAction
             if (selectionAction.selected) {
@@ -42,3 +38,8 @@ export const delaysReducer = (state: DelaysState = delays, action: Action): Dela
             return state
     }
 }
+
+export const delaysReducer = combineReducers<DelaysState>({
+    filters: delaysFiltersReducer,
+    selection: delaysSelectionReducer
+})
