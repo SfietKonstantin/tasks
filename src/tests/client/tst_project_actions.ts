@@ -8,10 +8,11 @@ import {
 } from "../../client/project/actions/project"
 import { TaskFilters } from "../../client/project/types"
 import {
-    TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE,
-    TASKS_RECEIVE_FAILURE, TASKS_FILTER_DISPLAY, fetchTasks, filterTasks
+    TASKS_REQUEST, TASKS_RECEIVE,
+    TASKS_RECEIVE_FAILURE, fetchTasks, filterTasks
 } from "../../client/project/actions/tasks"
 import { MilestoneFilterMode } from "../../client/common/tasklist/types"
+import { TasksAction, FiltersAction, TASKS_UPDATE, FILTERS_UPDATE } from "../../client/common/tasklist/actions"
 import { Project } from "../../common/types"
 import { Task } from "../../common/types"
 import { FakeResponse } from "./fakeresponse"
@@ -19,6 +20,14 @@ import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { project } from "./testdata"
 
 describe("Project actions", () => {
+    const filters: TaskFilters = {
+        notStartedChecked: false,
+        inProgressChecked: true,
+        doneChecked: false,
+        milestoneFilterMode: MilestoneFilterMode.TasksOnly,
+        text: "hello",
+        today: new Date(2016, 2, 6)
+    }
     describe("Project", () => {
         let sandbox: Sinon.SinonSandbox
         let dispatch: Sinon.SinonSpy
@@ -95,18 +104,10 @@ describe("Project actions", () => {
                 sandbox.restore()
                 clearFakeGlobal()
             })
-            it("Should create PROJECT_DEFINE", () => {
-                const filters: TaskFilters = {
-                    notStartedChecked: false,
-                    inProgressChecked: true,
-                    doneChecked: false,
-                    milestoneFilterMode: MilestoneFilterMode.TasksOnly,
-                    text: "hello"
-                }
-                const expected: TaskFiltersAction = {
-                    type: TASKS_FILTER_DISPLAY,
-                    filters,
-                    today: new Date(2016, 2, 6)
+            it("Should create FILTERS_UPDATE", () => {
+                const expected: FiltersAction<TaskFilters> = {
+                    type: FILTERS_UPDATE,
+                    filters
                 }
                 chai.expect(filterTasks("project", filters)).to.deep.equal(expected)
                 const args = {
@@ -159,13 +160,22 @@ describe("Project actions", () => {
                 fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
-                fetchTasks("identifier")(dispatch).then(() => {
-                    const expected: TasksAction = {
-                        type: TASKS_RECEIVE,
+                fetchTasks("identifier", filters)(dispatch).then(() => {
+                    const expected1: Action = {
+                        type: TASKS_RECEIVE
+                    }
+                    const expected2: TasksAction<Task> = {
+                        type: TASKS_UPDATE,
                         tasks
                     }
-                    chai.expect(dispatch.calledTwice).to.true
-                    chai.expect(dispatch.calledWithExactly(expected)).to.true
+                    const expected3: FiltersAction<TaskFilters> = {
+                        type: FILTERS_UPDATE,
+                        filters
+                    }
+                    chai.expect(dispatch.callCount).to.equal(4)
+                    chai.expect(dispatch.calledWithExactly(expected1)).to.true
+                    chai.expect(dispatch.calledWithExactly(expected2)).to.true
+                    chai.expect(dispatch.calledWithExactly(expected3)).to.true
                     done()
                 }).catch((error) => {
                     done(error)
@@ -185,7 +195,7 @@ describe("Project actions", () => {
                 fetchMock.once().returns(Promise.resolve(response))
 
                 // Test
-                fetchTasks("identifier")(dispatch).then(() => {
+                fetchTasks("identifier", filters)(dispatch).then(() => {
                     const expected: Action = { type: TASKS_RECEIVE_FAILURE }
                     chai.expect(dispatch.calledTwice).to.true
                     chai.expect(dispatch.calledWithExactly(expected)).to.true

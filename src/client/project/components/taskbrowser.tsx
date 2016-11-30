@@ -39,7 +39,7 @@ interface TaskBrowserProperties {
     tasks: Array<Task>
     filters: TaskFilters
     onFiltersChanged: (projectIdentifier: string, filters: TaskFilters) => void
-    onFetchTasks: (projectIdentifier: string) => void
+    onFetchTasks: (projectIdentifier: string, filters: TaskFilters) => void
 }
 
 export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
@@ -51,15 +51,15 @@ export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
         </TaskBrowserTaskList>
     }
     componentDidMount() {
-        this.props.onFetchTasks(this.props.projectIdentifier)
+        this.props.onFetchTasks(this.props.projectIdentifier, this.props.filters)
     }
 }
 
 export const mapStateToProps = (state: State) => {
     return {
         projectIdentifier: state.projectIdentifier,
-        tasks: state.tasks.filteredTasks,
-        filters: state.tasks.filters
+        tasks: state.tasks.filters.filteredTasks,
+        filters: state.tasks.filters.filters
     }
 }
 
@@ -68,8 +68,8 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
         onFiltersChanged: (projectIdentifier: string, taskFilters: TaskFilters) => {
             dispatch(filterTasks(projectIdentifier, taskFilters))
         },
-        onFetchTasks: (projectIdentifier: string) => {
-            dispatch(fetchTasks(projectIdentifier))
+        onFetchTasks: (projectIdentifier: string, taskFilters: TaskFilters) => {
+            dispatch(fetchTasks(projectIdentifier, taskFilters))
         }
     }
 }

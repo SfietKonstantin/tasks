@@ -5,7 +5,7 @@ import { RelationGraphNode } from "../graph"
 import { FileSelector } from "./fileselector"
 import { defineStage, defineMaxStage } from "../actions/stages"
 import { importRelations, dismissInvalidRelationsFormat } from "../actions/relations"
-import { updateTasks } from "../../../common/tasklist/actions"
+import { updateTasks, updateFilters } from "../../../common/tasklist/actions"
 import { MilestoneFilterMode, TaskListFilters } from "../../../common/tasklist/types"
 
 interface RelationsSelectorProperties {
@@ -76,7 +76,8 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             }
-            dispatch(updateTasks(Array.from(tasks.values()), filters))
+            dispatch(updateTasks(Array.from(tasks.values())))
+            dispatch(updateFilters(filters))
         },
         onDismissInvalidFormat: () => {
             dispatch(dismissInvalidRelationsFormat())

@@ -72,7 +72,8 @@ describe("Project components", () => {
                 inProgressChecked: false,
                 doneChecked: false,
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
+                text: "",
+                today: new Date(2016, 9, 1)
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -89,7 +90,8 @@ describe("Project components", () => {
                 inProgressChecked: true,
                 doneChecked: false,
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
+                text: "",
+                today: new Date(2016, 9, 1)
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -106,7 +108,8 @@ describe("Project components", () => {
                 inProgressChecked: false,
                 doneChecked: true,
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
+                text: "",
+                today: new Date(2016, 9, 1)
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -123,7 +126,8 @@ describe("Project components", () => {
                 inProgressChecked: false,
                 doneChecked: false,
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
+                text: "",
+                today: new Date(2016, 9, 1)
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -136,7 +140,8 @@ describe("Project components", () => {
                 inProgressChecked: false,
                 doneChecked: false,
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
+                text: "",
+                today: new Date(2016, 9, 1)
             }
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWithExactly(expected)).to.true
@@ -148,7 +153,8 @@ describe("Project components", () => {
                 inProgressChecked: false,
                 doneChecked: false,
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
+                text: "",
+                today: new Date(2016, 9, 1)
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -161,7 +167,8 @@ describe("Project components", () => {
                 inProgressChecked: true,
                 doneChecked: false,
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
+                text: "",
+                today: new Date(2016, 9, 1)
             }
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWithExactly(expected)).to.true
@@ -173,7 +180,8 @@ describe("Project components", () => {
                 inProgressChecked: false,
                 doneChecked: false,
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
+                text: "",
+                today: new Date(2016, 9, 1)
             }
             const component = enzyme.shallow(<TasksHeader filters={filters} onFiltersChanged={callback} />)
 
@@ -186,7 +194,8 @@ describe("Project components", () => {
                 inProgressChecked: false,
                 doneChecked: true,
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
-                text: ""
+                text: "",
+                today: new Date(2016, 9, 1)
             }
             chai.expect(callback.calledOnce).to.true
             chai.expect(callback.calledWithExactly(expected)).to.true

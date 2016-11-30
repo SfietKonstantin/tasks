@@ -1,24 +1,22 @@
-import { Action } from "redux"
-import { TasksState, TaskFilters } from "../types"
+import { combineReducers, Action } from "redux"
+import { TasksState, TaskFilters, TasksMainState, TasksFiltersState } from "../types"
 import { MilestoneFilterMode } from "../../common/tasklist/types"
+import { filtersReducer } from "../../common/tasklist/reducers"
 import { filterTaskList } from "../../common/tasklist/filters"
 import { Task } from "../../../common/types"
-import {
-    TasksAction, TaskFiltersAction, TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE,
-    TASKS_FILTER_DISPLAY
-} from "../actions/tasks"
-import { tasks } from "../states"
+import { TASKS_REQUEST, TASKS_RECEIVE, TASKS_RECEIVE_FAILURE } from "../actions/tasks"
+import { tasksFilters, tasksMain } from "../states"
 import { copyAssign } from "../../common/assign"
 import * as dateutils from "../../../common/dateutils"
 import * as latinize from "latinize"
 
-const filterTasks = (tasks: Array<Task>, filters: TaskFilters, today: Date | null): Array<Task> => {
-    if (!today) {
+const filterTasks = (tasks: Array<Task>, filters: TaskFilters): Array<Task> => {
+    if (!filters.today) {
         return []
     }
 
     const initialFiltered = filterTaskList(tasks, filters)
-    const todayTime = today.getTime()
+    const todayTime = filters.today.getTime()
     const filtered = initialFiltered.filter((task: Task) => {
         const startDate = new Date(task.startDate).getTime()
         const endDate = dateutils.addDays(new Date(task.startDate), task.duration).getTime()
@@ -38,30 +36,22 @@ const filterTasks = (tasks: Array<Task>, filters: TaskFilters, today: Date | nul
     })
 }
 
-export const tasksReducer = (state: TasksState = tasks, action: Action): TasksState => {
+const tasksFiltersReducer = filtersReducer(tasksFilters, filterTasks)
+
+const tasksMainReducer = (state: TasksMainState = tasksMain, action: Action): TasksMainState => {
     switch (action.type) {
         case TASKS_REQUEST:
             return copyAssign(state, { isFetching: true })
         case TASKS_RECEIVE:
-            const tasksAction = action as TasksAction
-            const tasks = tasksAction.tasks.sort((first: Task, second: Task): number => {
-                return first.estimatedStartDate.getTime() - second.estimatedStartDate.getTime()
-            })
-            return copyAssign(state, {
-                isFetching: false,
-                tasks,
-                filteredTasks: filterTasks(tasks, state.filters, state.today)
-            })
+            return copyAssign(state, { isFetching: false })
         case TASKS_RECEIVE_FAILURE:
             return copyAssign(state, { isFetching: false })
-        case TASKS_FILTER_DISPLAY:
-            const taskFiltersAction = action as TaskFiltersAction
-            return copyAssign(state, {
-                today: taskFiltersAction.today,
-                filters: taskFiltersAction.filters,
-                filteredTasks: filterTasks(state.tasks, taskFiltersAction.filters, taskFiltersAction.today)
-            })
         default:
             return state
     }
 }
+
+export const tasksReducer = combineReducers<TasksState>({
+    main: tasksMainReducer,
+    filters: tasksFiltersReducer
+})

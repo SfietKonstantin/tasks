@@ -12,14 +12,12 @@ export const filtersReducer = <T extends Task,
     return (state: State<T, F> = initialState, action: Action) => {
         switch (action.type) {
             case TASKS_UPDATE:
-                const tasksAction = action as TasksAction<T, F>
+                const tasksAction = action as TasksAction<T>
                 return copyAssign(state, {
-                    filters: tasksAction.filters,
-                    tasks: tasksAction.tasks,
-                    filteredTasks: filter(tasksAction.tasks, tasksAction.filters)
+                    tasks: tasksAction.tasks
                 })
             case FILTERS_UPDATE:
-                const filtersAction = action as FiltersAction<T, F>
+                const filtersAction = action as FiltersAction<F>
                 let returned = copyAssign(state, {
                     filters: filtersAction.filters,
                     filteredTasks: filter(state.tasks, filtersAction.filters)

@@ -47,7 +47,8 @@ describe("Project components", () => {
         inProgressChecked: true,
         doneChecked: true,
         text: "",
-        milestoneFilterMode: MilestoneFilterMode.NoFilter
+        milestoneFilterMode: MilestoneFilterMode.NoFilter,
+        today: null
     }
     beforeEach(() => {
         addFakeGlobal()
@@ -93,7 +94,7 @@ describe("Project components", () => {
                                                         onFiltersChanged={onFiltersChanged}
                                                         onFetchTasks={fetchTasks} />)
             chai.expect(fetchTasks.calledOnce).to.true
-            chai.expect(fetchTasks.calledWithExactly("project")).to.true
+            chai.expect(fetchTasks.calledWithExactly("project", filters)).to.true
         })
         it("Should react to filter changed", () => {
             const initialFilters: TaskFilters = {
@@ -101,14 +102,16 @@ describe("Project components", () => {
                 inProgressChecked: true,
                 doneChecked: true,
                 text: "",
-                milestoneFilterMode: MilestoneFilterMode.NoFilter
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                today: null
             }
             const filters: TaskFilters = {
                 notStartedChecked: false,
                 inProgressChecked: true,
                 doneChecked: true,
                 text: "test",
-                milestoneFilterMode: MilestoneFilterMode.TasksOnly
+                milestoneFilterMode: MilestoneFilterMode.TasksOnly,
+                today: null
             }
             const onFiltersChanged = sinon.spy()
             const fetchTasks = sinon.spy()
@@ -131,11 +134,11 @@ describe("Project components", () => {
     })
     it("Should map the onFetchTasks callback", () => {
         const mockedProject = sinon.mock(projectActions)
-        mockedProject.expects("fetchTasks").once().calledWithExactly("project")
+        mockedProject.expects("fetchTasks").once().calledWithExactly("project", filters)
         let dispatch = sinon.spy()
         const mapped = mapDispatchToProps(dispatch)
 
-        mapped.onFetchTasks("project")
+        mapped.onFetchTasks("project", filters)
         mockedProject.verify()
     })
 })

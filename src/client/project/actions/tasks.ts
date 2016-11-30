@@ -3,16 +3,11 @@ import { State, TaskFilters } from "../types"
 import { processError } from "../../common/actions/errors"
 import { ApiTask, createTaskFromApiTask } from "../../../common/apitypes"
 import { Task } from "../../../common/types"
+import { FiltersAction, updateTasks, updateFilters } from "../../common/tasklist/actions"
 
 export const TASKS_REQUEST = "TASKS_REQUEST"
 export const TASKS_RECEIVE = "TASKS_RECEIVE"
 export const TASKS_RECEIVE_FAILURE = "TASKS_RECEIVE_FAILURE"
-export const TASKS_FILTER_DISPLAY = "TASKS_FILTER_DISPLAY"
-
-export interface TasksAction extends Action {
-    type: string,
-    tasks: Array<Task>
-}
 
 export const requestTasks = (): Action => {
     return {
@@ -20,10 +15,9 @@ export const requestTasks = (): Action => {
     }
 }
 
-export const receiveTasks = (tasks: Array<Task>): TasksAction => {
+export const receiveTasks = (): Action => {
     return {
-        type: TASKS_RECEIVE,
-        tasks
+        type: TASKS_RECEIVE
     }
 }
 
@@ -33,7 +27,7 @@ export const receiveFailureTasks = (): Action => {
     }
 }
 
-export const fetchTasks = (projectIdentifier: string) => {
+export const fetchTasks = (projectIdentifier: string, filters: TaskFilters) => {
     return (dispatch: Dispatch<State>) => {
         dispatch(requestTasks())
         return fetch("/api/project/" + projectIdentifier + "/tasks").then((response: Response) => {
@@ -42,20 +36,16 @@ export const fetchTasks = (projectIdentifier: string) => {
             const tasks = apiTasks.map((apiTask: ApiTask) => {
                 return createTaskFromApiTask(apiTask)
             })
-            dispatch(receiveTasks(tasks))
+            dispatch(receiveTasks())
+            dispatch(updateTasks(tasks))
+            dispatch(updateFilters(filters))
         }).catch(() => {
             dispatch(receiveFailureTasks())
         })
     }
 }
 
-export interface TaskFiltersAction extends Action {
-    type: string,
-    filters: TaskFilters
-    today: Date | null
-}
-
-export const filterTasks = (projectIdentifier: string, filters: TaskFilters): TaskFiltersAction => {
+export const filterTasks = (projectIdentifier: string, filters: TaskFilters): FiltersAction<TaskFilters> => {
     try {
         let savedFilter = {
             notStartedChecked: filters.notStartedChecked,
@@ -64,9 +54,5 @@ export const filterTasks = (projectIdentifier: string, filters: TaskFilters): Ta
         }
         localStorage.setItem(projectIdentifier, JSON.stringify(savedFilter))
     } catch (error) {}
-    return {
-        type: TASKS_FILTER_DISPLAY,
-        filters,
-        today: new Date()
-    }
+    return updateFilters(filters)
 }
