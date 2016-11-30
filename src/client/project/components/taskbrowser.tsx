@@ -58,8 +58,8 @@ export class TaskBrowser extends React.Component<TaskBrowserProperties, {}> {
 export const mapStateToProps = (state: State) => {
     return {
         projectIdentifier: state.projectIdentifier,
-        tasks: state.tasks.filters.filteredTasks,
-        filters: state.tasks.filters.filters
+        tasks: state.tasks.taskList.filteredTasks,
+        filters: state.tasks.taskList.filters
     }
 }
 

@@ -1,5 +1,5 @@
 import {
-    Stage, Stages, TasksState, RelationsState, DelaysFiltersState, DelaysSelectionState,
+    Stage, Stages, TasksState, RelationsState, DelaysTaskListState, DelaysSelectionState,
     DelaysState, OverviewState, PrimaveraTask, SubmitState
 } from "./types"
 import { RelationGraphNode, GraphDiff } from "./graph"
@@ -33,7 +33,7 @@ export const relations: RelationsState = {
     isInvalidFormat: false
 }
 
-export const delaysFilters: DelaysFiltersState = {
+export const delaysFilters: DelaysTaskListState = {
     tasks: [],
     filteredTasks: [],
     filters: {
@@ -49,7 +49,7 @@ export const delaysSelection: DelaysSelectionState = {
 }
 
 export const delays: DelaysState = {
-    filters: delaysFilters,
+    taskList: delaysFilters,
     selection: delaysSelection
 }
 

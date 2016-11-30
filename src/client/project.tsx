@@ -31,13 +31,13 @@ export const render = (projectIdentifier: string) => {
         const filterJson = localStorage.getItem(projectIdentifier)
         if (filterJson != null) {
             const filter = JSON.parse(filterJson)
-            initialState.tasks.filters.filters.notStartedChecked = filter.notStartedChecked
-            initialState.tasks.filters.filters.inProgressChecked = filter.inProgressChecked
-            initialState.tasks.filters.filters.doneChecked = filter.doneChecked
+            initialState.tasks.taskList.filters.notStartedChecked = filter.notStartedChecked
+            initialState.tasks.taskList.filters.inProgressChecked = filter.inProgressChecked
+            initialState.tasks.taskList.filters.doneChecked = filter.doneChecked
         }
     }
     catch (error) {}
-    initialState.tasks.filters.filters.today = new Date()
+    initialState.tasks.taskList.filters.today = new Date()
 
     const store = Redux.createStore(
         mainReducer, initialState,

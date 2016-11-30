@@ -61,7 +61,7 @@ export interface RelationsState {
     isInvalidFormat: boolean
 }
 
-export type DelaysFiltersState = tasklist.State<PrimaveraTask, tasklist.TaskListFilters>
+export type DelaysTaskListState = tasklist.State<PrimaveraTask, tasklist.TaskListFilters>
 
 export interface DelaysSelectionState {
     selection: Set<string>
@@ -70,7 +70,7 @@ export interface DelaysSelectionState {
 }
 
 export interface DelaysState {
-    filters: DelaysFiltersState
+    taskList: DelaysTaskListState
     selection: DelaysSelectionState
 }
 

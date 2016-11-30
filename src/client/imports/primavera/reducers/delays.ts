@@ -1,6 +1,6 @@
 import { combineReducers, Action } from "redux"
 import { DelaySelectionAction, DELAY_SELECTION_DEFINE } from "../actions/delays"
-import { DelaysState, DelaysSelectionState, DelaysFiltersState, PrimaveraTask } from "../types"
+import { DelaysState, DelaysSelectionState, DelaysTaskListState, PrimaveraTask } from "../types"
 import { GraphDiff, RelationGraph } from "../graph"
 import { delaysFilters, delaysSelection } from "../states"
 import { MilestoneFilterMode, TaskListFilters } from "../../../common/tasklist/types"
@@ -40,6 +40,6 @@ const delaysSelectionReducer = (state: DelaysSelectionState = delaysSelection,
 }
 
 export const delaysReducer = combineReducers<DelaysState>({
-    filters: delaysFiltersReducer,
-    selection: delaysSelectionReducer
+    selection: delaysSelectionReducer,
+    taskList: delaysFiltersReducer
 })

@@ -21,7 +21,7 @@ export interface TaskFilters extends TaskListFilters {
     today: Date | null
 }
 
-export type TasksFiltersState = tasklist.State<Task, TaskFilters>
+export type TasksTaskListState = tasklist.State<Task, TaskFilters>
 
 export interface TasksMainState {
     isFetching: boolean
@@ -29,5 +29,5 @@ export interface TasksMainState {
 
 export interface TasksState {
     main: TasksMainState
-    filters: TasksFiltersState
+    taskList: TasksTaskListState
 }

@@ -37,7 +37,7 @@ describe("Project reducers", () => {
                 main: {
                     isFetching: true
                 },
-                filters: {
+                taskList: {
                     tasks: cloneArray(tasks),
                     filters: {
                         notStartedChecked: true,
@@ -109,7 +109,7 @@ describe("Project reducers", () => {
         })
         it("Should reduce FILTERS_UPDATE 1", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.filters.tasks = cloneArray(tasks)
+                initialState.tasks.taskList.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: true,
                     inProgressChecked: false,
@@ -119,8 +119,8 @@ describe("Project reducers", () => {
                     today: new Date()
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
-                chai.expect(state.tasks.filters.filters).to.deep.equal(filters)
-                chai.expect(state.tasks.filters.filteredTasks).to.deep.equal([
+                chai.expect(state.tasks.taskList.filters).to.deep.equal(filters)
+                chai.expect(state.tasks.taskList.filteredTasks).to.deep.equal([
                     tasks[4],
                     tasks[2]
                 ])
@@ -130,7 +130,7 @@ describe("Project reducers", () => {
         })
         it("Should reduce TASKS_FILTER_DISPLAY 2", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.filters.tasks = cloneArray(tasks)
+                initialState.tasks.taskList.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: false,
                     inProgressChecked: true,
@@ -140,8 +140,8 @@ describe("Project reducers", () => {
                     today: new Date()
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
-                chai.expect(state.tasks.filters.filters).to.deep.equal(filters)
-                chai.expect(state.tasks.filters.filteredTasks).to.deep.equal([
+                chai.expect(state.tasks.taskList.filters).to.deep.equal(filters)
+                chai.expect(state.tasks.taskList.filteredTasks).to.deep.equal([
                     tasks[1]
                 ])
             }
@@ -150,7 +150,7 @@ describe("Project reducers", () => {
         })
         it("Should reduce TASKS_FILTER_DISPLAY 3", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.filters.tasks = cloneArray(tasks)
+                initialState.tasks.taskList.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: false,
                     inProgressChecked: false,
@@ -160,8 +160,8 @@ describe("Project reducers", () => {
                     today: new Date()
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
-                chai.expect(state.tasks.filters.filters).to.deep.equal(filters)
-                chai.expect(state.tasks.filters.filteredTasks).to.deep.equal([
+                chai.expect(state.tasks.taskList.filters).to.deep.equal(filters)
+                chai.expect(state.tasks.taskList.filteredTasks).to.deep.equal([
                     tasks[0],
                     tasks[3]
                 ])
@@ -171,7 +171,7 @@ describe("Project reducers", () => {
         })
         it("Should reduce TASKS_FILTER_DISPLAY 4", () => {
             const checkState = (initialState: State) => {
-                initialState.tasks.filters.tasks = cloneArray(tasks)
+                initialState.tasks.taskList.tasks = cloneArray(tasks)
                 const filters: TaskFilters = {
                     notStartedChecked: true,
                     inProgressChecked: true,
@@ -181,8 +181,8 @@ describe("Project reducers", () => {
                     today: null
                 }
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
-                chai.expect(state.tasks.filters.filters).to.deep.equal(filters)
-                chai.expect(state.tasks.filters.filteredTasks).to.empty
+                chai.expect(state.tasks.taskList.filters).to.deep.equal(filters)
+                chai.expect(state.tasks.taskList.filteredTasks).to.empty
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -194,8 +194,8 @@ describe("Project reducers", () => {
                 const checkMapped = (initialState: State) => {
                     const mapped = taskBrowser.mapStateToProps(initialState)
                     chai.expect(mapped.projectIdentifier).to.deep.equal(initialState.projectIdentifier)
-                    chai.expect(mapped.tasks).to.deep.equal(initialState.tasks.filters.filteredTasks)
-                    chai.expect(mapped.filters).to.deep.equal(initialState.tasks.filters.filters)
+                    chai.expect(mapped.tasks).to.deep.equal(initialState.tasks.taskList.filteredTasks)
+                    chai.expect(mapped.filters).to.deep.equal(initialState.tasks.taskList.filters)
                 }
                 checkMapped(initialState1)
                 checkMapped(initialState2)

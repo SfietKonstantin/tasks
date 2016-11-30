@@ -96,8 +96,8 @@ export const mapStateToProps = (state: State) => {
         stage: state.stage.current,
         maxStage: state.stage.max,
         tasks: state.tasks.tasks,
-        filteredTasks: state.delays.filters.filteredTasks,
-        filters: state.delays.filters.filters,
+        filteredTasks: state.delays.taskList.filteredTasks,
+        filters: state.delays.taskList.filters,
         relations: state.relations.relations,
         warnings: state.delays.selection.warnings,
         selection: state.delays.selection.selection

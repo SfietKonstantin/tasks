@@ -88,7 +88,7 @@ describe("Primavera reducers", () => {
                 isInvalidFormat: true
             },
             delays: {
-                filters: {
+                taskList: {
                     filters: {
                         milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
                         text: "test"
@@ -239,10 +239,10 @@ describe("Primavera reducers", () => {
                 text: ""
             }
             const state1 = main.mainReducer(initialState1, updateFilters(filters))
-            chai.expect(state1.delays.filters.filteredTasks).to.empty
-            chai.expect(state1.delays.filters.filters).to.deep.equal(filters)
+            chai.expect(state1.delays.taskList.filteredTasks).to.empty
+            chai.expect(state1.delays.taskList.filters).to.deep.equal(filters)
             const state2 = main.mainReducer(initialState2, updateFilters(filters))
-            chai.expect(state2.delays.filters.filteredTasks).to.deep.equal([
+            chai.expect(state2.delays.taskList.filteredTasks).to.deep.equal([
                 primaveraTasks2.get("milestone1"),
                 primaveraTasks2.get("milestone2"),
                 primaveraTasks2.get("task1"),
@@ -250,7 +250,7 @@ describe("Primavera reducers", () => {
                 primaveraTasks2.get("task3"),
                 primaveraTasks2.get("task4")
             ])
-            chai.expect(state2.delays.filters.filters).to.deep.equal(filters)
+            chai.expect(state2.delays.taskList.filters).to.deep.equal(filters)
         })
         it("Should reduce DELAY_SELECTION_DEFINE 1", () => {
             const expectedDiffs: Array<GraphDiff> = [
@@ -398,8 +398,8 @@ describe("Primavera reducers", () => {
                     const mapped = delaysSelector.mapStateToProps(initialState)
                     chai.expect(mapped.stage).to.equal(initialState.stage.current)
                     expectMapEqual(mapped.tasks, initialState.tasks.tasks)
-                    chai.expect(mapped.filteredTasks).to.deep.equal(initialState.delays.filters.tasks)
-                    chai.expect(mapped.filters).to.deep.equal(initialState.delays.filters.filters)
+                    chai.expect(mapped.filteredTasks).to.deep.equal(initialState.delays.taskList.tasks)
+                    chai.expect(mapped.filters).to.deep.equal(initialState.delays.taskList.filters)
                     expectMapEqual(mapped.relations, initialState.relations.relations)
                     expectMapEqual(mapped.warnings, initialState.delays.selection.warnings)
                     expectSetEqual(mapped.selection, initialState.delays.selection.selection)

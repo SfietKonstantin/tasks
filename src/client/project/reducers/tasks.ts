@@ -1,5 +1,5 @@
 import { combineReducers, Action } from "redux"
-import { TasksState, TaskFilters, TasksMainState, TasksFiltersState } from "../types"
+import { TasksState, TaskFilters, TasksMainState, TasksTaskListState } from "../types"
 import { MilestoneFilterMode } from "../../common/tasklist/types"
 import { filtersReducer } from "../../common/tasklist/reducers"
 import { filterTaskList } from "../../common/tasklist/filters"
@@ -53,5 +53,5 @@ const tasksMainReducer = (state: TasksMainState = tasksMain, action: Action): Ta
 
 export const tasksReducer = combineReducers<TasksState>({
     main: tasksMainReducer,
-    filters: tasksFiltersReducer
+    taskList: tasksFiltersReducer
 })
