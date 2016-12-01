@@ -34,13 +34,14 @@ export const relations: RelationsState = {
 }
 
 export const delaysFilters: DelaysTaskListState = {
-    tasks: [],
-    filteredTasks: [],
-    displayedTasks: [],
+    tasksPerPage: 20,
     filters: {
         milestoneFilterMode: MilestoneFilterMode.NoFilter,
         text: ""
     },
+    tasks: [],
+    filteredTasks: [],
+    displayedTasks: [],
     currentPage: 0,
     maxPage: 0
 }

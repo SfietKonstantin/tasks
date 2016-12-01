@@ -89,6 +89,7 @@ describe("Primavera reducers", () => {
             },
             delays: {
                 taskList: {
+                    tasksPerPage: 10,
                     filters: {
                         milestoneFilterMode: MilestoneFilterMode.MilestonesOnly,
                         text: "test"

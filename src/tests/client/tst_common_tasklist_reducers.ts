@@ -1,10 +1,10 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
 import * as reducers from "../../client/common/tasklist/reducers"
-import { updateTasks, updateFilters } from "../../client/common/tasklist/actions"
+import { updateTasks, updateFilters, previousTasksPage, nextTasksPage } from "../../client/common/tasklist/actions"
 import { State, Task, TaskListFilters, MilestoneFilterMode } from "../../client/common/tasklist/types"
 import { filterTaskList } from "../../client/common/tasklist/filters"
-import { cloneArray } from "./testdata"
+import { cloneArray, cloneObject } from "./testdata"
 
 describe("TaskList reducers", () => {
     let dispatch: Sinon.SinonSpy
@@ -40,6 +40,7 @@ describe("TaskList reducers", () => {
     beforeEach(() => {
         dispatch = sinon.spy()
         initialState1 = {
+            tasksPerPage: 10,
             filters: {
                 text: "",
                 milestoneFilterMode: MilestoneFilterMode.NoFilter
@@ -51,6 +52,7 @@ describe("TaskList reducers", () => {
             maxPage: 2
         }
         initialState2 = {
+            tasksPerPage: 10,
             filters: {
                 text: "",
                 milestoneFilterMode: MilestoneFilterMode.NoFilter
@@ -68,6 +70,8 @@ describe("TaskList reducers", () => {
                 const action = updateTasks(tasks)
                 const state = reducers.filtersReducer(initialState, filterTaskList)(initialState, action)
                 chai.expect(state.tasks).to.deep.equal(tasks)
+                chai.expect(state.currentPage).to.equal(0)
+                chai.expect(state.maxPage).to.equal(0)
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -155,6 +159,87 @@ describe("TaskList reducers", () => {
             chai.expect(state2.filteredTasks).to.deep.equal([ tasks[0], tasks[4] ])
             chai.expect(state2.displayedTasks).to.deep.equal([ tasks[0], tasks[4] ])
             chai.expect(state2.filters).to.deep.equal(filters)
+        })
+        it("Should reduce FILTERS_UPDATE 7", () => {
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
+            const initialState = cloneObject(initialState2)
+            initialState.tasksPerPage = 2
+            const state = reducers.filtersReducer(initialState2, filterTaskList)(initialState, updateFilters(filters))
+            chai.expect(state.filteredTasks).to.deep.equal([ tasks[0], tasks[1], tasks[2], tasks[3], tasks[4] ])
+            chai.expect(state.displayedTasks).to.deep.equal([ tasks[0], tasks[1] ])
+            chai.expect(state.filters).to.deep.equal(filters)
+            chai.expect(state.maxPage).to.equal(2)
+        })
+        it("Should reduce TASKS_PAGE_PREVIOUS 1", () => {
+            const initialState: State<Task, TaskListFilters> = {
+                tasksPerPage: 2,
+                filters: {
+                    text: "",
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter
+                },
+                tasks: cloneArray(tasks),
+                filteredTasks: cloneArray(tasks),
+                displayedTasks: [ tasks[0], tasks[1] ],
+                currentPage: 0,
+                maxPage: 2
+            }
+            const state = reducers.filtersReducer(initialState2, filterTaskList)(initialState, previousTasksPage())
+            chai.expect(state.displayedTasks).to.deep.equal([ tasks[0], tasks[1] ])
+            chai.expect(state.currentPage).to.equal(0)
+        })
+        it("Should reduce TASKS_PAGE_PREVIOUS 2", () => {
+            const initialState: State<Task, TaskListFilters> = {
+                tasksPerPage: 2,
+                filters: {
+                    text: "",
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter
+                },
+                tasks: cloneArray(tasks),
+                filteredTasks: cloneArray(tasks),
+                displayedTasks: [ tasks[2], tasks[3] ],
+                currentPage: 1,
+                maxPage: 2
+            }
+            const state = reducers.filtersReducer(initialState2, filterTaskList)(initialState, previousTasksPage())
+            chai.expect(state.displayedTasks).to.deep.equal([ tasks[0], tasks[1] ])
+            chai.expect(state.currentPage).to.equal(0)
+        })
+        it("Should reduce TASKS_PAGE_NEXT 1", () => {
+            const initialState: State<Task, TaskListFilters> = {
+                tasksPerPage: 2,
+                filters: {
+                    text: "",
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter
+                },
+                tasks: cloneArray(tasks),
+                filteredTasks: cloneArray(tasks),
+                displayedTasks: [ tasks[2], tasks[3] ],
+                currentPage: 1,
+                maxPage: 2
+            }
+            const state = reducers.filtersReducer(initialState2, filterTaskList)(initialState, nextTasksPage())
+            chai.expect(state.displayedTasks).to.deep.equal([ tasks[4] ])
+            chai.expect(state.currentPage).to.equal(2)
+        })
+        it("Should reduce TASKS_PAGE_NEXT 2", () => {
+            const initialState: State<Task, TaskListFilters> = {
+                tasksPerPage: 2,
+                filters: {
+                    text: "",
+                    milestoneFilterMode: MilestoneFilterMode.NoFilter
+                },
+                tasks: cloneArray(tasks),
+                filteredTasks: cloneArray(tasks),
+                displayedTasks: [ tasks[4] ],
+                currentPage: 2,
+                maxPage: 2
+            }
+            const state = reducers.filtersReducer(initialState2, filterTaskList)(initialState, nextTasksPage())
+            chai.expect(state.displayedTasks).to.deep.equal([ tasks[4] ])
+            chai.expect(state.currentPage).to.equal(2)
         })
     })
 })

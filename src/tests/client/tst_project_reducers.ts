@@ -38,7 +38,7 @@ describe("Project reducers", () => {
                     isFetching: true
                 },
                 taskList: {
-                    tasks: cloneArray(tasks),
+                    tasksPerPage: 10,
                     filters: {
                         notStartedChecked: true,
                         inProgressChecked: true,
@@ -47,6 +47,7 @@ describe("Project reducers", () => {
                         text: "Some filter",
                         today: new Date(2016, 9, 1)
                     },
+                    tasks: cloneArray(tasks),
                     filteredTasks: cloneArray(tasks),
                     displayedTasks: cloneArray(tasks),
                     currentPage: 0,
