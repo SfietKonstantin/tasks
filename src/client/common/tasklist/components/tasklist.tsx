@@ -65,7 +65,7 @@ export abstract class TaskList<T extends Task,
                 {emptyIndicator}
                 <div className="panel-footer">
                     <Pager>
-                        <Pager.Item previous disabled={!previousEnabled} onClick={this.props.onPreviousPage.bind(this)}>
+                        <Pager.Item previous disabled={!previousEnabled} onClick={this.handlePrevious.bind(this)}>
                             &larr; Previous Page
                         </Pager.Item>
                         {pageIndicator}

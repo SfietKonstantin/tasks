@@ -345,8 +345,8 @@ describe("Common components", () => {
 
             formControls.at(0).simulate("input", { target: { value: "Test" } })
             formControls.at(0).simulate("blur")
-            chai.expect(onFiltersChanged.calledOnce)
-            chai.expect(onFiltersChanged.calledWithExactly("Test"))
+            chai.expect(onFiltersChanged.calledOnce).to.true
+            chai.expect(onFiltersChanged.calledWithExactly(filters)).to.true
         })
         it("Should handle submit", () => {
             const createElement = sinon.stub()
@@ -369,8 +369,50 @@ describe("Common components", () => {
 
             formControls.at(0).simulate("input", { target: { value: "Test" } })
             formControls.at(0).simulate("submit")
-            chai.expect(onFiltersChanged.calledOnce)
-            chai.expect(onFiltersChanged.calledWithExactly("Test"))
+            chai.expect(onFiltersChanged.calledOnce).to.true
+            chai.expect(onFiltersChanged.calledWithExactly(filters)).to.true
+        })
+        it("Should handle click on previous", () => {
+            const createElement = sinon.stub()
+            const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
+            const component = enzyme.shallow(<TestTaskList tasks={[]}
+                                                           filters={filters}
+                                                           currentPage={1}
+                                                           maxPage={1}
+                                                           onFiltersChanged={onFiltersChanged}
+                                                           onPreviousPage={onPreviousPage}
+                                                           onNextPage={onNextPage} />)
+            const pagerItems = component.find(Pager.Item)
+            pagerItems.at(0).simulate("click")
+            chai.expect(onPreviousPage.calledOnce).to.true
+            chai.expect(onPreviousPage.calledWithExactly()).to.true
+        })
+        it("Should handle click on next", () => {
+            const createElement = sinon.stub()
+            const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
+            const component = enzyme.shallow(<TestTaskList tasks={[]}
+                                                           filters={filters}
+                                                           currentPage={1}
+                                                           maxPage={1}
+                                                           onFiltersChanged={onFiltersChanged}
+                                                           onPreviousPage={onPreviousPage}
+                                                           onNextPage={onNextPage} />)
+            const pagerItems = component.find(Pager.Item)
+            pagerItems.at(1).simulate("click")
+            chai.expect(onNextPage.calledOnce).to.true
+            chai.expect(onNextPage.calledWithExactly()).to.true
         })
     })
     describe("StatusIndicator", () => {

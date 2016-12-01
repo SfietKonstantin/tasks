@@ -11,7 +11,7 @@ import { MilestoneFilterMode, TaskListFilters } from "../../client/common/taskli
 import { defineStage, defineMaxStage } from "../../client/imports/primavera/actions/stages"
 import { defineDelaySelection } from "../../client/imports/primavera/actions/delays"
 import { filterForOverview } from "../../client/imports/primavera/actions/overview"
-import { updateFilters } from "../../client/common/tasklist/actions"
+import { updateFilters, previousTasksPage, nextTasksPage } from "../../client/common/tasklist/actions"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 import { expectMapEqual } from "./expectutils"
 import {
@@ -80,6 +80,14 @@ describe("Primavera import DelaySelector", () => {
         component.simulate("current")
         chai.expect(onCurrentStage.calledOnce).to.true
         chai.expect(onCurrentStage.calledWithExactly()).to.true
+
+        taskListComponent.simulate("previousPage")
+        chai.expect(onPreviousTasksPage.calledOnce).to.true
+        chai.expect(onPreviousTasksPage.calledWithExactly()).to.true
+
+        taskListComponent.simulate("nextPage")
+        chai.expect(onNextTasksPage.calledOnce).to.true
+        chai.expect(onNextTasksPage.calledWithExactly()).to.true
     })
     it("Should render items correctly", () => {
         const onFiltersChanged = sinon.spy()
@@ -193,6 +201,20 @@ describe("Primavera import DelaySelector", () => {
 
         mapped.onFiltersChanged(taskListFilters)
         dispatch.calledWithExactly(updateFilters(taskListFilters))
+    })
+    it("Should map the onPreviousTasksPage callback", () => {
+        let dispatch = sinon.spy()
+        const mapped = mapDispatchToProps(dispatch)
+
+        mapped.onPreviousTasksPage()
+        dispatch.calledWithExactly(previousTasksPage())
+    })
+    it("Should map the onNextTasksPage callback", () => {
+        let dispatch = sinon.spy()
+        const mapped = mapDispatchToProps(dispatch)
+
+        mapped.onNextTasksPage()
+        dispatch.calledWithExactly(nextTasksPage())
     })
     it("Should map the onSelectionChanged callback", () => {
         let dispatch = sinon.spy()

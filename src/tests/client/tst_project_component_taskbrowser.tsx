@@ -9,6 +9,7 @@ import { filterTasks } from "../../client/project/actions/tasks"
 import * as projectActions from "../../client/project/actions/tasks"
 import { TaskListFilters } from "../../client/common/tasklist/types"
 import { MilestoneFilterMode } from "../../client/common/tasklist/types"
+import { previousTasksPage, nextTasksPage } from "../../client/common/tasklist/actions"
 import { Task } from "../../common/types"
 import { addFakeGlobal, clearFakeGlobal } from "./fakeglobal"
 
@@ -108,7 +109,7 @@ describe("Project components", () => {
             chai.expect(fetchTasks.calledOnce).to.true
             chai.expect(fetchTasks.calledWithExactly("project", filters)).to.true
         })
-        it("Should react to filter changed", () => {
+        it("Should react to callbacks", () => {
             const initialFilters: TaskFilters = {
                 notStartedChecked: false,
                 inProgressChecked: true,
@@ -141,6 +142,14 @@ describe("Project components", () => {
             component.simulate("filtersChanged", filters)
             chai.expect(onFiltersChanged.calledOnce).to.true
             chai.expect(onFiltersChanged.calledWithExactly("project", filters)).to.true
+
+            component.simulate("previousPage")
+            chai.expect(onPreviousTasksPage.calledOnce).to.true
+            chai.expect(onPreviousTasksPage.calledWithExactly()).to.true
+
+            component.simulate("nextPage")
+            chai.expect(onNextTasksPage.calledOnce).to.true
+            chai.expect(onNextTasksPage.calledWithExactly()).to.true
         })
     })
     it("Should map the onFiltersChanged callback", () => {
@@ -158,5 +167,19 @@ describe("Project components", () => {
 
         mapped.onFetchTasks("project", filters)
         mockedProject.verify()
+    })
+    it("Should map the onPreviousTasksPage callback", () => {
+        let dispatch = sinon.spy()
+        const mapped = mapDispatchToProps(dispatch)
+
+        mapped.onPreviousTasksPage()
+        dispatch.calledWithExactly(previousTasksPage())
+    })
+    it("Should map the onNextTasksPage callback", () => {
+        let dispatch = sinon.spy()
+        const mapped = mapDispatchToProps(dispatch)
+
+        mapped.onNextTasksPage()
+        dispatch.calledWithExactly(nextTasksPage())
     })
 })
