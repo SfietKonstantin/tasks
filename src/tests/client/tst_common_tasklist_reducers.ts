@@ -45,7 +45,10 @@ describe("TaskList reducers", () => {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter
             },
             tasks: [],
-            filteredTasks: []
+            filteredTasks: [],
+            displayedTasks: [],
+            currentPage: 1,
+            maxPage: 2
         }
         initialState2 = {
             filters: {
@@ -53,7 +56,10 @@ describe("TaskList reducers", () => {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter
             },
             tasks: cloneArray(tasks),
-            filteredTasks: cloneArray(tasks)
+            filteredTasks: cloneArray(tasks),
+            displayedTasks: cloneArray(tasks),
+            currentPage: 0,
+            maxPage: 1
         }
     })
     describe("TaskList reducers", () => {
@@ -73,9 +79,11 @@ describe("TaskList reducers", () => {
             }
             const state1 = reducers.filtersReducer(initialState1, filterTaskList)(initialState1, updateFilters(filters))
             chai.expect(state1.filteredTasks).to.empty
+            chai.expect(state1.displayedTasks).to.empty
             chai.expect(state1.filters).to.deep.equal(filters)
             const state2 = reducers.filtersReducer(initialState2, filterTaskList)(initialState2, updateFilters(filters))
             chai.expect(state2.filteredTasks).to.deep.equal([ tasks[0], tasks[1], tasks[2], tasks[3], tasks[4] ])
+            chai.expect(state2.displayedTasks).to.deep.equal([ tasks[0], tasks[1], tasks[2], tasks[3], tasks[4] ])
             chai.expect(state2.filters).to.deep.equal(filters)
         })
         it("Should reduce FILTERS_UPDATE 2", () => {
@@ -85,9 +93,11 @@ describe("TaskList reducers", () => {
             }
             const state1 = reducers.filtersReducer(initialState1, filterTaskList)(initialState1, updateFilters(filters))
             chai.expect(state1.filteredTasks).to.empty
+            chai.expect(state1.displayedTasks).to.empty
             chai.expect(state1.filters).to.deep.equal(filters)
             const state2 = reducers.filtersReducer(initialState2, filterTaskList)(initialState2, updateFilters(filters))
             chai.expect(state2.filteredTasks).to.deep.equal([ tasks[0], tasks[1], tasks[2] ])
+            chai.expect(state2.displayedTasks).to.deep.equal([ tasks[0], tasks[1], tasks[2] ])
             chai.expect(state2.filters).to.deep.equal(filters)
         })
         it("Should reduce FILTERS_UPDATE 3", () => {
@@ -97,9 +107,11 @@ describe("TaskList reducers", () => {
             }
             const state1 = reducers.filtersReducer(initialState1, filterTaskList)(initialState1, updateFilters(filters))
             chai.expect(state1.filteredTasks).to.empty
+            chai.expect(state1.displayedTasks).to.empty
             chai.expect(state1.filters).to.deep.equal(filters)
             const state2 = reducers.filtersReducer(initialState2, filterTaskList)(initialState2, updateFilters(filters))
             chai.expect(state2.filteredTasks).to.deep.equal([ tasks[3], tasks[4] ])
+            chai.expect(state2.displayedTasks).to.deep.equal([ tasks[3], tasks[4] ])
             chai.expect(state2.filters).to.deep.equal(filters)
         })
         it("Should reduce FILTERS_UPDATE 4", () => {
@@ -109,9 +121,11 @@ describe("TaskList reducers", () => {
             }
             const state1 = reducers.filtersReducer(initialState1, filterTaskList)(initialState1, updateFilters(filters))
             chai.expect(state1.filteredTasks).to.empty
+            chai.expect(state1.displayedTasks).to.empty
             chai.expect(state1.filters).to.deep.equal(filters)
             const state2 = reducers.filtersReducer(initialState2, filterTaskList)(initialState2, updateFilters(filters))
             chai.expect(state2.filteredTasks).to.deep.equal([ tasks[0], tasks[3] ])
+            chai.expect(state2.displayedTasks).to.deep.equal([ tasks[0], tasks[3] ])
             chai.expect(state2.filters).to.deep.equal(filters)
         })
         it("Should reduce FILTERS_UPDATE 5", () => {
@@ -121,9 +135,11 @@ describe("TaskList reducers", () => {
             }
             const state1 = reducers.filtersReducer(initialState1, filterTaskList)(initialState1, updateFilters(filters))
             chai.expect(state1.filteredTasks).to.empty
+            chai.expect(state1.displayedTasks).to.empty
             chai.expect(state1.filters).to.deep.equal(filters)
             const state2 = reducers.filtersReducer(initialState2, filterTaskList)(initialState2, updateFilters(filters))
             chai.expect(state2.filteredTasks).to.deep.equal([ tasks[0], tasks[1], tasks[2] ])
+            chai.expect(state2.displayedTasks).to.deep.equal([ tasks[0], tasks[1], tasks[2] ])
             chai.expect(state2.filters).to.deep.equal(filters)
         })
         it("Should reduce FILTERS_UPDATE 6", () => {
@@ -133,9 +149,11 @@ describe("TaskList reducers", () => {
             }
             const state1 = reducers.filtersReducer(initialState1, filterTaskList)(initialState1, updateFilters(filters))
             chai.expect(state1.filteredTasks).to.empty
+            chai.expect(state1.displayedTasks).to.empty
             chai.expect(state1.filters).to.deep.equal(filters)
             const state2 = reducers.filtersReducer(initialState2, filterTaskList)(initialState2, updateFilters(filters))
             chai.expect(state2.filteredTasks).to.deep.equal([ tasks[0], tasks[4] ])
+            chai.expect(state2.displayedTasks).to.deep.equal([ tasks[0], tasks[4] ])
             chai.expect(state2.filters).to.deep.equal(filters)
         })
     })

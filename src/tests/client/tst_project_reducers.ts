@@ -47,7 +47,10 @@ describe("Project reducers", () => {
                         text: "Some filter",
                         today: new Date(2016, 9, 1)
                     },
-                    filteredTasks: cloneArray(tasks)
+                    filteredTasks: cloneArray(tasks),
+                    displayedTasks: cloneArray(tasks),
+                    currentPage: 0,
+                    maxPage: 1
                 },
             }
         }
@@ -124,6 +127,10 @@ describe("Project reducers", () => {
                     tasks[4],
                     tasks[2]
                 ])
+                chai.expect(state.tasks.taskList.displayedTasks).to.deep.equal([
+                    tasks[4],
+                    tasks[2]
+                ])
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -142,6 +149,9 @@ describe("Project reducers", () => {
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
                 chai.expect(state.tasks.taskList.filters).to.deep.equal(filters)
                 chai.expect(state.tasks.taskList.filteredTasks).to.deep.equal([
+                    tasks[1]
+                ])
+                chai.expect(state.tasks.taskList.displayedTasks).to.deep.equal([
                     tasks[1]
                 ])
             }
@@ -165,6 +175,10 @@ describe("Project reducers", () => {
                     tasks[0],
                     tasks[3]
                 ])
+                chai.expect(state.tasks.taskList.displayedTasks).to.deep.equal([
+                    tasks[0],
+                    tasks[3]
+                ])
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -183,6 +197,7 @@ describe("Project reducers", () => {
                 const state = main.mainReducer(initialState, filterTasks("identifier", filters))
                 chai.expect(state.tasks.taskList.filters).to.deep.equal(filters)
                 chai.expect(state.tasks.taskList.filteredTasks).to.empty
+                chai.expect(state.tasks.taskList.displayedTasks).to.empty
             }
             checkState(initialState1)
             checkState(initialState2)
@@ -194,7 +209,7 @@ describe("Project reducers", () => {
                 const checkMapped = (initialState: State) => {
                     const mapped = taskBrowser.mapStateToProps(initialState)
                     chai.expect(mapped.projectIdentifier).to.deep.equal(initialState.projectIdentifier)
-                    chai.expect(mapped.tasks).to.deep.equal(initialState.tasks.taskList.filteredTasks)
+                    chai.expect(mapped.tasks).to.deep.equal(initialState.tasks.taskList.displayedTasks)
                     chai.expect(mapped.filters).to.deep.equal(initialState.tasks.taskList.filters)
                 }
                 checkMapped(initialState1)

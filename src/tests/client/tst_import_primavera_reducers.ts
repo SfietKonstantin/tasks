@@ -94,7 +94,10 @@ describe("Primavera reducers", () => {
                         text: "test"
                     },
                     tasks: mapToArray(primaveraTasks2),
-                    filteredTasks: mapToArray(primaveraTasks2)
+                    filteredTasks: mapToArray(primaveraTasks2),
+                    displayedTasks: mapToArray(primaveraTasks2),
+                    currentPage: 0,
+                    maxPage: 1
                 },
                 selection: {
                     selection: cloneSet(selectedDelays2),
@@ -240,9 +243,18 @@ describe("Primavera reducers", () => {
             }
             const state1 = main.mainReducer(initialState1, updateFilters(filters))
             chai.expect(state1.delays.taskList.filteredTasks).to.empty
+            chai.expect(state1.delays.taskList.displayedTasks).to.empty
             chai.expect(state1.delays.taskList.filters).to.deep.equal(filters)
             const state2 = main.mainReducer(initialState2, updateFilters(filters))
             chai.expect(state2.delays.taskList.filteredTasks).to.deep.equal([
+                primaveraTasks2.get("milestone1"),
+                primaveraTasks2.get("milestone2"),
+                primaveraTasks2.get("task1"),
+                primaveraTasks2.get("task2"),
+                primaveraTasks2.get("task3"),
+                primaveraTasks2.get("task4")
+            ])
+            chai.expect(state2.delays.taskList.displayedTasks).to.deep.equal([
                 primaveraTasks2.get("milestone1"),
                 primaveraTasks2.get("milestone2"),
                 primaveraTasks2.get("task1"),
@@ -398,7 +410,7 @@ describe("Primavera reducers", () => {
                     const mapped = delaysSelector.mapStateToProps(initialState)
                     chai.expect(mapped.stage).to.equal(initialState.stage.current)
                     expectMapEqual(mapped.tasks, initialState.tasks.tasks)
-                    chai.expect(mapped.filteredTasks).to.deep.equal(initialState.delays.taskList.tasks)
+                    chai.expect(mapped.displayedTasks).to.deep.equal(initialState.delays.taskList.displayedTasks)
                     chai.expect(mapped.filters).to.deep.equal(initialState.delays.taskList.filters)
                     expectMapEqual(mapped.relations, initialState.relations.relations)
                     expectMapEqual(mapped.warnings, initialState.delays.selection.warnings)

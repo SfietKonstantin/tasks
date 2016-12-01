@@ -18,7 +18,10 @@ export const filters: TaskFilters = {
 export const tasksFilters: TasksTaskListState = {
     tasks: [],
     filters,
-    filteredTasks: []
+    filteredTasks: [],
+    displayedTasks: [],
+    currentPage: 0,
+    maxPage: 0
 }
 
 export const tasksMain: TasksMainState = {

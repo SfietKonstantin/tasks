@@ -10,7 +10,7 @@ import { WarningsButton } from "./warningsbutton"
 import { defineStage, defineMaxStage } from "../actions/stages"
 import { defineDelaySelection } from "../actions/delays"
 import { filterForOverview } from "../actions/overview"
-import { updateFilters } from "../../../common/tasklist/actions"
+import { updateFilters, previousTasksPage, nextTasksPage } from "../../../common/tasklist/actions"
 import * as maputils from "../../../../common/maputils"
 
 interface PrimaveraTaskListProperties extends TaskListProperties<PrimaveraTask, TaskListFilters> {
@@ -40,12 +40,16 @@ interface DelaysSelectorProperties {
     stage: Stage
     maxStage: Stage
     tasks: Map<string, PrimaveraTask>
-    filteredTasks: Array<PrimaveraTask>
+    displayedTasks: Array<PrimaveraTask>
     filters: TaskListFilters
     relations: Map<string, RelationGraphNode>
     warnings: Map<string, Array<string>>
     selection: Set<string>
+    currentPage: number
+    maxPage: number
     onFiltersChanged: (filters: TaskListFilters) => void
+    onPreviousTasksPage: () => void
+    onNextTasksPage: () => void
     onSelectionChanged: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>,
                          identifier: string, selected: boolean) => void
     onCurrentStage: () => void
@@ -63,11 +67,15 @@ export class DelaysSelector extends React.Component<DelaysSelectorProperties, {}
         return <StagePanel displayStage={Stage.Delays} currentStage={this.props.stage}
                            maxStage={this.props.maxStage} title="4. Select delays"
                            warnings={totalWarnings} onCurrent={this.props.onCurrentStage.bind(this)}>
-            <PrimaveraTaskList tasks={this.props.filteredTasks}
+            <PrimaveraTaskList tasks={this.props.displayedTasks}
                                filters={this.props.filters}
                                selection={this.props.selection}
+                               currentPage={this.props.currentPage}
+                               maxPage={this.props.maxPage}
                                onSelectionChanged={this.handleSelectionChanged.bind(this)}
-                               onFiltersChanged={this.handleFiltersChanged.bind(this)} >
+                               onFiltersChanged={this.handleFiltersChanged.bind(this)}
+                               onPreviousPage={this.onPreviousPage.bind(this)}
+                               onNextPage={this.onNextPage.bind(this)} >
                 <span className="import-primavera-delay-indicator">
                     <Label bsStyle="primary">{this.props.selection.size}</Label> delays selected
                 </span>
@@ -89,6 +97,12 @@ export class DelaysSelector extends React.Component<DelaysSelectorProperties, {}
     private handleNext(e: React.MouseEvent) {
         this.props.onNextStage(this.props.tasks, this.props.selection, this.props.relations)
     }
+    private onPreviousPage() {
+        this.props.onPreviousTasksPage()
+    }
+    private onNextPage() {
+        this.props.onNextTasksPage()
+    }
 }
 
 export const mapStateToProps = (state: State) => {
@@ -96,11 +110,13 @@ export const mapStateToProps = (state: State) => {
         stage: state.stage.current,
         maxStage: state.stage.max,
         tasks: state.tasks.tasks,
-        filteredTasks: state.delays.taskList.filteredTasks,
+        displayedTasks: state.delays.taskList.displayedTasks,
         filters: state.delays.taskList.filters,
         relations: state.relations.relations,
         warnings: state.delays.selection.warnings,
-        selection: state.delays.selection.selection
+        selection: state.delays.selection.selection,
+        currentPage: state.delays.taskList.currentPage,
+        maxPage: state.delays.taskList.maxPage
     }
 }
 
@@ -108,6 +124,12 @@ export const mapDispatchToProps = (dispatch: Dispatch<State>) => {
     return {
         onFiltersChanged: (filters: TaskListFilters) => {
             dispatch(updateFilters(filters))
+        },
+        onPreviousTasksPage: () => {
+            dispatch(previousTasksPage())
+        },
+        onNextTasksPage: () => {
+            dispatch(nextTasksPage())
         },
         onSelectionChanged: (tasks: Map<string, PrimaveraTask>, relations: Map<string, RelationGraphNode>,
                              identifier: string, selected: boolean) => {

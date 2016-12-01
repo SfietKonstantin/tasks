@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
-import { Row, Col, ListGroup, FormGroup, FormControl } from "react-bootstrap"
+import { Row, Col, ListGroup, FormGroup, FormControl, Pager } from "react-bootstrap"
 import { TaskListFiltersToolbar } from "./tasklistfilterstoolbar"
 import { TaskListFilters, Task } from "../types"
 import { StatusIndicator, Status } from "../../../common/components/statusindicator"
@@ -8,8 +8,12 @@ import { assign } from "../../../common/assign"
 
 export interface TaskListProperties<T extends Task, F extends TaskListFilters> {
     tasks: Array<T>
+    currentPage: number
+    maxPage: number
     filters: F
     onFiltersChanged: (filters: F) => void
+    onPreviousPage: () => void
+    onNextPage: () => void
 }
 
 interface TaskListState {
@@ -32,6 +36,9 @@ export abstract class TaskList<T extends Task,
             return this.createElement(task)
         })
         const emptyIndicator = this.createEmptyIndicator()
+        const previousEnabled = this.props.currentPage > 0
+        const nextEnabled = this.props.currentPage < this.props.maxPage
+        const pageIndicator = this.createPageIndicator()
         return <div className="tab-table">
             <Row>
                 <Col xs={12} sm={6}>
@@ -56,6 +63,17 @@ export abstract class TaskList<T extends Task,
                     {content}
                 </ListGroup>
                 {emptyIndicator}
+                <div className="panel-footer">
+                    <Pager>
+                        <Pager.Item previous disabled={!previousEnabled} onClick={this.props.onPreviousPage.bind(this)}>
+                            &larr; Previous Page
+                        </Pager.Item>
+                        {pageIndicator}
+                        <Pager.Item next disabled={!nextEnabled} onClick={this.handleNext.bind(this)}>
+                            Next Page &rarr;
+                        </Pager.Item>
+                    </Pager>
+                </div>
             </div>
         </div>
     }
@@ -65,6 +83,12 @@ export abstract class TaskList<T extends Task,
             return null
         }
         return <StatusIndicator status={Status.Info} message="Nothing to show" />
+    }
+    private createPageIndicator(): JSX.Element | null {
+        if (this.props.tasks.length === 0) {
+            return null
+        }
+        return <span>{this.props.currentPage + 1} / {this.props.maxPage + 1}</span>
     }
     private handleTextChange(e: React.FormEvent) {
         const input = e.target as HTMLInputElement
@@ -80,5 +104,11 @@ export abstract class TaskList<T extends Task,
     private handleFiltersChanged() {
         const text = this.state.textFilter
         this.props.onFiltersChanged(assign(this.props.filters, { text }))
+    }
+    private handlePrevious() {
+        this.props.onPreviousPage()
+    }
+    private handleNext() {
+        this.props.onNextPage()
     }
 }

@@ -18,4 +18,7 @@ export interface State<T extends Task, F extends TaskListFilters> {
     filters: F
     tasks: Array<T>
     filteredTasks: Array<T>
+    displayedTasks: Array<T>
+    currentPage: number
+    maxPage: number
 }

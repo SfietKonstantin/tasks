@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as React from "react"
 import * as enzyme from "enzyme"
-import { Nav, NavItem } from "react-bootstrap"
+import { Nav, NavItem, Pager } from "react-bootstrap"
 import * as sinon from "sinon"
 import { Header } from "../../client/common/components/header"
 import { TabBar } from "../../client/common/components/tabs"
@@ -204,13 +204,19 @@ describe("Common components", () => {
                 }
             ]
             const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
             const filters: TaskListFilters = {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             }
             const component = enzyme.mount(<TestTaskList tasks={tasks}
                                                          filters={filters}
-                                                         onFiltersChanged={onFiltersChanged} />)
+                                                         currentPage={0}
+                                                         maxPage={0}
+                                                         onFiltersChanged={onFiltersChanged}
+                                                         onPreviousPage={onPreviousPage}
+                                                         onNextPage={onNextPage} />)
             const p = component.find("p")
             chai.expect(p).to.length(2)
             chai.expect(p.at(0).text()).to.equal("Task 1")
@@ -218,25 +224,100 @@ describe("Common components", () => {
         })
         it("Should create an empty ItemList", () => {
             const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
             const filters: TaskListFilters = {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             }
             const component = enzyme.shallow(<TestTaskList tasks={[]}
                                                            filters={filters}
-                                                           onFiltersChanged={onFiltersChanged} />)
+                                                           currentPage={0}
+                                                           maxPage={0}
+                                                           onFiltersChanged={onFiltersChanged}
+                                                           onPreviousPage={onPreviousPage}
+                                                           onNextPage={onNextPage} />)
             const statusIndicator = component.find("StatusIndicator")
             chai.expect(statusIndicator).to.length(1)
         })
+        it("Should render pages correctly 1", () => {
+            const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
+            const component = enzyme.shallow(<TestTaskList tasks={[]}
+                                                           filters={filters}
+                                                           currentPage={0}
+                                                           maxPage={2}
+                                                           onFiltersChanged={onFiltersChanged}
+                                                           onPreviousPage={onPreviousPage}
+                                                           onNextPage={onNextPage} />)
+            const pagerItems = component.find(Pager.Item)
+            chai.expect(pagerItems.at(0).prop("previous")).to.true
+            chai.expect(pagerItems.at(0).prop("disabled")).to.true
+            chai.expect(pagerItems.at(1).prop("next")).to.true
+            chai.expect(pagerItems.at(1).prop("disabled")).to.false
+        })
+        it("Should render pages correctly 2", () => {
+            const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
+            const component = enzyme.shallow(<TestTaskList tasks={[]}
+                                                           filters={filters}
+                                                           currentPage={1}
+                                                           maxPage={2}
+                                                           onFiltersChanged={onFiltersChanged}
+                                                           onPreviousPage={onPreviousPage}
+                                                           onNextPage={onNextPage} />)
+            const pagerItems = component.find(Pager.Item)
+            chai.expect(pagerItems.at(0).prop("previous")).to.true
+            chai.expect(pagerItems.at(0).prop("disabled")).to.false
+            chai.expect(pagerItems.at(1).prop("next")).to.true
+            chai.expect(pagerItems.at(1).prop("disabled")).to.false
+        })
+        it("Should render pages correctly 3", () => {
+            const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
+            const filters: TaskListFilters = {
+                milestoneFilterMode: MilestoneFilterMode.NoFilter,
+                text: ""
+            }
+            const component = enzyme.shallow(<TestTaskList tasks={[]}
+                                                           filters={filters}
+                                                           currentPage={2}
+                                                           maxPage={2}
+                                                           onFiltersChanged={onFiltersChanged}
+                                                           onPreviousPage={onPreviousPage}
+                                                           onNextPage={onNextPage} />)
+            const pagerItems = component.find(Pager.Item)
+            chai.expect(pagerItems.at(0).prop("previous")).to.true
+            chai.expect(pagerItems.at(0).prop("disabled")).to.false
+            chai.expect(pagerItems.at(1).prop("next")).to.true
+            chai.expect(pagerItems.at(1).prop("disabled")).to.true
+        })
         it("Should handle text changed", () => {
             const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
             const filters: TaskListFilters = {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             }
             const component = enzyme.mount(<TestTaskList tasks={[]}
                                                          filters={filters}
-                                                         onFiltersChanged={onFiltersChanged} />)
+                                                         currentPage={0}
+                                                         maxPage={0}
+                                                         onFiltersChanged={onFiltersChanged}
+                                                         onPreviousPage={onPreviousPage}
+                                                         onNextPage={onNextPage} />)
             const formControls = component.children().find("FormControl")
             chai.expect(formControls).to.length(1)
             formControls.at(0).simulate("input", { target: { value: "Test" } })
@@ -246,13 +327,19 @@ describe("Common components", () => {
         it("Should handle blur", () => {
             const createElement = sinon.stub()
             const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
             const filters: TaskListFilters = {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             }
             const component = enzyme.mount(<TestTaskList tasks={[]}
                                                          filters={filters}
-                                                         onFiltersChanged={onFiltersChanged} />)
+                                                         currentPage={0}
+                                                         maxPage={0}
+                                                         onFiltersChanged={onFiltersChanged}
+                                                         onPreviousPage={onPreviousPage}
+                                                         onNextPage={onNextPage} />)
             const formControls = component.children().find("FormControl")
             chai.expect(formControls).to.length(1)
 
@@ -264,13 +351,19 @@ describe("Common components", () => {
         it("Should handle submit", () => {
             const createElement = sinon.stub()
             const onFiltersChanged = sinon.spy()
+            const onPreviousPage = sinon.spy()
+            const onNextPage = sinon.spy()
             const filters: TaskListFilters = {
                 milestoneFilterMode: MilestoneFilterMode.NoFilter,
                 text: ""
             }
             const component = enzyme.mount(<TestTaskList tasks={[]}
                                                          filters={filters}
-                                                         onFiltersChanged={onFiltersChanged} />)
+                                                         currentPage={0}
+                                                         maxPage={0}
+                                                         onFiltersChanged={onFiltersChanged}
+                                                         onPreviousPage={onPreviousPage}
+                                                         onNextPage={onNextPage} />)
             const formControls = component.children().find("FormControl")
             chai.expect(formControls).to.length(1)
 

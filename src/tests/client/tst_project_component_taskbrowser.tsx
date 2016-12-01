@@ -60,11 +60,17 @@ describe("Project components", () => {
         it("Should render items correctly", () => {
             const onFiltersChanged = sinon.spy()
             const fetchTasks = sinon.spy()
+            const onPreviousTasksPage = sinon.spy()
+            const onNextTasksPage = sinon.spy()
             const component = enzyme.shallow(<TaskBrowser projectIdentifier="project"
                                                           tasks={tasks}
                                                           filters={filters}
+                                                          currentPage={0}
+                                                          maxPage={0}
                                                           onFiltersChanged={onFiltersChanged}
-                                                          onFetchTasks={fetchTasks} />)
+                                                          onFetchTasks={fetchTasks}
+                                                          onPreviousTasksPage={onPreviousTasksPage}
+                                                          onNextTasksPage={onNextTasksPage} />)
             const taskListComponent = component.dive()
             const listGroup = taskListComponent.find(ListGroup)
             chai.expect(listGroup.children()).to.length(3)
@@ -88,11 +94,17 @@ describe("Project components", () => {
         it("Should fetch tasks when mounted", () => {
             const onFiltersChanged = sinon.spy()
             const fetchTasks = sinon.spy()
+            const onPreviousTasksPage = sinon.spy()
+            const onNextTasksPage = sinon.spy()
             const component = enzyme.mount(<TaskBrowser projectIdentifier="project"
                                                         tasks={tasks}
                                                         filters={filters}
+                                                        currentPage={0}
+                                                        maxPage={0}
                                                         onFiltersChanged={onFiltersChanged}
-                                                        onFetchTasks={fetchTasks} />)
+                                                        onFetchTasks={fetchTasks}
+                                                        onPreviousTasksPage={onPreviousTasksPage}
+                                                        onNextTasksPage={onNextTasksPage} />)
             chai.expect(fetchTasks.calledOnce).to.true
             chai.expect(fetchTasks.calledWithExactly("project", filters)).to.true
         })
@@ -115,11 +127,17 @@ describe("Project components", () => {
             }
             const onFiltersChanged = sinon.spy()
             const fetchTasks = sinon.spy()
+            const onPreviousTasksPage = sinon.spy()
+            const onNextTasksPage = sinon.spy()
             const component = enzyme.shallow(<TaskBrowser projectIdentifier="project"
                                                           tasks={tasks}
                                                           filters={initialFilters}
+                                                          currentPage={0}
+                                                          maxPage={0}
                                                           onFiltersChanged={onFiltersChanged}
-                                                          onFetchTasks={fetchTasks} />)
+                                                          onFetchTasks={fetchTasks}
+                                                          onPreviousTasksPage={onPreviousTasksPage}
+                                                          onNextTasksPage={onNextTasksPage} />)
             component.simulate("filtersChanged", filters)
             chai.expect(onFiltersChanged.calledOnce).to.true
             chai.expect(onFiltersChanged.calledWithExactly("project", filters)).to.true

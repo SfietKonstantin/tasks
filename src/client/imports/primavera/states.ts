@@ -36,10 +36,13 @@ export const relations: RelationsState = {
 export const delaysFilters: DelaysTaskListState = {
     tasks: [],
     filteredTasks: [],
+    displayedTasks: [],
     filters: {
         milestoneFilterMode: MilestoneFilterMode.NoFilter,
         text: ""
-    }
+    },
+    currentPage: 0,
+    maxPage: 0
 }
 
 export const delaysSelection: DelaysSelectionState = {
