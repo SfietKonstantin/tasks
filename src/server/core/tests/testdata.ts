@@ -1,5 +1,7 @@
 import { IDataProvider } from "../data/idataprovider"
-import { Project, TaskDefinition, TaskRelation, TaskLocation } from "../../../common/types"
+import {
+    Project, TaskDefinition, TaskRelation, TaskLocation, DelayDefinition, DelayRelation
+} from "../../../common/types"
 import { IGraph, IProjectNode, ITaskNode } from "../graph/types"
 
 const fillProjectsData = (graph: IGraph): Promise<IProjectNode> => {
@@ -48,6 +50,27 @@ const fillTasksData = (projectNode: IProjectNode): Promise<void> => {
     }))
 }
 
+const fillDelays = (projectNode: IProjectNode): Promise<void> => {
+    const delays: Array<DelayDefinition> = [
+        {
+            identifier: "delay1",
+            name: "Delay 1",
+            description: "Delay 1",
+            date: new Date(2016, 9, 17)
+        },
+        {
+            identifier: "delay2",
+            name: "Delay 2",
+            description: "Delay 2",
+            date: new Date(2016, 11, 25)
+        }
+    ]
+
+    return Promise.all(delays.map((delay: DelayDefinition) => {
+        return projectNode.addDelay(delay)
+    }))
+}
+
 const fillTaskRelations = (projectNode: IProjectNode): Promise<void> => {
     const relations: Array<TaskRelation> = [
         {
@@ -80,14 +103,32 @@ const fillTaskRelations = (projectNode: IProjectNode): Promise<void> => {
     }))
 }
 
-export const fillTestData = (dataProvider: IDataProvider, graph: IGraph): Promise<void> => {
-    if (graph.nodes.size !== 0) {
-        return Promise.resolve()
-    }
+const fillDelayRelations = (projectNode: IProjectNode): Promise<void> => {
+    const relations: Array<DelayRelation> = [
+        {
+            task: "short",
+            delay: "delay1",
+            lag: 0
+        },
+        {
+            task: "reducing",
+            delay: "delay2",
+            lag: 0
+        }
+    ]
+    return Promise.all(relations.map((relation: DelayRelation) => {
+        projectNode.addDelayRelation(relation)
+    }))
+}
 
+export const fillTestData = (dataProvider: IDataProvider, graph: IGraph): Promise<void> => {
     return fillProjectsData(graph).then((projectNode: IProjectNode) => {
         return fillTasksData(projectNode).then(() => {
             return fillTaskRelations(projectNode)
+        }).then(() => {
+            return fillDelays(projectNode)
+        }).then(() => {
+            return fillDelayRelations(projectNode)
         })
     })
 }
