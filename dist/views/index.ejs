@@ -1,10 +1,12 @@
 <%- include('header') -%>
 
-<div class="jumbotron">
-    <div class="container">
-        <h1>Under developement</h1>
-        <p>This page is under developement</p>
-    </div>
-</div>
+<div id="content"></div>
+
+<script src="/index.bundle.js"></script>
+<script>
+window.onload = function() {
+    window.index.render()
+}
+</script>
 
 <%- include('footer') -%>

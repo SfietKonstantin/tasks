@@ -11,6 +11,7 @@ var filter = require('gulp-filter');
 
 var webpackClientConfig = {
     entry: {
+        index: ['babel-polyfill', './src/client/index.tsx'],
         project: ['babel-polyfill', './src/client/project.tsx'],
         task: ['babel-polyfill', './src/client/task.tsx'],
         imports: ['babel-polyfill', './src/client/imports.tsx']
@@ -132,6 +133,7 @@ gulp.task("test:pre", function () {
         "!tests/server/server.js",
         "!tests/server/core/tests/testdata.js",
         "!tests/server/routes/**/*.js",
+        "!tests/client/index.js",
         "!tests/client/project.js",
         "!tests/client/task.js",
         "!tests/client/imports.js",
