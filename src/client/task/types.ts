@@ -1,5 +1,5 @@
 import { Project, Modifier } from "../../common/types"
-import { ApiTask } from "../../common/apitypes"
+import { Task } from "../../common/types"
 
 export interface State {
     projectIdentifier: string
@@ -11,7 +11,7 @@ export interface State {
 export interface TaskState {
     isFetching: boolean
     project: Project | null
-    task: ApiTask | null
+    task: Task | null
 }
 
 export interface ImportantState {

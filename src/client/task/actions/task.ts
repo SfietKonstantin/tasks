@@ -1,7 +1,7 @@
 import { Action, Dispatch } from "redux"
 import { State } from "../types"
-import { Project, Modifier } from "../../../common/types"
-import { ApiTaskResults, ApiTask } from "../../../common/apitypes"
+import { Project, Task, Modifier } from "../../../common/types"
+import { ApiTaskResults, createTaskFromApiTask } from "../../../common/apitypes"
 
 export const TASK_REQUEST = "TASK_REQUEST"
 export const TASK_RECEIVE = "TASK_RECEIVE"
@@ -12,19 +12,17 @@ export interface TaskAction extends Action {
     projectIdentifier: string
     taskIdentifier: string
     project?: Project
-    task?: ApiTask
+    task?: Task
 }
 
-const requestTask = (projectIdentifier: string, taskIdentifier: string): TaskAction => {
+export const requestTask = (): Action => {
     return {
-        type: TASK_REQUEST,
-        projectIdentifier,
-        taskIdentifier
+        type: TASK_REQUEST
     }
 }
 
-const receiveTask = (projectIdentifier: string, taskIdentifier: string,
-                     project: Project, task: ApiTask): TaskAction => {
+export const receiveTask = (projectIdentifier: string, taskIdentifier: string,
+                            project: Project, task: Task): TaskAction => {
     return {
         type: TASK_RECEIVE,
         projectIdentifier,
@@ -36,11 +34,12 @@ const receiveTask = (projectIdentifier: string, taskIdentifier: string,
 
 export const fetchTask = (projectIdentifier: string, taskIdentifier: string) => {
     return (dispatch: Dispatch<State>) => {
-        dispatch(requestTask(projectIdentifier, taskIdentifier))
+        dispatch(requestTask())
         return fetch("/api/project/" + projectIdentifier +  "/task/" + taskIdentifier).then((response: Response) => {
             return response.json()
         }).then((result: ApiTaskResults) => {
-            dispatch(receiveTask(projectIdentifier, taskIdentifier, result.project, result.task))
+            dispatch(receiveTask(projectIdentifier, taskIdentifier, result.project,
+                                 createTaskFromApiTask(result.task)))
         })
     }
 }
@@ -52,19 +51,15 @@ export interface ModifierAddAction extends Action {
     modifier: Modifier
 }
 
-const requestAddModifier = (projectIdentifier: string, taskIdentifier: string,
-                            modifier: Modifier): ModifierAddAction => {
+export const requestAddModifier = (): Action => {
     return {
-        type: MODIFIER_REQUEST_ADD,
-        projectIdentifier,
-        taskIdentifier,
-        modifier
+        type: MODIFIER_REQUEST_ADD
     }
 }
 
 export const addModifier = (projectIdentifier: string, taskIdentifier: string, modifier: Modifier) => {
     return (dispatch: Dispatch<State>) => {
-        dispatch(requestAddModifier(projectIdentifier, taskIdentifier, modifier))
+        dispatch(requestAddModifier())
         const requestInit: RequestInit = {
             method: "PUT",
             headers: {
@@ -80,7 +75,8 @@ export const addModifier = (projectIdentifier: string, taskIdentifier: string, m
         return fetch("/api/modifier", requestInit).then((response: Response) => {
             return response.json()
         }).then((result: ApiTaskResults) => {
-            dispatch(receiveTask(projectIdentifier, taskIdentifier, result.project, result.task))
+            dispatch(receiveTask(projectIdentifier, taskIdentifier, result.project,
+                                 createTaskFromApiTask(result.task)))
         })
     }
 }

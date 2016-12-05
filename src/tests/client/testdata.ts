@@ -1,6 +1,5 @@
-import { Project, TaskRelation, DelayRelation, TaskLocation } from "../../common/types"
-import { ApiInputTask, ApiInputDelay } from "../../common/apitypes"
-import { Task } from "../../common/types"
+import { Project, Task, TaskRelation, DelayRelation, TaskLocation, Modifier } from "../../common/types"
+import { ApiTask, ApiInputTask, ApiInputDelay } from "../../common/apitypes"
 import { PrimaveraTask, PrimaveraTaskRelation } from "../../client/imports/primavera/types"
 import { RelationGraph } from "../../client/imports/primavera/graph"
 import { MilestoneFilterMode, TaskListFilters } from "../../client/common/tasklist/types"
@@ -27,15 +26,42 @@ export const mapToArray = <K, V>(map: Map<K, V>): Array<V> => {
 }
 
 export const project: Project = {
-    identifier: "identifier",
-    name: "Name",
-    description: "Description"
+    identifier: "project",
+    name: "Project",
+    description: "Project description"
 }
 
 export const emptyProject: Project = {
     identifier: "",
     name: "",
     description: ""
+}
+
+export const task: Task = {
+    identifier: "task",
+    name: "Task",
+    description: "Task description",
+    estimatedStartDate: new Date(2016, 9, 1),
+    estimatedDuration: 15,
+    startDate: new Date(2016, 9, 3),
+    duration: 17
+}
+
+export const apiTask: ApiTask = {
+    identifier: "task",
+    name: "Task",
+    description: "Task description",
+    estimatedStartDate: new Date(2016, 9, 1).toISOString(),
+    estimatedDuration: 15,
+    startDate: new Date(2016, 9, 3).toISOString(),
+    duration: 17
+}
+
+export const modifier: Modifier = {
+    name: "Modifier",
+    description: "Modifier description",
+    duration: 123,
+    location: TaskLocation.End
 }
 
 export let warnings = new Map<string, Array<string>>()

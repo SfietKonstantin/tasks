@@ -13,15 +13,14 @@ export interface ImportantAction extends Action {
     important?: boolean
 }
 
-const requestImportant = (projectIdentifier: string, taskIdentifier: string): ImportantAction => {
+export const requestImportant = (): Action => {
     return {
-        type: TASK_IMPORTANT_REQUEST,
-        projectIdentifier,
-        taskIdentifier
+        type: TASK_IMPORTANT_REQUEST
     }
 }
 
-const receiveImportant = (projectIdentifier: string, taskIdentifier: string, important: boolean): ImportantAction => {
+export const receiveImportant = (projectIdentifier: string, taskIdentifier: string,
+                                 important: boolean): ImportantAction => {
     return {
         type: TASK_IMPORTANT_RECEIVE,
         projectIdentifier,
@@ -36,7 +35,7 @@ interface ImportantResult {
 
 export const fetchImportant = (projectIdentifier: string, taskIdentifier: string) => {
     return (dispatch: Dispatch<State>) => {
-        dispatch(requestImportant(projectIdentifier, taskIdentifier))
+        dispatch(requestImportant())
         const url = "/api/project/" + projectIdentifier + "/task/" + taskIdentifier + "/important"
         return fetch(url).then((response: Response) => {
             return response.json()
@@ -46,19 +45,15 @@ export const fetchImportant = (projectIdentifier: string, taskIdentifier: string
     }
 }
 
-const requestUpdateImportant = (projectIdentifier: string, taskIdentifier: string,
-                                important: boolean): ImportantAction => {
+export const requestUpdateImportant = (): Action => {
     return {
-        type: TASK_IMPORTANT_REQUEST_UPDATE,
-        projectIdentifier,
-        taskIdentifier,
-        important
+        type: TASK_IMPORTANT_REQUEST_UPDATE
     }
 }
 
 export const updateImportant = (projectIdentifier: string, taskIdentifier: string, important: boolean) => {
     return (dispatch: Dispatch<State>) => {
-        dispatch(requestUpdateImportant(projectIdentifier, taskIdentifier, important))
+        dispatch(requestUpdateImportant())
         const url = "/api/project/" + projectIdentifier + "/task/" + taskIdentifier + "/important"
         const method = important ? "PUT" : "DELETE"
         return fetch(url, {method}).then((response: Response) => {

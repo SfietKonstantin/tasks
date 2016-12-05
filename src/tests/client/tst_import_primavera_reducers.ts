@@ -135,7 +135,8 @@ describe("Primavera reducers", () => {
     describe("Project reducers", () => {
         it("Should reduce PROJECT_DEFINE", () => {
             const checkState = (initialState: State) => {
-                const state = main.mainReducer(initialState, defineProject("identifier", "Name", "Description"))
+                const action = defineProject("project", "Project", "Project description")
+                const state = main.mainReducer(initialState, action)
                 chai.expect(state.project).to.deep.equal(project)
             }
             checkState(initialState1)
