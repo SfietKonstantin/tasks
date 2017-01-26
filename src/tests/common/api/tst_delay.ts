@@ -1,10 +1,10 @@
 import * as chai from "chai"
-import {Builder} from "../../../common/api/delay"
+import {DelayBuilder} from "../../../common/api/delay"
 import {DelayDefinition} from "../../../common/delay"
 import {InputError} from "../../../common/errors/input"
 
 describe("API Delay", () => {
-    describe("Builder", () => {
+    describe("DelayRelationBuilder", () => {
         it("Should create a Delay", () => {
             const apiDelay = {
                 identifier: "identifier",
@@ -18,7 +18,7 @@ describe("API Delay", () => {
                 description: "Description",
                 date: new Date(2015, 1, 15)
             }
-            chai.expect(Builder.create(apiDelay)).to.deep.equal(delay)
+            chai.expect(DelayBuilder.create(apiDelay)).to.deep.equal(delay)
         })
         it("Should not create a delay without identifier", () => {
             const apiDelay = {
@@ -27,7 +27,7 @@ describe("API Delay", () => {
                 date: new Date(2015, 1, 15).toISOString()
             }
             chai.expect(() => {
-                Builder.create(apiDelay)
+                DelayBuilder.create(apiDelay)
             }).to.throw(InputError)
         })
         it("Should not create a delay with wrong identifier", () => {
@@ -38,7 +38,7 @@ describe("API Delay", () => {
                 date: new Date(2015, 1, 15).toISOString()
             }
             chai.expect(() => {
-                Builder.create(apiDelay)
+                DelayBuilder.create(apiDelay)
             }).to.throw(InputError)
         })
         it("Should not create a delay without name", () => {
@@ -48,7 +48,7 @@ describe("API Delay", () => {
                 date: new Date(2015, 1, 15).toISOString()
             }
             chai.expect(() => {
-                Builder.create(apiDelay)
+                DelayBuilder.create(apiDelay)
             }).to.throw(InputError)
         })
         it("Should not create a delay with wrong name", () => {
@@ -59,7 +59,7 @@ describe("API Delay", () => {
                 date: new Date(2015, 1, 15).toISOString()
             }
             chai.expect(() => {
-                Builder.create(apiDelay)
+                DelayBuilder.create(apiDelay)
             }).to.throw(InputError)
         })
         it("Should not create a delay without description", () => {
@@ -69,7 +69,7 @@ describe("API Delay", () => {
                 date: new Date(2015, 1, 15).toISOString()
             }
             chai.expect(() => {
-                Builder.create(apiDelay)
+                DelayBuilder.create(apiDelay)
             }).to.throw(InputError)
         })
         it("Should not create a delay with wrong description", () => {
@@ -80,7 +80,7 @@ describe("API Delay", () => {
                 date: new Date(2015, 1, 15).toISOString()
             }
             chai.expect(() => {
-                Builder.create(apiDelay)
+                DelayBuilder.create(apiDelay)
             }).to.throw(InputError)
         })
         it("Should not create a delay without estimatedStartDate", () => {
@@ -91,7 +91,7 @@ describe("API Delay", () => {
                 estimatedDuration: 123
             }
             chai.expect(() => {
-                Builder.create(apiDelay)
+                DelayBuilder.create(apiDelay)
             }).to.throw(InputError)
         })
         it("Should not create a delay with wrong estimatedStartDate", () => {
@@ -102,7 +102,7 @@ describe("API Delay", () => {
                 date: {test: "test"}
             }
             chai.expect(() => {
-                Builder.create(apiDelay)
+                DelayBuilder.create(apiDelay)
             }).to.throw(InputError)
         })
     })

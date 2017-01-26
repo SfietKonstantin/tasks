@@ -1,17 +1,17 @@
 import * as chai from "chai"
-import {Builder} from "../../../common/api/delayrelation"
+import {DelayRelationBuilder} from "../../../common/api/delayrelation"
 import {DelayRelation} from "../../../common/delayrelation"
 import {InputError} from "../../../common/errors/input"
 
 describe("API Delay Relation", () => {
-    describe("Builder", () => {
+    describe("DelayRelationBuilder", () => {
         it("Should create a relation", () => {
             const relation: DelayRelation = {
                 delay: "delay",
                 task: "task",
                 lag: 3
             }
-            chai.expect(Builder.create(relation)).to.deep.equal(relation)
+            chai.expect(DelayRelationBuilder.create(relation)).to.deep.equal(relation)
         })
         it("Should not create a relation without delay", () => {
             const relation = {
@@ -19,7 +19,7 @@ describe("API Delay Relation", () => {
                 lag: 3
             }
             chai.expect(() => {
-                Builder.create(relation)
+                DelayRelationBuilder.create(relation)
             }).to.throw(InputError)
         })
         it("Should not create a relation with wrong delay", () => {
@@ -29,7 +29,7 @@ describe("API Delay Relation", () => {
                 lag: 3
             }
             chai.expect(() => {
-                Builder.create(relation)
+                DelayRelationBuilder.create(relation)
             }).to.throw(InputError)
         })
         it("Should not create a relation without task", () => {
@@ -38,7 +38,7 @@ describe("API Delay Relation", () => {
                 lag: 3
             }
             chai.expect(() => {
-                Builder.create(relation)
+                DelayRelationBuilder.create(relation)
             }).to.throw(InputError)
         })
         it("Should not create a relation with wrong task", () => {
@@ -48,7 +48,7 @@ describe("API Delay Relation", () => {
                 lag: 3
             }
             chai.expect(() => {
-                Builder.create(relation)
+                DelayRelationBuilder.create(relation)
             }).to.throw(InputError)
         })
         it("Should not create a relation without lag", () => {
@@ -57,7 +57,7 @@ describe("API Delay Relation", () => {
                 task: "task"
             }
             chai.expect(() => {
-                Builder.create(relation)
+                DelayRelationBuilder.create(relation)
             }).to.throw(InputError)
         })
         it("Should not create a relation with wrong lag", () => {
@@ -67,7 +67,7 @@ describe("API Delay Relation", () => {
                 lag: {test: "test"}
             }
             chai.expect(() => {
-                Builder.create(relation)
+                DelayRelationBuilder.create(relation)
             }).to.throw(InputError)
         })
     })

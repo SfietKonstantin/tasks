@@ -1,11 +1,11 @@
 import * as chai from "chai"
-import {Builder} from "../../../common/api/taskrelation"
+import {TaskRelationBuilder} from "../../../common/api/taskrelation"
 import {TaskRelation} from "../../../common/taskrelation"
 import {TaskLocation} from "../../../common/tasklocation"
 import {InputError} from "../../../common/errors/input"
 
 describe("API Task Relation", () => {
-    describe("Builder", () => {
+    describe("TaskRelationBuilder", () => {
         describe("createTaskRelation", () => {
             it("Should create a relation 1", () => {
                 const relation: TaskRelation = {
@@ -14,7 +14,7 @@ describe("API Task Relation", () => {
                     next: "task2",
                     lag: 3
                 }
-                chai.expect(Builder.create(relation)).to.deep.equal(relation)
+                chai.expect(TaskRelationBuilder.create(relation)).to.deep.equal(relation)
             })
             it("Should create a relation 2", () => {
                 const relation: TaskRelation = {
@@ -23,7 +23,7 @@ describe("API Task Relation", () => {
                     next: "task2",
                     lag: 3
                 }
-                chai.expect(Builder.create(relation)).to.deep.equal(relation)
+                chai.expect(TaskRelationBuilder.create(relation)).to.deep.equal(relation)
             })
             it("Should not create a relation without previous", () => {
                 const relation = {
@@ -32,7 +32,7 @@ describe("API Task Relation", () => {
                     lag: 3
                 }
                 chai.expect(() => {
-                    Builder.create(relation)
+                    TaskRelationBuilder.create(relation)
                 }).to.throw(InputError)
             })
             it("Should not create a relation with wrong previous", () => {
@@ -43,7 +43,7 @@ describe("API Task Relation", () => {
                     lag: 3
                 }
                 chai.expect(() => {
-                    Builder.create(relation)
+                    TaskRelationBuilder.create(relation)
                 }).to.throw(InputError)
             })
             it("Should not create a relation without previousLocation", () => {
@@ -53,7 +53,7 @@ describe("API Task Relation", () => {
                     lag: 3
                 }
                 chai.expect(() => {
-                    Builder.create(relation)
+                    TaskRelationBuilder.create(relation)
                 }).to.throw(InputError)
             })
             it("Should not create a relation with wrong previousLocation 1", () => {
@@ -64,7 +64,7 @@ describe("API Task Relation", () => {
                     lag: 3
                 }
                 chai.expect(() => {
-                    Builder.create(relation)
+                    TaskRelationBuilder.create(relation)
                 }).to.throw(InputError)
             })
             it("Should not create a relation with wrong previousLocation 2", () => {
@@ -75,7 +75,7 @@ describe("API Task Relation", () => {
                     lag: 3
                 }
                 chai.expect(() => {
-                    Builder.create(relation)
+                    TaskRelationBuilder.create(relation)
                 }).to.throw(InputError)
             })
             it("Should not create a relation without next", () => {
@@ -85,7 +85,7 @@ describe("API Task Relation", () => {
                     lag: 3
                 }
                 chai.expect(() => {
-                    Builder.create(relation)
+                    TaskRelationBuilder.create(relation)
                 }).to.throw(InputError)
             })
             it("Should not create a relation with wrong next", () => {
@@ -96,7 +96,7 @@ describe("API Task Relation", () => {
                     lag: 3
                 }
                 chai.expect(() => {
-                    Builder.create(relation)
+                    TaskRelationBuilder.create(relation)
                 }).to.throw(InputError)
             })
             it("Should not create a relation without lag", () => {
@@ -106,7 +106,7 @@ describe("API Task Relation", () => {
                     next: "task2"
                 }
                 chai.expect(() => {
-                    Builder.create(relation)
+                    TaskRelationBuilder.create(relation)
                 }).to.throw(InputError)
             })
             it("Should not create a relation with wrong lag", () => {
@@ -117,7 +117,7 @@ describe("API Task Relation", () => {
                     lag: {test: "test"}
                 }
                 chai.expect(() => {
-                    Builder.create(relation)
+                    TaskRelationBuilder.create(relation)
                 }).to.throw(InputError)
             })
         })

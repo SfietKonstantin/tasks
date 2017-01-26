@@ -1,17 +1,17 @@
 import * as chai from "chai"
-import {Builder} from "../../../common/api/project"
+import {ProjectBuilder} from "../../../common/api/project"
 import {Project} from "../../../common/project"
 import {InputError} from "../../../common/errors/input"
 
 describe("API Project", () => {
-    describe("Builder", () => {
+    describe("ProjectBuilder", () => {
         it("Should create a project", () => {
             const project: Project = {
                 identifier: "project",
                 name: "Project",
                 description: "Description"
             }
-            chai.expect(Builder.create(project)).to.deep.equal(project)
+            chai.expect(ProjectBuilder.create(project)).to.deep.equal(project)
         })
         it("Should not create a project without identifier", () => {
             const project = {
@@ -19,7 +19,7 @@ describe("API Project", () => {
                 description: "Description"
             }
             chai.expect(() => {
-                Builder.create(project)
+                ProjectBuilder.create(project)
             }).to.throw(InputError)
         })
         it("Should not create a project with wrong identifier", () => {
@@ -29,7 +29,7 @@ describe("API Project", () => {
                 description: "Description"
             }
             chai.expect(() => {
-                Builder.create(project)
+                ProjectBuilder.create(project)
             }).to.throw(InputError)
         })
         it("Should not create a project without name", () => {
@@ -39,7 +39,7 @@ describe("API Project", () => {
                 description: "Description"
             }
             chai.expect(() => {
-                Builder.create(project)
+                ProjectBuilder.create(project)
             }).to.throw(InputError)
         })
         it("Should not create a project with wrong name", () => {
@@ -48,7 +48,7 @@ describe("API Project", () => {
                 description: "Description"
             }
             chai.expect(() => {
-                Builder.create(project)
+                ProjectBuilder.create(project)
             }).to.throw(InputError)
         })
         it("Should not create a project without description", () => {
@@ -57,7 +57,7 @@ describe("API Project", () => {
                 name: "Project",
             }
             chai.expect(() => {
-                Builder.create(project)
+                ProjectBuilder.create(project)
             }).to.throw(InputError)
         })
         it("Should not create a project with wrong description", () => {
@@ -67,7 +67,7 @@ describe("API Project", () => {
                 description: {test: "test"}
             }
             chai.expect(() => {
-                Builder.create(project)
+                ProjectBuilder.create(project)
             }).to.throw(InputError)
         })
     })

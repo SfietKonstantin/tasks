@@ -1,7 +1,7 @@
 import {Project} from "../project"
 import {InputError} from "../errors/input"
 
-export class Builder {
+export class ProjectBuilder {
     static create(input: any): Project {
         if (!input.hasOwnProperty("identifier")) {
             throw new InputError("Property \"identifier\" cannot be found")

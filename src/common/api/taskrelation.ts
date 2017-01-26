@@ -2,7 +2,7 @@ import {TaskRelation} from "../taskrelation"
 import {InputError} from "../errors/input"
 import {TaskLocation} from "../tasklocation"
 
-export class Builder {
+export class TaskRelationBuilder {
     static create(input: any): TaskRelation {
         if (!input.hasOwnProperty("previous")) {
             throw new InputError("Property \"previous\" cannot be found")
@@ -20,7 +20,7 @@ export class Builder {
         if (typeof previous !== "string") {
             throw new InputError("Property \"previous\" should be a string")
         }
-        const previousLocation = Builder.parseTaskLocation(input["previousLocation"])
+        const previousLocation = TaskRelationBuilder.parseTaskLocation(input["previousLocation"])
         if (previousLocation == null) {
             throw new InputError("Property \"previousLocation\" should be a TaskLocation")
         }

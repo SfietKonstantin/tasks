@@ -1,24 +1,21 @@
 import {Identifiable} from "../identifiable"
-import {
-    TaskDefinition as CoreTaskDefinition,
-    Task as CoreTask
-} from "../task"
+import {TaskDefinition, Task} from "../task"
 import {InputError} from "../errors/input"
 
-export interface TaskDefinition extends Identifiable {
+export interface ApiTaskDefinition extends Identifiable {
     name: string
     description: string
     estimatedStartDate: string
     estimatedDuration: number
 }
 
-export interface Task extends TaskDefinition {
+export interface ApiTask extends ApiTaskDefinition {
     startDate: string
     duration: number
 }
 
-export class Builder {
-    static create(input: any): CoreTaskDefinition {
+export class TaskBuilder {
+    static create(input: any): TaskDefinition {
         if (!input.hasOwnProperty("identifier")) {
             throw new InputError("Property \"identifier\" cannot be found")
         }
@@ -64,7 +61,7 @@ export class Builder {
         }
     }
 
-    static to(task: CoreTask): Task {
+    static to(task: Task): ApiTask {
         return {
             identifier: task.identifier,
             name: task.name,
@@ -76,7 +73,7 @@ export class Builder {
         }
     }
 
-    static from(task: Task): CoreTask {
+    static from(task: ApiTask): Task {
         return {
             identifier: task.identifier,
             name: task.name,

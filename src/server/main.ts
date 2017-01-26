@@ -67,6 +67,6 @@ export class Main {
     }
 
     private onServerListening() {
-        winston.info("Server started on " + this.server.address().port)
+        winston.info(`Server started on ${this.server.address().port}`)
     }
 }

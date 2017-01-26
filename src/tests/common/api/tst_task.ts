@@ -1,10 +1,10 @@
 import * as chai from "chai"
-import {Builder, TaskDefinition as ApiTaskDefinition, Task as ApiTask} from "../../../common/api/task"
+import {TaskBuilder, ApiTaskDefinition, ApiTask} from "../../../common/api/task"
 import {TaskDefinition, Task} from "../../../common/task"
 import {InputError} from "../../../common/errors/input"
 
 describe("API Task", () => {
-    describe("Builder", () => {
+    describe("TaskBuilder", () => {
         it("Should build a Task", () => {
             const apiTask: ApiTaskDefinition = {
                 identifier: "identifier",
@@ -20,7 +20,7 @@ describe("API Task", () => {
                 estimatedStartDate: new Date(2015, 1, 15),
                 estimatedDuration: 123
             }
-            chai.expect(Builder.create(apiTask)).to.deep.equal(task)
+            chai.expect(TaskBuilder.create(apiTask)).to.deep.equal(task)
         })
         it("Should not create a task without identifier", () => {
             const apiTask = {
@@ -30,7 +30,7 @@ describe("API Task", () => {
                 estimatedDuration: 123
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
         it("Should not create a task with wrong identifier", () => {
@@ -42,7 +42,7 @@ describe("API Task", () => {
                 estimatedDuration: 123
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
         it("Should not create a task without name", () => {
@@ -53,7 +53,7 @@ describe("API Task", () => {
                 estimatedDuration: 123
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
         it("Should not create a task with wrong name", () => {
@@ -65,7 +65,7 @@ describe("API Task", () => {
                 estimatedDuration: 123
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
         it("Should not create a task without description", () => {
@@ -76,7 +76,7 @@ describe("API Task", () => {
                 estimatedDuration: 123
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
         it("Should not create a task with wrong description", () => {
@@ -88,7 +88,7 @@ describe("API Task", () => {
                 estimatedDuration: 123
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
         it("Should not create a task without estimatedStartDate", () => {
@@ -99,7 +99,7 @@ describe("API Task", () => {
                 estimatedDuration: 123
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
         it("Should not create a task with wrong estimatedStartDate", () => {
@@ -111,7 +111,7 @@ describe("API Task", () => {
                 estimatedDuration: 123
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
         it("Should not create a task without estimatedDuration", () => {
@@ -122,7 +122,7 @@ describe("API Task", () => {
                 estimatedStartDate: new Date(2015, 1, 15).toISOString()
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
         it("Should not create a task with wrong estimatedDuration", () => {
@@ -134,7 +134,7 @@ describe("API Task", () => {
                 estimatedDuration: {test: "test"}
             }
             chai.expect(() => {
-                Builder.create(apiTask)
+                TaskBuilder.create(apiTask)
             }).to.throw(InputError)
         })
     })
@@ -158,10 +158,10 @@ describe("API Task", () => {
             duration: 234
         }
         it("Should convert a Task to an API task", () => {
-            chai.expect(Builder.to(task)).to.deep.equal(apiTask)
+            chai.expect(TaskBuilder.to(task)).to.deep.equal(apiTask)
         })
         it("Should convert an API Task to a task", () => {
-            chai.expect(Builder.from(apiTask)).to.deep.equal(task)
+            chai.expect(TaskBuilder.from(apiTask)).to.deep.equal(task)
         })
     })
 })

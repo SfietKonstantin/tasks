@@ -1,7 +1,7 @@
 import * as redis from "redis"
-import * as redisasync from "./redisasync"
+import * as redisasync from "./async"
 import * as bluebird from "bluebird"
-import {IProjectDao} from "../iprojectdao"
+import {IProjectDao} from "../iproject"
 import {Project} from "../../../common/project"
 import {KeyFactory} from "./utils/keyfactory"
 import {CorruptedError} from "../error/corrupted"
@@ -22,18 +22,21 @@ class RedisProject {
     static save(project: Project, client: redisasync.RedisAsyncClient): Promise<void> {
         const redisProject = new RedisProject(project)
         const projectIdentifier = project.identifier
-        return client.hmsetAsync(KeyFactory.createProjectKey(projectIdentifier), redisProject).then(() => {
-            return client.saddAsync("project:ids", projectIdentifier)
+        const projectKey = KeyFactory.createProjectKey(projectIdentifier)
+        return client.hmsetAsync(projectKey, redisProject).then(() => {
+            const projectIdsKey = KeyFactory.createGlobalProjectKey("ids")
+            return client.saddAsync(projectIdsKey, projectIdentifier)
         })
     }
 
     static load(projectIdentifier: string, client: redisasync.RedisAsyncClient): Promise<Project> {
-        return client.hgetallAsync(KeyFactory.createProjectKey(projectIdentifier)).then((result: any) => {
+        const projectKey = KeyFactory.createProjectKey(projectIdentifier)
+        return client.hgetallAsync(projectKey).then((result: any) => {
             if (!result.hasOwnProperty("name")) {
-                throw new CorruptedError("Project " + projectIdentifier + " do not have property name")
+                throw new CorruptedError(`Project ${projectIdentifier} do not have property "name"`)
             }
             if (!result.hasOwnProperty("description")) {
-                throw new CorruptedError("Project " + projectIdentifier + " do not have property description")
+                throw new CorruptedError(`Project ${projectIdentifier} do not have property "description"`)
             }
             return {
                 identifier: projectIdentifier,
@@ -52,9 +55,10 @@ export class RedisProjectDao implements IProjectDao {
     }
 
     getAllProjects(): Promise<Array<Project>> {
-        return this.client.smembersAsync("project:ids").then((ids: Array<String>) => {
-            const sortedIds = ids.sort()
-            return Promise.all(sortedIds.map((identifier: string) => {
+        const projectIdsKey = KeyFactory.createGlobalProjectKey("ids")
+        return this.client.smembersAsync(projectIdsKey).then((identifiers: Array<String>) => {
+            const sortedIdentifiers = identifiers.sort()
+            return Promise.all(sortedIdentifiers.map((identifier: string) => {
                 return this.getProject(identifier).catch(() => {
                     return null
                 })
@@ -69,9 +73,10 @@ export class RedisProjectDao implements IProjectDao {
     }
 
     hasProject(projectIdentifier: string): Promise<void> {
-        return this.client.existsAsync(KeyFactory.createProjectKey(projectIdentifier)).then((result: number) => {
+        const projectKey = KeyFactory.createProjectKey(projectIdentifier)
+        return this.client.existsAsync(projectKey).then((result: number) => {
             if (result !== 1) {
-                throw new NotFoundError("Project " + projectIdentifier + " not found")
+                throw new NotFoundError(`Project ${projectIdentifier} not found`)
             }
         })
     }
@@ -79,7 +84,7 @@ export class RedisProjectDao implements IProjectDao {
     getProject(projectIdentifier: string): Promise<Project> {
         return this.hasProject(projectIdentifier).then(() => {
             return RedisProject.load(projectIdentifier, this.client)
-        }).catch((error: Error) => {
+        }).catch((error) => {
             wrapUnknownErrors(error)
         })
     }
@@ -87,15 +92,16 @@ export class RedisProjectDao implements IProjectDao {
     addProject(project: Project): Promise<void> {
         return this.notHasProject(project.identifier).then(() => {
             return RedisProject.save(project, this.client)
-        }).catch((error: Error) => {
+        }).catch((error) => {
             wrapUnknownErrors(error)
         })
     }
 
     private notHasProject(projectIdentifier: string): Promise<void> {
-        return this.client.existsAsync(KeyFactory.createProjectKey(projectIdentifier)).then((result: number) => {
+        const projectKey = KeyFactory.createProjectKey(projectIdentifier)
+        return this.client.existsAsync(projectKey).then((result: number) => {
             if (result === 1) {
-                throw new ExistsError("Project " + projectIdentifier + " already exists")
+                throw new ExistsError(`Project ${projectIdentifier} already exists`)
             }
         })
     }
