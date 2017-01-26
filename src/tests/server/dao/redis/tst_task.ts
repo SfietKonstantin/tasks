@@ -123,11 +123,11 @@ describe("Redis DAO Task", () => {
                 done(error)
             })
         })
-         it("Should get an exception for a task with corrupted estimatedDuration", (done) => {
-             const startDateKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "estimatedDuration")
-             RedisTestDataProvider.deleteValue(client, startDateKey).then(() => {
-                 return dao.getTask(project1.identifier, taskd1.identifier)
-             }).then(() => {
+        it("Should get an exception for a task with corrupted estimatedDuration", (done) => {
+            const startDateKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "estimatedDuration")
+            RedisTestDataProvider.deleteValue(client, startDateKey).then(() => {
+                return dao.getTask(project1.identifier, taskd1.identifier)
+            }).then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
@@ -179,11 +179,179 @@ describe("Redis DAO Task", () => {
             })
         })
         it("Should get an exception when adding a task in a project with corrupted task ids", (done) => {
-         const taskIdsKey = KeyFactory.createProjectKey(project1.identifier, "tasks")
+            const taskIdsKey = KeyFactory.createProjectKey(project1.identifier, "tasks")
             RedisTestDataProvider.setValue(client, taskIdsKey, "test").then(() => {
                 return dao.addTask(project1.identifier, taskd3)
             }).then(() => {
                 done(new Error("addTask should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(InternalError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+    })
+    describe("isTaskImportant", () => {
+        it("Should check that a task that is not important will be reported as non-important", (done) => {
+            dao.isTaskImportant(project1.identifier, taskd1.identifier).then((important: boolean) => {
+                chai.expect(important).to.false
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should check that a task that is important will be reported as important", (done) => {
+            const projectImportantTasksKey = KeyFactory.createProjectKey(project1.identifier, "task:important")
+            RedisTestDataProvider.addValue(client, projectImportantTasksKey, taskd1.identifier).then(() => {
+                return dao.isTaskImportant(project1.identifier, taskd1.identifier)
+            }).then((important: boolean) => {
+                chai.expect(important).to.true
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when checking if a task is important for an invalid project", (done) => {
+            dao.isTaskImportant(invalidProject.identifier, taskd1.identifier).then(() => {
+                done(new Error("isTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when checking if a task is important for an invalid task", (done) => {
+            dao.isTaskImportant(project1.identifier, invalidTask.identifier).then(() => {
+                done(new Error("isTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when checking if a task is important for a corrupted task", (done) => {
+            const projectImportantTasksKey = KeyFactory.createProjectKey(project1.identifier, "task:important")
+            RedisTestDataProvider.setValue(client, projectImportantTasksKey, "test").then(() => {
+                return dao.isTaskImportant(project1.identifier, taskd1.identifier)
+            }).then(() => {
+                done(new Error("isTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(InternalError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+    })
+    describe("setTaskImportant", () => {
+        it("Should set task as important", (done) => {
+            dao.setTaskImportant(project1.identifier, taskd1.identifier, true).then(() => {
+                return dao.isTaskImportant(project1.identifier, taskd1.identifier)
+            }).then((important: boolean) => {
+                chai.expect(important).to.true
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should not affect an important task when setting this task as important", (done) => {
+            const projectImportantTasksKey = KeyFactory.createProjectKey(project1.identifier, "task:important")
+            RedisTestDataProvider.addValue(client, projectImportantTasksKey, taskd1.identifier).then(() => {
+                return dao.setTaskImportant(project1.identifier, taskd1.identifier, true)
+            }).then(() => {
+                return dao.isTaskImportant(project1.identifier, taskd1.identifier)
+            }).then((important: boolean) => {
+                chai.expect(important).to.true
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should set task as not important", (done) => {
+            const projectImportantTasksKey = KeyFactory.createProjectKey(project1.identifier, "task:important")
+            RedisTestDataProvider.addValue(client, projectImportantTasksKey, taskd1.identifier).then(() => {
+                return dao.setTaskImportant(project1.identifier, taskd1.identifier, false)
+            }).then(() => {
+                return dao.isTaskImportant(project1.identifier, taskd1.identifier)
+            }).then((important: boolean) => {
+                chai.expect(important).to.false
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should not affecting a non-important task when setting this task as not important", (done) => {
+            dao.setTaskImportant(project1.identifier, taskd1.identifier, false).then(() => {
+                return dao.isTaskImportant(project1.identifier, taskd1.identifier)
+            }).then((important: boolean) => {
+                chai.expect(important).to.false
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when setting a task as important for an invalid project", (done) => {
+            dao.setTaskImportant(invalidProject.identifier, taskd1.identifier, true).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when setting a task as not important for an invalid project", (done) => {
+            dao.setTaskImportant(invalidProject.identifier, taskd1.identifier, false).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when setting a task as important for an invalid task", (done) => {
+            dao.setTaskImportant(project1.identifier, invalidTask.identifier, true).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when setting a task as important for an invalid task", (done) => {
+            dao.setTaskImportant(project1.identifier, invalidTask.identifier, false).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when setting a task as important for a corrupted task", (done) => {
+            const projectImportantTasksKey = KeyFactory.createProjectKey(project1.identifier, "task:important")
+            RedisTestDataProvider.setValue(client, projectImportantTasksKey, "test").then(() => {
+                return dao.setTaskImportant(project1.identifier, taskd1.identifier, true)
+            }).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(InternalError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when setting a task as not important for a corrupted task", (done) => {
+            const projectImportantTasksKey = KeyFactory.createProjectKey(project1.identifier, "task:important")
+            RedisTestDataProvider.setValue(client, projectImportantTasksKey, "test").then(() => {
+                return dao.setTaskImportant(project1.identifier, taskd1.identifier, false)
+            }).then(() => {
+                done(new Error("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)
                 done()

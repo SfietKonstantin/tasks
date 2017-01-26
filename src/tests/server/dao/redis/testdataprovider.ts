@@ -67,6 +67,10 @@ export class RedisTestDataProvider {
         return (client as RedisAsyncClient).setAsync(key, value)
     }
 
+    static addValue(client: redis.RedisClient, key: string, value: string) {
+        return (client as RedisAsyncClient).saddAsync(key, value)
+    }
+
     static flush(client: redis.RedisClient) {
         client.flushdb()
     }
