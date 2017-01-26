@@ -1,6 +1,6 @@
 import * as chai from "chai"
-import * as utilsmap from "../../common/utils/map"
-import {NotFoundError} from "../../common/errors/notfound"
+import * as utilsmap from "../../../common/utils/map"
+import {NotFoundError} from "../../../common/errors/notfound"
 
 describe("Map utils", () => {
     it("Should get an entry in the map", () => {

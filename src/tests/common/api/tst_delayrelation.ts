@@ -1,7 +1,7 @@
 import * as chai from "chai"
-import {Builder} from "../../common/api/delayrelation"
-import {DelayRelation} from "../../common/delayrelation"
-import {InputError} from "../../common/errors/input"
+import {Builder} from "../../../common/api/delayrelation"
+import {DelayRelation} from "../../../common/delayrelation"
+import {InputError} from "../../../common/errors/input"
 
 describe("API Delay Relation", () => {
     describe("Builder", () => {

@@ -1,8 +1,8 @@
 import * as chai from "chai"
-import {Builder} from "../../common/api/taskrelation"
-import {TaskRelation} from "../../common/taskrelation"
-import {TaskLocation} from "../../common/tasklocation"
-import {InputError} from "../../common/errors/input"
+import {Builder} from "../../../common/api/taskrelation"
+import {TaskRelation} from "../../../common/taskrelation"
+import {TaskLocation} from "../../../common/tasklocation"
+import {InputError} from "../../../common/errors/input"
 
 describe("API Task Relation", () => {
     describe("Builder", () => {

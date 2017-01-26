@@ -1,7 +1,7 @@
 import * as chai from "chai"
-import {Builder, TaskDefinition as ApiTaskDefinition, Task as ApiTask} from "../../common/api/task"
-import {TaskDefinition, Task} from "../../common/task"
-import {InputError} from "../../common/errors/input"
+import {Builder, TaskDefinition as ApiTaskDefinition, Task as ApiTask} from "../../../common/api/task"
+import {TaskDefinition, Task} from "../../../common/task"
+import {InputError} from "../../../common/errors/input"
 
 describe("API Task", () => {
     describe("Builder", () => {

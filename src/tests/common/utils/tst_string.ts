@@ -1,5 +1,5 @@
 import * as chai from "chai"
-import * as stringutils from "../../common/utils/string"
+import * as stringutils from "../../../common/utils/string"
 
 interface Data {
     identifier: string

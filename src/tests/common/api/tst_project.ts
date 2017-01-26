@@ -1,7 +1,7 @@
 import * as chai from "chai"
-import {Builder} from "../../common/api/project"
-import {Project} from "../../common/project"
-import {InputError} from "../../common/errors/input"
+import {Builder} from "../../../common/api/project"
+import {Project} from "../../../common/project"
+import {InputError} from "../../../common/errors/input"
 
 describe("API Project", () => {
     describe("Builder", () => {

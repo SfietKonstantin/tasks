@@ -1,5 +1,5 @@
 import * as chai from "chai"
-import * as utilsdate from "../../common/utils/date"
+import * as utilsdate from "../../../common/utils/date"
 
 describe("Date utils", () => {
     it("Should get a date as a label", () => {

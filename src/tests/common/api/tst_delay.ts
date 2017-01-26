@@ -1,7 +1,7 @@
 import * as chai from "chai"
-import {Builder} from "../../common/api/delay"
-import {DelayDefinition} from "../../common/delay"
-import {InputError} from "../../common/errors/input"
+import {Builder} from "../../../common/api/delay"
+import {DelayDefinition} from "../../../common/delay"
+import {InputError} from "../../../common/errors/input"
 
 describe("API Delay", () => {
     describe("Builder", () => {
