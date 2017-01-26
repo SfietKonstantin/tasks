@@ -12,6 +12,6 @@ export class RedisDaoBuilder implements IDaoBuilder {
         return new RedisProjectDao(this.client)
     }
     buildTaskDao() {
-        return new RedisTaskDao(this.client);
+        return new RedisTaskDao(this.client)
     }
 }

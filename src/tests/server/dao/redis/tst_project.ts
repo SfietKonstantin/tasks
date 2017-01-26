@@ -1,14 +1,14 @@
 import * as chai from "chai"
 import * as redis from "redis"
-import {Project} from "../../../common/project"
-import {RedisProjectDao} from "../../../server/dao/redis/project"
-import {RedisTestDataProvider} from "./redistestdataprovider"
-import {project1, project2, invalidProject, project3} from "../testdata"
-import {KeyFactory} from "../../../server/dao/redis/utils/keyfactory"
-import {NotFoundError} from "../../../common/errors/notfound"
-import {CorruptedError} from "../../../server/dao/error/corrupted"
-import {InternalError} from "../../../server/dao/error/internal"
-import {ExistsError} from "../../../server/dao/error/exists"
+import {Project} from "../../../../common/project"
+import {RedisProjectDao} from "../../../../server/dao/redis/project"
+import {RedisTestDataProvider} from "./testdataprovider"
+import {project1, project2, invalidProject, project3} from "../../testdata"
+import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
+import {NotFoundError} from "../../../../common/errors/notfound"
+import {CorruptedError} from "../../../../server/dao/error/corrupted"
+import {InternalError} from "../../../../server/dao/error/internal"
+import {ExistsError} from "../../../../server/dao/error/exists"
 
 describe("Redis DAO Project", () => {
     let client: redis.RedisClient
@@ -43,7 +43,7 @@ describe("Redis DAO Project", () => {
         })
         it("Should only get projects with body from the DB", (done) => {
             const projectKey = KeyFactory.createProjectKey(project1.identifier)
-            RedisTestDataProvider.delete(client, projectKey).then(() => {
+            RedisTestDataProvider.deleteValue(client, projectKey).then(() => {
                 return dao.getAllProjects()
             }).then((projects: Array<Project>) => {
                 chai.expect(projects).to.deep.equal([project2])
@@ -54,7 +54,7 @@ describe("Redis DAO Project", () => {
         })
         it("Should get only projects without corrupted body from the DB", (done) => {
             const projectKey = KeyFactory.createProjectKey(project1.identifier)
-            RedisTestDataProvider.set(client, projectKey, "test").then(() => {
+            RedisTestDataProvider.setValue(client, projectKey, "test").then(() => {
                 return dao.getAllProjects()
             }).then((projects: Array<Project>) => {
                 chai.expect(projects).to.deep.equal([project2])
@@ -65,8 +65,8 @@ describe("Redis DAO Project", () => {
         })
         it("Should get an empty list of projects for a DB with corrupted keys", (done) => {
             const projectIdsKey = KeyFactory.createGlobalProjectKey("ids")
-            RedisTestDataProvider.delete(client, projectIdsKey).then(() => {
-                return RedisTestDataProvider.set(client, projectIdsKey, "test")
+            RedisTestDataProvider.deleteValue(client, projectIdsKey).then(() => {
+                return RedisTestDataProvider.setValue(client, projectIdsKey, "test")
             }).then(() => {
                 return dao.getAllProjects()
             }).then((projects: Array<Project>) => {
@@ -124,7 +124,7 @@ describe("Redis DAO Project", () => {
         })
         it("Should get an exception for a corrupted project", (done) => {
             const projectKey = KeyFactory.createProjectKey(project1.identifier)
-            RedisTestDataProvider.set(client, projectKey, "test").then(() => {
+            RedisTestDataProvider.setValue(client, projectKey, "test").then(() => {
                 return dao.getProject(project1.identifier)
             }).then(() => {
                 done(new Error("getProject should not be a success"))
@@ -156,7 +156,7 @@ describe("Redis DAO Project", () => {
         })
         it("Should get an exception when adding a project in a DB with corrupted ids", (done) => {
             const projectIdsKey = KeyFactory.createGlobalProjectKey("ids")
-            RedisTestDataProvider.set(client, projectIdsKey, "test").then(() => {
+            RedisTestDataProvider.setValue(client, projectIdsKey, "test").then(() => {
                 return dao.addProject(project3)
             }).then(() => {
                 done(new Error("addProject should not be a success"))

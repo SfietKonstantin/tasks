@@ -1,14 +1,14 @@
 import * as chai from "chai"
 import * as redis from "redis"
-import {TaskDefinition} from "../../../common/task"
-import {RedisTaskDao} from "../../../server/dao/redis/task"
-import {RedisTestDataProvider} from "./redistestdataprovider"
-import {project1, invalidProject, taskd1, taskd2, invalidTask, taskd3} from "../testdata"
-import {KeyFactory} from "../../../server/dao/redis/utils/keyfactory"
-import {NotFoundError} from "../../../common/errors/notfound"
-import {CorruptedError} from "../../../server/dao/error/corrupted"
-import {InternalError} from "../../../server/dao/error/internal"
-import {ExistsError} from "../../../server/dao/error/exists"
+import {TaskDefinition} from "../../../../common/task"
+import {RedisTaskDao} from "../../../../server/dao/redis/task"
+import {RedisTestDataProvider} from "./testdataprovider"
+import {project1, invalidProject, taskd1, taskd2, invalidTask, taskd3} from "../../testdata"
+import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
+import {NotFoundError} from "../../../../common/errors/notfound"
+import {CorruptedError} from "../../../../server/dao/error/corrupted"
+import {InternalError} from "../../../../server/dao/error/internal"
+import {ExistsError} from "../../../../server/dao/error/exists"
 
 describe("Redis DAO Task", () => {
     let client: redis.RedisClient
@@ -45,7 +45,7 @@ describe("Redis DAO Task", () => {
         })
         it("Should only get tasks with body from the DB", (done) => {
             const projectKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier)
-            RedisTestDataProvider.delete(client, projectKey).then(() => {
+            RedisTestDataProvider.deleteValue(client, projectKey).then(() => {
                 return dao.getProjectTasks(project1.identifier)
             }).then((tasks: Array<TaskDefinition>) => {
                 chai.expect(tasks).to.deep.equal([taskd2])
@@ -112,7 +112,7 @@ describe("Redis DAO Task", () => {
         })
         it("Should get an exception for a task with corrupted estimatedStartDate", (done) => {
             const startDateKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "estimatedStartDate")
-            RedisTestDataProvider.delete(client, startDateKey).then(() => {
+            RedisTestDataProvider.deleteValue(client, startDateKey).then(() => {
                 return dao.getTask(project1.identifier, taskd1.identifier)
             }).then(() => {
                 done(new Error("getTask should not be a success"))
@@ -125,7 +125,7 @@ describe("Redis DAO Task", () => {
         })
          it("Should get an exception for a task with corrupted estimatedDuration", (done) => {
              const startDateKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "estimatedDuration")
-             RedisTestDataProvider.delete(client, startDateKey).then(() => {
+             RedisTestDataProvider.deleteValue(client, startDateKey).then(() => {
                  return dao.getTask(project1.identifier, taskd1.identifier)
              }).then(() => {
                 done(new Error("getTask should not be a success"))
@@ -138,7 +138,7 @@ describe("Redis DAO Task", () => {
         })
         it("Should get an exception for a corrupted task", (done) => {
             const taskKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier)
-            RedisTestDataProvider.set(client, taskKey, "test").then(() => {
+            RedisTestDataProvider.setValue(client, taskKey, "test").then(() => {
                 return dao.getTask(project1.identifier, taskd1.identifier)
             }).then(() => {
                 done(new Error("getTask should not be a success"))
@@ -180,7 +180,7 @@ describe("Redis DAO Task", () => {
         })
         it("Should get an exception when adding a task in a project with corrupted task ids", (done) => {
          const taskIdsKey = KeyFactory.createProjectKey(project1.identifier, "tasks")
-            RedisTestDataProvider.set(client, taskIdsKey, "test").then(() => {
+            RedisTestDataProvider.setValue(client, taskIdsKey, "test").then(() => {
                 return dao.addTask(project1.identifier, taskd3)
             }).then(() => {
                 done(new Error("addTask should not be a success"))

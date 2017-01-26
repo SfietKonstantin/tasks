@@ -1,9 +1,9 @@
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import {project1, project2, taskd1, taskd2} from "../testdata"
-import {Project} from "../../../common/project"
-import {TaskDefinition} from "../../../common/task";
-import {KeyFactory} from "../../../server/dao/redis/utils/keyfactory";
+import {project1, project2, taskd1, taskd2} from "../../testdata"
+import {Project} from "../../../../common/project"
+import {TaskDefinition} from "../../../../common/task"
+import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 bluebird.promisifyAll(redis)
 
 export interface RedisAsyncClient extends redis.RedisClient {
@@ -55,7 +55,7 @@ export class RedisTestDataProvider {
         })
     }
 
-    static delete(client: redis.RedisClient, key: string): Promise<void> {
+    static deleteValue(client: redis.RedisClient, key: string): Promise<void> {
         return (client as RedisAsyncClient).delAsync(key)
     }
 
@@ -63,7 +63,7 @@ export class RedisTestDataProvider {
         return (client as RedisAsyncClient).hdelAsync(key, member)
     }
 
-    static set(client: redis.RedisClient, key: string, value: string) {
+    static setValue(client: redis.RedisClient, key: string, value: string) {
         return (client as RedisAsyncClient).setAsync(key, value)
     }
 

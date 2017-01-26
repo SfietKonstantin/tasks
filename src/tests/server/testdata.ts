@@ -1,5 +1,5 @@
 import {Project} from "../../common/project"
-import {TaskDefinition} from "../../common/task";
+import {TaskDefinition} from "../../common/task"
 
 export const project: Project = {
     identifier: "project",

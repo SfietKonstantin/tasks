@@ -2,7 +2,8 @@ const gulp = require("gulp");
 const ts = require("gulp-typescript");
 const mocha = require("gulp-mocha");
 const istanbul = require('gulp-istanbul');
-
+const tslint = require("gulp-tslint");
+const filter = require('gulp-filter');
 
 gulp.task("build:common", function () {
     const tsProject = ts.createProject("src/common/tsconfig.json");
@@ -47,22 +48,27 @@ gulp.task("watch:server:tests", ["build:server:tests"], function () {
 gulp.task("test:pre", function () {
     // Removing entry points
     return gulp.src(["tests/common/**/*.js", "tests/server/**/*.js", "tests/client/**/*.js"])
-               .pipe(istanbul({includeUntested: true}))
-               .pipe(istanbul.hookRequire());
+        .pipe(istanbul({includeUntested: true}))
+        .pipe(istanbul.hookRequire());
 });
 
-gulp.task("test", ["test:pre"], function() {
+gulp.task("test", ["test:pre"], function () {
     return gulp.src("tests/tests/**/*.js")
-               .pipe(mocha({reporter: "spec"}))
-               .pipe(istanbul.writeReports({
-                    dir: "./coverage",
-                    reportOpts: {
-                        dir: "./coverage"
-                    },
-                    reporters: ["html"]
-                }))
+        .pipe(mocha({reporter: "spec"}))
+        .pipe(istanbul.writeReports({
+            dir: "./coverage",
+            reportOpts: {
+                dir: "./coverage"
+            },
+            reporters: ["html"]
+        }))
 })
 
+gulp.task('tslint', () => {
+    const f = filter(["**", "!**/index.d.ts"]);
+    return gulp.src("src/**/*.ts*").pipe(f).pipe(tslint())
+        .pipe(tslint.report({formatter: 'prose', emitError: false}));
+})
 
 gulp.task("default", ["build:common", "build:common:tests", "build:server", "build:server:tests"])
 gulp.task("watch", ["watch:common", "watch:common:tests", "watch:server", "watch:server:tests"])

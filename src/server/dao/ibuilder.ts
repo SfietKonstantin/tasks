@@ -1,5 +1,5 @@
 import {IProjectDao} from "./iproject"
-import {ITaskDao} from "./itask";
+import {ITaskDao} from "./itask"
 
 export interface IDaoBuilder {
     buildProjectDao(): IProjectDao

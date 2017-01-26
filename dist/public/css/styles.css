@@ -2,8 +2,8 @@
 
 .navbar {
     min-height: 30px;
-    border-radius: 0px;
-    margin-bottom: 0px;
+    border-radius: 0;
+    margin-bottom: 0;
 }
 
 .navbar-brand {
@@ -23,9 +23,9 @@
 
 .breadcrumb {
     background-color: transparent;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding: 8px 0px;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 8px 0;
 }
 
 /*.sidebar {
@@ -35,8 +35,8 @@
 /* Utils */
 
 .title-h1 {
-    margin-top: 0px;
-    margin-bottom: 0px;
+    margin-top: 0;
+    margin-bottom: 0;
     font-size: 30px;
 }
 
@@ -72,9 +72,9 @@
 
 /* Page header */
 .page-header {
-    padding-bottom: 0px;
-    margin-top: 0px;
-    margin-bottom: 0px;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .page-header-container {
@@ -83,7 +83,7 @@
 
 .page-header-nav {
     margin-top: 10px;
-    border-bottom-width: 0px;
+    border-bottom-width: 0;
 }
 
 .tab-table {
