@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-var server = require('./server/server');
-var s = new server.Server();
+const server = require('./lib/server/main');
+const s = server.Main.create();
 s.start(8080);

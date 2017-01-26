@@ -1,0 +1,19 @@
+{
+  "name": "zephyr-server",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "express": "^4.14.0",
+    "morgan": "^1.7.0",
+    "redis": "^2.6.5",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "@types/body-parser": "0.0.33",
+    "@types/express": "^4.0.35",
+    "@types/morgan": "^1.7.32",
+    "@types/redis": "^0.12.34",
+    "@types/winston": "^2.2.0"
+  }
+}
