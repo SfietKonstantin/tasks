@@ -3,7 +3,7 @@ import * as redis from "redis"
 import {TaskDefinition} from "../../../../common/task"
 import {RedisTaskDao} from "../../../../server/dao/redis/task"
 import {RedisTestDataProvider} from "./testdataprovider"
-import {project1, invalidProject, taskd1, taskd2, invalidTask, taskd3} from "../../testdata"
+import {project1, invalidProject, taskd1, taskd2, taskd3, taskd4, invalidTaskd} from "../../testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"
@@ -26,7 +26,7 @@ describe("Redis DAO Task", () => {
     describe("getProjectTasks", () => {
         it("Should get a list of tasks that belongs to a project from the DB", (done) => {
             dao.getProjectTasks(project1.identifier).then((tasks: Array<TaskDefinition>) => {
-                const expected: Array<TaskDefinition> = [taskd1, taskd2]
+                const expected: Array<TaskDefinition> = [taskd1, taskd2, taskd3]
                 chai.expect(tasks).to.deep.equal(expected)
                 done()
             }).catch((error) => {
@@ -48,7 +48,7 @@ describe("Redis DAO Task", () => {
             RedisTestDataProvider.deleteValue(client, projectKey).then(() => {
                 return dao.getProjectTasks(project1.identifier)
             }).then((tasks: Array<TaskDefinition>) => {
-                chai.expect(tasks).to.deep.equal([taskd2])
+                chai.expect(tasks).to.deep.equal([taskd2, taskd3])
                 done()
             }).catch((error) => {
                 done(error)
@@ -75,7 +75,7 @@ describe("Redis DAO Task", () => {
             })
         })
         it("Should get an exception for an invalid task identifier", (done) => {
-            dao.getTask(project1.identifier, invalidTask.identifier).then(() => {
+            dao.getTask(project1.identifier, invalidTaskd.identifier).then(() => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -152,14 +152,17 @@ describe("Redis DAO Task", () => {
     })
     describe("addTask", () => {
         it("Should add a task in the DB", (done) => {
-            dao.addTask(project1.identifier, taskd3).then(() => {
+            dao.addTask(project1.identifier, taskd4).then(() => {
+                return dao.getTask(project1.identifier, taskd4.identifier)
+            }).then((task: TaskDefinition) => {
+                chai.expect(task).to.deep.equal(taskd4)
                 done()
             }).catch((error) => {
                 done(error)
             })
         })
         it("Should get an exception when adding a task in the DB for an invalid project", (done) => {
-            dao.addTask(invalidProject.identifier, taskd3).then(() => {
+            dao.addTask(invalidProject.identifier, taskd4).then(() => {
                 done(new Error("addTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -181,7 +184,7 @@ describe("Redis DAO Task", () => {
         it("Should get an exception when adding a task in a project with corrupted task ids", (done) => {
             const taskIdsKey = KeyFactory.createProjectKey(project1.identifier, "tasks")
             RedisTestDataProvider.setValue(client, taskIdsKey, "test").then(() => {
-                return dao.addTask(project1.identifier, taskd3)
+                return dao.addTask(project1.identifier, taskd4)
             }).then(() => {
                 done(new Error("addTask should not be a success"))
             }).catch((error) => {
@@ -223,7 +226,7 @@ describe("Redis DAO Task", () => {
             })
         })
         it("Should get an exception when checking if a task is important for an invalid task", (done) => {
-            dao.isTaskImportant(project1.identifier, invalidTask.identifier).then(() => {
+            dao.isTaskImportant(project1.identifier, invalidTaskd.identifier).then(() => {
                 done(new Error("isTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -314,7 +317,7 @@ describe("Redis DAO Task", () => {
             })
         })
         it("Should get an exception when setting a task as important for an invalid task", (done) => {
-            dao.setTaskImportant(project1.identifier, invalidTask.identifier, true).then(() => {
+            dao.setTaskImportant(project1.identifier, invalidTaskd.identifier, true).then(() => {
                 done(new Error("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
@@ -324,7 +327,7 @@ describe("Redis DAO Task", () => {
             })
         })
         it("Should get an exception when setting a task as important for an invalid task", (done) => {
-            dao.setTaskImportant(project1.identifier, invalidTask.identifier, false).then(() => {
+            dao.setTaskImportant(project1.identifier, invalidTaskd.identifier, false).then(() => {
                 done(new Error("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)

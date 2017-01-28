@@ -8,17 +8,19 @@ export const get = <K, V>(map: Map<K, V>, key: K): V => {
     return returned
 }
 
-export const addToMapOfList = <K, V>(map: Map<K, Array<V>>, key: K, value: V): void => {
-    if (!map.has(key)) {
-        map.set(key, [])
+export class MapOfList {
+    static add<K, V>(map: Map<K, Array<V>>, key: K, value: V) {
+        if (!map.has(key)) {
+            map.set(key, [])
+        }
+        (map.get(key) as Array<V>).push(value)
     }
-    (map.get(key) as Array<V>).push(value)
-}
 
-export const lengthOfMapOfList = <K, V>(map: Map<K, Array<V>>): number => {
-    return Array.from(map.values(), (values: Array<V>) => {
-        return values.length
-    }).reduce((first: number, second: number) => {
-        return first + second
-    }, 0)
+    static length<K, V>(map: Map<K, Array<V>>): number {
+        return Array.from(map.values(), (values: Array<V>) => {
+            return values.length
+        }).reduce((first: number, second: number) => {
+            return first + second
+        }, 0)
+    }
 }

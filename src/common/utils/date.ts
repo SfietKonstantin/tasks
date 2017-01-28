@@ -1,8 +1,8 @@
-export const getDateLabel = (date: Date) => {
+export const dateAsLabel = (date: Date) => {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
 }
 
-export const getDateDiff = (first: Date, second: Date) => {
+export const diffDates = (first: Date, second: Date) => {
     const MS_PER_DAY = 1000 * 60 * 60 * 24
 
     // Discard the time and time-zone information.

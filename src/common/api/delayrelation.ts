@@ -2,7 +2,7 @@ import {DelayRelation} from "../delayrelation"
 import {InputError} from "../errors/input"
 
 export class DelayRelationBuilder {
-    static create(input: any): DelayRelation {
+    static fromObject(input: any): DelayRelation {
         if (!input.hasOwnProperty("delay")) {
             throw new InputError("Property \"delay\" cannot be found")
         }

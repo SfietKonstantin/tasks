@@ -1,15 +1,18 @@
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import {project1, project2, taskd1, taskd2} from "../../testdata"
+import {project1, project2, taskd1, taskd2, taskd3, taskRelation1, taskRelation2} from "../../testdata"
 import {Project} from "../../../../common/project"
 import {TaskDefinition} from "../../../../common/task"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
+import {TaskRelation} from "../../../../common/taskrelation"
+import {TaskLocationBuilder} from "../../../../server/dao/redis/utils/tasklocation"
 bluebird.promisifyAll(redis)
 
 export interface RedisAsyncClient extends redis.RedisClient {
     setAsync(...args: any[]): Promise<any>
     delAsync(...args: any[]): Promise<any>
     msetAsync(...args: any[]): Promise<any>
+    hsetAsync(...args: any[]): Promise<any>
     hmsetAsync(...args: any[]): Promise<any>
     hdelAsync(...args: any[]): Promise<any>
     saddAsync(...args: any[]): Promise<any>
@@ -34,20 +37,35 @@ export class RedisTestDataProvider {
                 })
             }))
         }).then(() => {
-            return Promise.all([taskd1, taskd2].map((task: TaskDefinition) => {
+            return Promise.all([taskd1, taskd2, taskd3].map((task: TaskDefinition) => {
                 const projectTasksKey = KeyFactory.createProjectKey(project1.identifier, "tasks")
                 return client.saddAsync(projectTasksKey, task.identifier).then(() => {
                     const redisTask = {
                         name: task.name,
-                        description: task.description,
+                        description: task.description
                     }
                     const taskKey = KeyFactory.createTaskKey(project1.identifier, task.identifier)
                     return client.hmsetAsync(taskKey, redisTask)
                 }).then(() => {
-                    const startDateKey = `task:${project1.identifier}:${task.identifier}:estimatedStartDate`
-                    const durationKey = `task:${project1.identifier}:${task.identifier}:estimatedDuration`
+                    const startDateKey = KeyFactory.createTaskKey(project1.identifier, task.identifier,
+                        "estimatedStartDate")
+                    const durationKey = KeyFactory.createTaskKey(project1.identifier, task.identifier,
+                        "estimatedDuration")
                     return client.msetAsync(startDateKey, task.estimatedStartDate.getTime(),
                         durationKey, task.estimatedDuration)
+                })
+            }))
+        }).then(() => {
+            return Promise.all([taskRelation1, taskRelation2].map((taskRelation: TaskRelation) => {
+                const taskRelationsKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "relations")
+                return client.saddAsync(taskRelationsKey, taskRelation.next).then(() => {
+                    const redisRelation = {
+                        previousLocation: TaskLocationBuilder.toString(taskRelation.previousLocation),
+                        lag: taskRelation.lag
+                    }
+                    const taskRelationKey = KeyFactory.createTaskRelationKey(project1.identifier, taskRelation.previous,
+                        taskRelation.next)
+                    return client.hmsetAsync(taskRelationKey, redisRelation)
                 })
             }))
         }).then(() => {
@@ -55,16 +73,20 @@ export class RedisTestDataProvider {
         })
     }
 
+    static setValue(client: redis.RedisClient, key: string, value: string) {
+        return (client as RedisAsyncClient).setAsync(key, value)
+    }
+
     static deleteValue(client: redis.RedisClient, key: string): Promise<void> {
         return (client as RedisAsyncClient).delAsync(key)
     }
 
-    static deleteMember(client: redis.RedisClient, key: string, member: string): Promise<void> {
-        return (client as RedisAsyncClient).hdelAsync(key, member)
+    static setMember(client: redis.RedisClient, key: string, member: string, value: string): Promise<void> {
+        return (client as RedisAsyncClient).hsetAsync(key, member, value)
     }
 
-    static setValue(client: redis.RedisClient, key: string, value: string) {
-        return (client as RedisAsyncClient).setAsync(key, value)
+    static deleteMember(client: redis.RedisClient, key: string, member: string): Promise<void> {
+        return (client as RedisAsyncClient).hdelAsync(key, member)
     }
 
     static addValue(client: redis.RedisClient, key: string, value: string) {

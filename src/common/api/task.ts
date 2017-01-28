@@ -15,7 +15,7 @@ export interface ApiTask extends ApiTaskDefinition {
 }
 
 export class TaskBuilder {
-    static create(input: any): TaskDefinition {
+    static fromObject(input: any): TaskDefinition {
         if (!input.hasOwnProperty("identifier")) {
             throw new InputError("Property \"identifier\" cannot be found")
         }
@@ -61,7 +61,7 @@ export class TaskBuilder {
         }
     }
 
-    static to(task: Task): ApiTask {
+    static toApiTask(task: Task): ApiTask {
         return {
             identifier: task.identifier,
             name: task.name,
@@ -73,7 +73,7 @@ export class TaskBuilder {
         }
     }
 
-    static from(task: ApiTask): Task {
+    static fromApiTask(task: ApiTask): Task {
         return {
             identifier: task.identifier,
             name: task.name,

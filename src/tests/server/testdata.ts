@@ -1,5 +1,7 @@
 import {Project} from "../../common/project"
 import {TaskDefinition} from "../../common/task"
+import {TaskLocation} from "../../common/tasklocation"
+import {TaskRelation} from "../../common/taskrelation"
 
 export const project: Project = {
     identifier: "project",
@@ -54,10 +56,46 @@ export const taskd3: TaskDefinition = {
     estimatedDuration: 10
 }
 
-export const invalidTask: TaskDefinition = {
-    identifier: "invalidTask",
+export const taskd4: TaskDefinition = {
+    identifier: "task4",
+    name: "Task 4",
+    description: "Task description 4",
+    estimatedStartDate: new Date(2016, 10, 10),
+    estimatedDuration: 5
+}
+
+export const invalidTaskd: TaskDefinition = {
+    identifier: "invalidTaskd",
     name: "Invalid task",
     description: "Invalid task description",
     estimatedStartDate: new Date(2000, 0, 1),
     estimatedDuration: 0
+}
+
+export const taskRelation1: TaskRelation = {
+    previous: taskd1.identifier,
+    previousLocation: TaskLocation.End,
+    next: taskd2.identifier,
+    lag: 12
+}
+
+export const taskRelation2: TaskRelation = {
+    previous: taskd1.identifier,
+    previousLocation: TaskLocation.End,
+    next: taskd3.identifier,
+    lag: 34
+}
+
+export const invalidTaskRelation1: TaskRelation = {
+    previous: invalidTaskd.identifier,
+    previousLocation: TaskLocation.End,
+    next: taskd1.identifier,
+    lag: 0
+}
+
+export const invalidTaskRelation2: TaskRelation = {
+    previous: taskd1.identifier,
+    previousLocation: TaskLocation.End,
+    next: invalidTaskd.identifier,
+    lag: 0
 }

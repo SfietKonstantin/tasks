@@ -3,7 +3,7 @@ import * as redis from "redis"
 import {Project} from "../../../../common/project"
 import {RedisProjectDao} from "../../../../server/dao/redis/project"
 import {RedisTestDataProvider} from "./testdataprovider"
-import {project1, project2, invalidProject, project3} from "../../testdata"
+import {project1, project2, project3, invalidProject} from "../../testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"
@@ -139,6 +139,9 @@ describe("Redis DAO Project", () => {
     describe("addProject", () => {
         it("Should add a project in the DB", (done) => {
             dao.addProject(project3).then(() => {
+                return dao.getProject(project3.identifier)
+            }).then((project: Project) => {
+                chai.expect(project).to.deep.equal(project3)
                 done()
             }).catch((error) => {
                 done(error)

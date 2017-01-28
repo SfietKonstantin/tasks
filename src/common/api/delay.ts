@@ -2,7 +2,7 @@ import {InputError} from "../errors/input"
 import {DelayDefinition} from "../delay"
 
 export class DelayBuilder {
-    static create(input: any): DelayDefinition {
+    static fromObject(input: any): DelayDefinition {
         if (!input.hasOwnProperty("identifier")) {
             throw new InputError("Property \"identifier\" cannot be found")
         }

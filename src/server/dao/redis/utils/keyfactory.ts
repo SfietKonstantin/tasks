@@ -17,4 +17,8 @@ export class KeyFactory {
             return `task:${projectIdentifier}:${taskIdentifier}`
         }
     }
+    static createTaskRelationKey(projectIdentifier: string, previousTaskIdentifier: string,
+                                 nextTaskIdentifier: string) {
+        return `task:${projectIdentifier}:${previousTaskIdentifier}:relation:${nextTaskIdentifier}`
+    }
 }
