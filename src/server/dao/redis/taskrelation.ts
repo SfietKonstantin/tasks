@@ -76,8 +76,8 @@ export class RedisTaskRelationDao implements ITaskRelationDao {
     }
 
     getTaskRelations(projectIdentifier: string, taskIdentifier: string): Promise<Array<TaskRelation>> {
-        const relationsKey = KeyFactory.createTaskKey(projectIdentifier, taskIdentifier, "relations")
         return this.hasTask(projectIdentifier, taskIdentifier).then((): Promise<Array<string>> => {
+            const relationsKey = KeyFactory.createTaskKey(projectIdentifier, taskIdentifier, "relations")
             return this.client.smembersAsync(relationsKey)
         }).then((identifiers: Array<string>) => {
             return Promise.all(identifiers.sort().map((childIndentifier: string): Promise<TaskRelation> => {

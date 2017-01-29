@@ -4,8 +4,8 @@ import {TaskRelation} from "../../../../common/taskrelation"
 import {RedisTaskRelationDao} from "../../../../server/dao/redis/taskrelation"
 import {RedisTestDataProvider} from "./testdataprovider"
 import {
-    project1, taskRelation1, invalidProject, invalidTaskRelation1, invalidTaskRelation2,
-    taskd1, taskRelation2, invalidTaskd
+    project1, invalidProject, taskd1, taskd2, invalidTaskd,
+    taskRelation1, taskRelation2, taskRelation3, invalidTaskRelation1, invalidTaskRelation2
 } from "../../testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
@@ -26,75 +26,10 @@ describe("Redis DAO TaskRelation", () => {
     afterEach(() => {
         client.quit()
     })
-    describe("addTaskRelation", () => {
-        it("Should add a task relation in the DB", (done) => {
-            const relationsKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "relations")
-            RedisTestDataProvider.deleteValue(client, relationsKey).then(() => {
-                return dao.addTaskRelation(project1.identifier, taskRelation1)
-            }).then(() => {
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception for an invalid project identifier", (done) => {
-            dao.addTaskRelation(invalidProject.identifier, taskRelation1).then(() => {
-                done(new Error("addTaskRelation should not be a success"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(NotFoundError)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception for an invalid parent task", (done) => {
-            dao.addTaskRelation(project1.identifier, invalidTaskRelation1).then(() => {
-                done(new Error("addTaskRelation should not be a success"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(NotFoundError)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception for an invalid child task", (done) => {
-            dao.addTaskRelation(project1.identifier, invalidTaskRelation2).then(() => {
-                done(new Error("addTaskRelation should not be a success"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(NotFoundError)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception when adding an existing task relation in the DB", (done) => {
-            dao.addTaskRelation(project1.identifier, taskRelation1).then(() => {
-                done(new Error("addTaskRelation should not be a success"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(ExistsError)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception when adding a task relation to a task with corrupted relations", (done) => {
-            const relationsKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "relations")
-            RedisTestDataProvider.setValue(client, relationsKey, "test").then(() => {
-                return dao.addTaskRelation(project1.identifier, taskRelation1)
-            }).then(() => {
-                done(new Error("addTaskRelation should not be a success"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(InternalError)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-    })
     describe("getTaskRelations", () => {
         it("Should get a list of task relations that belongs to a task from the DB", (done) => {
             dao.getTaskRelations(project1.identifier, taskd1.identifier).then((taskRelations: Array<TaskRelation>) => {
-                const expected: Array<TaskRelation> = [taskRelation1, taskRelation2]
+                const expected = [taskRelation1, taskRelation2]
                 chai.expect(taskRelations).to.deep.equal(expected)
                 done()
             }).catch((error) => {
@@ -111,7 +46,7 @@ describe("Redis DAO TaskRelation", () => {
                 done(error)
             })
         })
-        it("Should get an exception for an invalid project identifier", (done) => {
+        it("Should get an exception for an invalid task identifier", (done) => {
             dao.getTaskRelations(project1.identifier, invalidTaskd.identifier).then(() => {
                 done(new Error("getTaskRelations should not be a success"))
             }).catch((error) => {
@@ -152,7 +87,7 @@ describe("Redis DAO TaskRelation", () => {
         it("Should get an exception for a task relation with an invalid previousLocation", (done) => {
             const taskRelationKey = KeyFactory.createTaskRelationKey(project1.identifier, taskRelation1.previous,
                 taskRelation1.next)
-            RedisTestDataProvider.setMember(client, taskRelationKey, "previousLocation", "").then(() => {
+            RedisTestDataProvider.setMember(client, taskRelationKey, "previousLocation", "test").then(() => {
                 return dao.getTaskRelations(project1.identifier, taskd1.identifier)
             }).then(() => {
                 done(new Error("getTaskRelations should not be a success"))
@@ -183,6 +118,71 @@ describe("Redis DAO TaskRelation", () => {
                 return dao.getTaskRelations(project1.identifier, taskd1.identifier)
             }).then(() => {
                 done(new Error("getTaskRelations should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(InternalError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+    })
+    describe("addTaskRelation", () => {
+        it("Should add a task relation in the DB", (done) => {
+            dao.addTaskRelation(project1.identifier, taskRelation3).then(() => {
+                return dao.getTaskRelations(project1.identifier, taskd2.identifier)
+            }).then((taskRelations: Array<TaskRelation>) => {
+                chai.expect(taskRelations).to.deep.equal([taskRelation3])
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception for an invalid project identifier", (done) => {
+            dao.addTaskRelation(invalidProject.identifier, taskRelation3).then(() => {
+                done(new Error("addTaskRelation should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception for an invalid parent task", (done) => {
+            dao.addTaskRelation(project1.identifier, invalidTaskRelation1).then(() => {
+                done(new Error("addTaskRelation should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception for an invalid child task", (done) => {
+            dao.addTaskRelation(project1.identifier, invalidTaskRelation2).then(() => {
+                done(new Error("addTaskRelation should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when adding an existing task relation in the DB", (done) => {
+            dao.addTaskRelation(project1.identifier, taskRelation1).then(() => {
+                done(new Error("addTaskRelation should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(ExistsError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception when adding a task relation to a task with corrupted relations", (done) => {
+            const relationsKey = KeyFactory.createTaskKey(project1.identifier, taskd2.identifier, "relations")
+            RedisTestDataProvider.setValue(client, relationsKey, "test").then(() => {
+                return dao.addTaskRelation(project1.identifier, taskRelation3)
+            }).then(() => {
+                done(new Error("addTaskRelation should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)
                 done()

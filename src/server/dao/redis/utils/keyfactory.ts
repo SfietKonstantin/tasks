@@ -10,6 +10,7 @@ export class KeyFactory {
             return `project:${projectIdentifier}`
         }
     }
+
     static createTaskKey(projectIdentifier: string, taskIdentifier: string, property?: string) {
         if (property) {
             return `task:${projectIdentifier}:${taskIdentifier}:${property}`
@@ -17,8 +18,21 @@ export class KeyFactory {
             return `task:${projectIdentifier}:${taskIdentifier}`
         }
     }
+
     static createTaskRelationKey(projectIdentifier: string, previousTaskIdentifier: string,
                                  nextTaskIdentifier: string) {
         return `task:${projectIdentifier}:${previousTaskIdentifier}:relation:${nextTaskIdentifier}`
+    }
+
+    static createDelayKey(projectIdentifier: string, delayIdentifier: string, property?: string) {
+        if (property) {
+            return `delay:${projectIdentifier}:${delayIdentifier}:${property}`
+        } else {
+            return `delay:${projectIdentifier}:${delayIdentifier}`
+        }
+    }
+
+    static createDelayRelationKey(projectIdentifier: string, delay: string, task: string) {
+        return `delay:${projectIdentifier}:${delay}:relation:${task}`
     }
 }

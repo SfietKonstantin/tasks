@@ -1,11 +1,16 @@
 import * as redis from "redis"
 import * as bluebird from "bluebird"
-import {project1, project2, taskd1, taskd2, taskd3, taskRelation1, taskRelation2} from "../../testdata"
+import {
+    project1, project2, taskd1, taskd2, taskd3, taskRelation1, taskRelation2, delayd1, delayd2,
+    delayRelation1, delayRelation2
+} from "../../testdata"
 import {Project} from "../../../../common/project"
 import {TaskDefinition} from "../../../../common/task"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {TaskRelation} from "../../../../common/taskrelation"
 import {TaskLocationBuilder} from "../../../../server/dao/redis/utils/tasklocation"
+import {DelayDefinition} from "../../../../common/delay"
+import {DelayRelation} from "../../../../common/delayrelation"
 bluebird.promisifyAll(redis)
 
 export interface RedisAsyncClient extends redis.RedisClient {
@@ -57,14 +62,39 @@ export class RedisTestDataProvider {
             }))
         }).then(() => {
             return Promise.all([taskRelation1, taskRelation2].map((taskRelation: TaskRelation) => {
-                const taskRelationsKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "relations")
-                return client.saddAsync(taskRelationsKey, taskRelation.next).then(() => {
+                const relationsKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "relations")
+                return client.saddAsync(relationsKey, taskRelation.next).then(() => {
                     const redisRelation = {
                         previousLocation: TaskLocationBuilder.toString(taskRelation.previousLocation),
                         lag: taskRelation.lag
                     }
                     const taskRelationKey = KeyFactory.createTaskRelationKey(project1.identifier, taskRelation.previous,
                         taskRelation.next)
+                    return client.hmsetAsync(taskRelationKey, redisRelation)
+                })
+            }))
+        }).then(() => {
+            return Promise.all([delayd1, delayd2].map((delay: DelayDefinition) => {
+                const projectDelaysKey = KeyFactory.createProjectKey(project1.identifier, "delays")
+                return client.saddAsync(projectDelaysKey, delay.identifier).then(() => {
+                    const redisDelay = {
+                        name: delay.name,
+                        description: delay.description,
+                        date: delay.date.getTime()
+                    }
+                    const delayKey = KeyFactory.createDelayKey(project1.identifier, delay.identifier)
+                    return client.hmsetAsync(delayKey, redisDelay)
+                })
+            }))
+        }).then(() => {
+            return Promise.all([delayRelation1, delayRelation2].map((delayRelation: DelayRelation) => {
+                const relationsKey = KeyFactory.createDelayKey(project1.identifier, delayd1.identifier, "relations")
+                return client.saddAsync(relationsKey, delayRelation.task).then(() => {
+                    const redisRelation = {
+                        lag: delayRelation.lag
+                    }
+                    const taskRelationKey = KeyFactory.createDelayRelationKey(project1.identifier, delayRelation.delay,
+                        delayRelation.task)
                     return client.hmsetAsync(taskRelationKey, redisRelation)
                 })
             }))

@@ -23,38 +23,6 @@ describe("Redis DAO Task", () => {
     afterEach(() => {
         client.quit()
     })
-    describe("getProjectTasks", () => {
-        it("Should get a list of tasks that belongs to a project from the DB", (done) => {
-            dao.getProjectTasks(project1.identifier).then((tasks: Array<TaskDefinition>) => {
-                const expected: Array<TaskDefinition> = [taskd1, taskd2, taskd3]
-                chai.expect(tasks).to.deep.equal(expected)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should get an exception for an invalid project identifier", (done) => {
-            dao.getProjectTasks(invalidProject.identifier).then(() => {
-                done(new Error("getProjectTasks should not be a success"))
-            }).catch((error) => {
-                chai.expect(error).to.instanceOf(NotFoundError)
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-        it("Should only get tasks with body from the DB", (done) => {
-            const projectKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier)
-            RedisTestDataProvider.deleteValue(client, projectKey).then(() => {
-                return dao.getProjectTasks(project1.identifier)
-            }).then((tasks: Array<TaskDefinition>) => {
-                chai.expect(tasks).to.deep.equal([taskd2, taskd3])
-                done()
-            }).catch((error) => {
-                done(error)
-            })
-        })
-    })
     describe("getTask", () => {
         it("Should get a task from the DB", (done) => {
             dao.getTask(project1.identifier, taskd1.identifier).then((task: TaskDefinition) => {
@@ -144,6 +112,49 @@ describe("Redis DAO Task", () => {
                 done(new Error("getTask should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+    })
+    describe("getProjectTasks", () => {
+        it("Should get a list of tasks that belongs to a project from the DB", (done) => {
+            dao.getProjectTasks(project1.identifier).then((tasks: Array<TaskDefinition>) => {
+                const expected = [taskd1, taskd2, taskd3]
+                chai.expect(tasks).to.deep.equal(expected)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception for an invalid project identifier", (done) => {
+            dao.getProjectTasks(invalidProject.identifier).then(() => {
+                done(new Error("getProjectTasks should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(NotFoundError)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should only get tasks with body from the DB", (done) => {
+            const projectKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier)
+            RedisTestDataProvider.deleteValue(client, projectKey).then(() => {
+                return dao.getProjectTasks(project1.identifier)
+            }).then((tasks: Array<TaskDefinition>) => {
+                chai.expect(tasks).to.deep.equal([taskd2, taskd3])
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should only get tasks without corrupted body from the DB", (done) => {
+            const projectKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier)
+            RedisTestDataProvider.setValue(client, projectKey, "test").then(() => {
+                return dao.getProjectTasks(project1.identifier)
+            }).then((tasks: Array<TaskDefinition>) => {
+                chai.expect(tasks).to.deep.equal([taskd2, taskd3])
                 done()
             }).catch((error) => {
                 done(error)
