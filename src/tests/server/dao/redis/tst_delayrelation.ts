@@ -2,17 +2,18 @@ import * as chai from "chai"
 import * as redis from "redis"
 import {DelayRelation} from "../../../../common/delayrelation"
 import {RedisDelayRelationDao} from "../../../../server/dao/redis/delayrelation"
+import {RedisDaoBuilder} from "../../../../server/dao/redis/builder"
 import {RedisTestDataProvider} from "./testdataprovider"
 import {
-    project1, invalidProject,
-    taskd1, invalidTaskd, delayRelation1, delayRelation2, delayd1, invalidDelay, delayRelation3, delayd2,
-    invalidDelayRelation1, invalidDelayRelation2
+project1, invalidProject,
+taskd1, invalidTaskd, delayRelation1, delayRelation2, delayd1, invalidDelay, delayRelation3, delayd2,
+invalidDelayRelation1, invalidDelayRelation2
 } from "../../testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"
 import {InternalError} from "../../../../server/dao/error/internal"
-import {ExistsError} from "../../../../server/dao/error/exists"
+import {ExistsError} from "../../../../server/error/exists"
 
 describe("Redis DAO DelayRelation", () => {
     let client: redis.RedisClient
@@ -20,7 +21,8 @@ describe("Redis DAO DelayRelation", () => {
     beforeEach((done) => {
         RedisTestDataProvider.dump().then((testClient: redis.RedisClient) => {
             client = testClient
-            dao = new RedisDelayRelationDao(client)
+            const builder = new RedisDaoBuilder(client)
+            dao = builder.buildDelayRelationDao()
             done()
         })
     })

@@ -8,7 +8,7 @@ import {KeyFactory} from "./utils/keyfactory"
 import {CorruptedError} from "../error/corrupted"
 import {NotFoundError} from "../../../common/errors/notfound"
 import {RedisProjectDao} from "./project"
-import {ExistsError} from "../error/exists"
+import {ExistsError} from "../../error/exists"
 bluebird.promisifyAll(redis)
 
 class RedisTask {

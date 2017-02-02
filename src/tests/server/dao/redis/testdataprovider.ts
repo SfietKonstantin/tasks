@@ -2,7 +2,7 @@ import * as redis from "redis"
 import * as bluebird from "bluebird"
 import {
     project1, project2, taskd1, taskd2, taskd3, taskRelation1, taskRelation2, delayd1, delayd2,
-    delayRelation1, delayRelation2
+    delayRelation1, delayRelation2, modifier1, modifier2, modifier3
 } from "../../testdata"
 import {Project} from "../../../../common/project"
 import {TaskDefinition} from "../../../../common/task"
@@ -11,6 +11,7 @@ import {TaskRelation} from "../../../../common/taskrelation"
 import {TaskLocationBuilder} from "../../../../server/dao/redis/utils/tasklocation"
 import {DelayDefinition} from "../../../../common/delay"
 import {DelayRelation} from "../../../../common/delayrelation"
+import {Modifier} from "../../../../common/modifier"
 bluebird.promisifyAll(redis)
 
 export interface RedisAsyncClient extends redis.RedisClient {
@@ -98,6 +99,32 @@ export class RedisTestDataProvider {
                     return client.hmsetAsync(taskRelationKey, redisRelation)
                 })
             }))
+        }).then(() => {
+            return Promise.all([modifier1, modifier2, modifier3].map((modifier: Modifier, index: number) => {
+                const modifierIdsKey = `modifier:${project1.identifier}:ids`
+                const modifiersKey = KeyFactory.createTaskKey(project1.identifier, taskd1.identifier, "modifiers")
+                return client.saddAsync(modifierIdsKey, index + 1).then(() => {
+                    return client.saddAsync(modifiersKey, index + 1)
+                }).then(() => {
+                    const redisModifier = {
+                        name: modifier.name,
+                        description: modifier.description,
+                        location: TaskLocationBuilder.toString(modifier.location)
+                    }
+                    const modifierKey = KeyFactory.createModifierKey(project1.identifier, index + 1)
+                    return client.hmsetAsync(modifierKey, redisModifier)
+                }).then(() => {
+                    const durationKey = KeyFactory.createModifierKey(project1.identifier, index + 1, "duration")
+                    return client.setAsync(durationKey, modifier.duration)
+                })
+            })).then(() => {
+                return Promise.all([modifier1, modifier2].map((modifier: Modifier, index: number) => {
+                    const tasksKey = KeyFactory.createModifierKey(project1.identifier, index + 1, "tasks")
+                    return client.saddAsync(tasksKey, taskd1.identifier)
+                }))
+            }).then(() => {
+                return client.setAsync(`modifier:${project1.identifier}:lastId`, 2)
+            })
         }).then(() => {
             return client
         })

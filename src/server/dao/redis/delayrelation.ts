@@ -6,7 +6,7 @@ import {DelayRelation} from "../../../common/delayrelation"
 import {KeyFactory} from "./utils/keyfactory"
 import {CorruptedError} from "../error/corrupted"
 import {wrapUnknownErrors} from "./utils/error"
-import {ExistsError} from "../error/exists"
+import {ExistsError} from "../../error/exists"
 import {RedisTaskDao} from "./task"
 import {RedisDelayDao} from "./delay"
 bluebird.promisifyAll(redis)

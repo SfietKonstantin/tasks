@@ -7,7 +7,7 @@ import {KeyFactory} from "./utils/keyfactory"
 import {CorruptedError} from "../error/corrupted"
 import {NotFoundError} from "../../../common/errors/notfound"
 import {wrapUnknownErrors} from "./utils/error"
-import {ExistsError} from "../error/exists"
+import {ExistsError} from "../../error/exists"
 bluebird.promisifyAll(redis)
 
 class RedisProject {

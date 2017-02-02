@@ -3,15 +3,16 @@ import * as redis from "redis"
 import {TaskRelation} from "../../../../common/taskrelation"
 import {RedisTaskRelationDao} from "../../../../server/dao/redis/taskrelation"
 import {RedisTestDataProvider} from "./testdataprovider"
+import {RedisDaoBuilder} from "../../../../server/dao/redis/builder"
 import {
-    project1, invalidProject, taskd1, taskd2, invalidTaskd,
-    taskRelation1, taskRelation2, taskRelation3, invalidTaskRelation1, invalidTaskRelation2
+project1, invalidProject, taskd1, taskd2, invalidTaskd,
+taskRelation1, taskRelation2, taskRelation3, invalidTaskRelation1, invalidTaskRelation2
 } from "../../testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"
 import {InternalError} from "../../../../server/dao/error/internal"
-import {ExistsError} from "../../../../server/dao/error/exists"
+import {ExistsError} from "../../../../server/error/exists"
 
 describe("Redis DAO TaskRelation", () => {
     let client: redis.RedisClient
@@ -19,7 +20,8 @@ describe("Redis DAO TaskRelation", () => {
     beforeEach((done) => {
         RedisTestDataProvider.dump().then((testClient: redis.RedisClient) => {
             client = testClient
-            dao = new RedisTaskRelationDao(client)
+            const builder = new RedisDaoBuilder(client)
+            dao = builder.buildTaskRelationDao()
             done()
         })
     })

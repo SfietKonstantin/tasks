@@ -2,13 +2,14 @@ import * as chai from "chai"
 import * as redis from "redis"
 import {Project} from "../../../../common/project"
 import {RedisProjectDao} from "../../../../server/dao/redis/project"
+import {RedisDaoBuilder} from "../../../../server/dao/redis/builder"
 import {RedisTestDataProvider} from "./testdataprovider"
 import {project1, project2, project3, invalidProject} from "../../testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"
 import {InternalError} from "../../../../server/dao/error/internal"
-import {ExistsError} from "../../../../server/dao/error/exists"
+import {ExistsError} from "../../../../server/error/exists"
 
 describe("Redis DAO Project", () => {
     let client: redis.RedisClient
@@ -16,7 +17,8 @@ describe("Redis DAO Project", () => {
     beforeEach((done) => {
         RedisTestDataProvider.dump().then((testClient: redis.RedisClient) => {
             client = testClient
-            dao = new RedisProjectDao(client)
+            const builder = new RedisDaoBuilder(client)
+            dao = builder.buildProjectDao()
             done()
         })
     })

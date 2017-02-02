@@ -2,13 +2,14 @@ import * as chai from "chai"
 import * as redis from "redis"
 import {DelayDefinition} from "../../../../common/delay"
 import {RedisDelayDao} from "../../../../server/dao/redis/delay"
+import {RedisDaoBuilder} from "../../../../server/dao/redis/builder";
 import {RedisTestDataProvider} from "./testdataprovider"
 import {project1, invalidProject, delayd1, delayd2, delayd3, invalidDelay} from "../../testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"
 import {InternalError} from "../../../../server/dao/error/internal"
-import {ExistsError} from "../../../../server/dao/error/exists"
+import {ExistsError} from "../../../../server/error/exists"
 
 describe("Redis DAO Delay", () => {
     let client: redis.RedisClient
@@ -16,7 +17,8 @@ describe("Redis DAO Delay", () => {
     beforeEach((done) => {
         RedisTestDataProvider.dump().then((testClient: redis.RedisClient) => {
             client = testClient
-            dao = new RedisDelayDao(client)
+            const builder = new RedisDaoBuilder(client)
+            dao = builder.buildDelayDao()
             done()
         })
     })

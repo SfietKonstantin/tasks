@@ -24,6 +24,14 @@ export class KeyFactory {
         return `task:${projectIdentifier}:${previousTaskIdentifier}:relation:${nextTaskIdentifier}`
     }
 
+    static createModifierKey(projectIdentifier: string, modifierId: number, property?: string) {
+        if (property) {
+            return `modifier:${projectIdentifier}:${modifierId}:${property}`
+        } else {
+            return `modifier:${projectIdentifier}:${modifierId}`
+        }
+    }
+
     static createDelayKey(projectIdentifier: string, delayIdentifier: string, property?: string) {
         if (property) {
             return `delay:${projectIdentifier}:${delayIdentifier}:${property}`

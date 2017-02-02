@@ -2,13 +2,14 @@ import * as chai from "chai"
 import * as redis from "redis"
 import {TaskDefinition} from "../../../../common/task"
 import {RedisTaskDao} from "../../../../server/dao/redis/task"
+import {RedisDaoBuilder} from "../../../../server/dao/redis/builder"
 import {RedisTestDataProvider} from "./testdataprovider"
 import {project1, invalidProject, taskd1, taskd2, taskd3, taskd4, invalidTaskd} from "../../testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"
 import {InternalError} from "../../../../server/dao/error/internal"
-import {ExistsError} from "../../../../server/dao/error/exists"
+import {ExistsError} from "../../../../server/error/exists"
 
 describe("Redis DAO Task", () => {
     let client: redis.RedisClient
@@ -16,7 +17,8 @@ describe("Redis DAO Task", () => {
     beforeEach((done) => {
         RedisTestDataProvider.dump().then((testClient: redis.RedisClient) => {
             client = testClient
-            dao = new RedisTaskDao(client)
+            const builder = new RedisDaoBuilder(client)
+            dao = builder.buildTaskDao()
             done()
         })
     })

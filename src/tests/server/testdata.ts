@@ -4,6 +4,7 @@ import {TaskLocation} from "../../common/tasklocation"
 import {TaskRelation} from "../../common/taskrelation"
 import {DelayDefinition} from "../../common/delay"
 import {DelayRelation} from "../../common/delayrelation"
+import {Modifier} from "../../common/modifier"
 
 export const project1: Project = {
     identifier: "project1",
@@ -32,32 +33,41 @@ export const invalidProject: Project = {
 export const taskd1: TaskDefinition = {
     identifier: "task1",
     name: "Task 1",
-    description: "Task description 1",
-    estimatedStartDate: new Date(2016, 9, 1),
-    estimatedDuration: 30
+    description: "Task description 1 (Root task)",
+    estimatedStartDate: new Date(2016, 7, 15),
+    estimatedDuration: 31
 }
+
 export const taskd2: TaskDefinition = {
     identifier: "task2",
     name: "Task 2",
-    description: "Task description 2",
-    estimatedStartDate: new Date(2016, 9, 15),
-    estimatedDuration: 15
+    description: "Task description 2 (Long task)",
+    estimatedStartDate: new Date(2016, 8, 15),
+    estimatedDuration: 60
 }
 
 export const taskd3: TaskDefinition = {
     identifier: "task3",
     name: "Task 3",
-    description: "Task description 3",
-    estimatedStartDate: new Date(2016, 10, 1),
-    estimatedDuration: 10
+    description: "Task description 3 (Short task)",
+    estimatedStartDate: new Date(2016, 8, 15),
+    estimatedDuration: 31
 }
 
 export const taskd4: TaskDefinition = {
     identifier: "task4",
     name: "Task 4",
-    description: "Task description 4",
-    estimatedStartDate: new Date(2016, 10, 10),
-    estimatedDuration: 5
+    description: "Task description 4 (Task depending on two tasks)",
+    estimatedStartDate: new Date(2016, 10, 16),
+    estimatedDuration: 30
+}
+
+export const milestoned1: TaskDefinition = {
+    identifier: "milestone1",
+    name: "Milestone 1",
+    description: "Milestone description 1",
+    estimatedStartDate: new Date(2016, 7, 15),
+    estimatedDuration: 0
 }
 
 export const invalidTaskd: TaskDefinition = {
@@ -72,21 +82,49 @@ export const taskRelation1: TaskRelation = {
     previous: taskd1.identifier,
     previousLocation: TaskLocation.End,
     next: taskd2.identifier,
-    lag: 12
+    lag: 0
 }
 
 export const taskRelation2: TaskRelation = {
     previous: taskd1.identifier,
     previousLocation: TaskLocation.End,
     next: taskd3.identifier,
-    lag: 34
+    lag: 1
 }
 
 export const taskRelation3: TaskRelation = {
     previous: taskd2.identifier,
     previousLocation: TaskLocation.End,
     next: taskd3.identifier,
-    lag: 56
+    lag: 2
+}
+
+export const taskRelation4: TaskRelation = {
+    previous: taskd2.identifier,
+    previousLocation: TaskLocation.End,
+    next: taskd4.identifier,
+    lag: 0
+}
+
+export const taskRelation5: TaskRelation = {
+    previous: taskd3.identifier,
+    previousLocation: TaskLocation.End,
+    next: taskd4.identifier,
+    lag: 0
+}
+
+export const taskRelation6: TaskRelation = {
+    previous: taskd2.identifier,
+    previousLocation: TaskLocation.End,
+    next: taskd1.identifier,
+    lag: 0
+}
+
+export const taskRelation7: TaskRelation = {
+    previous: taskd2.identifier,
+    previousLocation: TaskLocation.Beginning,
+    next: taskd1.identifier,
+    lag: 0
 }
 
 export const invalidTaskRelation1: TaskRelation = {
@@ -106,15 +144,15 @@ export const invalidTaskRelation2: TaskRelation = {
 export const delayd1: DelayDefinition = {
     identifier: "delay1",
     name: "Delay 1",
-    description: "Description 1",
-    date: new Date(2016, 9, 1)
+    description: "Delay description 1",
+    date: new Date(2016, 11, 25)
 }
 
 export const delayd2: DelayDefinition = {
     identifier: "delay2",
     name: "Delay 2",
-    description: "Description 2",
-    date: new Date(2016, 9, 15)
+    description: "Delay description 2",
+    date: new Date(2016, 11, 30)
 }
 
 export const delayd3: DelayDefinition = {
@@ -134,19 +172,31 @@ export const invalidDelay: DelayDefinition = {
 export const delayRelation1: DelayRelation = {
     task: taskd1.identifier,
     delay: delayd1.identifier,
-    lag: 12
+    lag: 0
 }
 
 export const delayRelation2: DelayRelation = {
     task: taskd2.identifier,
     delay: delayd1.identifier,
-    lag: 34
+    lag: 5
 }
 
 export const delayRelation3: DelayRelation = {
     task: taskd1.identifier,
     delay: delayd2.identifier,
-    lag: 56
+    lag: 10
+}
+
+export const delayRelation4: DelayRelation = {
+    task: taskd4.identifier,
+    delay: delayd1.identifier,
+    lag: 0
+}
+
+export const delayRelation5: DelayRelation = {
+    task: taskd4.identifier,
+    delay: delayd2.identifier,
+    lag: 5
 }
 
 export const invalidDelayRelation1: DelayRelation = {
@@ -159,4 +209,39 @@ export const invalidDelayRelation2: DelayRelation = {
     task: invalidTaskd.identifier,
     delay: delayd2.identifier,
     lag: 0
+}
+
+export const modifier1: Modifier = {
+    name: "Modifier 1",
+    description: "Modifier description 1 (Root task modifier)",
+    duration: 5,
+    location: TaskLocation.End
+}
+
+export const modifier2: Modifier = {
+    name: "Modifier 2",
+    description: "Modifier description 2 (Short task modifier)",
+    duration: 10,
+    location: TaskLocation.Beginning
+}
+
+export const modifier3: Modifier = {
+    name: "Modifier 3",
+    description: "Modifier description 3 (Short task modifier)",
+    duration: 24,
+    location: TaskLocation.End
+}
+
+export const modifier4: Modifier = {
+    name: "Modifier 4",
+    description: "Description 4",
+    duration: 20,
+    location: TaskLocation.Beginning
+}
+
+export const modifier5: Modifier = {
+    name: "Modifier 5",
+    description: "Modifier with a negative duration",
+    duration: -2,
+    location: TaskLocation.End
 }
