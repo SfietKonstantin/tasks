@@ -22,9 +22,9 @@ import {get as mapGet} from "../../../common/utils/map"
 import {IDelayNodeImpl} from "./idelaynode"
 
 export class ProjectNode implements IProjectNodeImpl {
-    parent: IGraph
+    graph: IGraph
     projectIdentifier: string
-    nodes: Map<string, ITaskNode>
+    tasks: Map<string, ITaskNode>
     delays: Map<string, IDelayNode>
     private nodeFactory: INodeFactory
     private daoBuilder: IDaoBuilder
@@ -33,7 +33,7 @@ export class ProjectNode implements IProjectNodeImpl {
     private taskRelationDao: ITaskRelationDao
     private delayRelationDao: IDelayRelationDao
     private modifierDao: IModifierDao
-    constructor(nodeFactory: INodeFactory, daoBuilder: IDaoBuilder, parent: IGraph, projectIdentifier: string) {
+    constructor(nodeFactory: INodeFactory, daoBuilder: IDaoBuilder, graph: IGraph, projectIdentifier: string) {
         this.nodeFactory = nodeFactory
         this.daoBuilder = daoBuilder
         this.taskDao = daoBuilder.buildTaskDao()
@@ -41,9 +41,9 @@ export class ProjectNode implements IProjectNodeImpl {
         this.taskRelationDao = daoBuilder.buildTaskRelationDao()
         this.delayRelationDao = daoBuilder.buildDelayRelationDao()
         this.modifierDao = daoBuilder.buildModifierDao()
-        this.parent = parent
+        this.graph = graph
         this.projectIdentifier = projectIdentifier
-        this.nodes = new Map<string, ITaskNode>()
+        this.tasks = new Map<string, ITaskNode>()
         this.delays = new Map<string, IDelayNode>()
     }
     load(): Promise<void> {
@@ -52,7 +52,7 @@ export class ProjectNode implements IProjectNodeImpl {
             return Promise.all(tasks.map((task: TaskDefinition) => {
                 const node = this.nodeFactory.createTaskNode(this.daoBuilder, this, task.identifier,
                     task.estimatedStartDate, task.estimatedDuration)
-                this.nodes.set(task.identifier, node)
+                this.tasks.set(task.identifier, node)
             }))
         }).then(() => {
             return this.delayDao.getProjectDelays(this.projectIdentifier).then((delays: Array<DelayDefinition>) => {
@@ -62,18 +62,18 @@ export class ProjectNode implements IProjectNodeImpl {
                 })
             })
         }).then(() => {
-            return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
+            return Promise.all(Array.from(this.tasks.values(), (node: ITaskNode) => {
                 return this.modifierDao.getTaskModifiers(this.projectIdentifier, node.taskIdentifier)
                     .then((modifiers: Array<Modifier>) => {
                         node.modifiers = modifiers
                     })
             }))
         }).then(() => {
-            return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
+            return Promise.all(Array.from(this.tasks.values(), (node: ITaskNode) => {
                 return this.taskRelationDao.getTaskRelations(this.projectIdentifier, node.taskIdentifier)
                     .then((taskRelations: Array<TaskRelation>) => {
                         taskRelations.forEach((taskRelation: TaskRelation) => {
-                            const child = mapGet(this.nodes, taskRelation.next) as ITaskNodeImpl
+                            const child = mapGet(this.tasks, taskRelation.next) as ITaskNodeImpl
                             let taskNode = node as ITaskNodeImpl
                             return taskNode.addChild(child, taskRelation)
                         })
@@ -84,7 +84,7 @@ export class ProjectNode implements IProjectNodeImpl {
                 return this.delayRelationDao.getDelayRelations(this.projectIdentifier, node.delayIdentifier)
                     .then((delayRelations: Array<DelayRelation>) => {
                         delayRelations.forEach((delayRelation: DelayRelation) => {
-                            const task = mapGet(this.nodes, delayRelation.task) as ITaskNodeImpl
+                            const task = mapGet(this.tasks, delayRelation.task) as ITaskNodeImpl
                             let delayNode = node as IDelayNodeImpl
                             task.addDelay(delayNode, delayRelation)
                         })
@@ -92,11 +92,11 @@ export class ProjectNode implements IProjectNodeImpl {
             }))
         }).then(() => {
             const message = `Graph loaded for project "${this.projectIdentifier}", `
-                + `tasks: ${this.nodes.size}, `
+                + `tasks: ${this.tasks.size}, `
                 + `delays: ${this.delays.size}`
             winston.info(message)
 
-            return Promise.all(Array.from(this.nodes.values(), (node: ITaskNode) => {
+            return Promise.all(Array.from(this.tasks.values(), (node: ITaskNode) => {
                 return (node as ITaskNodeImpl).compute()
             }))
         }).then(() => {
@@ -104,13 +104,13 @@ export class ProjectNode implements IProjectNodeImpl {
         })
     }
     addTask(task: TaskDefinition): Promise<ITaskNode> {
-        if (this.nodes.has(task.identifier)) {
+        if (this.tasks.has(task.identifier)) {
             return Promise.reject(new ExistsError(`Task "${task.identifier}" is already present in project`))
         }
         return this.taskDao.addTask(this.projectIdentifier, task).then(() => {
             const node = this.nodeFactory.createTaskNode(this.daoBuilder, this, task.identifier,
                 task.estimatedStartDate, task.estimatedDuration)
-            this.nodes.set(task.identifier, node)
+            this.tasks.set(task.identifier, node)
             return node
         })
     }
@@ -125,21 +125,21 @@ export class ProjectNode implements IProjectNodeImpl {
         })
     }
     addTaskRelation(relation: TaskRelation): Promise<void> {
-        if (!this.nodes.has(relation.previous)) {
+        if (!this.tasks.has(relation.previous)) {
             return Promise.reject(new NotFoundError(`Task "${relation.previous}" is not present in project`))
         }
-        if (!this.nodes.has(relation.next)) {
+        if (!this.tasks.has(relation.next)) {
             return Promise.reject(new NotFoundError(`Task "${relation.next}" is not present in project`))
         }
 
         return this.taskRelationDao.addTaskRelation(this.projectIdentifier, relation).then(() => {
-            const child = mapGet(this.nodes, relation.next) as ITaskNodeImpl
-            let taskNode = mapGet(this.nodes, relation.previous) as ITaskNodeImpl
+            const child = mapGet(this.tasks, relation.next) as ITaskNodeImpl
+            let taskNode = mapGet(this.tasks, relation.previous) as ITaskNodeImpl
             return taskNode.addChild(child, relation)
         })
     }
     addDelayRelation(relation: DelayRelation): Promise<void> {
-        if (!this.nodes.has(relation.task)) {
+        if (!this.tasks.has(relation.task)) {
             return Promise.reject(new NotFoundError(`Task "${relation.task}" is not present in project`))
         }
         if (!this.delays.has(relation.delay)) {
@@ -148,7 +148,7 @@ export class ProjectNode implements IProjectNodeImpl {
 
         return this.delayRelationDao.addDelayRelation(this.projectIdentifier, relation).then(() => {
             const delay = mapGet(this.delays, relation.delay) as IDelayNodeImpl
-            let taskNode = mapGet(this.nodes, relation.task) as ITaskNodeImpl
+            let taskNode = mapGet(this.tasks, relation.task) as ITaskNodeImpl
             return taskNode.addDelay(delay, relation)
         })
     }

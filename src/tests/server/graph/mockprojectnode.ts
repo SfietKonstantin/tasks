@@ -8,15 +8,15 @@ import {TaskRelation} from "../../../common/taskrelation"
 import {DelayRelation} from "../../../common/delayrelation"
 
 export class MockProjectNode implements IProjectNodeImpl {
-    parent: IGraph
+    graph: IGraph
     projectIdentifier: string
-    nodes: Map<string, ITaskNode>
+    tasks: Map<string, ITaskNode>
     delays: Map<string, IDelayNode>
 
-    constructor(parent: IGraph, projectIdentifier: string) {
-        this.parent = parent
+    constructor(graph: IGraph, projectIdentifier: string) {
+        this.graph = graph
         this.projectIdentifier = projectIdentifier
-        this.nodes = new Map<string, ITaskNode>()
+        this.tasks = new Map<string, ITaskNode>()
         this.delays = new Map<string, IDelayNode>()
     }
 

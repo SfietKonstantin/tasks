@@ -7,7 +7,7 @@ import {get as mapGet} from "../../../common/utils/map"
 import {addDays, diffDates} from "../../../common/utils/date"
 
 export class DelayNode implements IDelayNodeImpl {
-    parent: IProjectNode
+    project: IProjectNode
     delayIdentifier: string
     initialMargin: number
     margin: number
@@ -15,8 +15,8 @@ export class DelayNode implements IDelayNodeImpl {
     relations: Map<string, DelayRelation>
     private date: Date
 
-    constructor(parent: IProjectNode, delayIdentifier: string, date: Date) {
-        this.parent = parent
+    constructor(project: IProjectNode, delayIdentifier: string, date: Date) {
+        this.project = project
         this.delayIdentifier = delayIdentifier
         this.initialMargin = 0
         this.margin = 0

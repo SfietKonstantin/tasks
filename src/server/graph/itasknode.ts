@@ -3,7 +3,7 @@ import {IDelayNode} from "./idelaynode"
 import {Modifier} from "../../common/modifier"
 
 export interface ITaskNode {
-    parent: IProjectNode
+    project: IProjectNode
     taskIdentifier: string
     startDate: Date
     duration: number

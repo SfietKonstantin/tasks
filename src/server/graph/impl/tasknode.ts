@@ -15,7 +15,7 @@ import {IModifierDao} from "../../dao/imodifier"
 import {IDelayNodeImpl} from "./idelaynode"
 
 export class TaskNode implements ITaskNodeImpl {
-    parent: IProjectNode
+    project: IProjectNode
     taskIdentifier: string
     startDate: Date
     duration: number
@@ -30,10 +30,10 @@ export class TaskNode implements ITaskNodeImpl {
     private modifierDao: IModifierDao
 
     constructor(daoBuilder: IDaoBuilder,
-                parent: IProjectNode, taskIdentifier: string,
+                project: IProjectNode, taskIdentifier: string,
                 estimatedStartDate: Date, estimatedDuration: number) {
         this.modifierDao = daoBuilder.buildModifierDao()
-        this.parent = parent
+        this.project = project
         this.taskIdentifier = taskIdentifier
         this.estimatedStartDate = new Date(estimatedStartDate.getTime())
         this.estimatedDuration = estimatedDuration
@@ -52,7 +52,7 @@ export class TaskNode implements ITaskNodeImpl {
     }
 
     addModifier(modifier: Modifier): Promise<Modifier> {
-        const projectIdentifier = this.parent.projectIdentifier
+        const projectIdentifier = this.project.projectIdentifier
         return this.modifierDao.addModifier(projectIdentifier, modifier).then((id: number) => {
             return this.modifierDao.addModifierForTask(projectIdentifier, id, this.taskIdentifier)
         }).then(() => {

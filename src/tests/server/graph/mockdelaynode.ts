@@ -4,15 +4,15 @@ import {ITaskNode} from "../../../server/graph/itasknode"
 import {DelayRelation} from "../../../common/delayrelation"
 
 export class MockDelayNode implements IDelayNodeImpl {
-    parent: IProjectNode
+    project: IProjectNode
     delayIdentifier: string
     initialMargin: number
     margin: number
     tasks: Array<ITaskNode>
     relations: Map<string, DelayRelation>
 
-    constructor(parent: IProjectNode, delayIdentifier: string) {
-        this.parent = parent
+    constructor(project: IProjectNode, delayIdentifier: string) {
+        this.project = project
         this.delayIdentifier = delayIdentifier
         this.initialMargin = 0
         this.margin = 0

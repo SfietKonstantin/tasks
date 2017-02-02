@@ -69,7 +69,7 @@ describe("Graph root", () => {
 
         // Test
         graph.addProject(project1).then(() => {
-            chai.expect(mapGet(graph.nodes, project1.identifier)).to.deep.equal(projectNode)
+            chai.expect(mapGet(graph.projects, project1.identifier)).to.deep.equal(projectNode)
             daoBuilder.verify()
             mockNodeFactory.verify()
             done()
@@ -85,7 +85,7 @@ describe("Graph root", () => {
         let graph = new Graph(nodeFactory, daoBuilder)
 
         // Mock
-        graph.nodes.set(project1.identifier, new MockProjectNode(graph, project1.identifier))
+        graph.projects.set(project1.identifier, new MockProjectNode(graph, project1.identifier))
 
         daoBuilder.mockProjectDao.expects("addProject").never()
         mockNodeFactory.expects("createProjectNode").never()

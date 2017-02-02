@@ -132,10 +132,10 @@ describe("Graph project node", () => {
 
         // Test
         node.load().then(() => {
-            chai.expect(mapGet(node.nodes, taskd1.identifier)).to.deep.equal(task1Node)
-            chai.expect(mapGet(node.nodes, taskd2.identifier)).to.deep.equal(task2Node)
-            chai.expect(mapGet(node.nodes, taskd3.identifier)).to.deep.equal(task3Node)
-            chai.expect(mapGet(node.nodes, taskd4.identifier)).to.deep.equal(task4Node)
+            chai.expect(mapGet(node.tasks, taskd1.identifier)).to.deep.equal(task1Node)
+            chai.expect(mapGet(node.tasks, taskd2.identifier)).to.deep.equal(task2Node)
+            chai.expect(mapGet(node.tasks, taskd3.identifier)).to.deep.equal(task3Node)
+            chai.expect(mapGet(node.tasks, taskd4.identifier)).to.deep.equal(task4Node)
 
             chai.expect(mapGet(node.delays, delayd1.identifier)).to.deep.equal(delay1Node)
             chai.expect(mapGet(node.delays, delayd2.identifier)).to.deep.equal(delay2Node)
@@ -169,7 +169,7 @@ describe("Graph project node", () => {
 
         // Test
         node.addTask(taskd1).then(() => {
-            chai.expect(mapGet(node.nodes, taskd1.identifier)).to.deep.equal(taskNode)
+            chai.expect(mapGet(node.tasks, taskd1.identifier)).to.deep.equal(taskNode)
             daoBuilder.verify()
             mockNodeFactory.verify()
             done()
@@ -186,7 +186,7 @@ describe("Graph project node", () => {
         let node = new ProjectNode(nodeFactory, daoBuilder, graph, project1.identifier)
 
         // Mock
-        node.nodes.set(taskd1.identifier, new MockTaskNode(node, taskd1.identifier,
+        node.tasks.set(taskd1.identifier, new MockTaskNode(node, taskd1.identifier,
             taskd1.estimatedStartDate, taskd1.estimatedDuration))
 
         daoBuilder.mockTaskDao.expects("addTask").never()
@@ -214,8 +214,8 @@ describe("Graph project node", () => {
         const taskNode1 = new MockTaskNode(node, taskd1.identifier, taskd1.estimatedStartDate, taskd1.estimatedDuration)
         let mockTaskNode1 = sinon.mock(taskNode1)
         const taskNode2 = new MockTaskNode(node, taskd2.identifier, taskd2.estimatedStartDate, taskd2.estimatedDuration)
-        node.nodes.set(taskd1.identifier, taskNode1)
-        node.nodes.set(taskd2.identifier, taskNode2)
+        node.tasks.set(taskd1.identifier, taskNode1)
+        node.tasks.set(taskd2.identifier, taskNode2)
 
         mockTaskNode1.expects("addChild").once()
             .withExactArgs(taskNode2, taskRelation1).returns(Promise.resolve())
@@ -241,7 +241,7 @@ describe("Graph project node", () => {
 
         // Mock
         const taskNode2 = new MockTaskNode(node, taskd2.identifier, taskd2.estimatedStartDate, taskd2.estimatedDuration)
-        node.nodes.set(taskd2.identifier, taskNode2)
+        node.tasks.set(taskd2.identifier, taskNode2)
 
         // Test
         node.addTaskRelation(taskRelation1).then(() => {
@@ -263,7 +263,7 @@ describe("Graph project node", () => {
 
         // Mock
         const taskNode1 = new MockTaskNode(node, taskd1.identifier, taskd1.estimatedStartDate, taskd1.estimatedDuration)
-        node.nodes.set(taskd1.identifier, taskNode1)
+        node.tasks.set(taskd1.identifier, taskNode1)
 
         // Test
         node.addTaskRelation(taskRelation1).then(() => {
@@ -337,7 +337,7 @@ describe("Graph project node", () => {
         const taskNode = new MockTaskNode(node, taskd1.identifier, taskd1.estimatedStartDate, taskd1.estimatedDuration)
         let mockTaskNode = sinon.mock(taskNode)
         const delayNode = new MockDelayNode(node, delayd1.identifier)
-        node.nodes.set(taskd1.identifier, taskNode)
+        node.tasks.set(taskd1.identifier, taskNode)
         node.delays.set(delayd1.identifier, delayNode)
 
         mockTaskNode.expects("addDelay").once()
@@ -386,7 +386,7 @@ describe("Graph project node", () => {
 
         // Mock
         const taskNode = new MockTaskNode(node, taskd1.identifier, taskd1.estimatedStartDate, taskd1.estimatedDuration)
-        node.nodes.set(taskd1.identifier, taskNode)
+        node.tasks.set(taskd1.identifier, taskNode)
 
         // Test
         node.addDelayRelation(delayRelation1).then(() => {

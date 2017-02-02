@@ -8,7 +8,7 @@ import {IDelayNodeImpl} from "../../../server/graph/impl/idelaynode"
 import {DelayRelation} from "../../../common/delayrelation"
 
 export class MockTaskNode implements ITaskNodeImpl {
-    parent: IProjectNode
+    project: IProjectNode
     taskIdentifier: string
     startDate: Date
     duration: number
@@ -21,8 +21,8 @@ export class MockTaskNode implements ITaskNodeImpl {
     childrenRelations: Map<string, TaskRelation>
     parentsRelations: Map<string, TaskRelation>
 
-    constructor(parent: IProjectNode, taskIdentifier: string, startDate: Date, duration: number) {
-        this.parent = parent
+    constructor(project: IProjectNode, taskIdentifier: string, startDate: Date, duration: number) {
+        this.project = project
         this.taskIdentifier = taskIdentifier
         this.startDate = startDate
         this.duration = duration
