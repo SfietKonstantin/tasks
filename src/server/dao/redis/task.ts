@@ -49,7 +49,7 @@ class RedisTask {
             const description: string = result["description"]
             const startDateKey = KeyFactory.createTaskKey(projectIdentifier, taskIdentifier, "estimatedStartDate")
             const durationKey = KeyFactory.createTaskKey(projectIdentifier, taskIdentifier, "estimatedDuration")
-            return client.mgetAsync(startDateKey, durationKey).then((result: Array<string>) => {
+            return client.mgetAsync(startDateKey, durationKey).then((result: Array<string>): TaskDefinition => {
                 if (!result[0]) {
                     throw new CorruptedError(`Task ${taskIdentifier} do not have property "estimatedDuration"`)
                 }

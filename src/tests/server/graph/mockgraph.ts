@@ -9,6 +9,10 @@ export class MockGraph implements IGraph {
         this.projects = new Map<string, IProjectNode>()
     }
 
+    load(): Promise<void> {
+        return Promise.reject(new Error("MockGraph: load is not mocked"))
+    }
+
     addProject(project: Project): Promise<IProjectNode> {
         return Promise.reject(new Error("MockGraph: addProject is not mocked"))
     }

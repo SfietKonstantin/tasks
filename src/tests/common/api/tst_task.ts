@@ -155,7 +155,7 @@ describe("API TaskBuilder", () => {
         duration: 234
     }
     it("Should convert a Task to an API task", () => {
-        chai.expect(TaskBuilder.toApiTask(task)).to.deep.equal(apiTask)
+        chai.expect(TaskBuilder.toApiTask(task, task.startDate, task.duration)).to.deep.equal(apiTask)
     })
     it("Should convert an API Task to a task", () => {
         chai.expect(TaskBuilder.fromApiTask(apiTask)).to.deep.equal(task)

@@ -61,15 +61,15 @@ export class TaskBuilder {
         }
     }
 
-    static toApiTask(task: Task): ApiTask {
+    static toApiTask(task: TaskDefinition, startDate: Date, duration: number): ApiTask {
         return {
             identifier: task.identifier,
             name: task.name,
             description: task.description,
             estimatedStartDate: task.estimatedStartDate.toISOString(),
             estimatedDuration: task.estimatedDuration,
-            startDate: task.startDate.toISOString(),
-            duration: task.duration
+            startDate: startDate.toISOString(),
+            duration
         }
     }
 

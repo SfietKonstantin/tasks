@@ -31,7 +31,7 @@ class RedisDelayRelation {
     static load(projectIdentifier: string, delay: string, task: string,
                 client: redisasync.RedisAsyncClient): Promise<DelayRelation> {
         const delayRelationKey = KeyFactory.createDelayRelationKey(projectIdentifier, delay, task)
-        return client.hgetallAsync(delayRelationKey).then((result: any) => {
+        return client.hgetallAsync(delayRelationKey).then((result: any): DelayRelation => {
             if (result == null) {
                 throw new CorruptedError(`DelayRelation ${delay}-${task} is null`)
             }

@@ -2,7 +2,7 @@ import * as chai from "chai"
 import * as redis from "redis"
 import {DelayDefinition} from "../../../../common/delay"
 import {RedisDelayDao} from "../../../../server/dao/redis/delay"
-import {RedisDaoBuilder} from "../../../../server/dao/redis/builder";
+import {RedisDaoBuilder} from "../../../../server/dao/redis/builder"
 import {RedisTestDataProvider} from "./testdataprovider"
 import {project1, invalidProject, delayd1, delayd2, delayd3, invalidDelay} from "../../testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"

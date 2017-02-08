@@ -118,7 +118,7 @@ export class RedisTestDataProvider {
                     return client.setAsync(durationKey, modifier.duration)
                 })
             })).then(() => {
-                return Promise.all([modifier1, modifier2].map((modifier: Modifier, index: number) => {
+                return Promise.all([modifier1, modifier2, modifier3].map((modifier: Modifier, index: number) => {
                     const tasksKey = KeyFactory.createModifierKey(project1.identifier, index + 1, "tasks")
                     return client.saddAsync(tasksKey, taskd1.identifier)
                 }))
@@ -127,6 +127,12 @@ export class RedisTestDataProvider {
             })
         }).then(() => {
             return client
+        })
+    }
+
+    static dumpOnly(): Promise<void> {
+        return RedisTestDataProvider.dump().then((client: redis.RedisClient) => {
+            client.quit()
         })
     }
 

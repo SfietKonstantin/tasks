@@ -14,6 +14,10 @@ export class RedisDaoBuilder implements IDaoBuilder {
         this.client = client
     }
 
+    stop() {
+        this.client.quit()
+    }
+
     buildProjectDao() {
         return new RedisProjectDao(this.client)
     }

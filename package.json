@@ -19,6 +19,7 @@
     "@types/node": "^6.0.62",
     "@types/redis": "^0.12.34",
     "@types/sinon": "^1.16.34",
+    "@types/supertest": "^2.0.0",
     "@types/winston": "^2.2.0",
     "bluebird": "^3.4.7",
     "chai": "^3.5.0",

@@ -58,7 +58,7 @@ class RedisModifier {
                 throw new CorruptedError(`Modifier ${modifierId} have an invalid type`)
             }
             const durationKey = KeyFactory.createModifierKey(projectIdentifier, modifierId, "duration")
-            return client.getAsync(durationKey).then((result: string) => {
+            return client.getAsync(durationKey).then((result: string): Modifier => {
                 if (!result) {
                     throw new CorruptedError(`Modifier ${modifierId} do not have property "duration"`)
                 }

@@ -28,6 +28,7 @@ export class MockTaskNode implements ITaskNodeImpl {
         this.duration = duration
         this.children = []
         this.parents = []
+        this.delays = []
         this.modifiers = []
         this.estimatedStartDate = startDate
         this.estimatedDuration = duration

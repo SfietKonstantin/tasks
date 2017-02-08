@@ -33,7 +33,7 @@ class RedisDelay {
     static load(projectIdentifier: string, delayIdentifier: string,
                 client: redisasync.RedisAsyncClient): Promise<DelayDefinition> {
         const delayKey = KeyFactory.createDelayKey(projectIdentifier, delayIdentifier)
-        return client.hgetallAsync(delayKey).then((result: any) => {
+        return client.hgetallAsync(delayKey).then((result: any): DelayDefinition => {
             if (!result.hasOwnProperty("name")) {
                 throw new CorruptedError(`DelayDefinition ${delayIdentifier} do not have property "name"`)
             }

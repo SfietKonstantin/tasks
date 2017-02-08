@@ -31,7 +31,7 @@ class RedisProject {
 
     static load(projectIdentifier: string, client: redisasync.RedisAsyncClient): Promise<Project> {
         const projectKey = KeyFactory.createProjectKey(projectIdentifier)
-        return client.hgetallAsync(projectKey).then((result: any) => {
+        return client.hgetallAsync(projectKey).then((result: any): Project => {
             if (!result.hasOwnProperty("name")) {
                 throw new CorruptedError(`Project ${projectIdentifier} do not have property "name"`)
             }

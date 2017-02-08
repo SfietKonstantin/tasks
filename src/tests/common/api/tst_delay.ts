@@ -1,5 +1,5 @@
 import * as chai from "chai"
-import {DelayBuilder} from "../../../common/api/delay"
+import {DelayBuilder, ApiDelay} from "../../../common/api/delay"
 import {DelayDefinition} from "../../../common/delay"
 import {InputError} from "../../../common/errors/input"
 
@@ -103,6 +103,26 @@ describe("API DelayBuilder", () => {
         chai.expect(() => {
             DelayBuilder.fromObject(apiDelay)
         }).to.throw(InputError)
+    })
+    const apiDelay: ApiDelay = {
+        identifier: "identifier",
+        name: "Name",
+        description: "Description",
+        date: new Date(2015, 1, 15).toISOString(),
+        initialMargin: 123,
+        margin: 456
+    }
+    const delay: DelayDefinition = {
+        identifier: "identifier",
+        name: "Name",
+        description: "Description",
+        date: new Date(2015, 1, 15)
+    }
+    it("Should convert a DelayDefinition to an API delay", () => {
+        chai.expect(DelayBuilder.toApiDelay(delay, 123, 456)).to.deep.equal(apiDelay)
+    })
+    it("Should convert an API DelayDefinition to a delay", () => {
+        chai.expect(DelayBuilder.fromApiDelay(apiDelay)).to.deep.equal(delay)
     })
 })
 

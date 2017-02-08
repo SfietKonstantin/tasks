@@ -36,6 +36,9 @@ export class MockDaoBuilder implements IDaoBuilder {
         this.mockModifierDao = sinon.mock(this.modifierDao)
     }
 
+    stop() {
+    }
+
     buildProjectDao(): MockProjectDao {
         return this.projectDao
     }

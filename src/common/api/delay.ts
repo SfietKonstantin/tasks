@@ -1,5 +1,17 @@
 import {InputError} from "../errors/input"
 import {DelayDefinition} from "../delay"
+import {Identifiable} from "../identifiable"
+
+export interface ApiDelayDefinition extends Identifiable {
+    name: string
+    description: string
+    date: string
+}
+
+export interface ApiDelay extends ApiDelayDefinition {
+    initialMargin: number
+    margin: number
+}
 
 export class DelayBuilder {
     static fromObject(input: any): DelayDefinition {
@@ -37,6 +49,26 @@ export class DelayBuilder {
             name,
             description,
             date: new Date(date)
+        }
+    }
+
+    static toApiDelay(delay: DelayDefinition, initialMargin: number, margin: number): ApiDelay {
+        return {
+            identifier: delay.identifier,
+            name: delay.name,
+            description: delay.description,
+            date: delay.date.toISOString(),
+            initialMargin,
+            margin
+        }
+    }
+
+    static fromApiDelay(delay: ApiDelayDefinition): DelayDefinition {
+        return {
+            identifier: delay.identifier,
+            name: delay.name,
+            description: delay.description,
+            date: new Date(delay.date)
         }
     }
 }

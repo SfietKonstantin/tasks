@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
 const server = require('./lib/server/main');
-const s = server.Main.create();
-s.start(8080);
+const main = new server.Main();
+main.start(8080);

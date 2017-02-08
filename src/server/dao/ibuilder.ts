@@ -6,6 +6,7 @@ import {IDelayRelationDao} from "./idelayrelation"
 import {IModifierDao} from "./imodifier"
 
 export interface IDaoBuilder {
+    stop(): void
     buildProjectDao(): IProjectDao
     buildTaskDao(): ITaskDao
     buildDelayDao(): IDelayDao

@@ -32,7 +32,7 @@ class RedisTaskRelation {
     static load(projectIdentifier: string, previous: string, next: string,
                 client: redisasync.RedisAsyncClient): Promise<TaskRelation> {
         const taskRelationKey = KeyFactory.createTaskRelationKey(projectIdentifier, previous, next)
-        return client.hgetallAsync(taskRelationKey).then((result: any) => {
+        return client.hgetallAsync(taskRelationKey).then((result: any): TaskRelation => {
             if (result == null) {
                 throw new CorruptedError(`TaskRelation ${previous}-${next} is null`)
             }
