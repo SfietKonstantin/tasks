@@ -1,5 +1,5 @@
 import * as chai from "chai"
-import {TaskApiProvider, ApiTaskData} from "../../../server/api/task"
+import {TaskApiProvider} from "../../../server/api/task"
 import {ApiTask, TaskBuilder} from "../../../common/api/task"
 import {project1, taskd1, taskd2, delayd1, modifier1, modifier2} from "../testdata"
 import {MockGraph} from "../graph/mockgraph"
@@ -12,6 +12,7 @@ import {MockProjectNode} from "../graph/mockprojectnode"
 import {MockTaskNode} from "../graph/mocktasknode"
 import {MockDelayNode} from "../graph/mockdelaynode"
 import {DelayBuilder} from "../../../common/api/delay"
+import {ApiTaskData} from "../../../server/api/taskdata"
 
 describe("API task", () => {
     let daoBuilder: MockDaoBuilder
@@ -198,6 +199,21 @@ describe("API task", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
+                done()
+            }).catch((error) => {
+                done(error)
+            })
+        })
+        it("Should get an exception on not found error (for task)", (done) => {
+            daoBuilder.mockTaskDao.expects("getTask").once()
+                .withExactArgs(project1.identifier, taskd1.identifier)
+                .returns(Promise.reject(new NotFoundError("Some error")))
+
+            apiProvider.getTask(project1.identifier, taskd1.identifier).then(() => {
+                done(new Error("getTask should not be a success"))
+            }).catch((error) => {
+                chai.expect(error).to.instanceOf(RequestError)
+                chai.expect((error as RequestError).status).to.equal(404)
                 done()
             }).catch((error) => {
                 done(error)

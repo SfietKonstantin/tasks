@@ -21,7 +21,7 @@ describe("Integration API utils", () => {
     })
     describe("asParameterHandler", () => {
         it("Should delegate the call", (done) => {
-            app.param(":test", asParameterHandler((req: TestRequest) => {
+            app.param("test", asParameterHandler((req: TestRequest) => {
                 req.data = req.params.test
             }))
             app.use("/test/:test", (req: TestRequest, res: Response) => {
@@ -34,7 +34,7 @@ describe("Integration API utils", () => {
                 .expect(JSON.stringify(data), done)
         })
         it("Should get an error as JSON", (done) => {
-            app.param(":test", asParameterHandler(() => {
+            app.param("test", asParameterHandler(() => {
                 throw new RequestError(404, "Stuff not found")
             }))
             app.use("/test/:test", (req: TestRequest, res: Response) => {
@@ -47,7 +47,7 @@ describe("Integration API utils", () => {
                 .expect(JSON.stringify(error), done)
         })
         it("Should get an unknown error as a HTTP 500", (done) => {
-            app.param(":test", asParameterHandler(() => {
+            app.param("test", asParameterHandler(() => {
                 throw new Error("Error")
             }))
             app.use("/test/:test", (req: TestRequest, res: Response) => {

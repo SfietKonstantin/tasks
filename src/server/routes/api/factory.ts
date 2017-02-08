@@ -1,9 +1,12 @@
-import {Router, Request, Response, NextFunction} from "express"
+import {Router, Request} from "express"
 import {IDaoBuilder} from "../../dao/ibuilder"
 import {ProjectApiProvider} from "../../api/project"
 import {IGraph} from "../../graph/igraph"
 import {asRoute, asParameterHandler} from "./utils"
 import {TaskApiProvider} from "../../api/task"
+import {ImportantTaskApiProvider} from "../../api/importanttask"
+import {ModifierApiProvider} from "../../api/modifier"
+import {ModifierBuilder} from "../../../common/api/modifier"
 
 interface ProjectRequest extends Request {
     projectIdentifier: string
@@ -16,10 +19,14 @@ interface TaskRequest extends ProjectRequest {
 export class ApiRouterFactory {
     private projectApiProvider: ProjectApiProvider
     private taskApiProvider: TaskApiProvider
+    private importantTaskApiProvider: ImportantTaskApiProvider
+    private modifierApiProvider: ModifierApiProvider
 
     constructor(daoBuilder: IDaoBuilder, graph: IGraph) {
         this.projectApiProvider = new ProjectApiProvider(daoBuilder, graph)
         this.taskApiProvider = new TaskApiProvider(daoBuilder, graph)
+        this.importantTaskApiProvider = new ImportantTaskApiProvider(daoBuilder, graph)
+        this.modifierApiProvider = new ModifierApiProvider(daoBuilder, graph)
     }
 
     create(): Router {
@@ -45,6 +52,26 @@ export class ApiRouterFactory {
 
         apiRouter.get("/project/:projectIdentifier/task/:taskIdentifier", asRoute((req: TaskRequest) => {
             return this.taskApiProvider.getTask(req.projectIdentifier, req.taskIdentifier)
+        }))
+
+        const importantTaskPath = "/project/:projectIdentifier/task/:taskIdentifier/important"
+        apiRouter.get(importantTaskPath, asRoute((req: TaskRequest) => {
+            return this.importantTaskApiProvider.isTaskImportant(req.projectIdentifier, req.taskIdentifier)
+        }))
+
+        apiRouter.put(importantTaskPath, asRoute((req: TaskRequest) => {
+            return this.importantTaskApiProvider.setTaskImportant(req.projectIdentifier, req.taskIdentifier, true)
+        }))
+
+        apiRouter.delete(importantTaskPath, asRoute((req: TaskRequest) => {
+            return this.importantTaskApiProvider.setTaskImportant(req.projectIdentifier, req.taskIdentifier, false)
+        }))
+
+        apiRouter.put("/modifier", asRoute((req: Request) => {
+            const projectIdentifier = ProjectApiProvider.getProjectIdentifier(req.body.projectIdentifier)
+            const taskIdentifier = TaskApiProvider.getTaskIdentifier(req.body.taskIdentifier)
+            const modifier = ModifierBuilder.fromObject(req.body.modifier)
+            return this.modifierApiProvider.addModifier(projectIdentifier, taskIdentifier, modifier)
         }))
         return apiRouter
     }

@@ -35,7 +35,7 @@ export class ProjectApiProvider {
         })
     }
 
-    getProject(projectIdentifier: any): Promise<Project> {
+    getProject(projectIdentifier: string): Promise<Project> {
         const projectDao = this.daoBuilder.buildProjectDao()
         return projectDao.getProject(projectIdentifier).catch((error: Error) => {
             if (error instanceof NotFoundError) {
@@ -49,32 +49,4 @@ export class ProjectApiProvider {
             }
         })
     }
-
-    /*
-    getProjectDelays(projectIdentifier: any): Promise<Array<ApiDelayDefinition>> {
-        if (typeof projectIdentifier !== "string") {
-            winston.error("projectIdentifier must be a string, not " + projectIdentifier)
-            const error = new RequestError(404, `Project "${projectIdentifier}" not found`)
-            return Promise.reject(error)
-        }
-        const delayDao = this.daoBuilder.buildDelayDao()
-        return delayDao.getProjectDelays(projectIdentifier).then((delays: Array<DelayDefinition>) => {
-            const projectNode = mapGet(this.graph.projects, projectIdentifier)
-            return delays.map((delay: DelayDefinition) => {
-                let delayNode = mapGet(projectNode.delays, delay.identifier)
-                return DelayBuilder.toApiDelay(delay, delayNode.initialMargin, delayNode.margin)
-            })
-        }).catch((error: Error) => {
-            if (error instanceof NotFoundError) {
-                winston.debug(error.message)
-                throw new RequestError(404, `Project "${projectIdentifier}" not found`)
-            } else if (ApiErrorUtils.isKnownError(error)) {
-                winston.error(error.message)
-                throw new RequestError(500, "Internal error")
-            } else {
-                throw error
-            }
-        })
-    }
-    */
 }

@@ -126,6 +126,9 @@ export class RedisTestDataProvider {
                 return client.setAsync(`modifier:${project1.identifier}:lastId`, 2)
             })
         }).then(() => {
+            const projectImportantTasksKey = KeyFactory.createProjectKey(project1.identifier, "task:important")
+            return client.saddAsync(projectImportantTasksKey, taskd2.identifier)
+        }).then(() => {
             return client
         })
     }

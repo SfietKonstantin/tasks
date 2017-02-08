@@ -1,6 +1,6 @@
 import {TaskRelation} from "../taskrelation"
 import {InputError} from "../errors/input"
-import {TaskLocation} from "../tasklocation"
+import {TaskLocationBuilder} from "./tasklocation"
 
 export class TaskRelationBuilder {
     static fromObject(input: any): TaskRelation {
@@ -20,7 +20,7 @@ export class TaskRelationBuilder {
         if (typeof previous !== "string") {
             throw new InputError("Property \"previous\" should be a string")
         }
-        const previousLocation = TaskRelationBuilder.taskLocationFromObject(input["previousLocation"])
+        const previousLocation = TaskLocationBuilder.fromObject(input["previousLocation"])
         if (previousLocation == null) {
             throw new InputError("Property \"previousLocation\" should be a TaskLocation")
         }
@@ -38,16 +38,6 @@ export class TaskRelationBuilder {
             previousLocation,
             next,
             lag
-        }
-    }
-
-    private static taskLocationFromObject(location: any): TaskLocation | null {
-        if (location === TaskLocation.Beginning) {
-            return TaskLocation.Beginning
-        } else if (location === TaskLocation.End) {
-            return TaskLocation.End
-        } else {
-            return null
         }
     }
 }
