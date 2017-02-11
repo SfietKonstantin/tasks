@@ -41,7 +41,6 @@ describe("API Project", () => {
 
             apiProvider.getProjects().then((projects: Array<Project>) => {
                 chai.expect(projects).to.equal(expected)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -83,7 +82,6 @@ describe("API Project", () => {
 
             apiProvider.getProject(project1.identifier).then((project: Project) => {
                 chai.expect(project).to.equal(project1)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)

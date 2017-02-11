@@ -142,7 +142,6 @@ describe("API task", () => {
 
             apiProvider.getTask(project1.identifier, taskd1.identifier).then((task: ApiTaskData) => {
                 chai.expect(task).to.deep.equal(expected)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -183,7 +182,6 @@ describe("API task", () => {
 
             apiProvider.getTask(project1.identifier, taskd1.identifier).then((task: ApiTaskData) => {
                 chai.expect(task).to.deep.equal(expected)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)

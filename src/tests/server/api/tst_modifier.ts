@@ -66,7 +66,6 @@ describe("API Modifier", () => {
 
             apiProvider.addModifier(project1.identifier, taskd1.identifier, modifier3).then((task: ApiTaskData) => {
                 chai.expect(task).to.deep.equal(expected)
-                daoBuilder.verify()
                 mockTaskNode.verify()
                 done()
             }).catch((error) => {
@@ -90,7 +89,6 @@ describe("API Modifier", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
-                daoBuilder.verify()
                 mockTaskNode.verify()
                 done()
             }).catch((error) => {
@@ -114,7 +112,6 @@ describe("API Modifier", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
-                daoBuilder.verify()
                 mockTaskNode.verify()
                 done()
             }).catch((error) => {
@@ -137,7 +134,6 @@ describe("API Modifier", () => {
                 done(new Error("addModifier should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
-                daoBuilder.verify()
                 mockTaskNode.verify()
                 done()
             }).catch((error) => {

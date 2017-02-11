@@ -28,7 +28,6 @@ describe("API important task", () => {
 
             apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then((important: boolean) => {
                 chai.expect(important).to.be.true
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -41,7 +40,6 @@ describe("API important task", () => {
 
             apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then((important: boolean) => {
                 chai.expect(important).to.be.false
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -57,7 +55,6 @@ describe("API important task", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -73,7 +70,6 @@ describe("API important task", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -88,7 +84,6 @@ describe("API important task", () => {
                 done(new Error("isTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -103,7 +98,6 @@ describe("API important task", () => {
 
             apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, true).then((important: boolean) => {
                 chai.expect(important).to.be.true
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -116,7 +110,6 @@ describe("API important task", () => {
 
             apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, false).then((important: boolean) => {
                 chai.expect(important).to.be.false
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -132,7 +125,6 @@ describe("API important task", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -148,7 +140,6 @@ describe("API important task", () => {
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
@@ -163,7 +154,6 @@ describe("API important task", () => {
                 done(new Error("setTaskImportant should not be a success"))
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
-                daoBuilder.verify()
                 done()
             }).catch((error) => {
                 done(error)
