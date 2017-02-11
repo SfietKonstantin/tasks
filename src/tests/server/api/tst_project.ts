@@ -34,101 +34,80 @@ describe("API Project", () => {
         })
     })
     describe("getAllProjects", () => {
-        it("Should get a list of projects", (done) => {
+        it("Should get a list of projects", () => {
             const expected: Array<Project> = [project1, project2]
             daoBuilder.mockProjectDao.expects("getAllProjects").once()
                 .returns(Promise.resolve(expected))
 
-            apiProvider.getProjects().then((projects: Array<Project>) => {
+            return apiProvider.getProjects().then((projects: Array<Project>) => {
                 chai.expect(projects).to.equal(expected)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on internal error", (done) => {
+        it("Should get an exception on internal error", () => {
             daoBuilder.mockProjectDao.expects("getAllProjects").once()
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            apiProvider.getProjects().then(() => {
-                done(new Error("getProjects should not be a success"))
+            return apiProvider.getProjects().then(() => {
+                throw new Error("getProjects should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on other error", (done) => {
+        it("Should get an exception on other error", () => {
             daoBuilder.mockProjectDao.expects("getAllProjects").once()
                 .returns(Promise.reject(new FakeError("Some error")))
 
-            apiProvider.getProjects().then(() => {
-                done(new Error("getProjects should not be a success"))
+            return apiProvider.getProjects().then(() => {
+                throw new Error("getProjects should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
     })
     describe("getProject", () => {
-        it("Should get a project", (done) => {
+        it("Should get a project", () => {
             daoBuilder.mockProjectDao.expects("getProject").once()
                 .withExactArgs(project1.identifier)
                 .returns(Promise.resolve(project1))
 
-            apiProvider.getProject(project1.identifier).then((project: Project) => {
+            return apiProvider.getProject(project1.identifier).then((project: Project) => {
                 chai.expect(project).to.equal(project1)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on not found error", (done) => {
+        it("Should get an exception on not found error", () => {
             daoBuilder.mockProjectDao.expects("getProject").once()
                 .withExactArgs(project1.identifier)
                 .returns(Promise.reject(new NotFoundError("Some error")))
 
-            apiProvider.getProject(project1.identifier).then(() => {
-                done(new Error("getProject should not be a success"))
+            return apiProvider.getProject(project1.identifier).then(() => {
+                throw new Error("getProject should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on internal error", (done) => {
+        it("Should get an exception on internal error", () => {
             daoBuilder.mockProjectDao.expects("getProject").once()
                 .withExactArgs(project1.identifier)
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            apiProvider.getProject(project1.identifier).then(() => {
-                done(new Error("getProject should not be a success"))
+            return apiProvider.getProject(project1.identifier).then(() => {
+                throw new Error("getProject should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on other error", (done) => {
+        it("Should get an exception on other error", () => {
             daoBuilder.mockProjectDao.expects("getProject").once()
                 .withExactArgs(project1.identifier)
                 .returns(Promise.reject(new FakeError("Some error")))
 
-            apiProvider.getProject(project1.identifier).then(() => {
-                done(new Error("getProject should not be a success"))
+            return apiProvider.getProject(project1.identifier).then(() => {
+                throw new Error("getProject should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
     })

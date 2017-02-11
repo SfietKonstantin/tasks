@@ -16,7 +16,7 @@ import {ExistsError} from "../../../../server/error/exists"
 import {NotFoundError} from "../../../../common/errors/notfound"
 
 describe("Graph project node", () => {
-    it("Should load the a project", (done) => {
+    it("Should load the a project", () => {
         // Node
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -131,7 +131,7 @@ describe("Graph project node", () => {
             .returns(Promise.resolve([delayRelation5]))
 
         // Test
-        node.load().then(() => {
+        return node.load().then(() => {
             chai.expect(mapGet(node.tasks, taskd1.identifier)).to.deep.equal(task1Node)
             chai.expect(mapGet(node.tasks, taskd2.identifier)).to.deep.equal(task2Node)
             chai.expect(mapGet(node.tasks, taskd3.identifier)).to.deep.equal(task3Node)
@@ -146,12 +146,9 @@ describe("Graph project node", () => {
             mockTask2Node.verify()
             mockTask3Node.verify()
             mockTask4Node.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should add a new task in the graph", (done) => {
+    it("Should add a new task in the graph", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -168,16 +165,13 @@ describe("Graph project node", () => {
             .returns(taskNode)
 
         // Test
-        node.addTask(taskd1).then(() => {
+        return node.addTask(taskd1).then(() => {
             chai.expect(mapGet(node.tasks, taskd1.identifier)).to.deep.equal(taskNode)
             daoBuilder.verify()
             mockNodeFactory.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should get an exception when adding an existing task", (done) => {
+    it("Should get an exception when adding an existing task", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -192,18 +186,15 @@ describe("Graph project node", () => {
         daoBuilder.mockTaskDao.expects("addTask").never()
         mockNodeFactory.expects("createTaskNode").never()
 
-        node.addTask(taskd1).then(() => {
-            done(new Error("addTask should not be a success"))
+        return node.addTask(taskd1).then(() => {
+            throw new Error("addTask should not be a success")
         }).catch((error) => {
             chai.expect(error).to.instanceOf(ExistsError)
             daoBuilder.verify()
             mockNodeFactory.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should add a new relation between tasks in the graph", (done) => {
+    it("Should add a new relation between tasks in the graph", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -224,15 +215,12 @@ describe("Graph project node", () => {
             .withExactArgs(project1.identifier, taskRelation1).returns(Promise.resolve())
 
         // Test
-        node.addTaskRelation(taskRelation1).then(() => {
+        return node.addTaskRelation(taskRelation1).then(() => {
             daoBuilder.verify()
             mockTaskNode1.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should get an exception when adding relation with invalid previous node", (done) => {
+    it("Should get an exception when adding relation with invalid previous node", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -244,17 +232,14 @@ describe("Graph project node", () => {
         node.tasks.set(taskd2.identifier, taskNode2)
 
         // Test
-        node.addTaskRelation(taskRelation1).then(() => {
-            done(new Error("addTaskRelation should not be a success"))
+        return node.addTaskRelation(taskRelation1).then(() => {
+            throw new Error("addTaskRelation should not be a success")
         }).catch((error) => {
             chai.expect(error).to.instanceOf(NotFoundError)
             daoBuilder.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should get an exception when adding relation with invalid next node", (done) => {
+    it("Should get an exception when adding relation with invalid next node", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -266,17 +251,14 @@ describe("Graph project node", () => {
         node.tasks.set(taskd1.identifier, taskNode1)
 
         // Test
-        node.addTaskRelation(taskRelation1).then(() => {
-            done(new Error("addTaskRelation should not be a success"))
+        return node.addTaskRelation(taskRelation1).then(() => {
+            throw new Error("addTaskRelation should not be a success")
         }).catch((error) => {
             chai.expect(error).to.instanceOf(NotFoundError)
             daoBuilder.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should add a new delay in the graph", (done) => {
+    it("Should add a new delay in the graph", () => {
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
         let mockNodeFactory = sinon.mock(nodeFactory)
@@ -292,16 +274,13 @@ describe("Graph project node", () => {
             .returns(delayNode)
 
         // Test
-        node.addDelay(delayd1).then(() => {
+        return node.addDelay(delayd1).then(() => {
             chai.expect(mapGet(node.delays, delayd1.identifier)).to.deep.equal(delayNode)
             daoBuilder.verify()
             mockNodeFactory.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should get an exception when adding an existing delay", (done) => {
+    it("Should get an exception when adding an existing delay", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -315,18 +294,15 @@ describe("Graph project node", () => {
         daoBuilder.mockDelayDao.expects("addDelay").never()
         mockNodeFactory.expects("createDelayNode").never()
 
-        node.addDelay(delayd1).then(() => {
-            done(new Error("addDelay should not be a success"))
+        return node.addDelay(delayd1).then(() => {
+            throw new Error("addDelay should not be a success")
         }).catch((error) => {
             chai.expect(error).to.instanceOf(ExistsError)
             daoBuilder.verify()
             mockNodeFactory.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should add a new relation between a delay and a task in the graph", (done) => {
+    it("Should add a new relation between a delay and a task in the graph", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -347,15 +323,12 @@ describe("Graph project node", () => {
             .withExactArgs(project1.identifier, delayRelation1).returns(Promise.resolve())
 
         // Test
-        node.addDelayRelation(delayRelation1).then(() => {
+        return node.addDelayRelation(delayRelation1).then(() => {
             daoBuilder.verify()
             mockTaskNode.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should get an exception when adding relation with invalid task node", (done) => {
+    it("Should get an exception when adding relation with invalid task node", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -367,17 +340,14 @@ describe("Graph project node", () => {
         node.delays.set(delayd1.identifier, delayNode)
 
         // Test
-        node.addDelayRelation(delayRelation1).then(() => {
-            done(new Error("addDelayRelation should not be a success"))
+        return node.addDelayRelation(delayRelation1).then(() => {
+            throw new Error("addDelayRelation should not be a success")
         }).catch((error) => {
             chai.expect(error).to.instanceOf(NotFoundError)
             daoBuilder.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should get an exception when adding relation with invalid delay node", (done) => {
+    it("Should get an exception when adding relation with invalid delay node", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -389,14 +359,11 @@ describe("Graph project node", () => {
         node.tasks.set(taskd1.identifier, taskNode)
 
         // Test
-        node.addDelayRelation(delayRelation1).then(() => {
-            done(new Error("addDelayRelation should not be a success"))
+        return node.addDelayRelation(delayRelation1).then(() => {
+            throw new Error("addDelayRelation should not be a success")
         }).catch((error) => {
             chai.expect(error).to.instanceOf(NotFoundError)
             daoBuilder.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
 })

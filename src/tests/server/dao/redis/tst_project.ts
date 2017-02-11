@@ -14,162 +14,122 @@ import {ExistsError} from "../../../../server/error/exists"
 describe("Redis DAO Project", () => {
     let client: redis.RedisClient
     let dao: RedisProjectDao
-    beforeEach((done) => {
-        RedisTestDataProvider.dump().then((testClient: redis.RedisClient) => {
+    beforeEach(() => {
+        return RedisTestDataProvider.dump().then((testClient: redis.RedisClient) => {
             client = testClient
             const builder = new RedisDaoBuilder(client)
             dao = builder.buildProjectDao()
-            done()
         })
     })
     afterEach(() => {
         client.quit()
     })
     describe("getAllProjects", () => {
-        it("Should get an empty list of projects in an empty DB", (done) => {
+        it("Should get an empty list of projects in an empty DB", () => {
             RedisTestDataProvider.flush(client)
-            dao.getAllProjects().then((projects: Array<Project>) => {
+            return dao.getAllProjects().then((projects: Array<Project>) => {
                 chai.expect(projects).to.empty
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get a list of projects from the DB", (done) => {
-            dao.getAllProjects().then((projects: Array<Project>) => {
+        it("Should get a list of projects from the DB", () => {
+            return dao.getAllProjects().then((projects: Array<Project>) => {
                 chai.expect(projects).to.deep.equal([project1, project2])
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should only get projects with body from the DB", (done) => {
+        it("Should only get projects with body from the DB", () => {
             const projectKey = KeyFactory.createProjectKey(project1.identifier)
-            RedisTestDataProvider.deleteValue(client, projectKey).then(() => {
+            return RedisTestDataProvider.deleteValue(client, projectKey).then(() => {
                 return dao.getAllProjects()
             }).then((projects: Array<Project>) => {
                 chai.expect(projects).to.deep.equal([project2])
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get only projects without corrupted body from the DB", (done) => {
+        it("Should get only projects without corrupted body from the DB", () => {
             const projectKey = KeyFactory.createProjectKey(project1.identifier)
-            RedisTestDataProvider.setValue(client, projectKey, "test").then(() => {
+            return RedisTestDataProvider.setValue(client, projectKey, "test").then(() => {
                 return dao.getAllProjects()
             }).then((projects: Array<Project>) => {
                 chai.expect(projects).to.deep.equal([project2])
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an empty list of projects for a DB with corrupted keys", (done) => {
+        it("Should get an empty list of projects for a DB with corrupted keys", () => {
             const projectIdsKey = KeyFactory.createGlobalProjectKey("ids")
-            RedisTestDataProvider.deleteValue(client, projectIdsKey).then(() => {
+            return RedisTestDataProvider.deleteValue(client, projectIdsKey).then(() => {
                 return RedisTestDataProvider.setValue(client, projectIdsKey, "test")
             }).then(() => {
                 return dao.getAllProjects()
             }).then((projects: Array<Project>) => {
                 chai.expect(projects).to.empty
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
     })
     describe("getProject", () => {
-        it("Should get a project from the DB", (done) => {
-            dao.getProject(project1.identifier).then((project: Project) => {
+        it("Should get a project from the DB", () => {
+            return dao.getProject(project1.identifier).then((project: Project) => {
                 chai.expect(project).to.deep.equal(project1)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid project identifier", (done) => {
-            dao.getProject(invalidProject.identifier).then(() => {
-                done(new Error("getProject should not be a success"))
+        it("Should get an exception for an invalid project identifier", () => {
+            return dao.getProject(invalidProject.identifier).then(() => {
+                throw new Error("getProject should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(NotFoundError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for a project with corrupted name", (done) => {
+        it("Should get an exception for a project with corrupted name", () => {
             const projectKey = KeyFactory.createProjectKey(project1.identifier)
-            RedisTestDataProvider.deleteMember(client, projectKey, "name").then(() => {
+            return RedisTestDataProvider.deleteMember(client, projectKey, "name").then(() => {
                 return dao.getProject(project1.identifier)
             }).then(() => {
-                done(new Error("getProject should not be a success"))
+                throw new Error("getProject should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for a project with corrupted description", (done) => {
+        it("Should get an exception for a project with corrupted description", () => {
             const projectKey = KeyFactory.createProjectKey(project1.identifier)
-            RedisTestDataProvider.deleteMember(client, projectKey, "description").then(() => {
+            return RedisTestDataProvider.deleteMember(client, projectKey, "description").then(() => {
                 return dao.getProject(project1.identifier)
             }).then(() => {
-                done(new Error("getProject should not be a success"))
+                throw new Error("getProject should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(CorruptedError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for a corrupted project", (done) => {
+        it("Should get an exception for a corrupted project", () => {
             const projectKey = KeyFactory.createProjectKey(project1.identifier)
-            RedisTestDataProvider.setValue(client, projectKey, "test").then(() => {
+            return RedisTestDataProvider.setValue(client, projectKey, "test").then(() => {
                 return dao.getProject(project1.identifier)
             }).then(() => {
-                done(new Error("getProject should not be a success"))
+                throw new Error("getProject should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
     })
     describe("addProject", () => {
-        it("Should add a project in the DB", (done) => {
-            dao.addProject(project3).then(() => {
+        it("Should add a project in the DB", () => {
+            return dao.addProject(project3).then(() => {
                 return dao.getProject(project3.identifier)
             }).then((project: Project) => {
                 chai.expect(project).to.deep.equal(project3)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception when adding an existing project in the DB", (done) => {
-            dao.addProject(project1).then(() => {
-                done(new Error("addProject should not be a success"))
+        it("Should get an exception when adding an existing project in the DB", () => {
+            return dao.addProject(project1).then(() => {
+                throw new Error("addProject should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(ExistsError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception when adding a project in a DB with corrupted ids", (done) => {
+        it("Should get an exception when adding a project in a DB with corrupted ids", () => {
             const projectIdsKey = KeyFactory.createGlobalProjectKey("ids")
-            RedisTestDataProvider.setValue(client, projectIdsKey, "test").then(() => {
+            return RedisTestDataProvider.setValue(client, projectIdsKey, "test").then(() => {
                 return dao.addProject(project3)
             }).then(() => {
-                done(new Error("addProject should not be a success"))
+                throw new Error("addProject should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(InternalError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
     })

@@ -4,12 +4,10 @@ import {RedisTestDataProvider} from "../dao/redis/testdataprovider"
 
 describe("Integration Error management", () => {
     let main: Main
-    beforeEach((done) => {
-        RedisTestDataProvider.dumpOnly().then(() => {
+    beforeEach(() => {
+        return RedisTestDataProvider.dumpOnly().then(() => {
             main = new Main(3)
             return main.start(8080)
-        }).then(() => {
-            done()
         })
     })
     afterEach(() => {

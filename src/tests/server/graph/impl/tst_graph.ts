@@ -10,7 +10,7 @@ import {get as mapGet} from "../../../../common/utils/map"
 
 
 describe("Graph root", () => {
-    it("Should load the graph", (done) => {
+    it("Should load the graph", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -41,17 +41,14 @@ describe("Graph root", () => {
             .withExactArgs()
             .returns(Promise.resolve([project1, project2]))
 
-        graph.load().then(() => {
+        return graph.load().then(() => {
             daoBuilder.verify()
             mockNodeFactory.verify()
             mockProject1Node.verify()
             mockProject2Node.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should add a new project in the graph", (done) => {
+    it("Should add a new project in the graph", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -68,16 +65,13 @@ describe("Graph root", () => {
             .returns(projectNode)
 
         // Test
-        graph.addProject(project1).then(() => {
+        return graph.addProject(project1).then(() => {
             chai.expect(mapGet(graph.projects, project1.identifier)).to.deep.equal(projectNode)
             daoBuilder.verify()
             mockNodeFactory.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
-    it("Should throw an exception when adding an existing project", (done) => {
+    it("Should throw an exception when adding an existing project", () => {
         // Graph
         const daoBuilder = new MockDaoBuilder()
         const nodeFactory = new MockNodeFactory()
@@ -90,15 +84,12 @@ describe("Graph root", () => {
         daoBuilder.mockProjectDao.expects("addProject").never()
         mockNodeFactory.expects("createProjectNode").never()
 
-        graph.addProject(project1).then(() => {
-            done(new Error("addProject should not be a success"))
+        return graph.addProject(project1).then(() => {
+            throw new Error("addProject should not be a success")
         }).catch((error) => {
             chai.expect(error).to.instanceOf(ExistsError)
             daoBuilder.verify()
             mockNodeFactory.verify()
-            done()
-        }).catch((error) => {
-            done(error)
         })
     })
 })

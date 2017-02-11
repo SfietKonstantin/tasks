@@ -13,7 +13,7 @@ import {MockTaskNode} from "../graph/mocktasknode"
 import {TaskRelation} from "../../../common/taskrelation"
 import {TaskRelationBuilder} from "../../../common/api/taskrelation"
 import {ApiTaskDefinition, TaskBuilder} from "../../../common/api/task"
-import {ApiDelayDefinition, DelayBuilder, ApiDelay} from "../../../common/api/delay"
+import {ApiDelayDefinition, DelayBuilder} from "../../../common/api/delay"
 import {ImportApiProvider} from "../../../server/api/import"
 import {MockDelayNode} from "../graph/mockdelaynode"
 import {DelayRelation} from "../../../common/delayrelation"
@@ -107,51 +107,42 @@ describe("API import", () => {
                 projectNodeMock.verify()
             })
         })
-        it("Should get an exception on existing project", (done) => {
+        it("Should get an exception on existing project", () => {
             mockGraph.expects("addProject").once()
                 .withExactArgs(project1)
                 .returns(Promise.reject(new ExistsError("Some error")))
 
-            apiProvider.import(project1, tasks, taskRelations, delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+            return apiProvider.import(project1, tasks, taskRelations, delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on internal error for project", (done) => {
+        it("Should get an exception on internal error for project", () => {
             mockGraph.expects("addProject").once()
                 .withExactArgs(project1)
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            apiProvider.import(project1, tasks, taskRelations, delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+            return apiProvider.import(project1, tasks, taskRelations, delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on other error", (done) => {
+        it("Should get an exception on other error", () => {
             mockGraph.expects("addProject").once()
                 .withExactArgs(project1)
                 .returns(Promise.reject(new FakeError("Some error")))
 
-            apiProvider.import(project1, tasks, taskRelations, delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+            return apiProvider.import(project1, tasks, taskRelations, delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on existing task", (done) => {
+        it("Should get an exception on existing task", () => {
             let projectNode = new MockProjectNode(graph, project1.identifier)
             mockGraph.expects("addProject").once()
                 .withExactArgs(project1)
@@ -163,18 +154,15 @@ describe("API import", () => {
                     .returns(Promise.reject(new ExistsError("Some error")))
             })
 
-            apiProvider.import(project1, tasks, taskRelations, [], []).then(() => {
-                done(new Error("import should not be a success"))
+            return apiProvider.import(project1, tasks, taskRelations, [], []).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
                 projectNodeMock.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on internal error for task", (done) => {
+        it("Should get an exception on internal error for task", () => {
             let projectNode = new MockProjectNode(graph, project1.identifier)
             mockGraph.expects("addProject").once()
                 .withExactArgs(project1)
@@ -186,18 +174,15 @@ describe("API import", () => {
                     .returns(Promise.reject(new InternalError("Some error")))
             })
 
-            apiProvider.import(project1, tasks, taskRelations, [], []).then(() => {
-                done(new Error("import should not be a success"))
+            return apiProvider.import(project1, tasks, taskRelations, [], []).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
                 projectNodeMock.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on inexisting task relation", (done) => {
+        it("Should get an exception on inexisting task relation", () => {
             let projectNode = new MockProjectNode(graph, project1.identifier)
             mockGraph.expects("addProject").once()
                 .withExactArgs(project1)
@@ -217,18 +202,15 @@ describe("API import", () => {
                     .returns(Promise.reject(new NotFoundError("Some error")))
             })
 
-            apiProvider.import(project1, tasks, taskRelations, [], []).then(() => {
-                done(new Error("import should not be a success"))
+            return apiProvider.import(project1, tasks, taskRelations, [], []).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
                 projectNodeMock.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on existing delay", (done) => {
+        it("Should get an exception on existing delay", () => {
             let projectNode = new MockProjectNode(graph, project1.identifier)
             mockGraph.expects("addProject").once()
                 .withExactArgs(project1)
@@ -240,18 +222,15 @@ describe("API import", () => {
                     .returns(Promise.reject(new ExistsError("Some error")))
             })
 
-            apiProvider.import(project1, [], [], delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+            return apiProvider.import(project1, [], [], delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
                 projectNodeMock.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on internal error for delay", (done) => {
+        it("Should get an exception on internal error for delay", () => {
             let projectNode = new MockProjectNode(graph, project1.identifier)
             mockGraph.expects("addProject").once()
                 .withExactArgs(project1)
@@ -263,18 +242,15 @@ describe("API import", () => {
                     .returns(Promise.reject(new InternalError("Some error")))
             })
 
-            apiProvider.import(project1, [], [], delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+            return apiProvider.import(project1, [], [], delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
                 projectNodeMock.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on inexisting delay relation", (done) => {
+        it("Should get an exception on inexisting delay relation", () => {
             let projectNode = new MockProjectNode(graph, project1.identifier)
             mockGraph.expects("addProject").once()
                 .withExactArgs(project1)
@@ -291,114 +267,84 @@ describe("API import", () => {
                     .returns(Promise.reject(new NotFoundError("Some error")))
             })
 
-            apiProvider.import(project1, [], [], delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+            return apiProvider.import(project1, [], [], delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
                 projectNodeMock.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid project input", (done) => {
-            apiProvider.import({test: "test"}, tasks, taskRelations, delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+        it("Should get an exception for an invalid project input", () => {
+            return apiProvider.import({test: "test"}, tasks, taskRelations, delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid task list input", (done) => {
-            apiProvider.import(project1, {test: "test"}, taskRelations, delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+        it("Should get an exception for an invalid task list input", () => {
+            return apiProvider.import(project1, {test: "test"}, taskRelations, delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid task input", (done) => {
-            apiProvider.import(project1, [{test: "test"}], taskRelations, delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+        it("Should get an exception for an invalid task input", () => {
+            return apiProvider.import(project1, [{test: "test"}], taskRelations, delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid task relation list input", (done) => {
-            apiProvider.import(project1, tasks, {test: "test"}, delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+        it("Should get an exception for an invalid task relation list input", () => {
+            return apiProvider.import(project1, tasks, {test: "test"}, delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid task relation input", (done) => {
-            apiProvider.import(project1, tasks, [{test: "test"}], delays, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+        it("Should get an exception for an invalid task relation input", () => {
+            return apiProvider.import(project1, tasks, [{test: "test"}], delays, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid delay list input", (done) => {
-            apiProvider.import(project1, tasks, taskRelations, {test: "test"}, delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+        it("Should get an exception for an invalid delay list input", () => {
+            return apiProvider.import(project1, tasks, taskRelations, {test: "test"}, delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid delay input", (done) => {
-            apiProvider.import(project1, tasks, taskRelations, [{test: "test"}], delayRelations).then(() => {
-                done(new Error("import should not be a success"))
+        it("Should get an exception for an invalid delay input", () => {
+            return apiProvider.import(project1, tasks, taskRelations, [{test: "test"}], delayRelations).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid delay relation list input", (done) => {
-            apiProvider.import(project1, tasks, taskRelations, delays, {test: "test"}).then(() => {
-                done(new Error("import should not be a success"))
+        it("Should get an exception for an invalid delay relation list input", () => {
+            return apiProvider.import(project1, tasks, taskRelations, delays, {test: "test"}).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception for an invalid delay relation input", (done) => {
-            apiProvider.import(project1, tasks, taskRelations, delays, [{test: "test"}]).then(() => {
-                done(new Error("import should not be a success"))
+        it("Should get an exception for an invalid delay relation input", () => {
+            return apiProvider.import(project1, tasks, taskRelations, delays, [{test: "test"}]).then(() => {
+                throw new Error("import should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(400)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
     })

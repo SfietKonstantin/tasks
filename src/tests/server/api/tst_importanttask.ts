@@ -21,142 +21,114 @@ describe("API important task", () => {
         daoBuilder.verify()
     })
     describe("isTaskImportant", () => {
-        it("Should get if a task is important (true)", (done) => {
+        it("Should get if a task is important (true)", () => {
             daoBuilder.mockTaskDao.expects("isTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier)
                 .returns(Promise.resolve(true))
 
-            apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then((important: boolean) => {
+            return apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then((important: boolean) => {
                 chai.expect(important).to.be.true
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get if a task is important (false)", (done) => {
+        it("Should get if a task is important (false)", () => {
             daoBuilder.mockTaskDao.expects("isTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier)
                 .returns(Promise.resolve(false))
 
-            apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then((important: boolean) => {
+            return apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then((important: boolean) => {
                 chai.expect(important).to.be.false
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on internal error", (done) => {
+        it("Should get an exception on internal error", () => {
             daoBuilder.mockTaskDao.expects("isTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier)
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then(() => {
-                done(new Error("isTaskImportant should not be a success"))
+            return apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then(() => {
+                throw new Error("isTaskImportant should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on not found error", (done) => {
+        it("Should get an exception on not found error", () => {
             daoBuilder.mockTaskDao.expects("isTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier)
                 .returns(Promise.reject(new NotFoundError("Some error")))
 
-            apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then(() => {
-                done(new Error("isTaskImportant should not be a success"))
+            return apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then(() => {
+                throw new Error("isTaskImportant should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on other error", (done) => {
+        it("Should get an exception on other error", () => {
             daoBuilder.mockTaskDao.expects("isTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier)
                 .returns(Promise.reject(new FakeError("Some error")))
 
-            apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then(() => {
-                done(new Error("isTaskImportant should not be a success"))
+            return apiProvider.isTaskImportant(project1.identifier, taskd1.identifier).then(() => {
+                throw new Error("isTaskImportant should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
     })
     describe("setTaskImportant", () => {
-        it("Should set if a task is important (true)", (done) => {
+        it("Should set if a task is important (true)", () => {
             daoBuilder.mockTaskDao.expects("setTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier, true)
                 .returns(Promise.resolve(true))
 
-            apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, true).then((important: boolean) => {
+            return apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, true)
+                .then((important: boolean) => {
                 chai.expect(important).to.be.true
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should set if a task is important (false)", (done) => {
+        it("Should set if a task is important (false)", () => {
             daoBuilder.mockTaskDao.expects("setTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier, false)
                 .returns(Promise.resolve(true))
 
-            apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, false).then((important: boolean) => {
+            return apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, false)
+                .then((important: boolean) => {
                 chai.expect(important).to.be.false
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on internal error", (done) => {
+        it("Should get an exception on internal error", () => {
             daoBuilder.mockTaskDao.expects("setTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier, true)
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, true).then(() => {
-                done(new Error("setTaskImportant should not be a success"))
+            return apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, true).then(() => {
+                throw new Error("setTaskImportant should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on not found error", (done) => {
+        it("Should get an exception on not found error", () => {
             daoBuilder.mockTaskDao.expects("setTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier, true)
                 .returns(Promise.reject(new NotFoundError("Some error")))
 
-            apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, true).then(() => {
-                done(new Error("setTaskImportant should not be a success"))
+            return apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, true).then(() => {
+                throw new Error("setTaskImportant should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on other error", (done) => {
+        it("Should get an exception on other error", () => {
             daoBuilder.mockTaskDao.expects("setTaskImportant").once()
                 .withExactArgs(project1.identifier, taskd1.identifier, true)
                 .returns(Promise.reject(new FakeError("Some error")))
 
-            apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, true).then(() => {
-                done(new Error("setTaskImportant should not be a success"))
+            return apiProvider.setTaskImportant(project1.identifier, taskd1.identifier, true).then(() => {
+                throw new Error("setTaskImportant should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
     })

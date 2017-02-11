@@ -12,12 +12,10 @@ import {ApiTaskData} from "../../../../server/api/taskdata"
 
 describe("Integration API", () => {
     let main: Main
-    beforeEach((done) => {
-        RedisTestDataProvider.dumpOnly().then(() => {
+    beforeEach(() => {
+        return RedisTestDataProvider.dumpOnly().then(() => {
             main = new Main(3)
             return main.start(8080)
-        }).then(() => {
-            done()
         })
     })
     afterEach(() => {

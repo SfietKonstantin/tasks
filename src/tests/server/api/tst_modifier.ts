@@ -28,7 +28,7 @@ describe("API Modifier", () => {
         daoBuilder.verify()
     })
     describe("addModifier", () => {
-        it("Should add a modifier", (done) => {
+        it("Should add a modifier", () => {
             daoBuilder.mockProjectDao.expects("getProject").once()
                 .withExactArgs(project1.identifier)
                 .returns(Promise.resolve(project1))
@@ -64,15 +64,13 @@ describe("API Modifier", () => {
                 .withExactArgs(modifier3)
                 .returns(Promise.resolve(modifier3))
 
-            apiProvider.addModifier(project1.identifier, taskd1.identifier, modifier3).then((task: ApiTaskData) => {
+            return apiProvider.addModifier(project1.identifier, taskd1.identifier, modifier3)
+                .then((task: ApiTaskData) => {
                 chai.expect(task).to.deep.equal(expected)
                 mockTaskNode.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on internal error", (done) => {
+        it("Should get an exception on internal error", () => {
             const projectNode = new MockProjectNode(graph, project1.identifier)
             graph.projects.set(project1.identifier, projectNode)
             const taskNode = new MockTaskNode(projectNode, taskd1.identifier,
@@ -84,18 +82,15 @@ describe("API Modifier", () => {
                 .withExactArgs(modifier3)
                 .returns(Promise.reject(new InternalError("Some error")))
 
-            apiProvider.addModifier(project1.identifier, taskd1.identifier, modifier3).then(() => {
-                done(new Error("addModifier should not be a success"))
+            return apiProvider.addModifier(project1.identifier, taskd1.identifier, modifier3).then(() => {
+                throw new Error("addModifier should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(500)
                 mockTaskNode.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on not found error", (done) => {
+        it("Should get an exception on not found error", () => {
             const projectNode = new MockProjectNode(graph, project1.identifier)
             graph.projects.set(project1.identifier, projectNode)
             const taskNode = new MockTaskNode(projectNode, taskd1.identifier,
@@ -107,18 +102,15 @@ describe("API Modifier", () => {
                 .withExactArgs(modifier3)
                 .returns(Promise.reject(new NotFoundError("Some error")))
 
-            apiProvider.addModifier(project1.identifier, taskd1.identifier, modifier3).then(() => {
-                done(new Error("addModifier should not be a success"))
+            return apiProvider.addModifier(project1.identifier, taskd1.identifier, modifier3).then(() => {
+                throw new Error("addModifier should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(RequestError)
                 chai.expect((error as RequestError).status).to.equal(404)
                 mockTaskNode.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
-        it("Should get an exception on other error", (done) => {
+        it("Should get an exception on other error", () => {
             const projectNode = new MockProjectNode(graph, project1.identifier)
             graph.projects.set(project1.identifier, projectNode)
             const taskNode = new MockTaskNode(projectNode, taskd1.identifier,
@@ -130,14 +122,11 @@ describe("API Modifier", () => {
                 .withExactArgs(modifier3)
                 .returns(Promise.reject(new FakeError("Some error")))
 
-            apiProvider.addModifier(project1.identifier, taskd1.identifier, modifier3).then(() => {
-                done(new Error("addModifier should not be a success"))
+            return apiProvider.addModifier(project1.identifier, taskd1.identifier, modifier3).then(() => {
+                throw new Error("addModifier should not be a success")
             }).catch((error) => {
                 chai.expect(error).to.instanceOf(FakeError)
                 mockTaskNode.verify()
-                done()
-            }).catch((error) => {
-                done(error)
             })
         })
     })
