@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import {ProjectApiProvider} from "../../../server/api/project"
 import {Project} from "../../../common/project"
-import {project1, project2} from "../testdata"
+import {project1, project2} from "../../common/testdata"
 import {MockGraph} from "../graph/mockgraph"
 import {MockDaoBuilder} from "../dao/mockbuilder"
 import {RequestError} from "../../../server/error/requesterror"

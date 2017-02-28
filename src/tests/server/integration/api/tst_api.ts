@@ -4,7 +4,7 @@ import {RedisTestDataProvider} from "../../dao/redis/testdataprovider"
 import {
     project1, project2, taskd1, taskd2, taskd3, modifier1, modifier2, modifier3,
     taskRelation2, delayd1, delayRelation2, modifier4
-} from "../../testdata"
+} from "../../../common/testdata"
 import {TaskBuilder} from "../../../../common/api/task"
 import {addDays, diffDates} from "../../../../common/utils/date"
 import {DelayBuilder} from "../../../../common/api/delay"

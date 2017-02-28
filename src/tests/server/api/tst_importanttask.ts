@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import {ImportantTaskApiProvider} from "../../../server/api/importanttask"
-import {project1, taskd1} from "../testdata"
+import {project1, taskd1} from "../../common/testdata"
 import {MockGraph} from "../graph/mockgraph"
 import {MockDaoBuilder} from "../dao/mockbuilder"
 import {RequestError} from "../../../server/error/requesterror"

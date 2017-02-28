@@ -37,6 +37,10 @@ export class Main {
 
         this.app.use("/api", this.apiRouterFactory.create())
 
+        this.app.get("/", (req: express.Request, res: express.Response) => {
+            res.render("index")
+        })
+
         this.app.use(Main.errorHandler)
         this.app.use(Main.defaultErrorHandler)
 

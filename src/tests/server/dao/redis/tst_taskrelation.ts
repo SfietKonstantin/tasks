@@ -7,7 +7,7 @@ import {RedisDaoBuilder} from "../../../../server/dao/redis/builder"
 import {
     project1, invalidProject, taskd1, taskd2, invalidTaskd,
     taskRelation1, taskRelation2, taskRelation3, invalidTaskRelation1, invalidTaskRelation2
-} from "../../testdata"
+} from "../../../common/testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"

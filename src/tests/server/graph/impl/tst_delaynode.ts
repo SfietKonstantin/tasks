@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import {DelayNode} from "../../../../server/graph/impl/delaynode"
 import {MockProjectNode} from "../mockprojectnode"
-import {project1, delayd1, taskd1, taskd2, delayRelation1, delayRelation2, modifier1, modifier2} from "../../testdata"
+import {project1, delayd1, taskd1, taskd2, delayRelation1, delayRelation2, modifier1, modifier2} from "../../../common/testdata"
 import {MockGraph} from "../mockgraph"
 import {MockTaskNode} from "../mocktasknode"
 import {addDays, diffDates} from "../../../../common/utils/date"

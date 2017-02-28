@@ -3,7 +3,7 @@ import * as sinon from "sinon"
 import {
     taskd1, taskd2, taskd3, taskd4, taskRelation1, taskRelation2, taskRelation4,
     taskRelation5, delayd1, delayd2, delayRelation4, delayRelation5, project1
-} from "../testdata"
+} from "../../common/testdata"
 import {TaskDefinition} from "../../../common/task"
 import {DelayDefinition} from "../../../common/delay"
 import {MockDaoBuilder} from "../dao/mockbuilder"

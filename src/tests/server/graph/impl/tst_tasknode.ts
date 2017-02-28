@@ -9,7 +9,7 @@ import {
     project1, taskd1, taskd4, delayd1, delayRelation4, modifier1, modifier5, modifier2,
     modifier4, taskd3, taskRelation3, milestoned1, taskd2, taskRelation1, taskRelation6, taskRelation2, taskRelation4,
     taskRelation5, taskRelation7
-} from "../../testdata"
+} from "../../../common/testdata"
 import {GraphError} from "../../../../server/graph/error/graph"
 import {diffDates, addDays} from "../../../../common/utils/date"
 import {MockTaskNode} from "../mocktasknode"

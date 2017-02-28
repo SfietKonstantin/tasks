@@ -3,7 +3,7 @@ import * as bluebird from "bluebird"
 import {
     project1, project2, taskd1, taskd2, taskd3, taskRelation1, taskRelation2, delayd1, delayd2,
     delayRelation1, delayRelation2, modifier1, modifier2, modifier3
-} from "../../testdata"
+} from "../../../common/testdata"
 import {Project} from "../../../../common/project"
 import {TaskDefinition} from "../../../../common/task"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"

@@ -10,7 +10,7 @@ import {
     project1, taskd1, taskd2, taskd3, taskd4, delayd1, delayd2, modifier1, modifier2,
     modifier3, taskRelation1, taskRelation2, taskRelation4, taskRelation5, delayRelation4, delayRelation5,
     delayRelation1
-} from "../../testdata"
+} from "../../../common/testdata"
 import {get as mapGet} from "../../../../common/utils/map"
 import {ExistsError} from "../../../../server/error/exists"
 import {NotFoundError} from "../../../../common/errors/notfound"

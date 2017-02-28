@@ -5,7 +5,7 @@
 <script src="/index.bundle.js"></script>
 <script>
 window.onload = function() {
-    window.index.render()
+    ReactDOM.render(React.createElement(window.index.Main, null), document.getElementById("content"))
 }
 </script>
 

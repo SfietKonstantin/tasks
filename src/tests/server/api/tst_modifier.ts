@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as sinon from "sinon"
 import {ModifierApiProvider} from "../../../server/api/modifier"
-import {project1, taskd1, delayd1, modifier1, modifier2, modifier3} from "../testdata"
+import {project1, taskd1, delayd1, modifier1, modifier2, modifier3} from "../../common/testdata"
 import {MockGraph} from "../graph/mockgraph"
 import {MockDaoBuilder} from "../dao/mockbuilder"
 import {RequestError} from "../../../server/error/requesterror"

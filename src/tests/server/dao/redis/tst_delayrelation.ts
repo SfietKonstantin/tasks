@@ -8,7 +8,7 @@ import {
     project1, invalidProject,
     delayRelation1, delayRelation2, delayd1, invalidDelay, delayRelation3, delayd2,
     invalidDelayRelation1, invalidDelayRelation2
-} from "../../testdata"
+} from "../../../common/testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"

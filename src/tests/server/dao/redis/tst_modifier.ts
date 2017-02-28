@@ -7,7 +7,7 @@ import {RedisTestDataProvider} from "./testdataprovider"
 import {
 project1, invalidProject, modifier1, modifier2, taskd1, invalidTaskd, modifier4,
 modifier3, taskd2
-} from "../../testdata"
+} from "../../../common/testdata"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"
