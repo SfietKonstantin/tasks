@@ -1,5 +1,5 @@
 import {Project} from "../../common/project"
-import {TaskDefinition} from "../../common/task"
+import {TaskDefinition, Task} from "../../common/task"
 import {TaskLocation} from "../../common/tasklocation"
 import {TaskRelation} from "../../common/taskrelation"
 import {DelayDefinition} from "../../common/delay"
@@ -244,4 +244,24 @@ export const modifier5: Modifier = {
     description: "Modifier with a negative duration",
     duration: -2,
     location: TaskLocation.End
+}
+
+export const task1: Task = {
+    identifier: taskd1.identifier,
+    name: taskd1.name,
+    description: taskd1.description,
+    estimatedStartDate: taskd1.estimatedStartDate,
+    estimatedDuration: taskd1.estimatedDuration,
+    startDate: new Date(2016, 7, 15),
+    duration: 31
+}
+
+export const task2: Task = {
+    identifier: taskd2.identifier,
+    name: taskd2.name,
+    description: taskd2.description,
+    estimatedStartDate: taskd2.estimatedStartDate,
+    estimatedDuration: taskd2.estimatedDuration,
+    startDate: new Date(2016, 8, 18),
+    duration: 32
 }

@@ -1,7 +1,7 @@
 import * as React from "react"
 import {Project} from "../../common/project"
 import {Card} from "semantic-ui-react"
-import {processFetch} from "../common/fetch"
+import {processFetch} from "../common/utils/fetch"
 
 interface MainState {
     isFetching: boolean

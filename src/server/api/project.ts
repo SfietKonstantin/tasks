@@ -15,14 +15,6 @@ export class ProjectApiProvider {
         this.graph = graph
     }
 
-    static getProjectIdentifier(projectIdentifier: any): string {
-        if (typeof projectIdentifier !== "string") {
-            winston.error(`projectIdentifier must be a string, not ${projectIdentifier}`)
-            throw new RequestError(404, `Project "${projectIdentifier}" not found`)
-        }
-        return projectIdentifier
-    }
-
     getProjects(): Promise<Array<Project>> {
         const projectDao = this.daoBuilder.buildProjectDao()
         return projectDao.getAllProjects().catch((error: Error) => {

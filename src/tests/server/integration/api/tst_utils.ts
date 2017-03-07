@@ -1,7 +1,7 @@
 import * as express from "express"
 import {Application, Request, Response} from "express"
 import * as supertest from "supertest"
-import {asRoute, asParameterHandler} from "../../../../server/routes/api/utils"
+import {asRoute, asParameterHandler} from "../../../../server/routes/utils"
 import {RequestError} from "../../../../server/error/requesterror"
 
 describe("Integration API utils", () => {

@@ -6,7 +6,8 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "strictNullChecks": true,
-        "jsx": "react"
+        "jsx": "react",
+        "sourceMap": true
     }
 }
  

@@ -18,14 +18,6 @@ export class TaskApiProvider {
         this.graph = graph
     }
 
-    static getTaskIdentifier(taskIdentifier: any): string {
-        if (typeof taskIdentifier !== "string") {
-            winston.error(`taskIdentifier must be a string, not ${taskIdentifier}`)
-            throw new RequestError(404, `Task "${taskIdentifier}" not found`)
-        }
-        return taskIdentifier
-    }
-
     getProjectTasks(projectIdentifier: string): Promise<Array<ApiTask>> {
         const taskDao = this.daoBuilder.buildTaskDao()
         return taskDao.getProjectTasks(projectIdentifier).then((tasks: Array<TaskDefinition>) => {

@@ -5,7 +5,10 @@
 <script src="/project.bundle.js"></script>
 <script>
 window.onload = function() {
-    window.project.render("<%= projectIdentifier %>")
+    let props = {
+        projectIdentifier: "<%= projectIdentifier %>"
+    }
+    ReactDOM.render(React.createElement(window.project.Main, props), document.getElementById("content"))
 }
 </script>
 

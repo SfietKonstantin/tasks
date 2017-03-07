@@ -7,17 +7,28 @@ const tslint = require("gulp-tslint");
 const filter = require('gulp-filter');
 const webpack = require("webpack");
 const webpackConfig = require('./webpack.config.js');
+const sourcemaps = require('gulp-sourcemaps');
+const remapIstanbul = require('remap-istanbul/lib/gulpRemapIstanbul');
 
 gulp.task("build:common", function () {
     const tsProject = ts.createProject("src/common/tsconfig.json");
-    const result = gulp.src("src/common/**/*.ts").pipe(tsProject());
-    return result.js.pipe(gulp.dest("dist/lib/common")).pipe(gulp.dest("tests/common"));
+    const result = gulp.src("src/common/**/*.ts")
+        .pipe(sourcemaps.init())
+        .pipe(tsProject());
+    return result.js
+        .pipe(gulp.dest("dist/lib/common"))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest("tests/common"));
 })
 
 gulp.task("build:common:tests", function () {
     const tsProject = ts.createProject("src/tests/common/tsconfig.json");
-    const result = gulp.src("src/tests/common/**/*.ts").pipe(tsProject());
-    return result.js.pipe(gulp.dest("tests/tests/common"));
+    const result = gulp.src("src/tests/common/**/*.ts")
+        .pipe(sourcemaps.init())
+        .pipe(tsProject());
+    return result.js
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest("tests/tests/common"));
 })
 
 gulp.task("watch:common:tests", ["build:common:tests"], function () {
@@ -30,8 +41,13 @@ gulp.task("watch:common", ["build:common"], function () {
 
 gulp.task("build:server", function () {
     const tsProject = ts.createProject('src/server/tsconfig.json');
-    const result = gulp.src("src/server/**/*.ts").pipe(tsProject());
-    return result.js.pipe(gulp.dest("dist/lib/server")).pipe(gulp.dest("tests/server"));
+    const result = gulp.src("src/server/**/*.ts")
+        .pipe(sourcemaps.init())
+        .pipe(tsProject());
+    return result.js
+        .pipe(gulp.dest("dist/lib/server"))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest("tests/server"));
 })
 
 gulp.task("watch:server", ["build:server"], function () {
@@ -40,8 +56,12 @@ gulp.task("watch:server", ["build:server"], function () {
 
 gulp.task("build:server:tests", function () {
     const tsProject = ts.createProject("src/tests/server/tsconfig.json");
-    const result = gulp.src("src/tests/server/**/*.ts").pipe(tsProject());
-    return result.js.pipe(gulp.dest("tests/tests/server"));
+    const result = gulp.src("src/tests/server/**/*.ts")
+        .pipe(sourcemaps.init())
+        .pipe(tsProject());
+    return result.js
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest("tests/tests/server"));
 })
 
 const webpackCompiler = webpack(webpackConfig);
@@ -62,8 +82,12 @@ gulp.task("watch:client", ["build:client"], function() {
 
 gulp.task("build:client:ts", function () {
     const tsProject = ts.createProject('src/client/tsconfig.json');
-    const result = gulp.src("src/client/**/*.ts*").pipe(tsProject());
-    return result.js.pipe(gulp.dest("tests/client"));
+    const result = gulp.src("src/client/**/*.ts*")
+        .pipe(sourcemaps.init())
+        .pipe(tsProject());
+    return result.js
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest("tests/client"));
 })
 
 gulp.task("watch:client:ts", ["build:client:ts"], function () {
@@ -72,8 +96,12 @@ gulp.task("watch:client:ts", ["build:client:ts"], function () {
 
 gulp.task("build:client:tests", function () {
     const tsProject = ts.createProject("src/tests/client/tsconfig.json");
-    const result = gulp.src("src/tests/client/**/*.ts*").pipe(tsProject());
-    return result.js.pipe(gulp.dest("tests/tests/client"));
+    const result = gulp.src("src/tests/client/**/*.ts*")
+        .pipe(sourcemaps.init())
+        .pipe(tsProject());
+    return result.js
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest("tests/tests/client"));
 })
 
 gulp.task("watch:server:tests", ["build:server:tests"], function () {
@@ -91,7 +119,7 @@ gulp.task("test:pre", function () {
         .pipe(istanbul.hookRequire());
 });
 
-gulp.task("test", ["test:pre"], function () {
+gulp.task("test:run", function() {
     return gulp.src("tests/tests/**/*.js")
         .pipe(mocha({reporter: "spec"}))
         .pipe(istanbul.writeReports({
@@ -99,9 +127,19 @@ gulp.task("test", ["test:pre"], function () {
             reportOpts: {
                 dir: "./coverage"
             },
-            reporters: ["html"]
-        }))
+            reporters: ["json"]
+        }));
+});
+
+gulp.task("test:post", function() {
+    return gulp.src("coverage/coverage-final.json").pipe(remapIstanbul({
+        reports: {
+            'html': 'coverage'
+        }
+    }));
 })
+
+gulp.task("test", ["test:pre", "test:run", "test:post"])
 
 gulp.task('tslint', () => {
     const f = filter(["**", "!**/index.d.ts"]);

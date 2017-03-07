@@ -8,8 +8,9 @@ import {RequestError} from "./error/requesterror"
 import {DaoBuilderFactory} from "./dao/factory"
 import {GraphFactory} from "./graph/factory"
 import {IDaoBuilder} from "./dao/ibuilder"
-import {ApiRouterFactory} from "./routes/api/factory"
+import {ApiRouterFactory} from "./routes/apifactory"
 import {IGraph} from "./graph/igraph"
+import {AppRouterFactory} from "./routes/appfactory"
 
 export class Main {
     private app: express.Application
@@ -36,10 +37,7 @@ export class Main {
         this.app.use(express.static(path.join(__dirname, "..", "..", "public")))
 
         this.app.use("/api", this.apiRouterFactory.create())
-
-        this.app.get("/", (req: express.Request, res: express.Response) => {
-            res.render("index")
-        })
+        this.app.use("/", AppRouterFactory.create())
 
         this.app.use(Main.errorHandler)
         this.app.use(Main.defaultErrorHandler)

@@ -86,7 +86,8 @@ export class RedisDelayDao implements IDelayDao {
             const projectDelaysKey = KeyFactory.createProjectKey(projectIdentifier, "delays")
             return this.client.smembersAsync(projectDelaysKey)
         }).then((delayIdentifiers: Array<string>) => {
-            return Promise.all(delayIdentifiers.map((delayIdentifier) => {
+            const sortedIdentifiers = delayIdentifiers.sort()
+            return Promise.all(sortedIdentifiers.map((delayIdentifier) => {
                 return this.getDelay(projectIdentifier, delayIdentifier).catch(() => {
                     return null
                 })

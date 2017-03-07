@@ -21,18 +21,6 @@ describe("API Project", () => {
     afterEach(() => {
         daoBuilder.verify()
     })
-    describe("getProjectIdentifier", () => {
-        it("Should get an exception for an invalid input", (done) => {
-            try {
-                ProjectApiProvider.getProjectIdentifier({value: "test"})
-                done(new Error("getProjectIdentifier should not be a success"))
-            } catch (error) {
-                chai.expect(error).to.instanceOf(RequestError)
-                chai.expect((error as RequestError).status).to.equal(404)
-                done()
-            }
-        })
-    })
     describe("getAllProjects", () => {
         it("Should get a list of projects", () => {
             const expected: Array<Project> = [project1, project2]

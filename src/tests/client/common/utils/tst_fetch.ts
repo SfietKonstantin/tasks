@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import "isomorphic-fetch"
-import {processFetch} from "../../../client/common/fetch"
+import {processFetch} from "../../../../client/common/utils/fetch"
 
 describe("Fetch helper", () => {
     interface TestObject {

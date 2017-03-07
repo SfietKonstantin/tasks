@@ -26,18 +26,6 @@ describe("API task", () => {
     afterEach(() => {
         daoBuilder.verify()
     })
-    describe("getTaskIdentifier", () => {
-        it("Should get an exception for an invalid input", (done) => {
-            try {
-                TaskApiProvider.getTaskIdentifier({value: "test"})
-                done(new Error("getTaskIdentifier should not be a success"))
-            } catch (error) {
-                chai.expect(error).to.instanceOf(RequestError)
-                chai.expect((error as RequestError).status).to.equal(404)
-                done()
-            }
-        })
-    })
     describe("getProjectTasks", () => {
         it("Should get project tasks", () => {
             const tasks = [taskd1, taskd2]

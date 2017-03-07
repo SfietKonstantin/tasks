@@ -5,6 +5,8 @@
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "inlineSourceMap": true
   }
 } 

@@ -1,6 +1,7 @@
 module.exports = {
     entry: {
-        index: ['./src/client/index/main.tsx']
+        index: ['./src/client/index/main.tsx'],
+        project: ['./src/client/project/main.tsx']
     },
     output: {
         library: "[name]",

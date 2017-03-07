@@ -1,20 +1,15 @@
 import {Router, Request} from "express"
-import {IDaoBuilder} from "../../dao/ibuilder"
-import {ProjectApiProvider} from "../../api/project"
-import {IGraph} from "../../graph/igraph"
-import {asRoute, asParameterHandler} from "./utils"
-import {TaskApiProvider} from "../../api/task"
-import {ImportantTaskApiProvider} from "../../api/importanttask"
-import {ModifierApiProvider} from "../../api/modifier"
-import {ModifierBuilder} from "../../../common/api/modifier"
-
-interface ProjectRequest extends Request {
-    projectIdentifier: string
-}
-
-interface TaskRequest extends ProjectRequest {
-    taskIdentifier: string
-}
+import {IDaoBuilder} from "../dao/ibuilder"
+import {ProjectApiProvider} from "../api/project"
+import {IGraph} from "../graph/igraph"
+import {
+    asRoute, asParameterHandler, ProjectRequest, TaskRequest, getProjectIdentifier,
+    getTaskIdentifier
+} from "./utils"
+import {TaskApiProvider} from "../api/task"
+import {ImportantTaskApiProvider} from "../api/importanttask"
+import {ModifierApiProvider} from "../api/modifier"
+import {ModifierBuilder} from "../../common/api/modifier"
 
 export class ApiRouterFactory {
     private projectApiProvider: ProjectApiProvider
@@ -32,10 +27,10 @@ export class ApiRouterFactory {
     create(): Router {
         const apiRouter = Router()
         apiRouter.param("projectIdentifier", asParameterHandler((req: ProjectRequest) => {
-            req.projectIdentifier = ProjectApiProvider.getProjectIdentifier(req.params.projectIdentifier)
+            req.projectIdentifier = getProjectIdentifier(req.params.projectIdentifier)
         }))
         apiRouter.param("taskIdentifier", asParameterHandler((req: TaskRequest) => {
-            req.taskIdentifier = TaskApiProvider.getTaskIdentifier(req.params.taskIdentifier)
+            req.taskIdentifier = getTaskIdentifier(req.params.taskIdentifier)
         }))
 
         apiRouter.get("/project/list", asRoute(() => {
@@ -68,8 +63,8 @@ export class ApiRouterFactory {
         }))
 
         apiRouter.put("/modifier", asRoute((req: Request) => {
-            const projectIdentifier = ProjectApiProvider.getProjectIdentifier(req.body.projectIdentifier)
-            const taskIdentifier = TaskApiProvider.getTaskIdentifier(req.body.taskIdentifier)
+            const projectIdentifier = getProjectIdentifier(req.body.projectIdentifier)
+            const taskIdentifier = getTaskIdentifier(req.body.taskIdentifier)
             const modifier = ModifierBuilder.fromObject(req.body.modifier)
             return this.modifierApiProvider.addModifier(projectIdentifier, taskIdentifier, modifier)
         }))
