@@ -119,7 +119,7 @@ gulp.task("test:pre", function () {
         .pipe(istanbul.hookRequire());
 });
 
-gulp.task("test:run", function() {
+gulp.task("test:run", ["test:pre"], function() {
     return gulp.src("tests/tests/**/*.js")
         .pipe(mocha({reporter: "spec"}))
         .pipe(istanbul.writeReports({
@@ -131,7 +131,7 @@ gulp.task("test:run", function() {
         }));
 });
 
-gulp.task("test:post", function() {
+gulp.task("test:post", ["test:run"], function() {
     return gulp.src("coverage/coverage-final.json").pipe(remapIstanbul({
         reports: {
             'html': 'coverage'
@@ -139,7 +139,7 @@ gulp.task("test:post", function() {
     }));
 })
 
-gulp.task("test", ["test:pre", "test:run", "test:post"])
+gulp.task("test", ["test:post"])
 
 gulp.task('tslint', () => {
     const f = filter(["**", "!**/index.d.ts"]);

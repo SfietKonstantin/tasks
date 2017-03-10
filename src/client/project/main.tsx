@@ -7,6 +7,7 @@ import {Project} from "../../common/project"
 import {Task} from "../../common/task"
 import {processFetch} from "../common/utils/fetch"
 import {ApiTask, TaskBuilder} from "../../common/api/task"
+import {TaskList} from "../common/components/tasklist"
 
 interface MainProperties {
     projectIdentifier: string
