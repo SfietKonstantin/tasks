@@ -14,9 +14,9 @@ import {InputError} from "../../../common/errors/input"
 bluebird.promisifyAll(redis)
 
 class RedisModifier {
-    name: string
-    description: string
-    location: string
+    readonly name: string
+    readonly description: string
+    readonly location: string
 
     constructor(modifier: Modifier) {
         this.name = modifier.name
@@ -73,7 +73,7 @@ class RedisModifier {
 }
 
 export class RedisModifierDao implements IModifierDao {
-    private client: redisasync.RedisAsyncClient
+    private readonly client: redisasync.RedisAsyncClient
 
     constructor(client: redis.RedisClient) {
         this.client = client as redisasync.RedisAsyncClient

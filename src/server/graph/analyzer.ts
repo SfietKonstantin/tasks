@@ -5,7 +5,7 @@ import {TaskRelation} from "../../common/taskrelation"
 import {get as mapGet} from "../../common/utils/map"
 
 interface Node {
-    taskIdentifier: string
+    readonly taskIdentifier: string
     children: Array<Node>
 }
 

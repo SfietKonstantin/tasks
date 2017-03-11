@@ -22,17 +22,17 @@ import {get as mapGet} from "../../../common/utils/map"
 import {IDelayNodeImpl} from "./idelaynode"
 
 export class ProjectNode implements IProjectNodeImpl {
-    graph: IGraph
-    projectIdentifier: string
+    readonly graph: IGraph
+    readonly projectIdentifier: string
     tasks: Map<string, ITaskNode>
     delays: Map<string, IDelayNode>
-    private nodeFactory: INodeFactory
-    private daoBuilder: IDaoBuilder
-    private taskDao: ITaskDao
-    private delayDao: IDelayDao
-    private taskRelationDao: ITaskRelationDao
-    private delayRelationDao: IDelayRelationDao
-    private modifierDao: IModifierDao
+    private readonly nodeFactory: INodeFactory
+    private readonly daoBuilder: IDaoBuilder
+    private readonly taskDao: ITaskDao
+    private readonly delayDao: IDelayDao
+    private readonly taskRelationDao: ITaskRelationDao
+    private readonly delayRelationDao: IDelayRelationDao
+    private readonly modifierDao: IModifierDao
     constructor(nodeFactory: INodeFactory, daoBuilder: IDaoBuilder, graph: IGraph, projectIdentifier: string) {
         this.nodeFactory = nodeFactory
         this.daoBuilder = daoBuilder

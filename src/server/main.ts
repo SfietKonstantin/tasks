@@ -4,7 +4,7 @@ import * as path from "path"
 import * as logger from "morgan"
 import * as http from "http"
 import * as winston from "winston"
-import {RequestError} from "./error/requesterror"
+import {RequestError} from "./error/request"
 import {DaoBuilderFactory} from "./dao/factory"
 import {GraphFactory} from "./graph/factory"
 import {IDaoBuilder} from "./dao/ibuilder"
@@ -13,11 +13,11 @@ import {IGraph} from "./graph/igraph"
 import {AppRouterFactory} from "./routes/appfactory"
 
 export class Main {
-    private app: express.Application
-    private daoBuilder: IDaoBuilder
-    private graph: IGraph
-    private server: http.Server
-    private apiRouterFactory: ApiRouterFactory
+    private readonly app: express.Application
+    private readonly daoBuilder: IDaoBuilder
+    private readonly graph: IGraph
+    private readonly server: http.Server
+    private readonly apiRouterFactory: ApiRouterFactory
     constructor(dbIndex: number = 0) {
         Main.initLog()
 

@@ -12,10 +12,10 @@ import {ModifierApiProvider} from "../api/modifier"
 import {ModifierBuilder} from "../../common/api/modifier"
 
 export class ApiRouterFactory {
-    private projectApiProvider: ProjectApiProvider
-    private taskApiProvider: TaskApiProvider
-    private importantTaskApiProvider: ImportantTaskApiProvider
-    private modifierApiProvider: ModifierApiProvider
+    private readonly projectApiProvider: ProjectApiProvider
+    private readonly taskApiProvider: TaskApiProvider
+    private readonly importantTaskApiProvider: ImportantTaskApiProvider
+    private readonly modifierApiProvider: ModifierApiProvider
 
     constructor(daoBuilder: IDaoBuilder, graph: IGraph) {
         this.projectApiProvider = new ProjectApiProvider(daoBuilder, graph)

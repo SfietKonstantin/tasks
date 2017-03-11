@@ -7,13 +7,13 @@ import {get as mapGet} from "../../../common/utils/map"
 import {addDays, diffDates} from "../../../common/utils/date"
 
 export class DelayNode implements IDelayNodeImpl {
-    project: IProjectNode
-    delayIdentifier: string
+    readonly project: IProjectNode
+    readonly delayIdentifier: string
     initialMargin: number
     margin: number
     tasks: Array<ITaskNode>
     relations: Map<string, DelayRelation>
-    private date: Date
+    private readonly date: Date
 
     constructor(project: IProjectNode, delayIdentifier: string, date: Date) {
         this.project = project

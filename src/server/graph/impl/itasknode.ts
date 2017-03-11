@@ -4,8 +4,8 @@ import {TaskRelation} from "../../../common/taskrelation"
 import {DelayRelation} from "../../../common/delayrelation"
 
 export interface ITaskNodeImpl extends ITaskNode {
-    estimatedStartDate: Date
-    estimatedDuration: number
+    readonly estimatedStartDate: Date
+    readonly estimatedDuration: number
     childrenRelations: Map<string, TaskRelation>
     parentsRelations: Map<string, TaskRelation>
 

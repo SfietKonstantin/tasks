@@ -12,8 +12,8 @@ import {ExistsError} from "../../error/exists"
 bluebird.promisifyAll(redis)
 
 class RedisTaskRelation {
-    previousLocation: string
-    lag: number
+    readonly previousLocation: string
+    readonly lag: number
 
     constructor(taskRelation: TaskRelation) {
         this.previousLocation = TaskLocationBuilder.toString(taskRelation.previousLocation)
@@ -57,7 +57,7 @@ class RedisTaskRelation {
 }
 
 export class RedisTaskRelationDao implements ITaskRelationDao {
-    private client: redisasync.RedisAsyncClient
+    private readonly client: redisasync.RedisAsyncClient
 
     constructor(client: redis.RedisClient) {
         this.client = client as redisasync.RedisAsyncClient

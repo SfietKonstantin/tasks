@@ -8,7 +8,7 @@ import {RedisDelayRelationDao} from "./delayrelation"
 import {RedisModifierDao} from "./modifier"
 
 export class RedisDaoBuilder implements IDaoBuilder {
-    private client: redis.RedisClient
+    private readonly client: redis.RedisClient
 
     constructor(client: redis.RedisClient) {
         this.client = client

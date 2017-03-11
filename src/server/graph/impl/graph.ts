@@ -8,9 +8,9 @@ import {ExistsError} from "../../error/exists"
 
 export class Graph implements IGraph {
     projects: Map<string, IProjectNode>
-    private nodeFactory: INodeFactory
-    private daoBuilder: IDaoBuilder
-    private dao: IProjectDao
+    private readonly nodeFactory: INodeFactory
+    private readonly daoBuilder: IDaoBuilder
+    private readonly dao: IProjectDao
 
     constructor(nodeFactory: INodeFactory, daoBuilder: IDaoBuilder) {
         this.nodeFactory = nodeFactory

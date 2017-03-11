@@ -1,10 +1,10 @@
 interface ErrorJson {
-    error: string
+    readonly error: string
 }
 
 export class RequestError extends Error implements Error {
-    status: number
-    json: ErrorJson
+    readonly status: number
+    readonly json: ErrorJson
 
     constructor(status: number, message: string) {
         super(message)

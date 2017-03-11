@@ -12,7 +12,7 @@ import {RedisDelayDao} from "./delay"
 bluebird.promisifyAll(redis)
 
 class RedisDelayRelation {
-    lag: number
+    readonly lag: number
 
     constructor(delayRelation: DelayRelation) {
         this.lag = delayRelation.lag
@@ -48,7 +48,7 @@ class RedisDelayRelation {
 }
 
 export class RedisDelayRelationDao implements IDelayRelationDao {
-    private client: redisasync.RedisAsyncClient
+    private readonly client: redisasync.RedisAsyncClient
 
     constructor(client: redis.RedisClient) {
         this.client = client as redisasync.RedisAsyncClient

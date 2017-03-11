@@ -11,19 +11,19 @@ import {IDelayNode} from "../graph/idelaynode"
 import {ITaskNode} from "../graph/itasknode"
 import {DelayDefinition} from "../../common/delay"
 import {NotFoundError} from "../../common/errors/notfound"
-import {RequestError} from "../error/requesterror"
+import {RequestError} from "../error/request"
 import {ApiErrorUtils} from "./error/utils"
 
 export interface ApiTaskData {
-    project: Project
-    task: ApiTask
-    modifiers: Array<Modifier>
-    delays: Array<ApiDelayDefinition>
+    readonly project: Project
+    readonly task: ApiTask
+    readonly modifiers: Array<Modifier>
+    readonly delays: Array<ApiDelayDefinition>
 }
 
 export class ApiTaskDataBuilder {
-    private daoBuilder: IDaoBuilder
-    private graph: IGraph
+    private readonly daoBuilder: IDaoBuilder
+    private readonly graph: IGraph
 
     constructor(daoBuilder: IDaoBuilder, graph: IGraph) {
         this.daoBuilder = daoBuilder

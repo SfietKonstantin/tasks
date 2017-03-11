@@ -1,7 +1,7 @@
 import * as winston from "winston"
 import {IDaoBuilder} from "../dao/ibuilder"
 import {IGraph} from "../graph/igraph"
-import {RequestError} from "../error/requesterror"
+import {RequestError} from "../error/request"
 import {get as mapGet} from "../../common/utils/map"
 import {TaskDefinition} from "../../common/task"
 import {TaskBuilder, ApiTask} from "../../common/api/task"
@@ -10,8 +10,8 @@ import {ApiErrorUtils} from "./error/utils"
 import {ApiTaskData, ApiTaskDataBuilder} from "./taskdata"
 
 export class TaskApiProvider {
-    private daoBuilder: IDaoBuilder
-    private graph: IGraph
+    private readonly daoBuilder: IDaoBuilder
+    private readonly graph: IGraph
 
     constructor(daoBuilder: IDaoBuilder, graph: IGraph) {
         this.daoBuilder = daoBuilder

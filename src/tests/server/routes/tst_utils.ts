@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import {getProjectIdentifier, getTaskIdentifier} from "../../../server/routes/utils"
-import {RequestError} from "../../../server/error/requesterror"
+import {RequestError} from "../../../server/error/request"
 
 describe("Routes utils", () => {
     describe("getProjectIdentifier", () => {

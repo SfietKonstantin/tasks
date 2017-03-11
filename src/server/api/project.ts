@@ -3,12 +3,12 @@ import {IDaoBuilder} from "../dao/ibuilder"
 import {IGraph} from "../graph/igraph"
 import {Project} from "../../common/project"
 import {NotFoundError} from "../../common/errors/notfound"
-import {RequestError} from "../error/requesterror"
+import {RequestError} from "../error/request"
 import {ApiErrorUtils} from "./error/utils"
 
 export class ProjectApiProvider {
-    private daoBuilder: IDaoBuilder
-    private graph: IGraph
+    private readonly daoBuilder: IDaoBuilder
+    private readonly graph: IGraph
 
     constructor(daoBuilder: IDaoBuilder, graph: IGraph) {
         this.daoBuilder = daoBuilder

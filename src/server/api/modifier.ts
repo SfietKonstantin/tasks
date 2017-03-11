@@ -1,15 +1,15 @@
 import * as winston from "winston"
 import {IDaoBuilder} from "../dao/ibuilder"
 import {IGraph} from "../graph/igraph"
-import {RequestError} from "../error/requesterror"
+import {RequestError} from "../error/request"
 import {NotFoundError} from "../../common/errors/notfound"
 import {ApiTaskDataBuilder, ApiTaskData} from "./taskdata"
 import {get as mapGet} from "../../common/utils/map"
 import {ApiErrorUtils} from "./error/utils"
 
 export class ModifierApiProvider {
-    private daoBuilder: IDaoBuilder
-    private graph: IGraph
+    private readonly daoBuilder: IDaoBuilder
+    private readonly graph: IGraph
 
     constructor(daoBuilder: IDaoBuilder, graph: IGraph) {
         this.daoBuilder = daoBuilder

@@ -15,19 +15,19 @@ import {IModifierDao} from "../../dao/imodifier"
 import {IDelayNodeImpl} from "./idelaynode"
 
 export class TaskNode implements ITaskNodeImpl {
-    project: IProjectNode
-    taskIdentifier: string
+    readonly project: IProjectNode
+    readonly taskIdentifier: string
     startDate: Date
     duration: number
     children: Array<ITaskNode>
     parents: Array<ITaskNode>
     delays: Array<IDelayNode>
     modifiers: Array<Modifier>
-    estimatedStartDate: Date
-    estimatedDuration: number
+    readonly estimatedStartDate: Date
+    readonly estimatedDuration: number
     childrenRelations: Map<string, TaskRelation>
     parentsRelations: Map<string, TaskRelation>
-    private modifierDao: IModifierDao
+    private readonly modifierDao: IModifierDao
 
     constructor(daoBuilder: IDaoBuilder,
                 project: IProjectNode, taskIdentifier: string,

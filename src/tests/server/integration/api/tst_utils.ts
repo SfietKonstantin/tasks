@@ -2,7 +2,7 @@ import * as express from "express"
 import {Application, Request, Response} from "express"
 import * as supertest from "supertest"
 import {asRoute, asParameterHandler} from "../../../../server/routes/utils"
-import {RequestError} from "../../../../server/error/requesterror"
+import {RequestError} from "../../../../server/error/request"
 
 describe("Integration API utils", () => {
     interface TestRequest extends Request {

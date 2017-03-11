@@ -12,9 +12,9 @@ import {RedisProjectDao} from "./project"
 bluebird.promisifyAll(redis)
 
 class RedisDelay {
-    name: string
-    description: string
-    date: number
+    readonly name: string
+    readonly description: string
+    readonly date: number
 
     constructor(delay: DelayDefinition) {
         this.name = delay.name
@@ -57,7 +57,7 @@ class RedisDelay {
 }
 
 export class RedisDelayDao implements IDelayDao {
-    private client: redisasync.RedisAsyncClient
+    private readonly client: redisasync.RedisAsyncClient
 
     constructor(client: redis.RedisClient) {
         this.client = client as redisasync.RedisAsyncClient

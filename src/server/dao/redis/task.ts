@@ -12,8 +12,8 @@ import {ExistsError} from "../../error/exists"
 bluebird.promisifyAll(redis)
 
 class RedisTask {
-    name: string
-    description: string
+    readonly name: string
+    readonly description: string
 
     constructor(task: TaskDefinition) {
         this.name = task.name
@@ -70,7 +70,7 @@ class RedisTask {
 }
 
 export class RedisTaskDao implements ITaskDao {
-    private client: redisasync.RedisAsyncClient
+    private readonly client: redisasync.RedisAsyncClient
 
     constructor(client: redis.RedisClient) {
         this.client = client as redisasync.RedisAsyncClient

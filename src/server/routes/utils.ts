@@ -1,6 +1,6 @@
 import * as winston from "winston"
 import {Request, Response, NextFunction, RequestHandler} from "express"
-import {RequestError} from "../error/requesterror"
+import {RequestError} from "../error/request"
 
 const handleError = (error: Error, res: Response) => {
     if (error instanceof RequestError) {
@@ -32,11 +32,11 @@ export const asRoute = <T>(callback: (req: Request) => Promise<T>): RequestHandl
 }
 
 export interface ProjectRequest extends Request {
-    projectIdentifier: string
+    readonly projectIdentifier: string
 }
 
 export interface TaskRequest extends ProjectRequest {
-    taskIdentifier: string
+    readonly taskIdentifier: string
 }
 
 export const getProjectIdentifier = (projectIdentifier: any): string => {

@@ -7,8 +7,8 @@ import {TaskRelation} from "../../common/taskrelation"
 import {DelayRelation} from "../../common/delayrelation"
 
 export interface IProjectNode {
-    graph: IGraph
-    projectIdentifier: string
+    readonly graph: IGraph
+    readonly projectIdentifier: string
     tasks: Map<string, ITaskNode>
     delays: Map<string, IDelayNode>
     addTask(task: TaskDefinition): Promise<ITaskNode>
