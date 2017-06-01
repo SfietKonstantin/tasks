@@ -1,6 +1,6 @@
 import {IGraph} from "../../../server/graph/igraph"
 import {IProjectNode} from "../../../server/graph/iprojectnode"
-import {Project} from "../../../common/project"
+import {Project} from "../../../common/old/project"
 
 export class MockGraph implements IGraph {
     projects: Map<string, IProjectNode>

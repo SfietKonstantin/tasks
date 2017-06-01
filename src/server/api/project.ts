@@ -1,7 +1,7 @@
 import * as winston from "winston"
 import {IDaoBuilder} from "../dao/ibuilder"
 import {IGraph} from "../graph/igraph"
-import {Project} from "../../common/project"
+import {Project} from "../../common/old/project"
 import {NotFoundError} from "../../common/errors/notfound"
 import {RequestError} from "../error/request"
 import {ApiErrorUtils} from "./error/utils"

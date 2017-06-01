@@ -1,4 +1,4 @@
-import {DelayDefinition} from "../../common/delay"
+import {DelayDefinition} from "../../common/old/delay"
 
 export interface IDelayDao {
     getDelay(projectIdentifier: string, delayIdentifier: string): Promise<DelayDefinition>

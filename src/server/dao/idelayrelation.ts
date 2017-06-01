@@ -1,4 +1,4 @@
-import {DelayRelation} from "../../common/delayrelation"
+import {DelayRelation} from "../../common/old/delayrelation"
 
 export interface IDelayRelationDao {
     addDelayRelation(projectIdentifier: string, relation: DelayRelation): Promise<void>

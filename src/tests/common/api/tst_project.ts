@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import {ProjectBuilder} from "../../../common/api/project"
-import {Project} from "../../../common/project"
+import {Project} from "../../../common/old/project"
 import {InputError} from "../../../common/errors/input"
 
 describe("API ProjectBuilder", () => {

@@ -1,5 +1,5 @@
 import * as React from "react"
-import {Project} from "../../common/project"
+import {Project} from "../../common/old/project"
 import {Card} from "semantic-ui-react"
 import {processFetch} from "../common/utils/fetch"
 

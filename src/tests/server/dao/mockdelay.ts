@@ -1,5 +1,5 @@
 import {IDelayDao} from "../../../server/dao/idelay"
-import {DelayDefinition} from "../../../common/delay"
+import {DelayDefinition} from "../../../common/old/delay"
 
 export class MockDelayDao implements IDelayDao {
     getDelay(projectIdentifier: string, delayIdentifier: string): Promise<DelayDefinition> {

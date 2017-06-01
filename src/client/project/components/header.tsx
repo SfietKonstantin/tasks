@@ -2,7 +2,7 @@ import * as React from "react"
 import {TabBar} from "../../common/components/tabs"
 import {Breadcrumb} from "./breadcrumb"
 import {Header as CommonHeader} from "../../common/components/header"
-import {Project} from "../../../common/project"
+import {Project} from "../../../common/old/project"
 
 interface HeaderProperties {
     project: Project

@@ -1,5 +1,5 @@
 import {IProjectDao} from "../../../server/dao/iproject"
-import {Project} from "../../../common/project"
+import {Project} from "../../../common/old/project"
 
 export class MockProjectDao implements IProjectDao {
     getAllProjects(): Promise<Array<Project>> {

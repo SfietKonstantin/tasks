@@ -1,4 +1,4 @@
-import {Modifier} from "../../common/modifier"
+import {Modifier} from "../../common/old/modifier"
 
 export interface IModifierDao {
     getModifier(projectIdentifier: string, modifierId: number): Promise<Modifier>

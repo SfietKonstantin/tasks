@@ -1,4 +1,4 @@
-import {DelayRelation} from "../delayrelation"
+import {DelayRelation} from "../old/delayrelation"
 import {InputError} from "../errors/input"
 
 export class DelayRelationBuilder {

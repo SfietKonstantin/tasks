@@ -1,4 +1,4 @@
-import {Modifier} from "../modifier"
+import {Modifier} from "../old/modifier"
 import {InputError} from "../errors/input"
 import {TaskLocationBuilder} from "./tasklocation"
 

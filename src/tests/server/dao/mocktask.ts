@@ -1,5 +1,5 @@
 import {ITaskDao} from "../../../server/dao/itask"
-import {TaskDefinition} from "../../../common/task"
+import {TaskDefinition} from "../../../common/old/task"
 
 export class MockTaskDao implements ITaskDao {
     getTask(projectIdentifier: string, taskIdentifier: string): Promise<TaskDefinition> {

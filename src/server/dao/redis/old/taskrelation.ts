@@ -1,14 +1,14 @@
 import * as redis from "redis"
-import * as redisasync from "./async"
+import * as redisasync from "../async"
 import * as bluebird from "bluebird"
-import {ITaskRelationDao} from "../itaskrelation"
-import {TaskRelation} from "../../../common/taskrelation"
-import {wrapUnknownErrors} from "./utils/error"
-import {KeyFactory} from "./utils/keyfactory"
-import {CorruptedError} from "../error/corrupted"
+import {ITaskRelationDao} from "../../itaskrelation"
+import {TaskRelation} from "../../../../common/old/taskrelation"
+import {wrapUnknownErrors} from "../utils/error"
+import {KeyFactory} from "../utils/keyfactory"
+import {CorruptedError} from "../../error/corrupted"
 import {RedisTaskDao} from "./task"
-import {TaskLocationBuilder} from "./utils/tasklocation"
-import {ExistsError} from "../../error/exists"
+import {TaskLocationBuilder} from "../utils/tasklocation"
+import {ExistsError} from "../../../error/exists"
 bluebird.promisifyAll(redis)
 
 class RedisTaskRelation {

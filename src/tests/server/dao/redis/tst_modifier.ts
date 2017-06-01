@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
-import {Modifier} from "../../../../common/modifier"
-import {RedisModifierDao} from "../../../../server/dao/redis/modifier"
+import {Modifier} from "../../../../common/old/modifier"
+import {RedisModifierDao} from "../../../../server/dao/redis/old/modifier"
 import {RedisDaoBuilder} from "../../../../server/dao/redis/builder"
 import {RedisTestDataProvider} from "./testdataprovider"
 import {
@@ -12,7 +12,7 @@ import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
 import {NotFoundError} from "../../../../common/errors/notfound"
 import {CorruptedError} from "../../../../server/dao/error/corrupted"
 import {InternalError} from "../../../../server/dao/error/internal"
-import {TaskLocation} from "../../../../common/tasklocation"
+import {TaskLocation} from "../../../../common/old/tasklocation"
 import {InputError} from "../../../../common/errors/input"
 
 describe("Redis DAO Modifier", () => {

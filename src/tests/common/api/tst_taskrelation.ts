@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import {TaskRelationBuilder} from "../../../common/api/taskrelation"
-import {TaskRelation} from "../../../common/taskrelation"
-import {TaskLocation} from "../../../common/tasklocation"
+import {TaskRelation} from "../../../common/old/taskrelation"
+import {TaskLocation} from "../../../common/old/tasklocation"
 import {InputError} from "../../../common/errors/input"
 
 describe("API TaskRelationBuilder", () => {

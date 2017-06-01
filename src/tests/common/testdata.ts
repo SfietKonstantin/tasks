@@ -1,10 +1,10 @@
-import {Project} from "../../common/project"
-import {TaskDefinition, Task} from "../../common/task"
-import {TaskLocation} from "../../common/tasklocation"
-import {TaskRelation} from "../../common/taskrelation"
-import {DelayDefinition} from "../../common/delay"
-import {DelayRelation} from "../../common/delayrelation"
-import {Modifier} from "../../common/modifier"
+import {Project} from "../../common/old/project"
+import {TaskDefinition, Task} from "../../common/old/task"
+import {TaskLocation} from "../../common/old/tasklocation"
+import {TaskRelation} from "../../common/old/taskrelation"
+import {DelayDefinition} from "../../common/old/delay"
+import {DelayRelation} from "../../common/old/delayrelation"
+import {Modifier} from "../../common/old/modifier"
 
 export const project1: Project = {
     identifier: "project1",

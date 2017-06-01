@@ -1,6 +1,6 @@
 import {IProjectNode} from "./iprojectnode"
 import {IDelayNode} from "./idelaynode"
-import {Modifier} from "../../common/modifier"
+import {Modifier} from "../../common/old/modifier"
 
 export interface ITaskNode {
     readonly project: IProjectNode

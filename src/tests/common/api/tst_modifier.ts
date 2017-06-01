@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import {ModifierBuilder} from "../../../common/api/modifier"
-import {Modifier} from "../../../common/modifier"
-import {TaskLocation} from "../../../common/tasklocation"
+import {Modifier} from "../../../common/old/modifier"
+import {TaskLocation} from "../../../common/old/tasklocation"
 import {InputError} from "../../../common/errors/input"
 
 describe("API ModifierBuilder", () => {

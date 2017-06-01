@@ -4,14 +4,14 @@ import {
     project1, project2, taskd1, taskd2, taskd3, taskRelation1, taskRelation2, delayd1, delayd2,
     delayRelation1, delayRelation2, modifier1, modifier2, modifier3
 } from "../../../common/testdata"
-import {Project} from "../../../../common/project"
-import {TaskDefinition} from "../../../../common/task"
+import {Project} from "../../../../common/old/project"
+import {TaskDefinition} from "../../../../common/old/task"
 import {KeyFactory} from "../../../../server/dao/redis/utils/keyfactory"
-import {TaskRelation} from "../../../../common/taskrelation"
+import {TaskRelation} from "../../../../common/old/taskrelation"
 import {TaskLocationBuilder} from "../../../../server/dao/redis/utils/tasklocation"
-import {DelayDefinition} from "../../../../common/delay"
-import {DelayRelation} from "../../../../common/delayrelation"
-import {Modifier} from "../../../../common/modifier"
+import {DelayDefinition} from "../../../../common/old/delay"
+import {DelayRelation} from "../../../../common/old/delayrelation"
+import {Modifier} from "../../../../common/old/modifier"
 bluebird.promisifyAll(redis)
 
 export interface RedisAsyncClient extends redis.RedisClient {

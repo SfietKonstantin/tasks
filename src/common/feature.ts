@@ -1,6 +1,7 @@
 import {Identifiable} from "./identifiable"
 
-export interface Project extends Identifiable {
+export interface Feature extends Identifiable {
     name: string
     description: string
+    color: string
 }

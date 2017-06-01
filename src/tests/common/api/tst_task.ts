@@ -1,6 +1,6 @@
 import * as chai from "chai"
 import {TaskBuilder, ApiTaskDefinition, ApiTask} from "../../../common/api/task"
-import {TaskDefinition, Task} from "../../../common/task"
+import {TaskDefinition, Task} from "../../../common/old/task"
 import {InputError} from "../../../common/errors/input"
 
 describe("API TaskBuilder", () => {

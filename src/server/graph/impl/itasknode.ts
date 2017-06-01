@@ -1,7 +1,7 @@
 import {ITaskNode} from "../itasknode"
 import {IDelayNodeImpl} from "./idelaynode"
-import {TaskRelation} from "../../../common/taskrelation"
-import {DelayRelation} from "../../../common/delayrelation"
+import {TaskRelation} from "../../../common/old/taskrelation"
+import {DelayRelation} from "../../../common/old/delayrelation"
 
 export interface ITaskNodeImpl extends ITaskNode {
     readonly estimatedStartDate: Date

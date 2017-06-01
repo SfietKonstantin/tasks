@@ -2,10 +2,10 @@ import {ITaskNodeImpl} from "../../../server/graph/impl/itasknode"
 import {ITaskNode} from "../../../server/graph/itasknode"
 import {IProjectNode} from "../../../server/graph/iprojectnode"
 import {IDelayNode} from "../../../server/graph/idelaynode"
-import {Modifier} from "../../../common/modifier"
-import {TaskRelation} from "../../../common/taskrelation"
+import {Modifier} from "../../../common/old/modifier"
+import {TaskRelation} from "../../../common/old/taskrelation"
 import {IDelayNodeImpl} from "../../../server/graph/impl/idelaynode"
-import {DelayRelation} from "../../../common/delayrelation"
+import {DelayRelation} from "../../../common/old/delayrelation"
 
 export class MockTaskNode implements ITaskNodeImpl {
     project: IProjectNode

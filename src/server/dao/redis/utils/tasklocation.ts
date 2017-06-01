@@ -1,4 +1,4 @@
-import {TaskLocation} from "../../../../common/tasklocation"
+import {TaskLocation} from "../../../../common/old/tasklocation"
 
 export class TaskLocationBuilder {
 

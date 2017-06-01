@@ -1,10 +1,10 @@
 import {IGraph} from "./igraph"
 import {ITaskNode} from "./itasknode"
 import {IDelayNode} from "./idelaynode"
-import {TaskDefinition} from "../../common/task"
-import {DelayDefinition} from "../../common/delay"
-import {TaskRelation} from "../../common/taskrelation"
-import {DelayRelation} from "../../common/delayrelation"
+import {TaskDefinition} from "../../common/old/task"
+import {DelayDefinition} from "../../common/old/delay"
+import {TaskRelation} from "../../common/old/taskrelation"
+import {DelayRelation} from "../../common/old/delayrelation"
 
 export interface IProjectNode {
     readonly graph: IGraph

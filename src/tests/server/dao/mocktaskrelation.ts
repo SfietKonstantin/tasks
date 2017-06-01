@@ -1,5 +1,5 @@
 import {ITaskRelationDao} from "../../../server/dao/itaskrelation"
-import {TaskRelation} from "../../../common/taskrelation"
+import {TaskRelation} from "../../../common/old/taskrelation"
 
 export class MockTaskRelationDao implements ITaskRelationDao {
     addTaskRelation(projectIdentifier: string, relation: TaskRelation): Promise<void> {

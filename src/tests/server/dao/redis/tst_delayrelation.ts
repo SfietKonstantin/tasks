@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
-import {DelayRelation} from "../../../../common/delayrelation"
-import {RedisDelayRelationDao} from "../../../../server/dao/redis/delayrelation"
+import {DelayRelation} from "../../../../common/old/delayrelation"
+import {RedisDelayRelationDao} from "../../../../server/dao/redis/old/delayrelation"
 import {RedisDaoBuilder} from "../../../../server/dao/redis/builder"
 import {RedisTestDataProvider} from "./testdataprovider"
 import {

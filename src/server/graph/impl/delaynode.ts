@@ -1,7 +1,7 @@
 import {IDelayNodeImpl} from "./idelaynode"
 import {IProjectNode} from "../iprojectnode"
 import {ITaskNode} from "../itasknode"
-import {DelayRelation} from "../../../common/delayrelation"
+import {DelayRelation} from "../../../common/old/delayrelation"
 import {ITaskNodeImpl} from "./itasknode"
 import {get as mapGet} from "../../../common/utils/map"
 import {addDays, diffDates} from "../../../common/utils/date"

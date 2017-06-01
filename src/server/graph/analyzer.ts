@@ -1,7 +1,7 @@
 import * as winston from "winston"
 import {GraphError} from "./error/graph"
-import {TaskDefinition} from "../../common/task"
-import {TaskRelation} from "../../common/taskrelation"
+import {TaskDefinition} from "../../common/old/task"
+import {TaskRelation} from "../../common/old/taskrelation"
 import {get as mapGet} from "../../common/utils/map"
 
 interface Node {

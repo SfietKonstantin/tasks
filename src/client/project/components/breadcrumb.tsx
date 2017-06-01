@@ -1,5 +1,5 @@
 import * as React from "react"
-import {Project} from "../../../common/project"
+import {Project} from "../../../common/old/project"
 
 interface BreadcrumbProperties {
     project: Project

@@ -2,10 +2,10 @@ import {IProjectNodeImpl} from "../../../server/graph/impl/iprojectnode"
 import {IGraph} from "../../../server/graph/igraph"
 import {ITaskNode} from "../../../server/graph/itasknode"
 import {IDelayNode} from "../../../server/graph/idelaynode"
-import {TaskDefinition} from "../../../common/task"
-import {DelayDefinition} from "../../../common/delay"
-import {TaskRelation} from "../../../common/taskrelation"
-import {DelayRelation} from "../../../common/delayrelation"
+import {TaskDefinition} from "../../../common/old/task"
+import {DelayDefinition} from "../../../common/old/delay"
+import {TaskRelation} from "../../../common/old/taskrelation"
+import {DelayRelation} from "../../../common/old/delayrelation"
 
 export class MockProjectNode implements IProjectNodeImpl {
     graph: IGraph

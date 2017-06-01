@@ -1,4 +1,4 @@
-import {Project} from "../../common/project"
+import {Project} from "../../common/old/project"
 
 export interface IProjectDao {
     getAllProjects(): Promise<Array<Project>>

@@ -1,7 +1,7 @@
 import {IDelayNodeImpl} from "../../../server/graph/impl/idelaynode"
 import {IProjectNode} from "../../../server/graph/iprojectnode"
 import {ITaskNode} from "../../../server/graph/itasknode"
-import {DelayRelation} from "../../../common/delayrelation"
+import {DelayRelation} from "../../../common/old/delayrelation"
 
 export class MockDelayNode implements IDelayNodeImpl {
     project: IProjectNode

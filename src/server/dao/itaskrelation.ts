@@ -1,4 +1,4 @@
-import {TaskRelation} from "../../common/taskrelation"
+import {TaskRelation} from "../../common/old/taskrelation"
 
 export interface ITaskRelationDao {
     addTaskRelation(projectIdentifier: string, relation: TaskRelation): Promise<void>

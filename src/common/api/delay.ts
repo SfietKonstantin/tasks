@@ -1,5 +1,5 @@
 import {InputError} from "../errors/input"
-import {DelayDefinition} from "../delay"
+import {DelayDefinition} from "../old/delay"
 import {Identifiable} from "../identifiable"
 
 export interface ApiDelayDefinition extends Identifiable {

@@ -1,5 +1,5 @@
 import * as chai from "chai"
-import {TaskLocation} from "../../../../../common/tasklocation"
+import {TaskLocation} from "../../../../../common/old/tasklocation"
 import {TaskLocationBuilder} from "../../../../../server/dao/redis/utils/tasklocation"
 
 describe("Redis DAO TaskLocation utils", () => {

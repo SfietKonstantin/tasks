@@ -1,4 +1,4 @@
-import {TaskDefinition} from "../../common/task"
+import {TaskDefinition} from "../../common/old/task"
 
 export interface ITaskDao {
     getTask(projectIdentifier: string, taskIdentifier: string): Promise<TaskDefinition>

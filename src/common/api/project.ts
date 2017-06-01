@@ -1,4 +1,4 @@
-import {Project} from "../project"
+import {Project} from "../old/project"
 import {InputError} from "../errors/input"
 
 export class ProjectBuilder {

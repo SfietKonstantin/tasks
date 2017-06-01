@@ -1,5 +1,5 @@
 import {IDelayRelationDao} from "../../../server/dao/idelayrelation"
-import {DelayRelation} from "../../../common/delayrelation"
+import {DelayRelation} from "../../../common/old/delayrelation"
 
 export class MockDelayRelationDao implements IDelayRelationDao {
     addDelayRelation(projectIdentifier: string, relation: DelayRelation): Promise<void> {

@@ -1,4 +1,4 @@
-import {TaskLocation} from "../tasklocation"
+import {TaskLocation} from "../old/tasklocation"
 
 export class TaskLocationBuilder {
     static fromObject(location: any): TaskLocation | null {

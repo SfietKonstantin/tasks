@@ -1,11 +1,11 @@
 import * as redis from "redis"
-import {RedisProjectDao} from "./project"
+import {RedisProjectDao} from "./old/project"
 import {IDaoBuilder} from "../ibuilder"
-import {RedisTaskDao} from "./task"
-import {RedisDelayDao} from "./delay"
-import {RedisTaskRelationDao} from "./taskrelation"
-import {RedisDelayRelationDao} from "./delayrelation"
-import {RedisModifierDao} from "./modifier"
+import {RedisTaskDao} from "./old/task"
+import {RedisDelayDao} from "./old/delay"
+import {RedisTaskRelationDao} from "./old/taskrelation"
+import {RedisDelayRelationDao} from "./old/delayrelation"
+import {RedisModifierDao} from "./old/modifier"
 
 export class RedisDaoBuilder implements IDaoBuilder {
     private readonly client: redis.RedisClient

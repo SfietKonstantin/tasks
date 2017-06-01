@@ -1,4 +1,4 @@
-import {TaskRelation} from "../taskrelation"
+import {TaskRelation} from "../old/taskrelation"
 import {InputError} from "../errors/input"
 import {TaskLocationBuilder} from "./tasklocation"
 

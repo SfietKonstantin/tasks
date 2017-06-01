@@ -1,5 +1,5 @@
 import {Identifiable} from "../identifiable"
-import {TaskDefinition, Task} from "../task"
+import {TaskDefinition, Task} from "../old/task"
 import {InputError} from "../errors/input"
 
 export interface ApiTaskDefinition extends Identifiable {

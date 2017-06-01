@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import * as redis from "redis"
-import {TaskRelation} from "../../../../common/taskrelation"
-import {RedisTaskRelationDao} from "../../../../server/dao/redis/taskrelation"
+import {TaskRelation} from "../../../../common/old/taskrelation"
+import {RedisTaskRelationDao} from "../../../../server/dao/redis/old/taskrelation"
 import {RedisTestDataProvider} from "./testdataprovider"
 import {RedisDaoBuilder} from "../../../../server/dao/redis/builder"
 import {
