@@ -32,11 +32,11 @@ export const asRoute = <T>(callback: (req: Request) => Promise<T>): RequestHandl
 }
 
 export interface ProjectRequest extends Request {
-    readonly projectIdentifier: string
+    projectIdentifier: string
 }
 
 export interface TaskRequest extends ProjectRequest {
-    readonly taskIdentifier: string
+    taskIdentifier: string
 }
 
 export const getProjectIdentifier = (projectIdentifier: any): string => {
