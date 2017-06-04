@@ -1,6 +1,6 @@
 import * as supertest from "supertest"
-import {Main} from "../../../../server/main"
-import {RedisTestDataProvider} from "../dao/redis/testdataprovider"
+import {Main} from "../../../server/main"
+import {RedisTestDataProvider} from "../old/dao/redis/testdataprovider"
 
 describe("Integration Error management", () => {
     let main: Main
@@ -13,7 +13,7 @@ describe("Integration Error management", () => {
     afterEach(() => {
         main.stop()
     })
-    xit("Should return a JSON as error", (done) => {
+    it("Should return a JSON as error", (done) => {
         supertest("http://localhost:8080").get("/invalid")
             .expect("Content-Type", /json/)
             .expect(404, done)

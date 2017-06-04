@@ -21,7 +21,7 @@ import {DelayRelationBuilder} from "../../../../common/old/api/delayrelation"
 import {ExistsError} from "../../../../server/error/exists"
 import {RequestError} from "../../../../server/error/request"
 import {InternalError} from "../../../../server/dao/error/internal"
-import {FakeError} from "./fakeerror"
+import {FakeError} from "../../api/fakeerror"
 import {NotFoundError} from "../../../../common/errors/notfound"
 
 describe("API import", () => {

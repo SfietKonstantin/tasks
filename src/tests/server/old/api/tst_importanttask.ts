@@ -5,7 +5,7 @@ import {MockGraph} from "../graph/mockgraph"
 import {MockDaoBuilder} from "../dao/mockbuilder"
 import {RequestError} from "../../../../server/error/request"
 import {InternalError} from "../../../../server/dao/error/internal"
-import {FakeError} from "./fakeerror"
+import {FakeError} from "../../api/fakeerror"
 import {NotFoundError} from "../../../../common/errors/notfound"
 
 describe("API important task", () => {

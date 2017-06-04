@@ -5,25 +5,21 @@ import * as logger from "morgan"
 import * as http from "http"
 import * as winston from "winston"
 import {RequestError} from "./error/request"
-import {DaoBuilderFactory} from "./old/dao/factory"
-import {GraphFactory} from "./old/graph/factory"
-import {IDaoBuilder} from "./old/dao/ibuilder"
+import {DaoBuilderFactory} from "./dao/factory"
+import {IDaoBuilder} from "./dao/ibuilder"
 import {ApiRouterFactory} from "./routes/apifactory"
-import {IGraph} from "./old/graph/igraph"
 import {AppRouterFactory} from "./routes/appfactory"
 
 export class Main {
     private readonly app: express.Application
     private readonly daoBuilder: IDaoBuilder
-    private readonly graph: IGraph
     private readonly server: http.Server
     private readonly apiRouterFactory: ApiRouterFactory
     constructor(dbIndex: number = 0) {
         Main.initLog()
 
         this.daoBuilder = DaoBuilderFactory.create(dbIndex)
-        this.graph = GraphFactory.create(this.daoBuilder)
-        this.apiRouterFactory = new ApiRouterFactory(this.daoBuilder, this.graph)
+        this.apiRouterFactory = new ApiRouterFactory(this.daoBuilder)
 
         this.app = express()
         this.app.set("view engine", "ejs")
@@ -45,12 +41,10 @@ export class Main {
         this.server = http.createServer(this.app)
     }
 
-    start(port: number): Promise<void> {
-        return this.graph.load().then(() => {
-            this.server.listen(port)
-            this.server.on("listening", () => {
-                winston.info(`Server started on ${port}`)
-            })
+    start(port: number) {
+        this.server.listen(port)
+        this.server.on("listening", () => {
+            winston.info(`Server started on ${port}`)
         })
     }
 

@@ -31,26 +31,14 @@ export const asRoute = <T>(callback: (req: Request) => Promise<T>): RequestHandl
     }
 }
 
-export interface ProjectRequest extends Request {
-    projectIdentifier: string
+export interface FeatureRequest extends Request {
+    featureIdentifier: string
 }
 
-export interface TaskRequest extends ProjectRequest {
-    taskIdentifier: string
-}
-
-export const getProjectIdentifier = (projectIdentifier: any): string => {
-    if (typeof projectIdentifier !== "string") {
-        winston.error(`projectIdentifier must be a string, not ${projectIdentifier}`)
-        throw new RequestError(404, `Project "${projectIdentifier}" not found`)
+export const getFeatureIdentifier = (featureIdentifier: any): string => {
+    if (typeof featureIdentifier !== "string") {
+        winston.error(`featureIdentifier must be a string, not ${featureIdentifier}`)
+        throw new RequestError(404, `Feature "${featureIdentifier}" not found`)
     }
-    return projectIdentifier
-}
-
-export const getTaskIdentifier = (taskIdentifier: any): string => {
-    if (typeof taskIdentifier !== "string") {
-        winston.error(`taskIdentifier must be a string, not ${taskIdentifier}`)
-        throw new RequestError(404, `Task "${taskIdentifier}" not found`)
-    }
-    return taskIdentifier
+    return featureIdentifier
 }

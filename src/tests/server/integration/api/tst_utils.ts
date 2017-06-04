@@ -1,8 +1,8 @@
 import * as express from "express"
 import {Application, Request, Response} from "express"
 import * as supertest from "supertest"
-import {asParameterHandler, asRoute} from "../../../../../server/routes/utils"
-import {RequestError} from "../../../../../server/error/request"
+import {asParameterHandler, asRoute} from "../../../../server/routes/utils"
+import {RequestError} from "../../../../server/error/request"
 
 describe("Integration API utils", () => {
     interface TestRequest extends Request {
@@ -20,7 +20,7 @@ describe("Integration API utils", () => {
         app = express()
     })
     describe("asParameterHandler", () => {
-        xit("Should delegate the call", (done) => {
+        it("Should delegate the call", (done) => {
             app.param("test", asParameterHandler((req: TestRequest) => {
                 req.data = req.params.test
             }))
@@ -33,7 +33,7 @@ describe("Integration API utils", () => {
                 .expect(200)
                 .expect(JSON.stringify(data), done)
         })
-        xit("Should get an error as JSON", (done) => {
+        it("Should get an error as JSON", (done) => {
             app.param("test", asParameterHandler(() => {
                 throw new RequestError(404, "Stuff not found")
             }))
@@ -46,7 +46,7 @@ describe("Integration API utils", () => {
                 .expect(404)
                 .expect(JSON.stringify(error), done)
         })
-        xit("Should get an unknown error as a HTTP 500", (done) => {
+        it("Should get an unknown error as a HTTP 500", (done) => {
             app.param("test", asParameterHandler(() => {
                 throw new Error("Error")
             }))
@@ -59,7 +59,7 @@ describe("Integration API utils", () => {
         })
     })
     describe("asRoute", () => {
-        xit("Should return the promise as JSON", (done) => {
+        it("Should return the promise as JSON", (done) => {
             app.use("/test", asRoute(() => {
                 return Promise.resolve(data)
             }))
@@ -69,7 +69,7 @@ describe("Integration API utils", () => {
                 .expect(200)
                 .expect(JSON.stringify(data), done)
         })
-        xit("Should get an error as JSON", (done) => {
+        it("Should get an error as JSON", (done) => {
             app.use("/test", asRoute(() => {
                 return Promise.reject(new RequestError(404, error.error))
             }))
@@ -79,7 +79,7 @@ describe("Integration API utils", () => {
                 .expect(404)
                 .expect(JSON.stringify(error), done)
         })
-        xit("Should get an unknown error as a HTTP 500", (done) => {
+        it("Should get an unknown error as a HTTP 500", (done) => {
             app.use("/test", asRoute(() => {
                 return Promise.reject(new Error("Error"))
             }))
