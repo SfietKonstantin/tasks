@@ -1,6 +1,6 @@
 import * as supertest from "supertest"
 import {Main} from "../../../server/main"
-import {RedisTestDataProvider} from "../old/dao/redis/testdataprovider"
+import {RedisTestDataProvider} from "../dao/redis/testdataprovider"
 
 describe("Integration Error management", () => {
     let main: Main
