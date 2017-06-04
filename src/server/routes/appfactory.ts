@@ -11,6 +11,10 @@ export class AppRouterFactory {
             res.render("stories", {currentTab: "stories"})
         })
 
+        appRouter.get("/features/", (req: Request, res: Response) => {
+            res.render("features", {currentTab: "features"})
+        })
+
         return appRouter
     }
 }
