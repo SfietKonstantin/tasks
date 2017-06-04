@@ -6,7 +6,7 @@ import {Overview} from "./components/overview"
 import {Project} from "../../common/old/project"
 import {Task} from "../../common/old/task"
 import {processFetch} from "../common/utils/fetch"
-import {ApiTask, TaskBuilder} from "../../common/api/task"
+import {ApiTask, TaskBuilder} from "../../common/old/api/task"
 import {TaskList} from "../common/components/tasklist"
 
 interface MainProperties {

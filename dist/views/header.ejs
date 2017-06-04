@@ -5,17 +5,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Zephyr</title>
-    <link href="/css/semantic.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/styles.css" rel="stylesheet">
     <script src="/lib/react.min.js"></script>
     <script src="/lib/react-dom.min.js"></script>
-    <script src="/lib/semantic-ui-react.min.js"></script>
+    <script src="/lib/react-bootstrap.min.js"></script>
 </head>
 <body>
-<div class="ui fixed inverted menu">
-    <div class="ui container">
-        <a href="/" class="header item">
-            Zephyr
-        </a>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Tasks manager</a>
+        </div>
+        <div id="navbar">
+            <ul class="nav navbar-nav">
+                <li class="<%= currentTab === "stories" ? "active" : ""%>"><a href="/stories">Stories</a></li>
+                <li class="<%= currentTab === "features" ? "active" : ""%>"><a href="/features">Features</a></li>
+                <li class="<%= currentTab === "sprint" ? "active" : ""%>"><a href="/sprint">Sprint</a></li>
+                <li class="<%= currentTab === "statistics" ? "active" : ""%>"><a href="/statistics">Statistics</a></li>
+                <li class="<%= currentTab === "settings" ? "active" : ""%>"><a href="/settings">Settings</a></li>
+            </ul>
+        </div>
     </div>
-</div>
+</nav>

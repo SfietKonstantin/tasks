@@ -1,5 +1,5 @@
 import {DaoErrorUtils} from "../../dao/error/utils"
-import {GraphError} from "../../graph/error/graph"
+import {GraphError} from "../../old/graph/error/graph"
 
 export class ApiErrorUtils {
     static isKnownError(error: Error): boolean {

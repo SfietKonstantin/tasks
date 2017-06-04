@@ -1,15 +1,15 @@
 import {Router, Request} from "express"
-import {IDaoBuilder} from "../dao/ibuilder"
-import {ProjectApiProvider} from "../api/project"
-import {IGraph} from "../graph/igraph"
+import {IDaoBuilder} from "../old/dao/ibuilder"
+import {ProjectApiProvider} from "../old/api/project"
+import {IGraph} from "../old/graph/igraph"
 import {
     asRoute, asParameterHandler, ProjectRequest, TaskRequest, getProjectIdentifier,
     getTaskIdentifier
 } from "./utils"
-import {TaskApiProvider} from "../api/task"
-import {ImportantTaskApiProvider} from "../api/importanttask"
-import {ModifierApiProvider} from "../api/modifier"
-import {ModifierBuilder} from "../../common/api/modifier"
+import {TaskApiProvider} from "../old/api/task"
+import {ImportantTaskApiProvider} from "../old/api/importanttask"
+import {ModifierApiProvider} from "../old/api/modifier"
+import {ModifierBuilder} from "../../common/old/api/modifier"
 
 export class ApiRouterFactory {
     private readonly projectApiProvider: ProjectApiProvider

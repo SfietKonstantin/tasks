@@ -18,6 +18,6 @@ module.exports = {
     externals: {
         "react": "React",
         "react-dom": "ReactDOM",
-        "semantic-ui-react": "semanticUIReact"
+        "react-bootstrap": "ReactBootstrap"
     }
 }

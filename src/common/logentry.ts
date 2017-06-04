@@ -1,21 +1,25 @@
-import {Task, TaskState} from "./task"
+import {Story, StoryState} from "./story"
 import {Sprint, SprintState} from "./sprint"
+import {Feature} from "./feature"
 
 enum LogEvent {
-    TaskCreated,
-    TaskRemoved,
-    TaskAddedInSprint,
-    TaskRemovedFromSprint,
-    TaskStateChanged,
+    FeatureCreated,
+    FeatureRemoved,
+    StoryCreated,
+    StoryRemoved,
+    StoryAddedInSprint,
+    StoryRemovedFromSprint,
+    StoryStateChanged,
     SprintStateChanged
 }
 
 export interface LogEntry {
     event: LogEvent
-    task?: Task
+    feature?: Feature
+    story?: Story
     sprint?: Sprint
-    taskOldState: TaskState
-    taskNewState: TaskState
+    storyOldState: StoryState
+    storyNewState: StoryState
     sprintOldState: SprintState
     sprintNewState: SprintState
 }

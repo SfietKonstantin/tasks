@@ -1,46 +1,25 @@
 export class KeyFactory {
-    static createGlobalProjectKey(property: string) {
-        return `project:${property}`
+    static createGlobalFeatureKey(property: string) {
+        return `tm:feature:${property}`
     }
 
-    static createProjectKey(projectIdentifier: string, property?: string) {
+    static createFeatureKey(featureIdentifier: string, property?: string) {
         if (property) {
-            return `project:${projectIdentifier}:${property}`
+            return `tm:feature:${featureIdentifier}:${property}`
         } else {
-            return `project:${projectIdentifier}`
+            return `tm:feature:${featureIdentifier}`
         }
     }
 
-    static createTaskKey(projectIdentifier: string, taskIdentifier: string, property?: string) {
+    static createGlobalStoryKey(property: string) {
+        return `tm:story:${property}`
+    }
+
+    static createStoryKey(storyIdentifier: string, property?: string) {
         if (property) {
-            return `task:${projectIdentifier}:${taskIdentifier}:${property}`
+            return `tm:story:${storyIdentifier}:${property}`
         } else {
-            return `task:${projectIdentifier}:${taskIdentifier}`
+            return `tm:story:${storyIdentifier}`
         }
-    }
-
-    static createTaskRelationKey(projectIdentifier: string, previousTaskIdentifier: string,
-                                 nextTaskIdentifier: string) {
-        return `task:${projectIdentifier}:${previousTaskIdentifier}:relation:${nextTaskIdentifier}`
-    }
-
-    static createModifierKey(projectIdentifier: string, modifierId: number, property?: string) {
-        if (property) {
-            return `modifier:${projectIdentifier}:${modifierId}:${property}`
-        } else {
-            return `modifier:${projectIdentifier}:${modifierId}`
-        }
-    }
-
-    static createDelayKey(projectIdentifier: string, delayIdentifier: string, property?: string) {
-        if (property) {
-            return `delay:${projectIdentifier}:${delayIdentifier}:${property}`
-        } else {
-            return `delay:${projectIdentifier}:${delayIdentifier}`
-        }
-    }
-
-    static createDelayRelationKey(projectIdentifier: string, delay: string, task: string) {
-        return `delay:${projectIdentifier}:${delay}:relation:${task}`
     }
 }

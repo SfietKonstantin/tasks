@@ -1,16 +1,8 @@
-import {IProjectDao} from "./iproject"
-import {ITaskDao} from "./itask"
-import {IDelayDao} from "./idelay"
-import {ITaskRelationDao} from "./itaskrelation"
-import {IDelayRelationDao} from "./idelayrelation"
-import {IModifierDao} from "./imodifier"
+import {IFeatureDao} from "./ifeature"
+import {IStoryDao} from "./istory"
 
 export interface IDaoBuilder {
     stop(): void
-    buildProjectDao(): IProjectDao
-    buildTaskDao(): ITaskDao
-    buildDelayDao(): IDelayDao
-    buildTaskRelationDao(): ITaskRelationDao
-    buildDelayRelationDao(): IDelayRelationDao
-    buildModifierDao(): IModifierDao
+    buildFeatureDao(): IFeatureDao
+    buildStoryDao(): IStoryDao
 }

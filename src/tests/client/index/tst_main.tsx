@@ -4,7 +4,7 @@ import * as React from "react"
 import * as enzyme from "enzyme"
 import "isomorphic-fetch"
 import {Main} from "../../../client/index/main"
-import {project1, project2} from "../../common/testdata"
+import {project1, project2} from "../../common/old/testdata"
 import {Card} from "semantic-ui-react"
 import {addMockWindow, removeMockWindow} from "../utils/mockwindow"
 
