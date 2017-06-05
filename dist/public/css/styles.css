@@ -1,3 +1,25 @@
 body {
     padding-top: 50px;
 }
+
+#content {
+    margin-top: 20px;
+}
+
+.color-indicator {
+    content:"";
+    vertical-align: middle;
+    width: 2px;
+    height: 15px;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.identifier-indicator {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.identifier-indicator::after {
+    content: ": ";
+}

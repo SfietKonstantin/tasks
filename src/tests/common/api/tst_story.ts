@@ -1,7 +1,7 @@
 import * as chai from "chai"
 import {ApiStory, StoryBuilder} from "../../../common/api/story"
 import {Story, StoryState} from "../../../common/story"
-import {SprintState} from "../../../common/sprint";
+import {SprintState} from "../../../common/sprint"
 
 describe("API StoryBuilder", () => {
     const apiStory1: ApiStory = {
