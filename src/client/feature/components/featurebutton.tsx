@@ -1,6 +1,7 @@
 import * as React from "react"
 import {Col, Button, Modal, Form, FormGroup, FormControl, ControlLabel, InputGroup, Radio} from "react-bootstrap"
 import {ApiFeature} from "../../../common/api/feature"
+import {generateColor} from "../utils/color";
 
 interface FeatureButtonProperties {
     onAddFeature: (feature: ApiFeature) => void
@@ -22,11 +23,14 @@ export class FeatureButton extends React.Component<FeatureButtonProperties, Feat
             identifier: "",
             name: "",
             description: "",
-            color: ""
+            color: generateColor()
         }
     }
 
     render() {
+        const style = {
+            background: this.state.color
+        }
         return <Button onClick={this.open.bind(this)}>
             <Modal show={this.state.show} bsSize="large" onHide={this.close.bind(this)}>
                 <Modal.Header closeButton>
@@ -57,8 +61,14 @@ export class FeatureButton extends React.Component<FeatureButtonProperties, Feat
                                 Color
                             </Col>
                             <Col xs={12} md={10}>
-                                <FormControl type="text" placeholder="#FF0000"
-                                             onInput={this.handleColorInput.bind(this)}/>
+                                <InputGroup>
+                                    <FormControl type="text" placeholder="#FF0000"
+                                                 defaultValue={this.state.color}
+                                                 onInput={this.handleColorInput.bind(this)}/>
+                                    <InputGroup.Addon>
+                                        <span className="color-indicator-large" style={style}/>
+                                    </InputGroup.Addon>
+                                </InputGroup>
                             </Col>
                         </FormGroup>
                         <FormGroup>
@@ -87,7 +97,7 @@ export class FeatureButton extends React.Component<FeatureButtonProperties, Feat
             identifier: "",
             name: "",
             description: "",
-            color: ""
+            color: generateColor()
         })
     }
 
